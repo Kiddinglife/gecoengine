@@ -107,9 +107,10 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../../../../src;../../../../thirdparty;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl/include/;../../../../thirdparty/log4cxx/src/main/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,42 +168,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\common\base64.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\blowfish.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\common.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\crashhandler.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\format.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\version.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\md5.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\rsa.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\sha1.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\strutil.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\tasks.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\timestamp.cpp" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-config.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-debug.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-ultils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\common\base64.h" />
-    <ClInclude Include="..\..\..\..\src\common\blowfish.h" />
-    <ClInclude Include="..\..\..\..\src\common\common.h" />
-    <ClInclude Include="..\..\..\..\src\common\crashhandler.h" />
-    <ClInclude Include="..\..\..\..\src\common\deadline.h" />
-    <ClInclude Include="..\..\..\..\src\common\format.h" />
-    <ClInclude Include="..\..\..\..\src\common\geco-ds-config.h" />
-    <ClInclude Include="..\..\..\..\src\common\geco-ds-malloc.h" />
-    <ClInclude Include="..\..\..\..\src\common\geco-thread.h" />
-    <ClInclude Include="..\..\..\..\src\common\version.h" />
-    <ClInclude Include="..\..\..\..\src\common\md5.h" />
-    <ClInclude Include="..\..\..\..\src\common\platform.h" />
-    <ClInclude Include="..\..\..\..\src\common\refcountable.h" />
-    <ClInclude Include="..\..\..\..\src\common\rsa.h" />
-    <ClInclude Include="..\..\..\..\src\common\sha1.h" />
-    <ClInclude Include="..\..\..\..\src\common\singleton.h" />
-    <ClInclude Include="..\..\..\..\src\common\smartpointer.h" />
-    <ClInclude Include="..\..\..\..\src\common\stringconv.h" />
-    <ClInclude Include="..\..\..\..\src\common\strutil.h" />
-    <ClInclude Include="..\..\..\..\src\common\task.h" />
-    <ClInclude Include="..\..\..\..\src\common\tasks.h" />
-    <ClInclude Include="..\..\..\..\src\common\timestamp.h" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\geco-engine-debug.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\geco-engine-ultils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
