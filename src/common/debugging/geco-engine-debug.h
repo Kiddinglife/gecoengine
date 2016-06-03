@@ -296,30 +296,30 @@ struct log_msg_mgr_t
             case CriticalMsgCB:
                 if (idx != critical_msg_cbs_.size() - 1)
                     critical_msg_cbs_[idx] = critical_msg_cbs_[critical_msg_cbs_.size() - 1];
-                critical_msg_cbs_._Mylast--;
+                //critical_msg_cbs_._Mylast--;
                 break;
             case ErrorMsgCB:
                 if (idx != error_msg_cbs_.size() - 1)
                     error_msg_cbs_[idx] = error_msg_cbs_[error_msg_cbs_.size() - 1];
-                error_msg_cbs_._Mylast--;
+                //error_msg_cbs_._Mylast--;
                 break;
             case WarnningMsgCB:
                 if (idx != warnning_msg_cbs_.size() - 1)
                     warnning_msg_cbs_[idx] =
                     warnning_msg_cbs_[warnning_msg_cbs_.size() - 1];
-                warnning_msg_cbs_._Mylast--;
+                //warnning_msg_cbs_._Mylast--;
                 break;
             case DebugMsgCB:
                 if (idx != debug_msg_cbs_.size() - 1)
                     debug_msg_cbs_[idx] =
                     debug_msg_cbs_[debug_msg_cbs_.size() - 1];
-                debug_msg_cbs_._Mylast--;
+                //debug_msg_cbs_._Mylast--;
                 break;
             case InfoMsgCB:
                 if (idx != info_msg_cbs_.size() - 1)
                     info_msg_cbs_[idx] =
                     info_msg_cbs_[info_msg_cbs_.size() - 1];
-                info_msg_cbs_._Mylast--;
+                //info_msg_cbs_._Mylast--;
                 break;
         }
     }
