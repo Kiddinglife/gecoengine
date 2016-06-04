@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "net", "geco-engine-network\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit-tests", "unit-tests\unit-tests.vcxproj", "{1CDE268D-100B-4CE5-8373-F44F055CA9E8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "net-engine-lib", "net-engine-lib\net-engine-lib.vcxproj", "{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -55,18 +53,6 @@ Global
 		{1CDE268D-100B-4CE5-8373-F44F055CA9E8}.Release|Win32.Build.0 = Release|Win32
 		{1CDE268D-100B-4CE5-8373-F44F055CA9E8}.Release|x64.ActiveCfg = Release|x64
 		{1CDE268D-100B-4CE5-8373-F44F055CA9E8}.Release|x64.Build.0 = Release|x64
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Debug|Win32.Build.0 = Debug|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Debug|x64.ActiveCfg = Debug|x64
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Debug|x64.Build.0 = Debug|x64
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Release|Win32.ActiveCfg = Release|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Release|Win32.Build.0 = Release|Win32
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Release|x64.ActiveCfg = Release|x64
-		{86CE9F39-3EFC-4C3D-8C17-84ACF1CAFDA0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -75,4 +75,11 @@
 #define ENABLE_DPRINTF	\
 (!CLIENT_BUILD || FORCE_ENABLE_DPRINTF)
 
+/*when debug, we enable file and line*/
+#ifdef _DEBUG
+#define FILE_AND_LINE __FILE__,__LINE__
+#else
+#define FILE_AND_LINE 0,0
+#endif
+
 #endif

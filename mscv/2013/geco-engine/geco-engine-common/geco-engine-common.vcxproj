@@ -107,7 +107,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STATIC_LIB_BUILD;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
@@ -170,10 +170,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-config.h" />
     <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-debug.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\geco-malloc.h" />
     <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-ultils.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\geco-ds-array-list.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\common\debugging\geco-engine-debug.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\geco-malloc.cpp" />
     <ClCompile Include="..\..\..\..\src\common\debugging\geco-engine-ultils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

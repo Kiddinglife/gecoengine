@@ -29,16 +29,16 @@
 #include "geco-engine-debug.h"
 #include "geco-engine-ultils.h"
 
-log_msg_mgr_t* log_msg_mgr_t::s_instance_ = NULL;
-bool log_msg_mgr_t::shouldWriteTimePrefix = false;
+// init static variables
+log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
+bool log_msg_filter_t::shouldWriteTimePrefix = false;
 #if defined( SERVER_BUILD ) || defined( PLAYSTATION3 )
-bool log_msg_mgr_t::shouldWriteToConsole = true;
+bool log_msg_filter_t::shouldWriteToConsole = true;
 #else
-bool log_msg_mgr_t::shouldWriteToConsole = false;
+bool log_msg_filter_t::shouldWriteToConsole = false;
 #endif
 
 #if ENABLE_DPRINTF
-// Commented in header file.
 void vdprintf(const char * format, va_list argPtr, const char * prefix)
 {
 #ifdef _WIN32
@@ -50,7 +50,7 @@ void vdprintf(const char * format, va_list argPtr, const char * prefix)
         len = strlen(prefix);
         memcpy(pBuf, prefix, len);
         pBuf += len;
-        if (log_msg_mgr_t::shouldWriteToConsole)
+        if (log_msg_filter_t::shouldWriteToConsole)
         {
             fprintf(stderr, "%s", prefix);
         }
@@ -66,21 +66,21 @@ void vdprintf(const char * format, va_list argPtr, const char * prefix)
     }
 
     OutputDebugString(wbuf.c_str());
-    if (log_msg_mgr_t::shouldWriteToConsole)
+    if (log_msg_filter_t::shouldWriteToConsole)
     {
         vfprintf(stderr, format, argPtr);
     }
 #else
-    if (log_msg_mgr_t::shouldWriteToConsole)
+    if (log_msg_filter_t::shouldWriteToConsole)
     {
-        if (log_msg_mgr_t::shouldWriteTimePrefix)
+        if (log_msg_filter_t::shouldWriteTimePrefix)
         {
             time_t ttime = time(NULL);
             char timebuff[32];
 
             if (0
-                    != strftime(timebuff, sizeof(timebuff), "%F %T: ",
-                            localtime(&ttime)))
+                != strftime(timebuff, sizeof(timebuff), "%F %T: ",
+                localtime(&ttime)))
             {
                 fprintf(stderr, timebuff);
             }
@@ -102,8 +102,28 @@ void vdprintf(const char * format, va_list argPtr, const char * prefix)
 
 /*prints a debug message if the input priorities satisfies thefilter*/
 void vdprintf(int componentPriority, int messagePriority, const char * format,
-        va_list argPtr, const char * prefix)
+    va_list argPtr, const char * prefix)
 {
     vdprintf(format, argPtr, prefix);
+}
+
+void dprintf(const char * format, ...)
+{
+    va_list argPtr;
+    va_start(argPtr, format);
+    vdprintf(format, argPtr);
+    va_end(argPtr);
+}
+
+/**
+*	This function prints a debug message if the input priorities satisfies the
+*	filter.
+*/
+void dprintf(int componentLevel, int severity, const char * format, ...)
+{
+    va_list argPtr;
+    va_start(argPtr, format);
+    vdprintf(componentLevel, severity, format, argPtr);
+    va_end(argPtr);
 }
 #endif

@@ -187,9 +187,6 @@
     <ProjectReference Include="..\geco-engine-common\geco-engine-common.vcxproj">
       <Project>{9db6451b-55f3-4a06-9c23-22c43b515e3d}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\net-engine-lib\net-engine-lib.vcxproj">
-      <Project>{86ce9f39-3efc-4c3d-8c17-84acf1cafda0}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\unittest\net-engine-tests.cc" />
