@@ -23,15 +23,15 @@
 
 static void* _DefaultMalloc(size_t size)
 {
-	return malloc(size);
+    return malloc(size);
 }
 static void* _DefaultRealloc(void *p, size_t size)
 {
-	return realloc(p, size);
+    return realloc(p, size);
 }
 static void _DefaultFree(void *p, size_t size)
 {
-	free(p);
+    free(p);
 }
 // These pointers are statically and globally defined in RakMemoryOverride.cpp
 // Change them to point to your own allocators if you want.
@@ -42,17 +42,17 @@ GecoFree geco_free = _DefaultFree;
 
 static void* _DefaultMalloc_Ex(size_t size, const char *file, unsigned int line)
 {
-	return malloc(size);
+    return malloc(size);
 }
 static void* _DefaultRealloc_Ex(void *p, size_t size, const char *file,
-		unsigned int line)
+        unsigned int line)
 {
-	return realloc(p, size);
+    return realloc(p, size);
 }
 static void _DefaultFree_Ex(void *p, size_t size, const char *file,
-		unsigned int line)
+        unsigned int line)
 {
-	free(p);
+    free(p);
 }
 /*function with ext for debug*/
 GecoMallocExt geco_malloc_ext = _DefaultMalloc_Ex;

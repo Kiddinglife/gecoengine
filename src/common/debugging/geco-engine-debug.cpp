@@ -27,7 +27,7 @@
 #include <stdarg.h>     /* va_list, va_start, va_copy, va_arg, va_end */
 #include <time.h>
 #include "geco-engine-debug.h"
-#include "geco-engine-ultils.h"
+#include "../ultils/geco-engine-ultils.h"
 
 // init static variables
 log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;

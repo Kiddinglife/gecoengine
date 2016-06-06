@@ -48,11 +48,11 @@ extern GECO_EXPORT GecoRealloc geco_realloc;
 extern GECO_EXPORT GecoFree geco_free;
 
 typedef void * (*GecoMallocExt)(size_t size, const char *file,
-		unsigned int line);
+        unsigned int line);
 typedef void * (*GecoReallocExt)(void *p, size_t size, const char *file,
-		unsigned int line);
+        unsigned int line);
 typedef void (*GecoFreeExt)(void *p, size_t size, const char *file,
-		unsigned int line);
+        unsigned int line);
 extern GECO_EXPORT GecoMallocExt geco_malloc_ext;
 extern GECO_EXPORT GecoReallocExt geco_realloc_ext;
 extern GECO_EXPORT GecoFreeExt geco_free_ext;
@@ -61,86 +61,86 @@ extern GECO_EXPORT GecoFreeExt geco_free_ext;
 template<class Type>
 GECO_EXPORT Type* geco_new(const char *file, unsigned int line)
 {
-	char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
-	Type *t = new (buffer) Type;
-	return t;
+    char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
+    Type *t = new (buffer) Type;
+    return t;
 }
 template<class Type, class P1>
 GECO_EXPORT Type* geco_new(const char *file, unsigned int line, const P1 &p1)
 {
-	char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
-	Type *t = new (buffer) Type(p1);
-	return t;
+    char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
+    Type *t = new (buffer) Type(p1);
+    return t;
 }
 template<class Type, class P1, class P2>
 GECO_EXPORT Type* geco_new(const char *file, unsigned int line, const P1 &p1,
-		const P2 &p2)
+        const P2 &p2)
 {
-	char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
-	Type *t = new (buffer) Type(p1, p2);
-	return t;
+    char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
+    Type *t = new (buffer) Type(p1, p2);
+    return t;
 }
 template<class Type, class P1, class P2, class P3>
 GECO_EXPORT Type* geco_new(const char *file, unsigned int line, const P1 &p1,
-		const P2 &p2, const P3 &p3)
+        const P2 &p2, const P3 &p3)
 {
-	char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
-	Type *t = new (buffer) Type(p1, p2, p3);
-	return t;
+    char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
+    Type *t = new (buffer) Type(p1, p2, p3);
+    return t;
 }
 template<class Type, class P1, class P2, class P3, class P4>
 GECO_EXPORT Type* geco_new(const char *file, unsigned int line, const P1 &p1,
-		const P2 &p2, const P3 &p3, const P4 &p4)
+        const P2 &p2, const P3 &p3, const P4 &p4)
 {
-	char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
-	Type *t = new (buffer) Type(p1, p2, p3, p4);
-	return t;
+    char *buffer = (char *) (geco_malloc_ext)(sizeof(Type), file, line);
+    Type *t = new (buffer) Type(p1, p2, p3, p4);
+    return t;
 }
 
 template<class Type>
 GECO_EXPORT Type* geco_new_array(const int count, const char *file,
-		unsigned int line)
+        unsigned int line)
 {
-	if (count == 0)
-		return 0;
+    if (count == 0)
+        return 0;
 
-	//		Type *t;
-	char *buffer = (char *) (geco_malloc_ext)(
-			sizeof(int) + sizeof(Type) * count, file, line);
-	((int*) buffer)[0] = count;
-	for (int i = 0; i < count; i++)
-	{
-		//t =
-		new (buffer + sizeof(int) + i * sizeof(Type)) Type;
-	}
-	return (Type *) (buffer + sizeof(int));
+    //		Type *t;
+    char *buffer = (char *) (geco_malloc_ext)(
+            sizeof(int) + sizeof(Type) * count, file, line);
+    ((int*) buffer)[0] = count;
+    for (int i = 0; i < count; i++)
+    {
+        //t =
+        new (buffer + sizeof(int) + i * sizeof(Type)) Type;
+    }
+    return (Type *) (buffer + sizeof(int));
 }
 
 template<class Type>
 GECO_EXPORT void geco_delete(Type *buff, const char *file, unsigned int line)
 {
-	if (buff == 0)
-		return;
-	buff->~Type();
-	(geco_free_ext)((char*) buff, sizeof(Type), file, line);
+    if (buff == 0)
+        return;
+    buff->~Type();
+    (geco_free_ext)((char*) buff, sizeof(Type), file, line);
 
 }
 
 template<class Type>
 GECO_EXPORT void geco_delete_array(Type *buff, const char *file,
-		unsigned int line)
+        unsigned int line)
 {
-	if (buff == 0)
-		return;
+    if (buff == 0)
+        return;
 
-	int count = ((int*) ((char*) buff - sizeof(int)))[0];
-	Type *t;
-	for (int i = 0; i < count; i++)
-	{
-		t = buff + i;
-		t->~Type();
-	}
-	(geco_free_ext)(buff - sizeof(int), sizeof(Type), file, line);
+    int count = ((int*) ((char*) buff - sizeof(int)))[0];
+    Type *t;
+    for (int i = 0; i < count; i++)
+    {
+        t = buff + i;
+        t->~Type();
+    }
+    (geco_free_ext)(buff - sizeof(int), sizeof(Type), file, line);
 
 }
 

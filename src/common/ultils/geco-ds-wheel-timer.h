@@ -10,15 +10,15 @@
 
 namespace geco
 {
-namespace ds
-{
-struct wheel_timer_mgr_t
-{
-    wheel_timer_mgr_t();
-    virtual ~wheel_timer_mgr_t();
-};
+    namespace ds
+    {
+        struct wheel_timer_mgr_t
+        {
+                wheel_timer_mgr_t();
+                virtual ~wheel_timer_mgr_t();
+        };
 
-} /* namespace ds */
+    } /* namespace ds */
 } /* namespace geco */
 
 #endif /* SRC_COMMON_DS_WHEELTIMERMGRT_H_ */

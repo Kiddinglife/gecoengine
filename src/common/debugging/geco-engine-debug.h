@@ -26,7 +26,7 @@
 #include <thread>
 #include <assert.h>
 
-#include "geco-engine-config.h"
+#include "../geco-engine-config.h"
 #include "../ds/geco-ds-array-list.h"
 
 /**
@@ -96,11 +96,11 @@ enum CallBackType
  */
 struct critical_msg_cb_t
 {
-    virtual void handle(const char * msg) = 0;
-    virtual ~critical_msg_cb_t()
-    {
-    }
-    ;
+        virtual void handle(const char * msg) = 0;
+        virtual ~critical_msg_cb_t()
+        {
+        }
+        ;
 };
 
 /**
@@ -110,39 +110,39 @@ struct critical_msg_cb_t
  */
 struct debug_msg_cb_t
 {
-    virtual bool handle(int component_priority, int msg_priority,
-            const char * format, va_list args_list) = 0;
-    virtual ~debug_msg_cb_t()
-    {
-    }
-    ;
+        virtual bool handle(int component_priority, int msg_priority,
+                const char * format, va_list args_list) = 0;
+        virtual ~debug_msg_cb_t()
+        {
+        }
+        ;
 };
 
 struct error_msg_cb_t
 {
-    virtual bool handle(const char * msg) = 0;
-    virtual ~error_msg_cb_t()
-    {
-    }
-    ;
+        virtual bool handle(const char * msg) = 0;
+        virtual ~error_msg_cb_t()
+        {
+        }
+        ;
 };
 
 struct warnning_msg_cb_t
 {
-    virtual bool handle(const char * msg) = 0;
-    virtual ~warnning_msg_cb_t()
-    {
-    }
-    ;
+        virtual bool handle(const char * msg) = 0;
+        virtual ~warnning_msg_cb_t()
+        {
+        }
+        ;
 };
 
 struct info_msg_cb_t
 {
-    virtual bool handle(const char * msg) = 0;
-    virtual ~info_msg_cb_t()
-    {
-    }
-    ;
+        virtual bool handle(const char * msg) = 0;
+        virtual ~info_msg_cb_t()
+        {
+        }
+        ;
 };
 
 /**
@@ -152,144 +152,145 @@ struct info_msg_cb_t
 struct log_msg_filter_t
 {
 
-    static log_msg_filter_t* s_instance_;
-    static bool shouldWriteTimePrefix;
-    static bool shouldWriteToConsole;
+        static log_msg_filter_t* s_instance_;
+        static bool shouldWriteTimePrefix;
+        static bool shouldWriteToConsole;
 
-    typedef geco::ds::array_list_t<critical_msg_cb_t*> critical_msg_cbs_t;
-    typedef geco::ds::array_list_t<error_msg_cb_t*> error_msg_cbs_t;
-    typedef geco::ds::array_list_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
-    typedef geco::ds::array_list_t<debug_msg_cb_t*> debug_msg_cbs_t;
-    typedef geco::ds::array_list_t<info_msg_cb_t*> info_msg_cbs_t;
-    critical_msg_cbs_t critical_msg_cbs_;
-    error_msg_cbs_t error_msg_cbs_;
-    warnning_msg_cbs_t warnning_msg_cbs_;
-    debug_msg_cbs_t debug_msg_cbs_;
-    info_msg_cbs_t info_msg_cbs_;
+        typedef geco::ds::array_list_t<critical_msg_cb_t*> critical_msg_cbs_t;
+        typedef geco::ds::array_list_t<error_msg_cb_t*> error_msg_cbs_t;
+        typedef geco::ds::array_list_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
+        typedef geco::ds::array_list_t<debug_msg_cb_t*> debug_msg_cbs_t;
+        typedef geco::ds::array_list_t<info_msg_cb_t*> info_msg_cbs_t;
+        critical_msg_cbs_t critical_msg_cbs_;
+        error_msg_cbs_t error_msg_cbs_;
+        warnning_msg_cbs_t warnning_msg_cbs_;
+        debug_msg_cbs_t debug_msg_cbs_;
+        info_msg_cbs_t info_msg_cbs_;
 
-    // Only messages with a message priority greater than or equal
-    // to this limit will be displayed.
-    int filter_threshold_;
+        // Only messages with a message priority greater than or equal
+        // to this limit will be displayed.
+        int filter_threshold_;
 
-    // whether or not development time assertions should cause a real assertion.
-    bool has_dev_assert_;
+        // whether or not development time assertions should cause a real assertion.
+        bool has_dev_assert_;
 
-    log_msg_filter_t()
-    {
-        filter_threshold_ = 0;
-        has_dev_assert_ = true;
-        critical_msg_cbs_.reserve(64);
-        error_msg_cbs_.reserve(64);
-        warnning_msg_cbs_.reserve(64);
-        debug_msg_cbs_.reserve(64);
-    }
-
-    /**
-     *	This method returns the singleton instance of this class.
-     */
-    static log_msg_filter_t& get_instance()
-    {
-        if (s_instance_ == NULL)
+        log_msg_filter_t()
         {
-            s_instance_ = new log_msg_filter_t();
+            filter_threshold_ = 0;
+            has_dev_assert_ = true;
+            critical_msg_cbs_.reserve(64);
+            error_msg_cbs_.reserve(64);
+            warnning_msg_cbs_.reserve(64);
+            debug_msg_cbs_.reserve(64);
         }
-        return *s_instance_;
-    }
 
-    static void free_instance()
-    {
-        if (s_instance_)
+        /**
+         *	This method returns the singleton instance of this class.
+         */
+        static log_msg_filter_t& get_instance()
         {
-            delete s_instance_;
-            s_instance_ = NULL;
+            if (s_instance_ == NULL)
+            {
+                s_instance_ = new log_msg_filter_t();
+            }
+            return *s_instance_;
         }
-    }
 
-    /**
-     * @brief returns whether or not a message should be accepted.
-     * @details
-     * when component_priority <= filter_threshold_, only accept msg with
-     * priority >= filter_threshold_
-     * when component_priority > filter_threshold_, only accept msg with
-     * priority >= component_priority
-     */
-    static bool should_accept(int component_priority, int msg_riority)
-    {
-        return (msg_riority
-                >= std::max(log_msg_filter_t::get_instance().filter_threshold_,
-                        component_priority));
-    }
-
-    /*
-     * @brief This method sets a callback associated with a critical message,
-     * @details log_msg_filter_t now owns the object pointed to by pCallback.
-     * @return pair of index and call back type
-     */
-    std::pair<unsigned int, CallBackType> add(critical_msg_cb_t * pCallback)
-    {
-        critical_msg_cbs_.push_back(pCallback);
-        return std::make_pair((debug_msg_cbs_.size() - 1), CriticalMsgCB);
-    }
-    /*
-     *	@brief This method sets a callback associated with a error message,
-     *  @details log_msg_filter_t now owns the object pointed to by pCallback.
-     */
-    std::pair<unsigned int, CallBackType> add(error_msg_cb_t * pCallback)
-    {
-        error_msg_cbs_.push_back(pCallback);
-        return std::make_pair((debug_msg_cbs_.size() - 1), ErrorMsgCB);
-    }
-    /*
-     *	@brief This method sets a callback associated with a warnning message,
-     *  @details log_msg_filter_t now owns the object pointed to by pCallback.
-     */
-    std::pair<unsigned int, CallBackType> add(warnning_msg_cb_t * pCallback)
-    {
-        warnning_msg_cbs_.push_back(pCallback);
-        return std::make_pair((debug_msg_cbs_.size() - 1), WarnningMsgCB);
-    }
-    /*
-     *	@brief This method sets a callback associated with a info message,
-     *  @details log_msg_filter_t now owns the object pointed to by pCallback.
-     */
-    std::pair<unsigned int, CallBackType> add(info_msg_cb_t * pCallback)
-    {
-        info_msg_cbs_.push_back(pCallback);
-        return std::make_pair((debug_msg_cbs_.size() - 1), InfoMsgCB);
-    }
-    /*
-     * @brief sets a callback associated with a debug message.
-     * @details If the callback is set and returns true, the default
-     * behaviour for displaying messages is not done.
-     * DebugFilter now owns the object pointed to by pCallback.
-     */
-    std::pair<unsigned int, CallBackType> add(debug_msg_cb_t* pCallback)
-    {
-        debug_msg_cbs_.push_back(pCallback);
-        return std::make_pair((debug_msg_cbs_.size() - 1), DebugMsgCB);
-    }
-
-    void remove(unsigned int idx, CallBackType cbt)
-    {
-        switch (cbt)
+        static void free_instance()
         {
-        case CriticalMsgCB:
-            critical_msg_cbs_.remove_fast(idx);
-            break;
-        case ErrorMsgCB:
-            error_msg_cbs_.remove_fast(idx);
-            break;
-        case WarnningMsgCB:
-            warnning_msg_cbs_.remove_fast(idx);
-            break;
-        case DebugMsgCB:
-            debug_msg_cbs_.remove_fast(idx);
-            break;
-        case InfoMsgCB:
-            info_msg_cbs_.remove_fast(idx);
-            break;
+            if (s_instance_)
+            {
+                delete s_instance_;
+                s_instance_ = NULL;
+            }
         }
-    }
+
+        /**
+         * @brief returns whether or not a message should be accepted.
+         * @details
+         * when component_priority <= filter_threshold_, only accept msg with
+         * priority >= filter_threshold_
+         * when component_priority > filter_threshold_, only accept msg with
+         * priority >= component_priority
+         */
+        static bool should_accept(int component_priority, int msg_riority)
+        {
+            return (msg_riority
+                    >= std::max(
+                            log_msg_filter_t::get_instance().filter_threshold_,
+                            component_priority));
+        }
+
+        /*
+         * @brief This method sets a callback associated with a critical message,
+         * @details log_msg_filter_t now owns the object pointed to by pCallback.
+         * @return pair of index and call back type
+         */
+        std::pair<unsigned int, CallBackType> add(critical_msg_cb_t * pCallback)
+        {
+            critical_msg_cbs_.push_back(pCallback);
+            return std::make_pair((debug_msg_cbs_.size() - 1), CriticalMsgCB);
+        }
+        /*
+         *	@brief This method sets a callback associated with a error message,
+         *  @details log_msg_filter_t now owns the object pointed to by pCallback.
+         */
+        std::pair<unsigned int, CallBackType> add(error_msg_cb_t * pCallback)
+        {
+            error_msg_cbs_.push_back(pCallback);
+            return std::make_pair((debug_msg_cbs_.size() - 1), ErrorMsgCB);
+        }
+        /*
+         *	@brief This method sets a callback associated with a warnning message,
+         *  @details log_msg_filter_t now owns the object pointed to by pCallback.
+         */
+        std::pair<unsigned int, CallBackType> add(warnning_msg_cb_t * pCallback)
+        {
+            warnning_msg_cbs_.push_back(pCallback);
+            return std::make_pair((debug_msg_cbs_.size() - 1), WarnningMsgCB);
+        }
+        /*
+         *	@brief This method sets a callback associated with a info message,
+         *  @details log_msg_filter_t now owns the object pointed to by pCallback.
+         */
+        std::pair<unsigned int, CallBackType> add(info_msg_cb_t * pCallback)
+        {
+            info_msg_cbs_.push_back(pCallback);
+            return std::make_pair((debug_msg_cbs_.size() - 1), InfoMsgCB);
+        }
+        /*
+         * @brief sets a callback associated with a debug message.
+         * @details If the callback is set and returns true, the default
+         * behaviour for displaying messages is not done.
+         * DebugFilter now owns the object pointed to by pCallback.
+         */
+        std::pair<unsigned int, CallBackType> add(debug_msg_cb_t* pCallback)
+        {
+            debug_msg_cbs_.push_back(pCallback);
+            return std::make_pair((debug_msg_cbs_.size() - 1), DebugMsgCB);
+        }
+
+        void remove(unsigned int idx, CallBackType cbt)
+        {
+            switch (cbt)
+            {
+                case CriticalMsgCB:
+                    critical_msg_cbs_.remove_fast(idx);
+                    break;
+                case ErrorMsgCB:
+                    error_msg_cbs_.remove_fast(idx);
+                    break;
+                case WarnningMsgCB:
+                    warnning_msg_cbs_.remove_fast(idx);
+                    break;
+                case DebugMsgCB:
+                    debug_msg_cbs_.remove_fast(idx);
+                    break;
+                case InfoMsgCB:
+                    info_msg_cbs_.remove_fast(idx);
+                    break;
+            }
+        }
 };
 
 /**
@@ -313,9 +314,8 @@ enum LogMsgPriority
 
 inline const char * get_logmsg_prefix_str(LogMsgPriority p)
 {
-    static const char * prefixes[] =
-    { "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR", "CRITICAL",
-            "HACK", "SCRIPT", "ASSET" };
+    static const char * prefixes[] = { "TRACE", "DEBUG", "INFO", "NOTICE",
+            "WARNING", "ERROR", "CRITICAL", "HACK", "SCRIPT", "ASSET" };
     return (p >= 0 && (size_t) p < sizeof(prefixes)) ? prefixes[(int) p] : "";
 }
 
@@ -326,66 +326,66 @@ inline const char * get_logmsg_prefix_str(LogMsgPriority p)
  */
 class log_msg_helper
 {
-public:
-    log_msg_helper(int componentPriority, int messagePriority) :
-            componentPriority_(componentPriority), messagePriority_(
-                    messagePriority)
-    {
-    }
-    log_msg_helper() :
-            componentPriority_(0), messagePriority_(LOG_MSG_CRITICAL)
-    {
-    }
-    static void fini();
+    public:
+        log_msg_helper(int componentPriority, int messagePriority) :
+                componentPriority_(componentPriority), messagePriority_(
+                        messagePriority)
+        {
+        }
+        log_msg_helper() :
+                componentPriority_(0), messagePriority_(LOG_MSG_CRITICAL)
+        {
+        }
+        static void fini();
 
 #ifndef _WIN32
-    void message(const char * format, ...)
-            __attribute__((format(printf, 2, 3)));
-    void criticalMessage(const char * format, ...)
-            __attribute__((format(printf, 2, 3)));
-    void devCriticalMessage(const char * format, ...)
-            __attribute__((format(printf, 2, 3)));
+        void message(const char * format, ...)
+                __attribute__((format(printf, 2, 3)));
+        void criticalMessage(const char * format, ...)
+                __attribute__((format(printf, 2, 3)));
+        void devCriticalMessage(const char * format, ...)
+                __attribute__((format(printf, 2, 3)));
 #else
-    void message(const char * format, ...);
-    void criticalMessage(const char * format, ...);
-    void devCriticalMessage(const char * format, ...);
+        void message(const char * format, ...);
+        void criticalMessage(const char * format, ...);
+        void devCriticalMessage(const char * format, ...);
 #endif
 
-    void messageBackTrace();
-    static void shouldWriteToSyslog(bool state = true);
+        void messageBackTrace();
+        static void shouldWriteToSyslog(bool state = true);
 
-    static void showErrorDialogs(bool show);
-    static bool showErrorDialogs();
+        static void showErrorDialogs(bool show);
+        static bool showErrorDialogs();
 
-    static void criticalMsgOccurs(bool occurs)
-    {
-        criticalMsgOccurs_ = occurs;
-    }
-    static bool criticalMsgOccurs()
-    {
-        return criticalMsgOccurs_;
-    }
+        static void criticalMsgOccurs(bool occurs)
+        {
+            criticalMsgOccurs_ = occurs;
+        }
+        static bool criticalMsgOccurs()
+        {
+            return criticalMsgOccurs_;
+        }
 
 #ifdef _WIN32
-    static void logToFile(const char* line);
-    static void automatedTest(bool isTest)
-    {   automatedTest_ = isTest;}
-    static bool automatedTest()
-    {   return automatedTest_;}
+        static void logToFile(const char* line);
+        static void automatedTest(bool isTest)
+        {   automatedTest_ = isTest;}
+        static bool automatedTest()
+        {   return automatedTest_;}
 #endif
 
-private:
-    void criticalMessageHelper(bool isDevAssertion, const char * format,
-            va_list argPtr);
+    private:
+        void criticalMessageHelper(bool isDevAssertion, const char * format,
+                va_list argPtr);
 
-    int componentPriority_;
-    int messagePriority_;
+        int componentPriority_;
+        int messagePriority_;
 
-    static bool showErrorDialogs_;
-    static bool criticalMsgOccurs_;
-    static std::mutex* mutex_;
+        static bool showErrorDialogs_;
+        static bool criticalMsgOccurs_;
+        static std::mutex* mutex_;
 #ifdef _WIN32
-    static bool automatedTest_;
+        static bool automatedTest_;
 #endif
 };
 

@@ -30,6 +30,7 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.254553402" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.2095744416" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/home/jakez/2016209/geco-game-engine/thirdparty/googlemock/include"/>
+									<listOptionValue builtIn="false" value="/home/jakez/2016209/geco-game-engine/src"/>
 									<listOptionValue builtIn="false" value="/home/jakez/2016209/geco-game-engine/thirdparty/googletest/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1111421330" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
