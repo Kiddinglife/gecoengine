@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>geco-game-engine-unittest-project</name>
+	<name>engine-unittest</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -31,4 +31,10 @@
 			<locationURI>PARENT-2-PROJECT_LOC/unittest</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PARENT</name>
+			<value>$%7BPARENT-2-PROJECT_LOC%7D/2016209/geco-game-engine</value>
+		</variable>
+	</variableList>
 </projectDescription>

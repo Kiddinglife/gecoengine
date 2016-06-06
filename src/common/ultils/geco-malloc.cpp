@@ -21,29 +21,17 @@
 // created on 02-June-2016 by Jackie Zhang
 #include "geco-malloc.h"
 
-#if defined(__FreeBSD__)
-#include <stdlib.h>
-#elif defined ( __APPLE__ ) || defined ( __APPLE_CC__ )
-#include <malloc/malloc.h>
-#include <alloca.h>
-#elif defined(_WIN32)
-#include <malloc.h>
-#else
-#include <malloc.h>
-#include <alloca.h> // Alloca needed on Ubuntu apparently
-#endif
-
 static void* _DefaultMalloc(size_t size)
 {
-    return malloc(size);
+	return malloc(size);
 }
 static void* _DefaultRealloc(void *p, size_t size)
 {
-    return realloc(p, size);
+	return realloc(p, size);
 }
 static void _DefaultFree(void *p, size_t size)
 {
-    free(p);
+	free(p);
 }
 // These pointers are statically and globally defined in RakMemoryOverride.cpp
 // Change them to point to your own allocators if you want.
@@ -54,16 +42,17 @@ GecoFree geco_free = _DefaultFree;
 
 static void* _DefaultMalloc_Ex(size_t size, const char *file, unsigned int line)
 {
-    return malloc(size);
+	return malloc(size);
 }
-static void* _DefaultRealloc_Ex(void *p, size_t size,
-    const char *file, unsigned int line)
+static void* _DefaultRealloc_Ex(void *p, size_t size, const char *file,
+		unsigned int line)
 {
-    return realloc(p, size);
+	return realloc(p, size);
 }
-static void _DefaultFree_Ex(void *p, size_t size, const char *file, unsigned int line)
+static void _DefaultFree_Ex(void *p, size_t size, const char *file,
+		unsigned int line)
 {
-    free(p);
+	free(p);
 }
 /*function with ext for debug*/
 GecoMallocExt geco_malloc_ext = _DefaultMalloc_Ex;

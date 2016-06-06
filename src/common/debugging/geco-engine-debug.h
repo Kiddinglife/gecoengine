@@ -1,27 +1,33 @@
 /*
-* Geco Gaming Company
-* All Rights Reserved.
-* Copyright (c)  2016 GECOEngine.
-*
-* GECOEngine is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GECOEngine is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
+ * Geco Gaming Company
+ * All Rights Reserved.
+ * Copyright (c)  2016 GECOEngine.
+ *
+ * GECOEngine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GECOEngine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
 
-* You should have received a copy of the GNU Lesser General Public License
-* along with KBEngine.  If not, see <http://www.gnu.org/licenses/>.
-*
-*/
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with KBEngine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 // created on 02-June-2016 by Jackie Zhang
-
 #ifndef _INCLUDE_GECO_ENGINE_DEBUG
 #define _INCLUDE_GECO_ENGINE_DEBUG
+
+#include <mutex>
+#include <thread>
+#include <assert.h>
+
+#include "geco-engine-config.h"
+#include "../ds/geco-ds-array-list.h"
 
 /**
  *	@file geco-engine-debug.h
@@ -77,23 +83,12 @@
  *	@param MF_ASSERT is a macro that should be used instead of assert or ASSERT.
  */
 
-#include <assert.h>
-#include <algorithm>
-#include <mutex>
-
-#include "geco-engine-config.h"
-#include "../ds/geco-ds-array-list.h"
-
 /**
-* Definition for callback functor type
-*/
+ * Definition for callback functor type
+ */
 enum CallBackType
 {
-    CriticalMsgCB,
-    ErrorMsgCB,
-    WarnningMsgCB,
-    DebugMsgCB,
-    InfoMsgCB,
+    CriticalMsgCB, ErrorMsgCB, WarnningMsgCB, DebugMsgCB, InfoMsgCB,
 };
 
 /**
@@ -102,7 +97,10 @@ enum CallBackType
 struct critical_msg_cb_t
 {
     virtual void handle(const char * msg) = 0;
-    virtual ~critical_msg_cb_t() {};
+    virtual ~critical_msg_cb_t()
+    {
+    }
+    ;
 };
 
 /**
@@ -112,27 +110,39 @@ struct critical_msg_cb_t
  */
 struct debug_msg_cb_t
 {
-    virtual bool handle(int component_priority,
-        int msg_priority, const char * format, va_list args_list) = 0;
-    virtual ~debug_msg_cb_t() {};
+    virtual bool handle(int component_priority, int msg_priority,
+            const char * format, va_list args_list) = 0;
+    virtual ~debug_msg_cb_t()
+    {
+    }
+    ;
 };
 
 struct error_msg_cb_t
 {
     virtual bool handle(const char * msg) = 0;
-    virtual ~error_msg_cb_t() {};
+    virtual ~error_msg_cb_t()
+    {
+    }
+    ;
 };
 
 struct warnning_msg_cb_t
 {
     virtual bool handle(const char * msg) = 0;
-    virtual ~warnning_msg_cb_t() {};
+    virtual ~warnning_msg_cb_t()
+    {
+    }
+    ;
 };
 
 struct info_msg_cb_t
 {
     virtual bool handle(const char * msg) = 0;
-    virtual ~info_msg_cb_t() {};
+    virtual ~info_msg_cb_t()
+    {
+    }
+    ;
 };
 
 /**
@@ -146,17 +156,16 @@ struct log_msg_filter_t
     static bool shouldWriteTimePrefix;
     static bool shouldWriteToConsole;
 
-    typedef geco_ds::array_list_t<critical_msg_cb_t*> critical_msg_cbs_t;
-    typedef geco_ds::array_list_t<error_msg_cb_t*> error_msg_cbs_t;
-    typedef geco_ds::array_list_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
-    typedef geco_ds::array_list_t<debug_msg_cb_t*> debug_msg_cbs_t;
-    typedef geco_ds::array_list_t<info_msg_cb_t*> info_msg_cbs_t;
+    typedef geco::ds::array_list_t<critical_msg_cb_t*> critical_msg_cbs_t;
+    typedef geco::ds::array_list_t<error_msg_cb_t*> error_msg_cbs_t;
+    typedef geco::ds::array_list_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
+    typedef geco::ds::array_list_t<debug_msg_cb_t*> debug_msg_cbs_t;
+    typedef geco::ds::array_list_t<info_msg_cb_t*> info_msg_cbs_t;
     critical_msg_cbs_t critical_msg_cbs_;
     error_msg_cbs_t error_msg_cbs_;
     warnning_msg_cbs_t warnning_msg_cbs_;
     debug_msg_cbs_t debug_msg_cbs_;
     info_msg_cbs_t info_msg_cbs_;
-
 
     // Only messages with a message priority greater than or equal
     // to this limit will be displayed.
@@ -206,8 +215,9 @@ struct log_msg_filter_t
      */
     static bool should_accept(int component_priority, int msg_riority)
     {
-        return (msg_riority >= std::max(log_msg_filter_t::get_instance().filter_threshold_,
-            component_priority));
+        return (msg_riority
+                >= std::max(log_msg_filter_t::get_instance().filter_threshold_,
+                        component_priority));
     }
 
     /*
@@ -239,9 +249,9 @@ struct log_msg_filter_t
         return std::make_pair((debug_msg_cbs_.size() - 1), WarnningMsgCB);
     }
     /*
-    *	@brief This method sets a callback associated with a info message,
-    *  @details log_msg_filter_t now owns the object pointed to by pCallback.
-    */
+     *	@brief This method sets a callback associated with a info message,
+     *  @details log_msg_filter_t now owns the object pointed to by pCallback.
+     */
     std::pair<unsigned int, CallBackType> add(info_msg_cb_t * pCallback)
     {
         info_msg_cbs_.push_back(pCallback);
@@ -263,29 +273,29 @@ struct log_msg_filter_t
     {
         switch (cbt)
         {
-            case CriticalMsgCB:
-                critical_msg_cbs_.remove_fast(idx);
-                break;
-            case ErrorMsgCB:
-                error_msg_cbs_.remove_fast(idx);
-                break;
-            case WarnningMsgCB:
-                warnning_msg_cbs_.remove_fast(idx);
-                break;
-            case DebugMsgCB:
-                debug_msg_cbs_.remove_fast(idx);
-                break;
-            case InfoMsgCB:
-                info_msg_cbs_.remove_fast(idx);
-                break;
+        case CriticalMsgCB:
+            critical_msg_cbs_.remove_fast(idx);
+            break;
+        case ErrorMsgCB:
+            error_msg_cbs_.remove_fast(idx);
+            break;
+        case WarnningMsgCB:
+            warnning_msg_cbs_.remove_fast(idx);
+            break;
+        case DebugMsgCB:
+            debug_msg_cbs_.remove_fast(idx);
+            break;
+        case InfoMsgCB:
+            info_msg_cbs_.remove_fast(idx);
+            break;
         }
     }
 };
 
 /**
-*	This enumeration is used to indicate the priority of a message. The higher
-*	the enumeration's value, the higher the priority.
-*/
+ *	This enumeration is used to indicate the priority of a message. The higher
+ *	the enumeration's value, the higher the priority.
+ */
 enum LogMsgPriority
 {
     LOG_MSG_TRACE,
@@ -304,48 +314,37 @@ enum LogMsgPriority
 inline const char * get_logmsg_prefix_str(LogMsgPriority p)
 {
     static const char * prefixes[] =
-    {
-        "TRACE",
-        "DEBUG",
-        "INFO",
-        "NOTICE",
-        "WARNING",
-        "ERROR",
-        "CRITICAL",
-        "HACK",
-        "SCRIPT",
-        "ASSET"
-    };
-    return (p >= 0 && (size_t)p < sizeof(prefixes)) ? prefixes[(int)p] : "";
+    { "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR", "CRITICAL",
+            "HACK", "SCRIPT", "ASSET" };
+    return (p >= 0 && (size_t) p < sizeof(prefixes)) ? prefixes[(int) p] : "";
 }
 
 /**
-*  This class implements the functionality exposed by BigWorld message macros,
-*	manages calling registered message callbacks, and handles both critical
-*  and non-critical messages.
-*/
+ *  This class implements the functionality exposed by BigWorld message macros,
+ *	manages calling registered message callbacks, and handles both critical
+ *  and non-critical messages.
+ */
 class log_msg_helper
 {
-    public:
+public:
     log_msg_helper(int componentPriority, int messagePriority) :
-        componentPriority_(componentPriority),
-        messagePriority_(messagePriority)
+            componentPriority_(componentPriority), messagePriority_(
+                    messagePriority)
     {
     }
     log_msg_helper() :
-        componentPriority_(0),
-        messagePriority_(LOG_MSG_CRITICAL)
+            componentPriority_(0), messagePriority_(LOG_MSG_CRITICAL)
     {
     }
     static void fini();
 
 #ifndef _WIN32
     void message(const char * format, ...)
-        __attribute__((format(printf, 2, 3)));
+            __attribute__((format(printf, 2, 3)));
     void criticalMessage(const char * format, ...)
-        __attribute__((format(printf, 2, 3)));
+            __attribute__((format(printf, 2, 3)));
     void devCriticalMessage(const char * format, ...)
-        __attribute__((format(printf, 2, 3)));
+            __attribute__((format(printf, 2, 3)));
 #else
     void message(const char * format, ...);
     void criticalMessage(const char * format, ...);
@@ -358,18 +357,26 @@ class log_msg_helper
     static void showErrorDialogs(bool show);
     static bool showErrorDialogs();
 
-    static void criticalMsgOccurs(bool occurs)	{ criticalMsgOccurs_ = occurs; }
-    static bool criticalMsgOccurs()	{ return criticalMsgOccurs_; }
+    static void criticalMsgOccurs(bool occurs)
+    {
+        criticalMsgOccurs_ = occurs;
+    }
+    static bool criticalMsgOccurs()
+    {
+        return criticalMsgOccurs_;
+    }
 
 #ifdef _WIN32
     static void logToFile(const char* line);
-    static void automatedTest(bool isTest) { automatedTest_ = isTest; }
-    static bool automatedTest() { return automatedTest_; }
+    static void automatedTest(bool isTest)
+    {   automatedTest_ = isTest;}
+    static bool automatedTest()
+    {   return automatedTest_;}
 #endif
 
-    private:
+private:
     void criticalMessageHelper(bool isDevAssertion, const char * format,
-        va_list argPtr);
+            va_list argPtr);
 
     int componentPriority_;
     int messagePriority_;
@@ -385,29 +392,30 @@ class log_msg_helper
 #if ENABLE_DPRINTF
 // This function prints a debug message.
 #ifndef _WIN32
-void dprintf(const char * format, ...)
-__attribute__((format(printf, 1, 2)));
-void dprintf(int componentPriority, int messagePriority,
-    const char * format, ...)
-    __attribute__((format(printf, 3, 4)));
+void dprintf(const char * format, ...) __attribute__((format(printf, 1, 2)));
+void dprintf(int componentPriority, int messagePriority, const char * format,
+        ...) __attribute__((format(printf, 3, 4)));
 #else
 void dprintf(const char * format, ...);
 void dprintf(int componentPriority, int messagePriority,
-    const char * format, ...);
+        const char * format, ...);
 #endif
-void vdprintf(const char * format, va_list argPtr,
-    const char * prefix = NULL);
-void vdprintf(int componentPriority, int messagePriority,
-    const char * format, va_list argPtr, const char * prefix = NULL);
+void vdprintf(const char * format, va_list argPtr, const char * prefix = NULL);
+void vdprintf(int componentPriority, int messagePriority, const char * format,
+        va_list argPtr, const char * prefix = NULL);
 #else
 /// This function prints a debug message.
-inline void dprintf(const char * format, ...) {}
+inline void dprintf(const char * format, ...)
+{}
 inline void dprintf(int componentPriority, int messagePriority,
-    const char * format, ...) {}
+        const char * format, ...)
+{}
 inline void vdprintf(const char * format, va_list argPtr,
-    const char * prefix = NULL) {}
+        const char * prefix = NULL)
+{}
 inline void vdprintf(int componentPriority, int messagePriority,
-    const char * format, va_list argPtr, const char * prefix = NULL) {}
+        const char * format, va_list argPtr, const char * prefix = NULL)
+{}
 #endif
 
 #endif
