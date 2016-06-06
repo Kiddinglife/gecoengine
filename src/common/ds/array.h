@@ -1,4 +1,4 @@
-/// \file array_list_t.h
+/// \file array_t.h
 /// \internal
 /// \brief similar to std::vector
 /// \details Usually the Queue class is used instead,
@@ -26,7 +26,7 @@ namespace geco
          *  I don't bother with operator= to improve performance.
          */
         template<class ElementType, unsigned int QUEUE_INIT_SIZE = 32>
-        class GECO_EXPORT array_list_t
+        class GECO_EXPORT array_t
         {
             private:
                 /// An array of user values
@@ -37,11 +37,11 @@ namespace geco
                 unsigned int allocation_size;
 
             public:
-                array_list_t() :
+                array_t() :
                         allocation_size(0), listArray(0), list_size(0)
                 {
                 }
-                ~array_list_t()
+                ~array_t()
                 {
                     if (allocation_size > 0)
                     {
@@ -50,7 +50,7 @@ namespace geco
                         list_size = allocation_size = 0;
                     }
                 }
-                array_list_t(const array_list_t& original_copy)
+                array_t(const array_t& original_copy)
                 {
                     /// allocate memory for copying the elements from @param original_copy
                     if (original_copy.list_size == 0)
@@ -69,7 +69,7 @@ namespace geco
 
                     list_size = allocation_size = original_copy.list_size;
                 }
-                array_list_t& operator=(const array_list_t& original_copy)
+                array_t& operator=(const array_t& original_copy)
                 {
                     if (this == &original_copy)
                         return *this;

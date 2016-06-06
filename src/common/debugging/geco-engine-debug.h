@@ -27,7 +27,7 @@
 #include <assert.h>
 
 #include "../geco-engine-config.h"
-#include "../ds/geco-ds-array-list.h"
+#include "../ds/array.h"
 
 /**
  *	@file geco-engine-debug.h
@@ -156,11 +156,11 @@ struct log_msg_filter_t
         static bool shouldWriteTimePrefix;
         static bool shouldWriteToConsole;
 
-        typedef geco::ds::array_list_t<critical_msg_cb_t*> critical_msg_cbs_t;
-        typedef geco::ds::array_list_t<error_msg_cb_t*> error_msg_cbs_t;
-        typedef geco::ds::array_list_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
-        typedef geco::ds::array_list_t<debug_msg_cb_t*> debug_msg_cbs_t;
-        typedef geco::ds::array_list_t<info_msg_cb_t*> info_msg_cbs_t;
+        typedef geco::ds::array_t<critical_msg_cb_t*> critical_msg_cbs_t;
+        typedef geco::ds::array_t<error_msg_cb_t*> error_msg_cbs_t;
+        typedef geco::ds::array_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
+        typedef geco::ds::array_t<debug_msg_cb_t*> debug_msg_cbs_t;
+        typedef geco::ds::array_t<info_msg_cb_t*> info_msg_cbs_t;
         critical_msg_cbs_t critical_msg_cbs_;
         error_msg_cbs_t error_msg_cbs_;
         warnning_msg_cbs_t warnning_msg_cbs_;

@@ -1,8 +1,11 @@
 #include "gtest/gtest.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-//#define TIMEOUT_DISABLE_BUILTIN_BITOPS
+/**
+ *  unit tests have:
+ *  1) TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
+ *
+ */
 #include "common/ultils/geco-engine-ultils.h"
 using namespace geco::ultils;
 static int naive_clz(int bits, uint64_t v)
@@ -93,7 +96,6 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
             result = 1;
     }
     EXPECT_EQ(result, 0);
-    uint64_t a = 12;
-    int count = ctz64(a);
-    printf("ctz64(%lu)->%d", a, count);
 }
+
+

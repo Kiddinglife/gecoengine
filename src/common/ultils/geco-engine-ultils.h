@@ -32,7 +32,7 @@
 #include <windows.h>
 #define WIN32_LEAN_AND_MEAN
 #endif
-#define TIMEOUT_DISABLE_BUILTIN_BITOPS
+//#define TIMEOUT_DISABLE_BUILTIN_BITOPS
 namespace geco
 {
     namespace ultils
@@ -47,6 +47,10 @@ namespace geco
 #endif
 
         /*============ timer bit operations ===============*/
+/**
+ *  @return sizeofbits -1  if given 0, eg uint64_t a = 0, ctz64(a) returns 63
+ *  other number will be fine
+ * */
 #if defined(__GNUC__) && !defined(TIMEOUT_DISABLE_BUILTIN_BITOPS)
         /* First define ctz and clz functions; these are compiler-dependent if
          * you want them to be fast. On GCC and clang and some others,
@@ -194,7 +198,7 @@ namespace geco
             y = x << 1;
             if (y != 0)
                 return (int) (n - 2);
-            return (int) (n -1);
+            return (int) (n - 1);
         }
         inline static int get_leading_zeros_size(unsigned short x)
         {
