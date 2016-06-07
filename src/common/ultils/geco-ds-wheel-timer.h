@@ -18,10 +18,35 @@
  *
  */
 
-// created on 06-June-2016 by Jackie Zhang
-#ifndef SRC_COMMON_DS_WHEELTIMERMGRT_H_
-#define SRC_COMMON_DS_WHEELTIMERMGRT_H_
-#include <stdbool.h>    /* bool */
+/**
+ * wheel 1 has 256 slots
+ * wheel 2 has 64  slots
+ * wheel 3 has 64  slots
+ * wheel 4 has 64  slots
+ * wheel 5 has 64  slots
+ *
+ *In practice it's done by categorizing all future jiffies into 5 wheels:
+ * wheel 1  jiffies of [1, 2^8]  1..256,
+ * wheel 2  jiffies of [2^8, 2^14] 257..16384,
+ * wheel 3  jiffies of [2^14, 2^20] 16385..1048576,
+ * wheel 4  jiffies of [2^20, 2^26] 1048577..67108864,
+ * wheel 5  jiffies of [2^26, 2^32] 67108865..4294967295
+ *
+ * the first wheel consists of 256 buckets
+ * (each bucket representing a single jiffy),
+ * the second category consists of 64 buckets equally divided
+ * (each bucket represents 256 subsequent jiffies),
+ * the third category consists of 64 buckets too
+ * (each bucket representing 256*64 ==16384 jiffies),
+ * the fourth category consists of 64 buckets too
+ * (each bucket representing 256*64*64 == 1048576 jiffies),
+ * the fifth category consists of 64 buckets too (each bucket representing 67108864 jiffies).
+ *
+ * /
+ // created on 06-June-2016 by Jackie Zhang
+ #ifndef SRC_COMMON_DS_WHEELTIMERMGRT_H_
+ #define SRC_COMMON_DS_WHEELTIMERMGRT_H_
+ #include <stdbool.h>    /* bool */
 #include <stdio.h>      /* FILE */
 #include <inttypes.h>   /* PRIu64 PRIx64 PRIX64 uint64_t */
 #include <list>
@@ -55,14 +80,13 @@ namespace geco
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
         struct event_handler_t
         {
-                /*if NULL, fn is c style function, otherwise member method*/
-                virtual int handle(int etype, void* args) = 0;
-        };
-        struct timeout_cb
-        {
+                unsigned int event_type;
+                unsigned int owner_type;
+                void* owner;
                 void (*fn)();
                 void *arg;
         };
+        /* struct timeout_cb */
 
         struct timeout
         {
