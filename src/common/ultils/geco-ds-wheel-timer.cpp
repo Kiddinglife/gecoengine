@@ -19,24 +19,12 @@
  */
 
 // created on 06-June-2016 by Jackie Zhang
-
 #include "geco-ds-wheel-timer.h"
 
 namespace geco
 {
     namespace ds
     {
-
-        wheel_timer_mgr_t::wheel_timer_mgr_t()
-        {
-            // TODO Auto-generated constructor stub
-
-        }
-
-        wheel_timer_mgr_t::~wheel_timer_mgr_t()
-        {
-            // TODO Auto-generated destructor stub
-        }
 
     } /* namespace ds */
 } /* namespace geco */

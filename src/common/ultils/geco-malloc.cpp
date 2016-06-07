@@ -20,7 +20,6 @@
 
 // created on 02-June-2016 by Jackie Zhang
 #include "geco-malloc.h"
-
 static void* _DefaultMalloc(size_t size)
 {
     return malloc(size);

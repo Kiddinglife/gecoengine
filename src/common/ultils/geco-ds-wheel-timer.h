@@ -42,14 +42,31 @@
  * (each bucket representing 256*64*64 == 1048576 jiffies),
  * the fifth category consists of 64 buckets too (each bucket representing 67108864 jiffies).
  *
- * /
- // created on 06-June-2016 by Jackie Zhang
- #ifndef SRC_COMMON_DS_WHEELTIMERMGRT_H_
- #define SRC_COMMON_DS_WHEELTIMERMGRT_H_
- #include <stdbool.h>    /* bool */
+ */
+
+/*
+ * created on 06-June-2016 by Jackie Zhang
+ */
+
+#ifndef SRC_COMMON_DS_WHEELTIMERMGRT_H_
+#define SRC_COMMON_DS_WHEELTIMERMGRT_H_
+#include <stdbool.h>    /* bool */
 #include <stdio.h>      /* FILE */
 #include <inttypes.h>   /* PRIu64 PRIx64 PRIX64 uint64_t */
 #include <list>
+#include <functional>
+#include <limits.h>    /* CHAR_BIT */
+#include <stddef.h>    /* NULL */
+#include <stdlib.h>    /* malloc(3) free(3) */
+#include <string.h>    /* memset(3) */
+#if defined(__linux__) || defined(__unix__)
+#include <errno.h>     /* errno */
+#define get_last_error() errno
+#else
+#define get_last_error() WSAGetLastError()
+#endif
+#include "geco-engine-ultils.h"
+#include "geco-malloc.h"
 
 /* type defines */
 #define TIMEOUT_C(n) UINT64_C(n)
@@ -59,16 +76,97 @@
 #define TIMEOUT_mHZ TIMEOUT_C(1000)
 #define TIMEOUT_uHZ TIMEOUT_C(1000000)
 #define TIMEOUT_nHZ TIMEOUT_C(1000000000)
-typedef uint64_t timeout_t;
 #define timeout_error_t int /* for documentation purposes */
 
-#define REPEAT_PERIOD 0x01 /* interval (repeating) timeout */
-#define TIMEOUT_ABS 0x02 /* treat timeout values as absolute */
+#define REPEAT_TIMER 0x01 /* interval (repeating) TIMER */
+#define ABS_TIMEOUT 0x02 /* treat timeout values as absolute */
 #define TIMEOUT_INITIALIZER(flags) { (flags) }
 #define timeout_setcb(to, fn, arg) do { \
     (to)->callback.fn = (fn);       \
     (to)->callback.arg = (arg);     \
 } while (0)
+
+/*
+ * helpers
+ * * * * * */
+#define countof(a) (sizeof (a) / sizeof *(a))
+#define endof(a) (&(a)[countof(a)])
+#define MIN(a, b) (((a) < (b))? (a) : (b))
+#define MAX(a, b) (((a) > (b))? (a) : (b))
+
+/*
+ * B I T  M A N I P U L A T I O N  R O U T I N E S
+ *
+ * The macros and routines below implement wheel parameterization. The
+ * inputs are:
+ *
+ *   WHEEL_BIT - The number of value bits mapped in each wheel. The
+ *               lowest-order WHEEL_BIT bits index the lowest-order (highest
+ *               resolution) wheel, the next group of WHEEL_BIT bits the
+ *               higher wheel, etc.
+ *
+ *   WHEEL_NUM - The number of wheels. WHEEL_BIT * WHEEL_NUM = the number of
+ *               value bits used by all the wheels. For the default of 6 and
+ *               4, only the low 24 bits are processed. Any timeout value
+ *               larger than this will cycle through again.
+ *
+ * The implementation uses bit fields to remember which slot in each wheel
+ * is populated, and to generate masks of expiring slots according to the
+ * current update interval (i.e. the "tickless" aspect). The slots to
+ * process in a wheel are (populated-set & interval-mask).
+ *
+ * WHEEL_BIT cannot be larger than 6 bits because 2^6 -> 64 is the largest
+ * number of slots which can be tracked in a uint64_t integer bit field.
+ * WHEEL_BIT cannot be smaller than 3 bits because of our rotr and rotl
+ * routines, which only operate on all the value bits in an integer, and
+ * there's no integer smaller than uint8_t.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#define WHEEL_BIT 6
+#define WHEEL_NUM 4
+#define WHEEL_LEN (1U << WHEEL_BIT) // 2^6 = 64
+#define WHEEL_MAX (WHEEL_LEN - 1) // 63
+#define WHEEL_MASK (WHEEL_LEN - 1) // 63 = 01111111
+#define TIMEOUT_MAX \
+((TIMEOUT_C(1) << (WHEEL_BIT * WHEEL_NUM)) - 1) //2^24-1
+
+#if WHEEL_BIT == 6
+#define ctz(n) ctz64(n)
+#define clz(n) clz64(n)
+#define fls(n) ((int)(64 - clz64(n)))
+#else
+#define ctz(n) ctz32(n)
+#define clz(n) clz32(n)
+#define fls(n) ((int)(32 - clz32(n)))
+#endif
+
+#if WHEEL_BIT == 6
+#define WHEEL_C(n) UINT64_C(n)
+#define WHEEL_PRIu PRIu64
+#define WHEEL_PRIx PRIx64
+typedef uint64_t wheel_t;
+#elif WHEEL_BIT == 5
+#define WHEEL_C(n) UINT32_C(n)
+#define WHEEL_PRIu PRIu32
+#define WHEEL_PRIx PRIx32
+typedef uint32_t wheel_t;
+#elif WHEEL_BIT == 4
+#define WHEEL_C(n) UINT16_C(n)
+#define WHEEL_PRIu PRIu16
+#define WHEEL_PRIx PRIx16
+typedef uint16_t wheel_t;
+#elif WHEEL_BIT == 3
+#define WHEEL_C(n) UINT8_C(n)
+#define WHEEL_PRIu PRIu8
+#define WHEEL_PRIx PRIx8
+typedef uint8_t wheel_t;
+#else
+#error invalid WHEEL_BIT value
+#endif
+
+#define wheel_list_type 0
+#define expired_list_type 1
+#define unset_list_type 2
 
 namespace geco
 {
@@ -86,25 +184,12 @@ namespace geco
                 void (*fn)();
                 void *arg;
         };
-        /* struct timeout_cb */
 
-        struct timeout
+        struct timeout_cb
         {
-                int flags;
-                timeout_t expires;/* absolute expiration time */
-                std::list<timeout*>* pending;/* timeout list if pending on wheel or expiry queue */
-                std::list<timeout*>** timeout_list_list;
-                struct timeout_cb callback; /* optional callback information */
-                timeout_t interval;/* timeout interval if periodic */
-                struct timeouts *timeouts;/* timeouts collection if member of */
+                void (*fn)();
+                void *arg;
         };
-
-        struct wheel_timer_mgr_t
-        {
-                wheel_timer_mgr_t();
-                virtual ~wheel_timer_mgr_t();
-        };
-
     } /* namespace ds */
 } /* namespace geco */
 

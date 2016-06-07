@@ -36,6 +36,7 @@
 #include <new>
 
 #include "../geco-engine-export.h"
+#include "../geco-engine-config.h"
 
 // These pointers are statically and globally defined in RakMemoryOverride.cpp
 // Change them to point to your own allocators if you want.
