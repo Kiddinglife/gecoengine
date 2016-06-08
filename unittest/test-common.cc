@@ -1,17 +1,19 @@
 #include "gtest/gtest.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 /**
  *  unit tests have:
  *  1) TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
  *
  */
+
 #include "common/ultils/geco-engine-ultils.h"
 using namespace geco::ultils;
 static int naive_clz(int bits, uint64_t v)
 {
     int r = 0;
-    uint64_t bit = ((uint64_t) 1) << (bits-1);
+    uint64_t bit = ((uint64_t) 1) << (bits - 1);
     while (bit && 0 == (v & bit))
     {
         r++;
@@ -42,15 +44,15 @@ static int check(uint64_t vv)
 
     if (ctz64(vv) != naive_ctz(64, vv))
     {
-        printf("mismatch with %d ctz64: %d, naive_ctz: %d\n",
-                vv, ctz64(vv),naive_ctz(64, vv));
+        printf("mismatch with %d ctz64: %d, naive_ctz: %d\n", vv, ctz64(vv),
+                naive_ctz(64, vv));
         exit(1);
         return 0;
     }
     if (clz64(vv) != naive_clz(64, vv))
     {
-        printf("mismatch with %d clz64: %d, %d\n",
-                vv, clz64(vv),naive_clz(64, vv));
+        printf("mismatch with %d clz64: %d, %d\n", vv, clz64(vv),
+                naive_clz(64, vv));
         exit(1);
         return 0;
     }
@@ -98,4 +100,35 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
     EXPECT_EQ(result, 0);
 }
 
+#include "common/ultils/geco-ds-wheel-timer.h"
+static int& test_bind(int& timer_type)
+{
+    int* a = new int;
+    *a = 1;
+    return *a;
+}
+static int* test_bind2(int* timer_type)
+{
+    int* a = new int;
+    *a = 1;
+    return a;
+}
+typedef int& (*fn1)(int&); // cannot put fn1 to typedef function not typed !
+typedef std::function<int&(int&)> mycb;
+typedef std::function<int*(int*)> mycb2;
+using namespace std::placeholders;
+// adds visibility of _1, _2, _3,...
+TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_CB)
+{
+    mycb f = std::bind(test_bind, _1);
+    int a = 1;
+    int& ret = f(a);
+    EXPECT_EQ(1, ret);
+    delete &ret;
+
+    mycb2 f2 = std::bind(test_bind2, _1);
+    int* ret2 = f2(&a);
+    EXPECT_EQ(1, *ret2);
+    delete ret2;
+}
 
