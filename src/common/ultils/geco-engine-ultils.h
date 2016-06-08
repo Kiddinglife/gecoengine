@@ -47,10 +47,10 @@ namespace geco
 #endif
 
         /*============ timer bit operations ===============*/
-/**
- *  @return sizeofbits -1  if given 0, eg uint64_t a = 0, ctz64(a) returns 63
- *  other number will be fine
- * */
+        /**
+         *  @return sizeofbits -1  if given 0, eg uint64_t a = 0, ctz64(a) returns 63
+         *  other number will be fine
+         * */
 #if defined(__GNUC__) && !defined(TIMEOUT_DISABLE_BUILTIN_BITOPS)
         /* First define ctz and clz functions; these are compiler-dependent if
          * you want them to be fast. On GCC and clang and some others,

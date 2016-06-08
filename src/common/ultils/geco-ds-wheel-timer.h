@@ -140,22 +140,22 @@
 #define fls(n) ((int)(32 - clz32(n)))
 #endif
 
-#if WHEEL_BIT == 6
+#if WHEEL_BIT == 6 // max timeout allowed is 4.66 hours
 #define WHEEL_C(n) UINT64_C(n)
 #define WHEEL_PRIu PRIu64
 #define WHEEL_PRIx PRIx64
 typedef uint64_t wheel_t;
-#elif WHEEL_BIT == 5
+#elif WHEEL_BIT == 5 // max timeout allowed is 17 minutes
 #define WHEEL_C(n) UINT32_C(n)
 #define WHEEL_PRIu PRIu32
 #define WHEEL_PRIx PRIx32
 typedef uint32_t wheel_t;
-#elif WHEEL_BIT == 4
+#elif WHEEL_BIT == 4 // max timeout allowed is 65.5 seconds
 #define WHEEL_C(n) UINT16_C(n)
 #define WHEEL_PRIu PRIu16
 #define WHEEL_PRIx PRIx16
 typedef uint16_t wheel_t;
-#elif WHEEL_BIT == 3
+#elif WHEEL_BIT == 3 // max timeout allowed is 4.09 seconds
 #define WHEEL_C(n) UINT8_C(n)
 #define WHEEL_PRIu PRIu8
 #define WHEEL_PRIx PRIx8
@@ -205,108 +205,127 @@ namespace geco
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
         struct event_handler_t
         {
-                unsigned int event_type;
-                unsigned int owner_type;
-                void* owner;
-                void (*fn)();
-                void *arg;
+            unsigned int event_type;
+            unsigned int owner_type;
+            void* owner;
+            void(*fn)();
+            void *arg;
         };
         struct timeout_cb
         {
-                void (*fn)();
-                void *arg;
+            void(*fn)();
+            void *arg;
         };
         struct wtimers_t;
         struct wtimer_t;
         typedef std::list<wtimer_t*> timer_list;
         typedef timer_list::iterator wtimer_id_t;
-        typedef std::function<int (*)(unsigned int timer_type)> tcb;
+        typedef std::function<int(*)(unsigned int timer_type)> tcb;
         struct wtimer_t
         {
-                wtimer_id_t id;
-                int intid; /* 0 means id is an empty iterator */
-                int flags;
-                time_t abs_expires; /*abs expiration time*/
-                timer_list* pending; /* timer list if pended on wheel or expiry list*/
+            wtimer_id_t id;
+            int intid; /* 0 means id is an empty iterator */
+            int flags;
+            time_t abs_expires; /*abs expiration time*/
+            timer_list* pending; /* timer list if pended on wheel or expiry list*/
 #ifndef TIMEOUT_DISABLE_CALLBACKS
-                struct timeout_cb callback; /* optional callback information */
+            struct timeout_cb callback; /* optional callback information */
 #endif
 #ifndef TIMEOUT_DISABLE_INTERVALS
-                time_t interval; /* timeout interval if periodic */
+            time_t interval; /* timeout interval if periodic */
 #endif
 #ifndef TIMEOUT_DISABLE_RELATIVE_ACCESS
-                struct wtimers_t *wtimers; /* timer collection*/
+            struct wtimers_t *wtimers; /* timer collection*/
 #endif
-                /* initialize timeout structure (same as TIMEOUT_INITIALIZER) */
-                void init(int wt_flags);
+            /* initialize timeout structure (same as TIMEOUT_INITIALIZER) */
+            void init(int wt_flags);
 #ifndef TIMEOUT_DISABLE_RELATIVE_ACCESS
-                /* true if on timing wheel, false otherwise */
-                bool pending_wheel();
-                /* true if on expired queue, false otherwise */
-                bool pending_expired(wtimer_t *);
-                /* remove timeout from any timing wheel (okay if not member of any) */
-                void stop();
+            /* true if on timing wheel, false otherwise */
+            bool pending_wheel();
+            /* true if on expired queue, false otherwise */
+            bool pending_expired(wtimer_t *);
+            /* remove timeout from any timing wheel (okay if not member of any) */
+            void stop();
 #endif
         };
 
         class wtimers_t
         {
             public:
-                timer_list wheel[WHEEL_NUM][WHEEL_LEN];
-                timer_list expired;
-                wheel_t pending[WHEEL_NUM];
-                time_t curtime;
-                time_t hertz;
+            timer_list wheel[WHEEL_NUM][WHEEL_LEN];
+            timer_list expired;
+            wheel_t pending[WHEEL_NUM];
+            time_t curtime;
+            time_t hertz;
 
             public:
-                time_t get_hz()
-                {
-                    return this->hertz;
-                }
-                wtimers_t(time_t hz); //timeouts_init
-                void stop_timer(wtimer_t*); //timeouts_del
-                int get_slot_idx(int wheel, time_t expires)
-                {
-                    return WHEEL_MASK
-                            & ((expires >> (wheel * WHEEL_BIT)) - !!wheel);
-                }
-                int get_wheel_idx(time_t timeout) //timeout_wheel
-                {
-                    /* must be called with timeout != 0, so fls input is nonzero */
-                    return (fls(MIN(timeout, TIMEOUT_MAX)) - 1) / WHEEL_BIT;
-                }
-                time_t get_rem(wtimer_t* to) //timeout_rem
-                {
-                    return to->abs_expires - this->curtime;
-                }
-                bool has_expired_timer() //timeouts_expired
-                {
-                    return !this->expired.empty();
-                }
-                bool has_pending_timer() //timeouts_pending
-                {
-                    wheel_t pending = 0;
-                    int wheel;
+            /**
+             * Calculate the interval before needing to process any timeouts
+             * pending on any wheel. (This is separated from the public API
+             * routine so we can evaluate our wheel invariant assertions irrespective
+             * of the expired queue.)
+             *
+             * This might return a timeout value sooner than any installed timeout
+             * if only higher-order wheels have timeouts pending.
+             * We can only know when to process a wheel, not precisely when a
+             * timeout is scheduled.
+             *
+             * Our timeout accuracy could be off by 2^(N*M)-1 units where N is
+             * the wheel number and M is WHEEL_BIT. Only timeouts which have
+             * fallen through to wheel 0 can be known exactly.
+             *
+             * We should never return a timeout larger than the lowest
+             * actual timeout.*/
+            time_t init();
 
-                    for (wheel = 0; wheel < WHEEL_NUM; wheel++)
-                    {
-                        pending |= this->pending[wheel];
-                    }
-                    return !!pending;
-                } /* timeouts_pending() */
-                void add_timer(wtimer_t *to, time_t timeout);
-                void sche_timer(wtimer_t *to, time_t expires);
+            time_t get_hz()
+            {
+                return this->hertz;
+            }
+            wtimers_t(time_t hz); //timeouts_init
+            void stop_timer(wtimer_t*); //timeouts_del
+            int get_slot_idx(int wheel, time_t expires)
+            {
+                return WHEEL_MASK
+                    & ((expires >> (wheel * WHEEL_BIT)) - !!wheel);
+            }
+            int get_wheel_idx(time_t timeout) //timeout_wheel
+            {
+                /* must be called with timeout != 0, so fls input is nonzero */
+                return (fls(MIN(timeout, TIMEOUT_MAX)) - 1) / WHEEL_BIT;
+            }
+            time_t get_rem(wtimer_t* to) //timeout_rem
+            {
+                return to->abs_expires - this->curtime;
+            }
+            bool has_expired_timer() //timeouts_expired
+            {
+                return !this->expired.empty();
+            }
+            bool has_pending_timer() //timeouts_pending
+            {
+                wheel_t pending = 0;
+                int wheel;
+
+                for (wheel = 0; wheel < WHEEL_NUM; wheel++)
+                {
+                    pending |= this->pending[wheel];
+                }
+                return !!pending;
+            } /* timeouts_pending() */
+            void add_timer(wtimer_t *to, time_t timeout);
+            void sche_timer(wtimer_t *to, time_t expires);
 #ifndef TIMEOUT_DISABLE_INTERVALS
-                void readd_timer(wtimer_t *to);
+            void readd_timer(wtimer_t *to);
 #endif
-                wtimer_t *get_first_expired_timer(); //timeouts_get
+            wtimer_t *get_first_expired_timer(); //timeouts_get
 
         };
         struct wtimers_it
         {
-                int flags;
-                unsigned pc, i, j;
-                wtimer_t *to;
+            int flags;
+            unsigned pc, i, j;
+            wtimer_t *to;
         };
     } /* namespace ds */
 } /* namespace geco */

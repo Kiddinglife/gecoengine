@@ -26,6 +26,34 @@ namespace geco
 {
     namespace ultils
     {
+        static inline wheel_t rotl(const wheel_t v, int c)
+        {
+            // 1) c < 63
+            // (sizeof v * CHAR_BIT - 1) = 63 =   00 111111,
+            // c                                     =  8 =   00 001000
+            // 63&8 = 00 001000 = c = 8 > 0,
+            //  (v << c) = 
+            // 
+            // 2) c == 63
+            // (sizeof v * CHAR_BIT - 1) = 63 =   00 111111,
+            // c                                     = 63 =   00 111111,
+            // 63&63 = 00 000000 = c = 63 > 0, return v 
+            //
+            // 2) c >= 63
+            // (sizeof v * CHAR_BIT - 1) = 63 =   00 111111,
+            // c                                     = 128 = 01 000000,
+            // 63&128 = 00 000000 = c = 0, return v 
+            //
+            if (!(c &= (sizeof v * CHAR_BIT - 1))) return v;
+            return (v << c) | (v >> (sizeof v * CHAR_BIT - c));
+        } /* rotl() */
+
+        static inline wheel_t rotr(const wheel_t v, int c)
+        {
+            if (!(c &= (sizeof v * CHAR_BIT - 1))) return v;
+            return (v >> c) | (v << (sizeof v * CHAR_BIT - c));
+        } /* rotr() */
+
         inline void wtimer_t::init(int wt_flags)
         {
             memset(this, 0, sizeof(wtimer_t));
@@ -36,7 +64,7 @@ namespace geco
         inline bool wtimer_t::pending_wheel()
         {
             return this->pending != NULL
-                    && this->pending != &this->wtimers->expired;
+                && this->pending != &this->wtimers->expired;
         }
         /* true if on expired queue, false otherwise */
         inline bool wtimer_t::pending_expired(wtimer_t *)
@@ -49,6 +77,35 @@ namespace geco
             wtimers->stop_timer(this);
         }
 #endif
+
+        time_t wtimers_t::init()
+        {
+            time_t timeout = ~TIMEOUT_C(0), relmask = 0, _timeout;
+            int wheel, slot;
+            for (wheel = 0; wheel < WHEEL_NUM; wheel++)
+            {
+                /*1) there is timers pended in this wheel*/
+                if (this->pending[wheel])
+                {
+                    slot = WHEEL_MASK & (this->curtime >> (wheel*WHEEL_BIT));
+
+                    /* ctz input cannot be zero: this->pending[wheel] is
+                     * nonzero, so rotr() is nonzero.
+                     * +1 to higher order wheels as those timeouts are one rotation
+                     * in the future (otherwise they'd be on a lower wheel or expired) */
+                    _timeout = (ctz(rotr(this->pending[wheel], slot)) + !!wheel)
+                        << (wheel*WHEEL_BIT);
+
+                    /* reduce by how much lower wheels have progressed */
+                    _timeout -= relmask & this->curtime;
+                    timeout = MIN(_timeout, timeout);
+                }
+
+                relmask <<= WHEEL_BIT;
+                relmask |= WHEEL_MASK;
+            }
+            return timeout;
+        }
 
         wtimers_t::wtimers_t(time_t hz)
         {
@@ -149,7 +206,7 @@ namespace geco
                 /*3) this timer is stored in wheel list that is empty now,
                  * we need do some extra clearup work*/
                 if (wtimer_ptr->pending != &(this->expired)
-                        && wtimer_ptr->pending->empty())
+                    && wtimer_ptr->pending->empty())
                 {
                     // get offset of the wheel where this timer locates
                     ptrdiff_t index = wtimer_ptr->pending - &this->wheel[0][0];
