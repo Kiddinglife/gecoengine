@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 /**
  *  unit tests have:
  *  1) TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
@@ -130,5 +129,19 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_CB)
     int* ret2 = f2(&a);
     EXPECT_EQ(1, *ret2);
     delete ret2;
+
+}
+#include "common/ultils/geco-ds-wheel-timer.h"
+TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_DOUBLE)
+{
+    for (unsigned short i = 0; i <= ~UINT16_C(0); i++)
+    {
+        if (i == 0)
+            EXPECT_EQ(0, !!i);
+        else
+            EXPECT_EQ(1, !!i);
+    }
+    unsigned short maxx = 12345689;
+    EXPECT_EQ(1, !!maxx);
 }
 
