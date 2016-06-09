@@ -79,13 +79,13 @@ namespace geco
         {
             DWORD zeros = 0;
             _BitScanForward(&zeros, val);
-            return zeros;
+            return (int)zeros;
         }
         __inline int clz32(unsigned long val)
         {
             DWORD zeros = 0;
             _BitScanReverse(&zeros, val);
-            return zeros;
+            return (int)zeros;
         }
 #ifdef _WIN64
         /* According to the documentation, these only exist on Win64. */
@@ -93,13 +93,13 @@ namespace geco
         {
             DWORD zeros = 0;
             _BitScanForward64(&zeros, val);
-            return zeros;
+            return (int)zeros;
         }
         __inline int clz64(uint64_t val)
         {
             DWORD zeros = 0;
             _BitScanReverse64(&zeros, val);
-            return zeros;
+            return (int)zeros;
         }
 #else
         __inline int ctz64(uint64_t val)

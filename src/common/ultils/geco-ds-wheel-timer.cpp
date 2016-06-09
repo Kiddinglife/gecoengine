@@ -70,12 +70,13 @@ namespace geco
         inline bool wtimer_t::pending_wheel()
         {
             return this->pending != NULL
-                    && this->pending != &this->wtimers->expired;
+                && this->pending != &this->wtimers->expired;
         }
         /* true if on expired queue, false otherwise */
-        inline bool wtimer_t::pending_expired(wtimer_t *)
+        inline bool wtimer_t::pending_expired()
         {
-            return pending != NULL && pending == &wtimers->expired;
+            return this->pending != NULL 
+                && this->pending == &wtimers->expired;
         }
         /* remove timeout from any timing wheel (okay if not member of any) */
         inline void wtimer_t::stop()
@@ -119,7 +120,7 @@ namespace geco
                      * in the future (otherwise they'd be on a lower wheel or expired)
                      * 双感叹号!!是为了把"非0值"转换成1，而0值还是0 */
                     _timeout = (ctz(rotr(this->pending[wheel], slot)) + !!wheel)
-                            << (wheel * WHEEL_BIT);
+                        << (wheel * WHEEL_BIT);
 
                     /* relmask & this->curtime is another bit operation that can calculate
                      * abs time that all lower wheels have represent.
@@ -148,7 +149,7 @@ namespace geco
                 {
                     /* 1) If the elapsed time is greater than the maximum period of
                      * the wheel, mark every position as expiring (bit 1 means expired) */
-                    pending = (wheel_t) (~WHEEL_C(0));
+                    pending = (wheel_t)(~WHEEL_C(0));
                 }
                 else
                 {
@@ -159,7 +160,7 @@ namespace geco
 
                     /*2.1) get the elpased time slot index*/
                     wheel_t _elapsed = WHEEL_MASK
-                            & (elapsed >> (wheel * WHEEL_BIT));
+                        & (elapsed >> (wheel * WHEEL_BIT));
 
                     /*
                      * TODO: It's likely that at least one of the
@@ -167,18 +168,18 @@ namespace geco
                      * or can be replaced with a simpler operation.*/
                     /*2.2 get curr slot index in the wheel of the curr time*/
                     int currtime_oldslot = WHEEL_MASK
-                            & (this->curtime >> wheel * WHEEL_BIT);
+                        & (this->curtime >> wheel * WHEEL_BIT);
                     /* 2.3 set all timer as expired bwtween old slot index and
                      * _elapsed slot index*/
                     pending = rotl(((TIMEOUT_C(1) << _elapsed)) - 1,
-                            currtime_oldslot);
+                        currtime_oldslot);
 
                     /*2.4 get new slot index in the wheel of the abstime*/
                     int currtime_newslot = WHEEL_MASK
-                            & (abstime >> wheel * WHEEL_BIT);
+                        & (abstime >> wheel * WHEEL_BIT);
                     /* 2.5 set all timer as expired bwtween old slot index and new slot index*/
                     pending |= rotl(((TIMEOUT_C(1) << _elapsed)) - 1,
-                            currtime_newslot);
+                        currtime_newslot);
                 }
 
                 /*3.1) AND to get the expired timer number*/
@@ -223,15 +224,15 @@ namespace geco
 
             /*update curr abs time*/
             this->curtime = abstime;
-//            while (!this->todo.empty())
-//            {
-//                wtimer_t* to = this->todo.front();
-//                this->todo.pop_front();
-//                to->pending = NULL;
-//                /*add the expired timers to expired list for timeout imediatey
-//                 * at this moment,  to->abs_expires MUST <   this->curtime */
-//                sche_timer(to, to->abs_expires);
-//            }
+            //            while (!this->todo.empty())
+            //            {
+            //                wtimer_t* to = this->todo.front();
+            //                this->todo.pop_front();
+            //                to->pending = NULL;
+            //                /*add the expired timers to expired list for timeout imediatey
+            //                 * at this moment,  to->abs_expires MUST <   this->curtime */
+            //                sche_timer(to, to->abs_expires);
+            //            }
         }
 
         void wtimers_t::open(time_t hz)
@@ -241,7 +242,6 @@ namespace geco
             {
                 this->pending[i] = 0;
             }
-            assert(i == 3);
             this->curtime = 0;
             this->hertz = (hz) ? hz : TIMEOUT_mHZ;
         }
@@ -333,7 +333,7 @@ namespace geco
                 /*3) this timer is stored in wheel list that is empty now,
                  * we need do some extra clearup work*/
                 if (wtimer_ptr->pending != &(this->expired)
-                        && wtimer_ptr->pending->empty())
+                    && wtimer_ptr->pending->empty())
                 {
                     // get offset of the wheel where this timer locates
                     ptrdiff_t index = wtimer_ptr->pending - &this->wheel[0][0];

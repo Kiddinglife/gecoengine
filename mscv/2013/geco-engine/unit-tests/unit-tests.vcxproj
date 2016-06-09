@@ -115,7 +115,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SERVER_BUILD;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../../src;../../../../thirdparty/;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl-1.0.0d/include;../../../../thirdparty/googletest/include/;../../../../thirdparty/googlemock/include/;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -165,7 +165,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SERVER_BUILD;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../../src;../../../../thirdparty/;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl-1.0.0d/include;../../../../thirdparty/googletest/include/;../../../../thirdparty/googlemock/include/;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -189,7 +189,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\unittest\net-engine-tests.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-common.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
   </ItemGroup>
   <ItemGroup>
