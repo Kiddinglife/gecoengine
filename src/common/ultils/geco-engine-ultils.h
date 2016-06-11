@@ -23,7 +23,8 @@
 #ifndef _INCLUDE_GECO_ENGINE_ULTILS
 #define _INCLUDE_GECO_ENGINE_ULTILS
 
-#include <string>
+#include <cstring>
+#include <stdio.h>
 #include <stdint.h>
 #ifdef _MSC_VER
 #include <intrin.h>     /* _BitScanForward, _BitScanReverse */
@@ -46,15 +47,15 @@ namespace geco
 #define MIN(a, b) (((a) < (b))? (a) : (b))
 #define MAX(a, b) (((a) > (b))? (a) : (b))
 
-        /// Given a number of bits, 
+        /// Given a number of bits,
         /// return how many bytes are needed to hold all bits.
-        /// For example, 17 bits will need 3 bytes to hold. 
+        /// For example, 17 bits will need 3 bytes to hold.
 #define BITS_TO_BYTES(x) (((x)+7)>>3)
 #define BYTES_TO_BITS(x) ((x)<<3)
 
-        inline void Bitify(char* out, int mWritePosBits, char* mBuffer)
+        inline void Bitify(char* out, int mWritePosBits, unsigned char* mBuffer, bool hide_zero_low_bytes = false)
         {
-            printf("%s[%dbits %dbytes]:\n", "BitsDumpResult", mWritePosBits, BITS_TO_BYTES(mWritePosBits));
+            printf("[%dbits %dbytes]\ntop (low byte)-> bottom (high byte),\nright(low bit)->left(high bit):\n", mWritePosBits, BITS_TO_BYTES(mWritePosBits));
             if (mWritePosBits <= 0)
             {
                 strcpy(out, "no bits to print\n");
@@ -65,6 +66,7 @@ namespace geco
             int stopPos;
             int outter;
             int len = BITS_TO_BYTES(mWritePosBits);
+            bool first_1 = true;
 
             for (outter = 0; outter < len; outter++)
             {
@@ -76,9 +78,18 @@ namespace geco
                 for (inner = 7; inner >= stopPos; inner--)
                 {
                     if ((mBuffer[outter] >> inner) & 1)
+                    {
+                        if(hide_zero_low_bytes && first_1 && strIndex >=8)
+                        {
+                        	strIndex = (strIndex &7)+2;
+                        	first_1 =false;
+                        }
                         out[strIndex++] = '1';
+                    }
                     else
-                        out[strIndex++] = '0';
+                    {
+                    	out[strIndex++] = '0';
+                    }
                 }
                 out[strIndex++] = '\n';
             }
