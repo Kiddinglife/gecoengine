@@ -21,13 +21,26 @@
 // created on 06-June-2016 by Jackie Zhang
 #include "geco-ds-wheel-timer.h"
 #include <assert.h>
+#include "../../common/debugging/geco-engine-debug.h"
 
 namespace geco
 {
+  
     namespace ultils
     {
+        template <class t>
+        static void d_bitify(t v)
+        {
+            char buf[1024];
+            Bitify(buf, sizeof(t) * 8, (char*)&v);
+            geco::debugging::dprintf("%s\n", buf);
+        }
+
         static inline wheel_t rotl(const wheel_t v, int c)
         {
+
+            d_bitify(v);
+
             /*
              * _timeout =
              * (ctz(rotr(this->pending[wheel], slot)) + !!wheel)
@@ -38,26 +51,45 @@ namespace geco
             // 63&8 = 00 001000 = c = 8 > 0,
             //  (v << c) = 111 00000 << 8 = 0 | 56
             // 
-            // 2) c == 63
+            // 2) c == 0, v == 31 = 000 11111
             // (sizeof v * CHAR_BIT - 1) = 63 =   00 111111,
-            // c                                     = 63 =   00 111111,
-            // 63&63 = 00 000000 = c = 63 > 0, return v 
+            // c                                     = 0
+            // 0&63 = 0 , 
+            // (v << c) = 000 11111 << 5 = 000000 11 = 3
+            // (v << (sizeof v * CHAR_BIT - c) =  000 11111 << 58 =
             //
-            // 2) c >= 63
-            // (sizeof v * CHAR_BIT - 1) = 63 =   00 111111,
-            // c                                     = 128 = 01 000000,
-            // 63&128 = 00 000000 = c = 0, return v 
-            //
-            if (!(c &= (sizeof v * CHAR_BIT - 1)))
-                return v;
-            return (v << c) | (v >> (sizeof v * CHAR_BIT - c));
+            //if (!(c &= (sizeof v * CHAR_BIT - 1)))
+            //    return v;
+            //return (v << c) | (v >> (sizeof v * CHAR_BIT - c));
+
+            wheel_t vchar_minus_1 = (sizeof v * CHAR_BIT - 1);
+            wheel_t c_yu_vchar_minus_1 = c &vchar_minus_1;
+            c = c_yu_vchar_minus_1;
+            if (!c) return v;
+
+            wheel_t v_ls_c = (v << c);
+            wheel_t vchar_minus_c = (sizeof v * CHAR_BIT - c);
+            wheel_t v_rs_vchar_minus_c = v >> vchar_minus_c;
+            wheel_t ret = v_ls_c | v_rs_vchar_minus_c;
+            return ret;
         } /* rotl() */
 
         static inline wheel_t rotr(const wheel_t v, int c)
         {
-            if (!(c &= (sizeof v * CHAR_BIT - 1)))
-                return v;
-            return (v >> c) | (v << (sizeof v * CHAR_BIT - c));
+            //if (!(c &= (sizeof v * CHAR_BIT - 1)))
+            //    return v;
+            //return (v >> c) | (v << (sizeof v * CHAR_BIT - c));
+
+            wheel_t vchar_minus_1 = (sizeof v * CHAR_BIT - 1);
+            wheel_t c_yu_vchar_minus_1 = c &vchar_minus_1;
+            c = c_yu_vchar_minus_1;
+            if (!c) return v;
+
+            wheel_t v_rs_c = (v >> c);
+            wheel_t vchar_minus_c = (sizeof v * CHAR_BIT - c);
+            wheel_t v_ls_vchar_minus_c = v << vchar_minus_c;
+            wheel_t ret = v_rs_c | v_ls_vchar_minus_c;
+            return ret;
         } /* rotr() */
 
         void wtimer_t::init(int wt_flags)
@@ -70,7 +102,7 @@ namespace geco
         bool wtimer_t::pending_wheel()
         {
             return this->pending != NULL
-                    && this->pending != &this->wtimers->expired;
+                && this->pending != &this->wtimers->expired;
         }
         /* true if on expired queue, false otherwise */
         bool wtimer_t::pending_expired()
@@ -89,6 +121,8 @@ namespace geco
             /*~TIMEOUT_C(0) is the max value of uint64_t */
             time_t timeout = ~TIMEOUT_C(0), relmask = 0, _timeout;
             int wheel, slot, scale;
+            wheel_t val;
+
             for (wheel = 0; wheel < WHEEL_NUM; wheel++)
             {
                 /*1) there are existing timers pended in this wheel*/
@@ -111,7 +145,7 @@ namespace geco
                      * that is 645 & (2^6-1) = 645 & WHEEL_MASK = 5 */
                     scale = this->curtime >> (wheel * WHEEL_BIT);
                     slot = WHEEL_MASK & scale;
-
+       
                     /*
                      * determine the relative timout of the latest timer on current wheel
                      * ctz input cannot be zero: this->pending[wheel] is
@@ -129,8 +163,9 @@ namespace geco
                      * assume on wheel 1, timeout = 2 << 6(wheel 1 timeout)
                      * + 1 << 6(wheel0 timeout)
                      **/
-                    _timeout = (ctz(rotr(this->pending[wheel], slot)) + !!wheel)
-                            << (wheel * WHEEL_BIT);
+                    val = rotr(this->pending[wheel], slot);
+                    int tzeros = ctz(val);
+                    _timeout = (tzeros + !!wheel)<< (wheel * WHEEL_BIT);
 
                     /* relmask & this->curtime is another bit operation that can calculate
                      * relative time, we reduce this value from relative timeout,
@@ -167,7 +202,7 @@ namespace geco
                 {
                     /* 1) If the elapsed time is greater than the maximum period of
                      * the wheel, mark every position as expiring (bit 1 means expired) */
-                    pending = (wheel_t) (~WHEEL_C(0));
+                    pending = (wheel_t)(~WHEEL_C(0));
                 }
                 else
                 {
@@ -176,8 +211,7 @@ namespace geco
                      * slot, inclusive of the last slot. We'll bitwise-AND this
                      * with our pending set below.*/
                     /*2.1) get the elpased time slot index*/
-                    wheel_t _elapsed = WHEEL_MASK
-                            & (elapsed >> (wheel * WHEEL_BIT));
+                    wheel_t _elapsed = WHEEL_MASK& (elapsed >> (wheel * WHEEL_BIT));
 
                     /*
                      * TODO: check if curr time is included in time max range
@@ -188,20 +222,20 @@ namespace geco
                      * following three bit fill operations is redundant
                      * or can be replaced with a simpler operation.*/
                     /*2.2 get curr slot index in the wheel of the curr time*/
-                    int currtime_oldslot = WHEEL_MASK
-                            & (this->curtime >> wheel * WHEEL_BIT);
-                    /* 2.3 set all timer as expired bwtween old slot index and
-                     * _elapsed slot index*/
-                    pending = rotl(((WHEEL_C(1) << _elapsed)) - 1,
-                            currtime_oldslot);
+                    int currtime_oldslot = WHEEL_MASK& (this->curtime >> wheel * WHEEL_BIT);
+                    /* 2.3 set all timer as expired bwtween curr time and
+                     * _elapsed time
+                     * (WHEEL_C(1) << _elapsed) = 00000001 << 5 = 00100000 = 32
+                     * 32-1 = 31 = 000 11111 = 31
+                     * rotl(31,0) = 31 = 11111
+                     */
+                    pending = rotl(((WHEEL_C(1) << _elapsed)) - 1, currtime_oldslot);
 
                     /*2.4 get new slot index in the wheel of the abstime*/
-                    int currtime_newslot = WHEEL_MASK
-                            & (abstime >> wheel * WHEEL_BIT);
+                    int currtime_newslot = WHEEL_MASK & (abstime >> wheel * WHEEL_BIT);
                     /* 2.5 set all timer as expired bwtween old slot index and new slot index*/
-                    pending |= rotl(
-                            rotl(((WHEEL_C(1) << _elapsed)) - 1,
-                                    currtime_newslot), _elapsed);
+                    wheel_t val = rotl(((WHEEL_C(1) << _elapsed)) - 1, currtime_newslot);
+                    pending |= rotl(val, _elapsed);
                     pending |= WHEEL_C(1) << currtime_newslot;
                 }
 
@@ -270,10 +304,12 @@ namespace geco
                 wt->wtimers = NULL;
                 wt->intid = 0;
                 this->expired.pop_front();
+
 #ifndef TIMEOUT_DISABLE_INTERVALS
                 if ((wt->flags & REPEAT_TIMER) && wt->interval > 0)
                     readd_timer(wt);
 #endif
+
                 return wt;
             }
             else
@@ -334,6 +370,7 @@ namespace geco
                 /* 3) set curr slot on curr wheel to bit one to indicate there is
                  * timer exists in this slot  */
                 this->pending[wheel] |= (WHEEL_C(1) << slot);
+                
             }
             else
             {
@@ -356,7 +393,7 @@ namespace geco
                 /*3) this timer is stored in wheel list that is empty now,
                  * we need do some extra clearup work*/
                 if (wtimer_ptr->pending != &(this->expired)
-                        && wtimer_ptr->pending->empty())
+                    && wtimer_ptr->pending->empty())
                 {
                     /*3.1) get offset of the wheel where this timer locates*/
                     ptrdiff_t index = wtimer_ptr->pending - &this->wheel[0][0];

@@ -38,6 +38,55 @@ namespace geco
     namespace ultils
     {
 
+        /*
+        * helpers
+        * * * * * */
+#define countof(a) (sizeof (a) / sizeof *(a))
+#define endof(a) (&(a)[countof(a)])
+#define MIN(a, b) (((a) < (b))? (a) : (b))
+#define MAX(a, b) (((a) > (b))? (a) : (b))
+
+        /// Given a number of bits, 
+        /// return how many bytes are needed to hold all bits.
+        /// For example, 17 bits will need 3 bytes to hold. 
+#define BITS_TO_BYTES(x) (((x)+7)>>3)
+#define BYTES_TO_BITS(x) ((x)<<3)
+
+        inline void Bitify(char* out, int mWritePosBits, char* mBuffer)
+        {
+            printf("%s[%dbits %dbytes]:\n", "BitsDumpResult", mWritePosBits, BITS_TO_BYTES(mWritePosBits));
+            if (mWritePosBits <= 0)
+            {
+                strcpy(out, "no bits to print\n");
+                return;
+            }
+            int strIndex = 0;
+            int inner;
+            int stopPos;
+            int outter;
+            int len = BITS_TO_BYTES(mWritePosBits);
+
+            for (outter = 0; outter < len; outter++)
+            {
+                if (outter == len - 1)
+                    stopPos = 8 - (((mWritePosBits - 1) & 7) + 1);
+                else
+                    stopPos = 0;
+
+                for (inner = 7; inner >= stopPos; inner--)
+                {
+                    if ((mBuffer[outter] >> inner) & 1)
+                        out[strIndex++] = '1';
+                    else
+                        out[strIndex++] = '0';
+                }
+                out[strIndex++] = '\n';
+            }
+
+            out[strIndex++] = '\n';
+            out[strIndex++] = 0;
+        }
+
 #if defined(_WIN32)
         /*  Converts the given narrow string to the wide representation, using the
          *  active code page on this system. Returns true if it succeeded, otherwise
@@ -72,7 +121,7 @@ namespace geco
         {
             return __builtin_clzll(val);
         }
-#elif defined(_MSC_VER) && !defined(TIMEOUT_DISABLE_BUILTIN_BITOPS)
+#elif !defined(_MSC_VER) && !defined(TIMEOUT_DISABLE_BUILTIN_BITOPS)
         /* On MSVC, we have these handy functions. We can ignore their return
          * values, since we will never supply val == 0. */
         __inline int ctz32(unsigned long val)
@@ -110,18 +159,18 @@ namespace geco
         }
         __inline int clz64(uint64_t val)
         {
-            uint32_t lo = (uint32_t) val;
-            uint32_t hi = (uint32_t) (val >> 32);
+            uint32_t lo = (uint32_t)val;
+            uint32_t hi = (uint32_t)(val >> 32);
             return hi ? clz32(hi) : 32 + clz32(lo);
         }
 #endif
 #else
         /*we have to impl these functions by ourselves*/
         /* uint64_t will take 8 times assignment to be reversed */
-        inline void reverse(unsigned char *src, const uint length)
+        inline void reverse(unsigned char *src, const unsigned int length)
         {
             unsigned char temp;
-            for (uint i = 0; i < (length >> 1); i++)
+            for (unsigned int i = 0; i < (length >> 1); i++)
             {
                 temp = src[i];
                 src[i] = src[length - i - 1];
@@ -130,7 +179,7 @@ namespace geco
         }
         inline static int get_leading_zeros_size(char x)
         {
-            return get_leading_zeros_size((unsigned char) x);
+            return get_leading_zeros_size((unsigned char)x);
         }
         inline static int get_leading_zeros_size(unsigned char x)
         {
@@ -162,8 +211,8 @@ namespace geco
             }
             y = x >> 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_trailing_zeros_size(unsigned char x)
         {
@@ -197,8 +246,8 @@ namespace geco
             }
             y = x << 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_leading_zeros_size(unsigned short x)
         {
@@ -226,8 +275,8 @@ namespace geco
             }
             y = x >> 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_trailing_zeros_size(unsigned short x)
         {
@@ -255,12 +304,12 @@ namespace geco
             }
             y = x << 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_leading_zeros_size(short x)
         {
-            return get_leading_zeros_size((unsigned short) x);
+            return get_leading_zeros_size((unsigned short)x);
         }
         inline static int get_leading_zeros_size(unsigned int x)
         {
@@ -294,8 +343,8 @@ namespace geco
             }
             y = x >> 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_trailing_zeros_size(unsigned int x)
         {
@@ -329,12 +378,12 @@ namespace geco
             }
             y = x << 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_leading_zeros_size(int x)
         {
-            return get_leading_zeros_size((unsigned int) x);
+            return get_leading_zeros_size((unsigned int)x);
         }
         inline static int get_leading_zeros_size(uint64_t x)
         {
@@ -374,8 +423,8 @@ namespace geco
             }
             y = x >> 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_trailing_zeros_size(uint64_t x)
         {
@@ -420,12 +469,12 @@ namespace geco
             }
             y = x << 1;
             if (y != 0)
-                return (int) (n - 2);
-            return (int) (n - 1);
+                return (int)(n - 2);
+            return (int)(n - 1);
         }
         inline static int get_leading_zeros_size(int64_t x)
         {
-            return get_leading_zeros_size((uint64_t) x);
+            return get_leading_zeros_size((uint64_t)x);
         }
         inline int clz32(unsigned int val)
         {

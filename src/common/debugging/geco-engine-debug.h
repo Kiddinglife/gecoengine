@@ -30,6 +30,7 @@
 
 #include "../geco-engine-config.h"
 #include "../ds/array.h"
+#include "../ultils/geco-engine-ultils.h"
 
 /**
  *	@file geco-engine-debug.h
@@ -176,7 +177,7 @@ namespace geco
             static bool should_accept(int component_priority, int msg_riority)
             {
                 return (msg_riority
-                    >= std::max(
+                    >= MAX(
                     log_msg_filter_t::get_instance().filter_threshold_,
                     component_priority));
             }

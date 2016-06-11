@@ -20,28 +20,33 @@
 
 // created on 02-June-2016 by Jackie Zhang
 #include "geco-engine-ultils.h"
-using namespace geco::ultils;
+namespace geco
+{
+    namespace ultils
+    {
 
 #ifdef _WIN32
-bool multibyte2wchar(const char * src, std::wstring& output)
-{
-    int len = MultiByteToWideChar(CP_ACP, 0, src, -1, NULL, 0);
-    if (len <= 0)
-    {
-        return false;
-    }
-    else
-    {
-        // MultiByteToWideChar will process the \0 at the end of the source,
-        //  so len will contain that too, meaning that the output size WILL
-        //  include the \0 at the end, which breaks string concatenation,
-        //  since they will be put AFTER the \0. So, after processing the string
-        //  we remove the \0 of the output.
-        output.resize(len);
-        int res = MultiByteToWideChar(CP_ACP, 0, src, -1, &output[0], len);
-        output.resize(output.length() - 1);
-        return res != 0;
-    }
-}
+        bool multibyte2wchar(const char * src, std::wstring& output)
+        {
+            int len = MultiByteToWideChar(CP_ACP, 0, src, -1, NULL, 0);
+            if (len <= 0)
+            {
+                return false;
+            }
+            else
+            {
+                // MultiByteToWideChar will process the \0 at the end of the source,
+                //  so len will contain that too, meaning that the output size WILL
+                //  include the \0 at the end, which breaks string concatenation,
+                //  since they will be put AFTER the \0. So, after processing the string
+                //  we remove the \0 of the output.
+                output.resize(len);
+                int res = MultiByteToWideChar(CP_ACP, 0, src, -1, &output[0], len);
+                output.resize(output.length() - 1);
+                return res != 0;
+            }
+        }
 
 #endif
+    }
+}
