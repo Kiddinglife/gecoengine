@@ -138,23 +138,23 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_CB)
 
 #include "common/ultils/geco-ds-wheel-timer.h"
 using namespace geco::ultils;
-#define THE_END_OF_TIME ((time_t)-1)
+#define THE_END_OF_TIME ((timeout_t)-1)
 #define FAIL() do{printf("Failure on line %d\n", __LINE__);	goto done;} while (0)
 /* configuration for check_randomized */
 struct rand_cfg
 {
 	/* When creating timeouts, smallest possible delay */
-	time_t min_timeout;
+	timeout_t min_timeout;
 	/* When creating timeouts, largest possible delay */
-	time_t max_timeout;
+	timeout_t max_timeout;
 	/* First time to start the clock at. */
-	time_t start_at;
+	timeout_t start_at;
 	/* Do not advance the clock past this time. */
-	time_t end_at;
+	timeout_t end_at;
 	/* Number of timeouts to create and monitor. */
 	int n_timeouts;
 	/* Advance the clock by no more than this each step. */
-	time_t max_step;
+	timeout_t max_step;
 	/* Use relative timers and stepping */
 	int relative;
 	/* Every time the clock ticks, try removing this many timeouts at
@@ -164,12 +164,12 @@ struct rand_cfg
 	int finalize;
 };
 /* Not very random */
-static time_t random_to(time_t min, time_t max)
+static timeout_t random_to(timeout_t min, timeout_t max)
 {
 	if (max <= min)
 		return min;
 	/* Not actually all that random, but should exercise the code. */
-	time_t rand64 = rand() * (time_t) INT_MAX + rand();
+	timeout_t rand64 = rand() * (timeout_t) INT_MAX + rand();
 	return min + (rand64 % (max - min));
 }
 static void check_randomized(const struct rand_cfg *cfg)
@@ -177,12 +177,12 @@ static void check_randomized(const struct rand_cfg *cfg)
 	uint64_t i, j, err;
 	int rv = 1;
 	wtimer_t* t = new wtimer_t[cfg->n_timeouts];
-	time_t* timeouts = new time_t[cfg->n_timeouts];
+	timeout_t* timeouts = new timeout_t[cfg->n_timeouts];
 	uint8_t *fired = new uint8_t[cfg->n_timeouts];
 	uint8_t *found = new uint8_t[cfg->n_timeouts];
 	uint8_t *deleted = new uint8_t[cfg->n_timeouts];
 	memset(t, 0, sizeof(wtimer_t) * cfg->n_timeouts);
-	memset(timeouts, 0, sizeof(time_t) * cfg->n_timeouts);
+	memset(timeouts, 0, sizeof(timeout_t) * cfg->n_timeouts);
 	memset(fired, 0, sizeof(uint8_t) * cfg->n_timeouts);
 	memset(deleted, 0, sizeof(uint8_t) * cfg->n_timeouts);
 	memset(found, 0, sizeof(uint8_t) * cfg->n_timeouts);
@@ -197,7 +197,7 @@ static void check_randomized(const struct rand_cfg *cfg)
 		EXPECT_EQ(tos.pending[i], 0);
 	}
 
-	time_t now = cfg->start_at;
+	timeout_t now = cfg->start_at;
 	int n_added_pending = 0, cnt_added_pending = 0;
 	int n_added_expired = 0, cnt_added_expired = 0;
 	wtimer_iterator_t it_p, it_e, it_all;
@@ -281,11 +281,11 @@ static void check_randomized(const struct rand_cfg *cfg)
 //	while (now < cfg->end_at)
 //	{
 //		int n_fired_this_time = 0;
-//		time_t first_at = tos.timout() + now;
+//		timeout_t first_at = tos.timout() + now;
 //
-//		time_t step = random_to(1, cfg->max_step);
+//		timeout_t step = random_to(1, cfg->max_step);
 //		now += step;
-//		time_t oldtime = now;
+//		timeout_t oldtime = now;
 //		int another;
 //
 //		if (rel)
@@ -303,7 +303,7 @@ static void check_randomized(const struct rand_cfg *cfg)
 //			}
 //		}
 //
-//		time_t tm = tos.timout();
+//		timeout_t tm = tos.timout();
 //		another = (tm == 0);
 //		while (NULL != (to = tos.get_expired_timer()))
 //		{

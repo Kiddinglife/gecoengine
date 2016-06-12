@@ -81,7 +81,7 @@ namespace geco
             {
                 if (log_msg_filter_t::shouldWriteTimePrefix)
                 {
-                    time_t ttime = time(NULL);
+                    timeout_t ttime = time(NULL);
                     char timebuff[32];
 
                     if (0
