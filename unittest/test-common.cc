@@ -276,33 +276,31 @@ static void check_randomized(const struct rand_cfg *cfg)
 	}
 	EXPECT_EQ(n_added_expired, 0);
 
-	tos.timout();
+	while (now < cfg->end_at)
+	{
+		int n_fired_this_time = 0;
+		timeout_t first_at = tos.timout() + now;
+		printf("now %lu, first_at %lu\n", now, first_at);
+		timeout_t oldtime = now;
+		timeout_t step = random_to(1, cfg->max_step);
+		now += step;
+		int another;
 
-//	while (now < cfg->end_at)
-//	{
-//		int n_fired_this_time = 0;
-//		timeout_t first_at = tos.timout() + now;
-//
-//		timeout_t step = random_to(1, cfg->max_step);
-//		now += step;
-//		timeout_t oldtime = now;
-//		int another;
-//
-//		if (rel)
-//			tos.step(step);
-//		else
-//			tos.update(now);
-//
-//		for (i = 0; i < cfg->try_removing; ++i)
-//		{
-//			int idx = rand() % cfg->n_timeouts;
-//			if (!fired[idx])
-//			{
-//				tos.stop_timer(&t[idx]);
-//				++deleted[idx];
-//			}
-//		}
-//
+		if (rel)
+			tos.step(step);
+		else
+			tos.update(now);
+
+		for (i = 0; i < cfg->try_removing; ++i)
+		{
+			int idx = rand() % cfg->n_timeouts;
+			if (!fired[idx])
+			{
+				tos.stop_timer(&t[idx]);
+				++deleted[idx];
+			}
+		}
+
 //		timeout_t tm = tos.timout();
 //		another = (tm == 0);
 //		while (NULL != (to = tos.get_expired_timer()))
@@ -312,7 +310,7 @@ static void check_randomized(const struct rand_cfg *cfg)
 //			EXPECT_EQ(t + i, to);
 //			EXPECT_LE(timeouts[i], now);
 //		}
-//	}
+	}
 
 	tos.close();
 	EXPECT_EQ(false, tos.has_expiring_timer());
@@ -338,7 +336,7 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER)
 	/*min_timeout*/100,
 	/*max_timeout*/100,
 	/*start_at*/5,
-	/*end_at*/1000,
+	/*end_at*/150,
 	/*n_timeouts*/3,
 	/*max_step*/10,
 	/*relative*/0,

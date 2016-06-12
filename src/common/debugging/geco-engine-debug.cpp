@@ -32,106 +32,105 @@
 
 namespace geco
 {
-    namespace debugging
-    {
+namespace debugging
+{
 
-        // init static variables
-        log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
-        bool log_msg_filter_t::shouldWriteTimePrefix = false;
+// init static variables
+log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
+bool log_msg_filter_t::shouldWriteTimePrefix = false;
 #if defined( SERVER_BUILD ) || defined( PLAYSTATION3 )
-        bool log_msg_filter_t::shouldWriteToConsole = true;
+bool log_msg_filter_t::shouldWriteToConsole = true;
 #else
-        bool log_msg_filter_t::shouldWriteToConsole = false;
+bool log_msg_filter_t::shouldWriteToConsole = false;
 #endif
 
 #if ENABLE_DPRINTF
-        void vdprintf(const char * format, va_list argPtr, const char * prefix)
-        {
+void vdprintf(const char * format, va_list argPtr, const char * prefix)
+{
 #ifdef _WIN32
-            char buf[2048];
-            char * pBuf = buf;
-            int len = 0;
-            if (prefix)
-            {
-                len = strlen(prefix);
-                memcpy(pBuf, prefix, len);
-                pBuf += len;
-                if (log_msg_filter_t::shouldWriteToConsole)
-                {
-                    fprintf(stderr, "%s", prefix);
-                }
-            }
+	char buf[2048];
+	char * pBuf = buf;
+	int len = 0;
+	if (prefix)
+	{
+		len = strlen(prefix);
+		memcpy(pBuf, prefix, len);
+		pBuf += len;
+		if (log_msg_filter_t::shouldWriteToConsole)
+		{
+			fprintf(stderr, "%s", prefix);
+		}
+	}
 
-            _vsnprintf(pBuf, sizeof(buf) - len, format, argPtr);
-            buf[sizeof(buf) - 1] = 0;
+	_vsnprintf(pBuf, sizeof(buf) - len, format, argPtr);
+	buf[sizeof(buf) - 1] = 0;
 
-            std::wstring wbuf;
-            if (!geco::ultils::multibyte2wchar(buf, wbuf))
-            {
-                wbuf = L"[Error converting message string to wide]\n";
-            }
+	std::wstring wbuf;
+	if (!geco::ultils::multibyte2wchar(buf, wbuf))
+	{
+		wbuf = L"[Error converting message string to wide]\n";
+	}
 
-            OutputDebugString(wbuf.c_str());
-            if (log_msg_filter_t::shouldWriteToConsole)
-            {
-                vfprintf(stderr, format, argPtr);
-            }
+	OutputDebugString(wbuf.c_str());
+	if (log_msg_filter_t::shouldWriteToConsole)
+	{
+		vfprintf(stderr, format, argPtr);
+	}
 #else
-            if (log_msg_filter_t::shouldWriteToConsole)
-            {
-                if (log_msg_filter_t::shouldWriteTimePrefix)
-                {
-                    timeout_t ttime = time(NULL);
-                    char timebuff[32];
+	if (log_msg_filter_t::shouldWriteToConsole)
+	{
+		if (log_msg_filter_t::shouldWriteTimePrefix)
+		{
+			time_t ttime = time(NULL);
+			char timebuff[32];
 
-                    if (0
-                        != strftime(timebuff, sizeof(timebuff), "%F %T: ",
-                        localtime(&ttime)))
-                    {
-                        fprintf(stderr, timebuff);
-                    }
-                }
+			if (strftime(timebuff, sizeof(timebuff), "%F %T: ",
+					localtime(&ttime)) != 0)
+			{
+				fprintf(stderr, "%s", timebuff);
+			}
+		}
 
-                if (prefix)
-                {
-                    fprintf(stderr, "%s", prefix);
-                }
+		if (prefix)
+		{
+			fprintf(stderr, "%s", prefix);
+		}
 
-                // Need to make a copy of the va_list here to avoid crashing on 64bit
-                va_list tmpArgPtr;
-                va_copy(tmpArgPtr, argPtr);
-                vfprintf(stderr, format, tmpArgPtr);
-                va_end(tmpArgPtr);
-            }
+		// Need to make a copy of the va_list here to avoid crashing on 64bit
+		va_list tmpArgPtr;
+		va_copy(tmpArgPtr, argPtr);
+		vfprintf(stderr, format, tmpArgPtr);
+		va_end(tmpArgPtr);
+	}
 #endif
-        }
+}
 
-        /*prints a debug message if the input priorities satisfies thefilter*/
-        void vdprintf(int componentPriority, int messagePriority, const char * format,
-            va_list argPtr, const char * prefix)
-        {
-            vdprintf(format, argPtr, prefix);
-        }
+/*prints a debug message if the input priorities satisfies thefilter*/
+void vdprintf(int componentPriority, int messagePriority, const char * format,
+		va_list argPtr, const char * prefix)
+{
+	vdprintf(format, argPtr, prefix);
+}
 
-        void dprintf(const char * format, ...)
-        {
-            va_list argPtr;
-            va_start(argPtr, format);
-            vdprintf(format, argPtr);
-            va_end(argPtr);
-        }
+void dprintf(const char * format, ...)
+{
+	va_list argPtr;
+	va_start(argPtr, format);
+	vdprintf(format, argPtr);
+	va_end(argPtr);
+}
 
-        /**
-        *	This function prints a debug message if the input priorities satisfies the
-        *	filter.
-        */
-        void dprintf(int componentLevel, int severity, const char * format, ...)
-        {
-            va_list argPtr;
-            va_start(argPtr, format);
-            vdprintf(componentLevel, severity, format, argPtr);
-            va_end(argPtr);
-        }
+/**
+ *	This function prints a debug message if the input priorities satisfies the
+ *	filter.
+ */
+void dprintf(int componentLevel, int severity, const char * format, ...)
+{
+	va_list argPtr;
+	va_start(argPtr, format);
+	vdprintf(componentLevel, severity, format, argPtr);
+	va_end(argPtr);
+}
 #endif
-    }
+}
 }
