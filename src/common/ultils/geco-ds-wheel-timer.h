@@ -66,6 +66,8 @@
 #else
 #define get_last_error() WSAGetLastError()
 #endif
+
+#define DPRINTF
 #include "geco-engine-ultils.h"
 #include "geco-malloc.h"
 
@@ -207,6 +209,12 @@ do {(cur)->flags = (_flags);(cur)->pc = 0;}while(0)
 #define add_float_timer(wtimers_ref, to, timeout) \
 (wtimers_ref).add_timer((to), timeouts_f2i((T), (timeout)))
 
+#ifdef DPRINTF
+#define dprint(fmt, msg) printf(fmt, msg)
+#else
+#define dprint(msg, fmt)
+#endif
+
 namespace geco
 {
 namespace ultils
@@ -338,23 +346,31 @@ public:
 		{
 			for (j = 0; j < WHEEL_LEN; j++)
 			{
-				for (auto& t : this->wheel[i][j])
+				if (!this->wheel[i][j].empty())
 				{
-					t->pending = NULL;
-					t->wtimers = NULL;
-					t->intid = 0; // make iterator as "NULL"
+					for (auto& t : this->wheel[i][j])
+					{
+						t->pending = NULL;
+						t->wtimers = NULL;
+						t->intid = 0; // make iterator as "NULL"
+					}
+					this->wheel[i][j].clear();
 				}
-				this->wheel[i][j].clear();
 			}
+			this->pending[i] = 0;
+
 		}
 
-		for (auto& t : this->expired)
+		if (!this->wheel[i][j].empty())
 		{
-			t->pending = NULL;
-			t->wtimers = NULL;
-			t->intid = 0; // make iterator as "NULL"
+			for (auto& t : this->expired)
+			{
+				t->pending = NULL;
+				t->wtimers = NULL;
+				t->intid = 0; // make iterator as "NULL"
+			}
+			this->expired.clear();
 		}
-		this->expired.clear();
 	}
 
 	time_t get_hz()

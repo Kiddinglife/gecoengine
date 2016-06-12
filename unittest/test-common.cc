@@ -275,61 +275,67 @@ static void check_randomized(const struct rand_cfg *cfg)
 		++fired[i];
 	}
 	EXPECT_EQ(n_added_expired, 0);
-//
-//    while (now < cfg->end_at)
-//    {
-//        int n_fired_this_time = 0;
-//        time_t first_at = tos.timout() + now;
-////        time_t step = random_to(1, cfg->max_step);
-////        now += step;
-////        time_t oldtime = now;
-////        int another;
-////
-////        if (rel)
-////            tos.step(step);
-////        else
-////            tos.update(now);
-////
-////        for (i = 0; i < cfg->try_removing; ++i)
-////        {
-////            int idx = rand() % cfg->n_timeouts;
-////            if (!fired[idx])
-////            {
-////                tos.stop_timer(&t[idx]);
-////                ++deleted[idx];
-////            }
-////        }
-////
-////        time_t tm = tos.timout();
-////        another = (tm == 0);
-////        while (NULL != (to = tos.get_expired_timer()))
-////        {
-////            EXPECT_EQ(another, 1); /* Thought we saw the last one! */
-////            i = to - t;
-////            EXPECT_EQ(t + i, to);
-////            EXPECT_LE(timeouts[i], now);
-////        }
-//	 }
 
-	done:
+	tos.timout();
+
+//	while (now < cfg->end_at)
+//	{
+//		int n_fired_this_time = 0;
+//		time_t first_at = tos.timout() + now;
+//
+//		time_t step = random_to(1, cfg->max_step);
+//		now += step;
+//		time_t oldtime = now;
+//		int another;
+//
+//		if (rel)
+//			tos.step(step);
+//		else
+//			tos.update(now);
+//
+//		for (i = 0; i < cfg->try_removing; ++i)
+//		{
+//			int idx = rand() % cfg->n_timeouts;
+//			if (!fired[idx])
+//			{
+//				tos.stop_timer(&t[idx]);
+//				++deleted[idx];
+//			}
+//		}
+//
+//		time_t tm = tos.timout();
+//		another = (tm == 0);
+//		while (NULL != (to = tos.get_expired_timer()))
+//		{
+//			EXPECT_EQ(another, 1); /* Thought we saw the last one! */
+//			i = to - t;
+//			EXPECT_EQ(t + i, to);
+//			EXPECT_LE(timeouts[i], now);
+//		}
+//	}
+
 	tos.close();
-	if (t)
-		free(t);
+	EXPECT_EQ(false, tos.has_expiring_timer());
+	EXPECT_EQ(false, tos.has_expired_timer());
+
+	done: if (t)
+		delete[] t;
 	if (timeouts)
-		free(timeouts);
+		delete[] timeouts;
 	if (fired)
-		free(fired);
+		delete[] fired;
 	if (found)
-		free(found);
+		delete[] found;
 	if (deleted)
-		free(deleted);
+		delete[] deleted;
+	printf("done !\n");
 }
 
 TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER)
 {
 	struct rand_cfg cfg1 =
 	{
-	/*min_timeout*/1,
+	/*min_timeout*/100,
 	/*max_timeout*/100,
 	/*start_at*/5,
 	/*end_at*/1000,

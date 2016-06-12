@@ -101,9 +101,10 @@ void wtimer_t::stop()
 time_t wtimers_t::get_interval()
 {
 	/*~TIMEOUT_C(0) is the max value of uint64_t */
-	time_t timeout = ~TIMEOUT_C(0), relmask = 0, _timeout;
-	int wheel, slot, scale;
-	wheel_t val;
+	time_t timeout = ~TIMEOUT_C(0);
+	time_t _timeout;
+	time_t relmask = 0;
+	int wheel, slot;
 
 	for (wheel = 0; wheel < WHEEL_NUM; wheel++)
 	{
@@ -125,7 +126,7 @@ time_t wtimers_t::get_interval()
 			 * it should be 645 % 64 = 5 = slot index,
 			 *  this calculation has a fast bit operation, unless the range is 2 times big
 			 * that is 645 & (2^6-1) = 645 & WHEEL_MASK = 5 */
-			scale = this->curtime >> (wheel * WHEEL_BIT);
+			int scale = this->curtime >> (wheel * WHEEL_BIT);
 			slot = WHEEL_MASK & scale;
 
 			/*
@@ -145,7 +146,7 @@ time_t wtimers_t::get_interval()
 			 * assume on wheel 1, timeout = 2 << 6(wheel 1 timeout)
 			 * + 1 << 6(wheel0 timeout)
 			 **/
-			val = rotr(this->pending[wheel], slot);
+			wheel_t val = rotr(this->pending[wheel], slot);
 			int tzeros = ctz(val);
 			_timeout = (tzeros + !!wheel) << (wheel * WHEEL_BIT);
 
@@ -156,7 +157,9 @@ time_t wtimers_t::get_interval()
 
 			/* swap if it is the current rel timeout is smaller than previous one
 			 * this is to find the smallest rel timeout for all timers on all wheels*/
+
 			timeout = MIN(_timeout, timeout);
+			printf("before timeout %lu, _timeout %lu\n", timeout, _timeout);
 		}
 
 		/* different wheels have different rel mask to be used*/
@@ -332,7 +335,7 @@ void wtimers_t::add_timer(wtimer_t *to, time_t timeout)
 
 void wtimers_t::sche_timer(wtimer_t *to, time_t abs_expires)
 {
-	time_t rem; /*remianing time before timeout*/
+	time_t rem; /*remaining time before timeout*/
 	int wheel, slot; /*row-col-style index to find timeout list to add this timer to*/
 
 	/*1) delete this timer if already existed */
@@ -345,7 +348,7 @@ void wtimers_t::sche_timer(wtimer_t *to, time_t abs_expires)
 		/*2) this is a timer being expired, so we need
 		 * determine the wheel and slot where this timer should go*/
 		rem = get_rem(to);
-		printf("add pending timer(abstimout %lu,currtime %lu,rem %lu),\n", abs_expires, this->curtime,rem);
+		//printf("add pending timer(abstimout %lu,currtime %lu,rem %lu),\n",abs_expires, this->curtime, rem);
 
 		wheel = this->get_wheel_idx(rem);
 		slot = this->get_slot_idx(wheel, abs_expires);
@@ -357,13 +360,14 @@ void wtimers_t::sche_timer(wtimer_t *to, time_t abs_expires)
 		/* 3) set curr slot on curr wheel to bit one to indicate there is
 		 * timer exists in this slot  */
 		this->pending[wheel] |= (WHEEL_C(1) << slot);
-		char buf[1024];
-		geco::ultils::Bitify(buf,sizeof(wheel_t)*8, (unsigned char*)&this->pending[wheel]);
-		printf("wheel %d, slot %d, pending \n%s\n", wheel,slot,buf);
+//		char buf[1024];
+//		geco::ultils::Bitify(buf, sizeof(wheel_t) * 8,
+//				(unsigned char*) &this->pending[wheel]);
+//		printf("wheel %d, slot %d, pending \n%s\n", wheel, slot, buf);
 	}
 	else
 	{
-		printf("add expired timer(abstimout %lu,currtime %lu)\n", abs_expires, this->curtime);
+		//printf("add expired timer(abstimout %lu,currtime %lu)\n", abs_expires,this->curtime);
 		/*3) this timer is triggered imediately, push it to expired list*/
 		to->pending = &this->expired;
 		to->pending->push_back(to);
@@ -372,8 +376,8 @@ void wtimers_t::sche_timer(wtimer_t *to, time_t abs_expires)
 		to->intid = 1;
 	}
 
-	printf("to timer list addred %lu, now its size %lu, \n",
-			to->pending - &this->wheel[0][0], to->pending->size());
+	//printf("to timer list addred %lu, now its size %lu, \n",
+	//to->pending - &this->wheel[0][0], to->pending->size());
 }
 inline void wtimers_t::stop_timer(wtimer_t* wtimer_ptr) //timeouts_del
 {
