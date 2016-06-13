@@ -235,8 +235,9 @@ void wtimers_t::update(timeout_t abstime)
 			/*3.3 push it to the expired list */
 			for (auto& ele : this->wheel[wheel][slot])
 			{
-				printf("timer(%lu) in pending list expired, put it to expired list",
-						ele->abs_expires);
+				printf(
+						"update(curtime %lu)::a pending timer(abs_expires %lu) got expired\n",
+						abstime, ele->abs_expires);
 				ele->pending = &this->expired;
 			}
 			this->expired.merge(this->wheel[wheel][slot]);
@@ -337,7 +338,8 @@ void wtimers_t::sche_timer(wtimer_t *to, timeout_t abs_expires)
 		/*2) this is a timer being expired, so we need
 		 * determine the wheel and slot where this timer should go*/
 		rem = get_rem(to);
-		//printf("add pending timer(abstimout %lu,currtime %lu,rem %lu),\n",abs_expires, this->curtime, rem);
+		printf("add_timer(pending)::abstimout=%lu,currtime %lu,rem %d),\n",
+				abs_expires, this->curtime, (int) rem);
 
 		wheel = this->get_wheel_idx(rem);
 		slot = this->get_slot_idx(wheel, abs_expires);
@@ -356,7 +358,8 @@ void wtimers_t::sche_timer(wtimer_t *to, timeout_t abs_expires)
 	}
 	else
 	{
-		//printf("add expired timer(abstimout %lu,currtime %lu)\n", abs_expires,this->curtime);
+		printf("add_timer(expired)::abstimout=%lu,currtime %lu,\n", abs_expires,
+				this->curtime);
 		/*3) this timer is triggered imediately, push it to expired list*/
 		to->pending = &this->expired;
 		to->pending->push_back(to);
@@ -364,9 +367,6 @@ void wtimers_t::sche_timer(wtimer_t *to, timeout_t abs_expires)
 		--to->id;
 		to->intid = 1;
 	}
-
-	//printf("to timer list addred %lu, now its size %lu, \n",
-	//to->pending - &this->wheel[0][0], to->pending->size());
 }
 inline void wtimers_t::stop_timer(wtimer_t* wtimer_ptr) //timeouts_del
 {

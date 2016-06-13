@@ -172,8 +172,92 @@ static timeout_t random_to(timeout_t min, timeout_t max)
 	timeout_t rand64 = rand() * (timeout_t) INT_MAX + rand();
 	return min + (rand64 % (max - min));
 }
-static void check_randomized(const struct rand_cfg *cfg)
+
+/*
+ * Check some basic algorithm invariants. If these invariants fail then
+ * something is definitely broken.
+ */
+#define report(...) do { \
+	if ((fp)) \
+		fprintf(fp, __VA_ARGS__); \
+} while (0)
+
+#define check(expr, ...) do { \
+	if (!(expr)) { \
+		report(__VA_ARGS__); \
+		return 0; \
+        	} \
+} while (0)
+
+/*
+ * Use dumb looping to locate the earliest timeout pending on the wheel so
+ * our invariant assertions can check the result of our optimized code.
+ * the earlist pending timeout should greater than curr time after
+ * get_exired_timer() called.
+ */
+static wtimer_t* min_timeout(wtimers_t* T)
 {
+	struct wtimer_t *min = NULL;
+	unsigned i, j;
+
+	for (i = 0; i < countof(T->wheel); i++)
+	{
+		for (j = 0; j < countof(T->wheel[i]); j++)
+		{
+			for (auto& to : T->wheel[i][j])
+			{
+				if (min == NULL)
+					min = to;
+				if (to->abs_expires < min->abs_expires)
+					min = to;
+			}
+		}
+	}
+	return min;
+} /* timeouts_min() */
+
+/*the earlist pending timeout should greater than curr time after
+ * get_exired_timer() called.*/
+bool timeouts_check(wtimers_t *T, FILE *fp)
+{
+	timeout_t timeout;
+	wtimer_t* to = min_timeout(T);
+	if (to != NULL)
+	{
+		check(to->abs_expires > T->curtime,
+				"missed timeout (expires:%" TIMEOUT_PRIu " <= curtime:%" TIMEOUT_PRIu ")\n",
+				to->abs_expires, T->curtime);
+
+		timeout = T->get_interval();
+		check(timeout <= to->abs_expires - T->curtime,
+				"wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
+				timeout, (to->abs_expires - T->curtime), to->abs_expires,
+				T->curtime);
+
+		timeout = T->timout();
+		check(timeout <= to->abs_expires - T->curtime,
+				"wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
+				timeout, (to->abs_expires - T->curtime), to->abs_expires,
+				T->curtime);
+	}
+	else
+	{
+		timeout = T->timout();
+		if (!T->expired.empty())
+			check(timeout == 0,
+					"wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
+					timeout, TIMEOUT_C(0));
+		else
+			check(timeout == ~TIMEOUT_C(0),
+					"wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
+					timeout, ~TIMEOUT_C(0));
+	}
+	return 1;
+}
+
+static int check_randomized(const struct rand_cfg *cfg)
+{
+	printf("+++++++++++++++=CheckRandomized+++++++++++++++++\n");
 	uint64_t i, j, err;
 	int rv = 1;
 	wtimer_t* t = new wtimer_t[cfg->n_timeouts];
@@ -207,6 +291,7 @@ static void check_randomized(const struct rand_cfg *cfg)
 
 	EXPECT_EQ(!t || !timeouts || !fired || !found || !deleted, false);
 
+	printf("---------------init and add all sample timers ---------------\n");
 	tos.update(cfg->start_at);
 	EXPECT_EQ(!!n_added_pending, tos.has_expiring_timer());
 	EXPECT_EQ(!!n_added_expired, tos.has_expired_timer());
@@ -266,6 +351,7 @@ static void check_randomized(const struct rand_cfg *cfg)
 	EXPECT_EQ(cnt_added_expired, n_added_expired);
 	EXPECT_EQ(n_added_pending, cnt_added_pending);
 
+	printf("\n---------------filter out all expired timers ---------------\n");
 	while (NULL != (to = tos.get_expired_timer()))
 	{
 		i = to - &t[0];
@@ -276,11 +362,12 @@ static void check_randomized(const struct rand_cfg *cfg)
 	}
 	EXPECT_EQ(n_added_expired, 0);
 
+	printf("\n---------------now we test pending timers---------------\n");
 	while (now < cfg->end_at)
 	{
 		int n_fired_this_time = 0;
-		timeout_t first_at = tos.timout() + now;
-		printf("now %lu, first_at %lu\n", now, first_at);
+		timeout_t td = tos.timout();
+		timeout_t first_at = td + now;
 		timeout_t oldtime = now;
 		timeout_t step = random_to(1, cfg->max_step);
 		now += step;
@@ -301,21 +388,67 @@ static void check_randomized(const struct rand_cfg *cfg)
 			}
 		}
 
-//		timeout_t tm = tos.timout();
-//		another = (tm == 0);
-//		while (NULL != (to = tos.get_expired_timer()))
-//		{
-//			EXPECT_EQ(another, 1); /* Thought we saw the last one! */
-//			i = to - t;
-//			EXPECT_EQ(t + i, to);
-//			EXPECT_LE(timeouts[i], now);
-//		}
+		timeout_t tm = tos.timout();
+		another = (tm == 0);
+		while (NULL != (to = tos.get_expired_timer()))
+		{
+			EXPECT_EQ(another, 1); /* Thought we saw the last one! */
+			i = to - t;
+			EXPECT_EQ(t + i, to);
+			EXPECT_LE(timeouts[i], now);
+			EXPECT_GT(timeouts[i], oldtime);
+			EXPECT_GE(timeouts[i], first_at);
+			fired[i]++;
+			timeout_t tm = tos.timout();
+			another = (tm == 0);
+		}
+		EXPECT_EQ(n_fired_this_time && first_at > now, false);
+		EXPECT_EQ(another, 0);
+		EXPECT_TRUE(timeouts_check(&tos, stderr));
 	}
+
+	for (i = 0; i < cfg->n_timeouts; ++i)
+	{
+		EXPECT_LE(fired[i], 1);/* Nothing fired twice. */
+		if (timeouts[i] <= now)
+		{
+			EXPECT_TRUE(fired[i] || deleted[i]); //CHECK ALREADY TIMEOUT
+		}
+		else
+		{
+			EXPECT_EQ(fired[i], 0); // CHECK NOT TIMEOUT
+		}
+
+		// FIRED !DELETED
+		// !FIRED !DELETED
+		// !FIRED DELETED
+		EXPECT_FALSE(fired[i] && deleted[i]);
+
+		if (cfg->finalize > 1)
+		{
+			if (!fired[i])
+				tos.stop_timer(&t[i]);
+		}
+	}
+
+	/* Now nothing more should fire between now and the end of time. */
+	if (cfg->finalize)
+	{
+		tos.update(THE_END_OF_TIME);
+		if (cfg->finalize > 1)
+		{
+			EXPECT_EQ(tos.get_expired_timer(), (wtimer_t*)0);
+			EXPECT_EQ(false, tos.has_expiring_timer());
+			EXPECT_EQ(false, tos.has_expired_timer());
+		}
+	}
+	rv = 0;
 
 	tos.close();
 	EXPECT_EQ(false, tos.has_expiring_timer());
 	EXPECT_EQ(false, tos.has_expired_timer());
 
+	printf("\n---------------clearup---------------\n");
 	done: if (t)
 		delete[] t;
 	if (timeouts)
@@ -326,22 +459,37 @@ static void check_randomized(const struct rand_cfg *cfg)
 		delete[] found;
 	if (deleted)
 		delete[] deleted;
-	printf("done !\n");
+
+	return rv;
 }
+
+#define DO(fn) do {                             \
+		printf("."); fflush(stdout);	\
+		fn;					\
+            } while (0)
+
+#define DO_N(n, fn) do {			\
+		for (j = 0; j < (n); ++j) {	\
+			DO(fn);			\
+        		}				\
+    	} while (0)
 
 TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER)
 {
+	int j;
+	int n_failed = 0;
+
 	struct rand_cfg cfg1 =
 	{
-	/*min_timeout*/100,
-	/*max_timeout*/100,
-	/*start_at*/5,
-	/*end_at*/150,
-	/*n_timeouts*/3,
+	/*min_timeout*/1,
+	/*max_timeout*/381,
+	/*start_at*/100,
+	/*end_at*/1000,
+	/*n_timeouts*/1,
 	/*max_step*/10,
 	/*relative*/0,
 	/*try_removing*/0,
 	/*finalize*/2 };
-	check_randomized(&cfg1);
+	DO_N(1, check_randomized(&cfg1));
 }
 
