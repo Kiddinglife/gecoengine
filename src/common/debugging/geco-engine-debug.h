@@ -91,6 +91,31 @@ namespace geco
     namespace debugging
     {
 
+#define LOG_BUFSIZ 5012
+#if defined(_unix_) || defined(_linux_) || defined( PLAYSTATION3 ) 
+#define geco_isnan isnan
+#define geco_isinf isinf
+#define geco_snprintf snprintf
+#define geco_vsnprintf vsnprintf
+#define geco_vsnwprintf vsnwprintf
+#define geco_snwprintf swprintf
+#define geco_stricmp strcasecmp
+#define geco_strnicmp strncasecmp
+#define geco_fileno fileno
+#define geco_va_copy va_copy
+#else
+#define geco_isnan _isnan
+#define geco_isinf(x) (!_finite(x) && !_isnan(x))
+#define geco_snprintf _snprintf
+#define geco_vsnprintf _vsnprintf
+#define geco_vsnwprintf _vsnwprintf
+#define geco_snwprintf _snwprintf
+#define geco_stricmp _stricmp
+#define geco_strnicmp _strnicmp
+#define geco_fileno _fileno
+#define geco_va_copy( dst, src) dst = src
+#endif // unix
+
         /** Definition for the critical message callback functor*/
         struct critical_msg_cb_tag{};
         typedef std::function<void(const char* msg, critical_msg_cb_tag*)> critical_msg_cb_t;
@@ -114,7 +139,7 @@ namespace geco
         typedef std::function<bool(const char * msg, info_msg_cb_tag*)> info_msg_cb_t;
 
         /** This class is used to help filter log messages.*/
-        struct log_msg_filter_t
+        struct log_msg_filter_t //oldname - DebugFilter
         {
 
             static log_msg_filter_t* s_instance_;
@@ -290,20 +315,26 @@ namespace geco
         }
 
         /**
-         *  This class implements the functionality exposed by BigWorld message macros,
+         *  @brief This class implements the functionality exposed by message macros.
          *	manages calling registered message callbacks, and handles both critical
          *  and non-critical messages.
          */
-        class log_msg_helper
+        struct log_msg_helper
         {
-            public:
+            static bool show_error_dialogs_;
+            static bool critical_msg_occurs_;
+            static std::mutex* mutex_;
+
+            int cpn_priority_;
+            int msg_priority_;
+
             log_msg_helper(int componentPriority, int messagePriority) :
-                componentPriority_(componentPriority), messagePriority_(
+                cpn_priority_(componentPriority), msg_priority_(
                 messagePriority)
             {
             }
             log_msg_helper() :
-                componentPriority_(0), messagePriority_(LOG_MSG_CRITICAL)
+                cpn_priority_(0), msg_priority_(LOG_MSG_CRITICAL)
             {
             }
             static void fini();
@@ -311,58 +342,39 @@ namespace geco
 #ifndef _WIN32
             void message(const char * format, ...)
                 __attribute__((format(printf, 2, 3)));
-            void criticalMessage(const char * format, ...)
+            void critical_msg(const char * format, ...)
                 __attribute__((format(printf, 2, 3)));
-            void devCriticalMessage(const char * format, ...)
+            void dev_critical_msg(const char * format, ...)
                 __attribute__((format(printf, 2, 3)));
 #else
+            static bool automated_test_;
+            static void log2file(const char* line);
             void message(const char * format, ...);
-            void criticalMessage(const char * format, ...);
-            void devCriticalMessage(const char * format, ...);
+            /**
+             *	This is a helper function used by the CRITICAL_MSG macro.
+             */
+            void critical_msg(const char * format, ...);
+            /**
+             *	@brief This is a helper function used by the CRITICAL_MSG macro.
+             * If DebugFilter::hasDevelopmentAssertions() is true, this will cause a proper
+             *	critical message otherwise, it'll behaviour similar to a normal error
+             *	message. */
+            void dev_critical_msg(const char * format, ...); // devCriticalMessage
 #endif
 
             void messageBackTrace();
-            static void shouldWriteToSyslog(bool state = true);
+            static void should_write2syslog(bool state = true);
 
-            static void showErrorDialogs(bool show);
-            static bool showErrorDialogs();
+            static void show_error_dialogs(bool show);
+            static bool show_error_dialogs();
 
-            static void criticalMsgOccurs(bool occurs)
-            {
-                criticalMsgOccurs_ = occurs;
-            }
-            static bool criticalMsgOccurs()
-            {
-                return criticalMsgOccurs_;
-            }
-
-#ifdef _WIN32
-            static void logToFile(const char* line);
-            static void automatedTest(bool isTest)
-            {
-                automatedTest_ = isTest;
-            }
-            static bool automatedTest()
-            {
-                return automatedTest_;
-            }
-#endif
-
-            private:
-            void criticalMessageHelper(bool isDevAssertion, const char * format,
+            //criticalMessageHelper
+            void critical_msg_aux(bool isDevAssertion, const char * format,
                 va_list argPtr);
-
-            int componentPriority_;
-            int messagePriority_;
-
-            static bool showErrorDialogs_;
-            static bool criticalMsgOccurs_;
-            static std::mutex* mutex_;
-#ifdef _WIN32
-            static bool automatedTest_;
-#endif
         };
 
+
+        //--------------defines
 #if ENABLE_DPRINTF
         // This function prints a debug message.
 #ifndef _WIN32

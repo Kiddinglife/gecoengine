@@ -23,6 +23,8 @@
 #ifndef _INCLUDE_GECO_ENGINE_CONFIG
 #define _INCLUDE_GECO_ENGINE_CONFIG
 
+//#define GECO_EXPORTER 0
+
 /**
  * This define is used to control the conditional compilation of features
  * that will be removed from the client builds provided to the public.
@@ -36,9 +38,17 @@
  *
  * build server and client at same time is wrong
  */
+
+#ifdef CLIENT_BUILD
+#	define ENABLE_CLIENT_BUILD						1
+#else
+#	define ENABLE_CLIENT_BUILD						0
+#endif
+
 #if defined( SERVER_BUILD ) && defined( CLIENT_BUILD )
 #error "CLIENT_BUILD and SERVER_BUILD macros should not be used at same time"
 #endif
+
 #if !defined( SERVER_BUILD ) && !defined( CLIENT_BUILD )
 #error "both of CLIENT_BUILD and SERVER_BUILD macro are not be used !"
 #endif
@@ -72,8 +82,9 @@
 #define FORCE_ENABLE_PYTHON_LOG						0
 #define FORCE_ENABLE_STACK_TRACKER					0
 
-#define ENABLE_DPRINTF	\
-(!CLIENT_BUILD || FORCE_ENABLE_DPRINTF)
+#define ENABLE_DPRINTF     (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_DPRINTF)
+
+#define ENABLE_STACK_TRACKER    (!GECO_EXPORTER && (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_STACK_TRACKER))
 
 /*when debug, we enable file and line*/
 #ifdef _DEBUG
@@ -81,5 +92,11 @@
 #else
 #define FILE_AND_LINE 0,0
 #endif
+
+#if defined( _WIN32 )
+#define NEW_LINE "\r\n"
+#else//WIN32
+#define NEW_LINE "\n"
+#endif//WIN32
 
 #endif

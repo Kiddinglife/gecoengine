@@ -172,6 +172,7 @@
     <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-engine-config.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-engine-ultils.h" />

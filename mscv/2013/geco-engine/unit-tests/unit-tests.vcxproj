@@ -189,11 +189,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\unittest\test-common.cc" />
-    <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
+    <None Include="..\..\..\..\unittest\readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\unittest\readme.md" />
+    <ClCompile Include="..\..\..\..\unittest\test-common.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

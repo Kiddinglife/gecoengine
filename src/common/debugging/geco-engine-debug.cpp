@@ -34,6 +34,21 @@ namespace geco
 {
     namespace debugging
     {
+        // global variables
+        bool g_write2syslog = false;
+        std::string  g_syslog_name;
+        static const char dev_assertion_msg[] =
+            "Development assertions may indicate failures caused by incorrect "
+            "engine usage.\n"
+            "In "
+#ifdef MF_SERVER
+            "production mode"
+#else
+            "Release builds"
+#endif
+            ", they do not cause the application to exit.\n"
+            "Please investigate potential misuses of the engine at the time of the "
+            "failure.\n";
 
         // init static variables
         log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
@@ -132,5 +147,42 @@ namespace geco
             va_end(argPtr);
         }
 #endif
+
+
+        /**
+        *	This is a helper function used by the CRITICAL_MSG macro.
+        */
+        void log_msg_helper::critical_msg(const char * format, ...)
+        {
+            va_list argPtr;
+            va_start(argPtr, format);
+            this->critical_msg_aux(true, format, argPtr);
+            va_end(argPtr);
+        }
+
+        void log_msg_helper::dev_critical_msg(const char * format, ...)
+        {
+            va_list argPtr;
+            va_start(argPtr, format);
+            this->critical_msg_aux(true, format, argPtr);
+            va_end(argPtr);
+        }
+
+        /**
+        *	This is a helper function used by the CRITICAL_MSG macro.
+        */
+        void log_msg_helper::critical_msg_aux(bool isDevAssertion, const char * format, va_list argPtr)
+        {
+            char buf[LOG_BUFSIZ];
+            geco_vsnprintf(buf, sizeof(buf), format, argPtr);
+            buf[sizeof(buf) - 1] = '\0';
+            log_msg_helper::critical_msg_occurs_ = true;
+
+#if ENABLE_STACK_TRACKER
+
+
+#endif
+        }
+
     }
 }
