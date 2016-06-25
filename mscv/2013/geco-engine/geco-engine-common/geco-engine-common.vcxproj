@@ -168,21 +168,23 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\common\debugging\geco-engine-debug.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\debug.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\stack_tracker_t.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-engine-config.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\geco-engine-ultils.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\ultils.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-malloc.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\common\debugging\geco-engine-debug.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\debug.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\geco-engine-ultils.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\ultils.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

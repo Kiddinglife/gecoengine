@@ -21,7 +21,7 @@
 // created on 06-June-2016 by Jackie Zhang
 #include "geco-ds-wheel-timer.h"
 #include <assert.h>
-#include "../../common/debugging/geco-engine-debug.h"
+#include "../../common/debugging/debug.h"
 
 namespace geco
 {
