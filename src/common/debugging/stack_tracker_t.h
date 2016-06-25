@@ -29,11 +29,12 @@
 #include <cassert>
 #include "../geco-engine-config.h"
 #include "debug.h"
-
+#include <thread>
 namespace geco
 {
     namespace debugging
     {
+
 #if ENABLE_STACK_TRACKER
         struct stack_item_t
         {
