@@ -18,7 +18,7 @@
  *
  */
 
-// created on 02-June-2016 by Jackie Zhang
+ // created on 02-June-2016 by Jackie Zhang
 #ifndef _INCLUDE_GECO_ENGINE_DEBUG
 #define _INCLUDE_GECO_ENGINE_DEBUG
 
@@ -31,6 +31,7 @@
 #include "../geco-engine-config.h"
 #include "../ds/array.h"
 #include "../ultils/ultils.h"
+#include "../ultils/geco-malloc.h"
 
 /**
  *	@file geco-engine-debug.h
@@ -92,32 +93,17 @@ namespace geco
     {
 
 #define LOG_BUFSIZ 5012
-#if defined(_unix_) || defined(_linux_) || defined( PLAYSTATION3 ) 
-#define geco_isnan isnan
-#define geco_isinf isinf
-#define geco_snprintf snprintf
-#define geco_vsnprintf vsnprintf
-#define geco_vsnwprintf vsnwprintf
-#define geco_snwprintf swprintf
-#define geco_stricmp strcasecmp
-#define geco_strnicmp strncasecmp
-#define geco_fileno fileno
-#define geco_va_copy va_copy
-#else
-#define geco_isnan _isnan
-#define geco_isinf(x) (!_finite(x) && !_isnan(x))
-#define geco_snprintf _snprintf
-#define geco_vsnprintf _vsnprintf
-#define geco_vsnwprintf _vsnwprintf
-#define geco_snwprintf _snwprintf
-#define geco_stricmp _stricmp
-#define geco_strnicmp _strnicmp
-#define geco_fileno _fileno
-#define geco_va_copy( dst, src) dst = src
-#endif // unix
 
-        /** Definition for the critical message callback functor*/
-        struct critical_msg_cb_tag{};
+        extern bool g_write2syslog;
+        extern std::string g_syslog_name;
+
+
+        //-------------------------------------------------------
+        //	Section: log_msg_filter_t
+        //-------------------------------------------------------
+
+        /*Definition for the critical message callback functor*/
+        struct critical_msg_cb_tag {};
         typedef std::function<void(const char* msg, critical_msg_cb_tag*)> critical_msg_cb_t;
 
         /**
@@ -125,17 +111,17 @@ namespace geco
          *  function returns true, the default behaviour for
          *  displaying messages is ignored.
          **/
-        struct debug_msg_cb_tag{};
+        struct debug_msg_cb_tag {};
         typedef std::function<bool(int component_priority, int msg_priority,
             const char * format, va_list args_list, debug_msg_cb_tag*)> debug_msg_cb_t;
 
-        struct error_msg_cb_tag{};
+        struct error_msg_cb_tag {};
         typedef std::function<bool(const char * msg, error_msg_cb_tag*)> error_msg_cb_t;
 
-        struct warnning_msg_cb_tag{};
+        struct warnning_msg_cb_tag {};
         typedef std::function<bool(const char * msg, warnning_msg_cb_tag*)> warnning_msg_cb_t;
 
-        struct info_msg_cb_tag{};
+        struct info_msg_cb_tag {};
         typedef std::function<bool(const char * msg, info_msg_cb_tag*)> info_msg_cb_t;
 
         /** This class is used to help filter log messages.*/
@@ -178,7 +164,7 @@ namespace geco
             {
                 if (s_instance_ == NULL)
                 {
-                    s_instance_ = new log_msg_filter_t();
+                    s_instance_ = geco_new<log_msg_filter_t>(FILE_AND_LINE);
                 }
                 return *s_instance_;
             }
@@ -187,7 +173,7 @@ namespace geco
             {
                 if (s_instance_)
                 {
-                    delete s_instance_;
+                    geco_delete<log_msg_filter_t>(s_instance_, FILE_AND_LINE);
                     s_instance_ = NULL;
                 }
             }
@@ -203,8 +189,8 @@ namespace geco
             {
                 return (msg_riority
                     >= MAX(
-                    log_msg_filter_t::get_instance().filter_threshold_,
-                    component_priority));
+                        log_msg_filter_t::get_instance().filter_threshold_,
+                        component_priority));
             }
 
             /**
@@ -314,6 +300,12 @@ namespace geco
             return (p >= 0 && (size_t)p < sizeof(prefixes)) ? prefixes[(int)p] : "";
         }
 
+
+
+        //-------------------------------------------------------
+        //	Section: log_msg_helper
+        //-------------------------------------------------------
+
         /**
          *  @brief This class implements the functionality exposed by message macros.
          *	manages calling registered message callbacks, and handles both critical
@@ -330,14 +322,13 @@ namespace geco
 
             log_msg_helper(int componentPriority, int messagePriority) :
                 cpn_priority_(componentPriority), msg_priority_(
-                messagePriority)
+                    messagePriority)
             {
             }
             log_msg_helper() :
                 cpn_priority_(0), msg_priority_(LOG_MSG_CRITICAL)
             {
             }
-            static void fini();
 
 #ifndef _WIN32
             void message(const char * format, ...)
@@ -362,19 +353,76 @@ namespace geco
             void dev_critical_msg(const char * format, ...); // devCriticalMessage
 #endif
 
-            void messageBackTrace();
-            static void should_write2syslog(bool state = true);
+            void msg_back_trace();
+            static void should_write2syslog(bool state = true)
+            {
+                g_write2syslog = state;
+            }
 
-            static void show_error_dialogs(bool show);
-            static bool show_error_dialogs();
+            /**
+             * This method allow tools to have a common method
+             * to set whether to show error dialogs or not
+             *  Do this in a thread-safe way.
+             */
+            static void show_error_dialogs(bool show)
+            {
+                if (mutex_ == NULL) mutex_ = new std::mutex;
+                mutex_->lock();
+                show_error_dialogs_ = show;
+                mutex_->unlock();
+            }
+            static bool show_error_dialogs()
+            {
+                if (mutex_ == NULL) mutex_ = new std::mutex;
+                mutex_->lock();
+                bool show_error_dialogs = show_error_dialogs_;
+                mutex_->unlock();
+                return show_error_dialogs;
+            }
 
             //criticalMessageHelper
             void critical_msg_aux(bool isDevAssertion, const char * format,
                 va_list argPtr);
+
+            static void fini()
+            {
+                if (mutex_) delete mutex_;
+                mutex_ = NULL;
+                log_msg_filter_t::free_instance();
+            }
+        };
+
+        /* This class is used to query if the current thread is the main thread.*/
+        struct main_thread_tracker_t
+        {
+            /*
+             *	This static thread-local variable is initialised to false, and set to true
+             *	in the constructor of the static s_mainThreadTracker object below
+             */
+            static thread_local bool is_curr_thread_main_thread_;
+
+            main_thread_tracker_t()
+            {
+                main_thread_tracker_t::is_curr_thread_main_thread_ = true;
+            }
+
+            /*
+             * @brief
+             * Static method that returns true if the current thread is the main thread,
+             * false otherwise.
+             *	@return      true if the current thread is the main thread, false if not
+             */
+            bool is_curr_thread_main_thread()
+            {
+                return main_thread_tracker_t::is_curr_thread_main_thread_;
+            }
         };
 
 
-        //--------------defines
+
+        //-------------------------------------------------------
+        //	Section: printf functions
+        //-------------------------------------------------------
 #if ENABLE_DPRINTF
         // This function prints a debug message.
 #ifndef _WIN32

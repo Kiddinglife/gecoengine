@@ -144,5 +144,4 @@ GECO_EXPORT void geco_delete_array(Type *buff, const char *file,
     (geco_free_ext)(buff - sizeof(int), sizeof(Type), file, line);
 
 }
-
 #endif

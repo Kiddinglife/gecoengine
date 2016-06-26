@@ -18,30 +18,48 @@
  *
  */
 
-// created on 02-June-2016 by Jackie Zhang
-//#include "pch.hpp"
-//#include "string_utils.hpp"
+ // created on 02-June-2016 by Jackie Zhang
+ //#include "pch.hpp"
+ //#include "string_utils.hpp"
 #include <stdio.h>      /* printf, vprintf*/
 #include <stdlib.h>     /* malloc */
 #include <string.h>     /* strlen, strcat */
 #include <stdarg.h>     /* va_list, va_start, va_copy, va_arg, va_end */
 #include <time.h>
 
-#include "debug.h"
+
+#include <string.h>
+#if defined(_WIN32)
+#include <windows.h>
+#include <time.h>
+#pragma warning( disable: 4995 ) // disable warning for unsafe string functions
+//#include "critical_message_box.hpp"
+#pragma comment( lib, "winmm" )
+#elif defined( PLAYSTATION3 )
+#else
+#include <unistd.h>
+#include <syslog.h>
+#endif
+
+#include "../plateform.h"
 #include "../ultils/ultils.h"
+#include "debug.h"
+#include "stack_tracker_t.h"
 
 namespace geco
 {
     namespace debugging
     {
-        // global variables
+        //-------------------------------------------------------
+        //	Section: globals
+        //-------------------------------------------------------
         bool g_write2syslog = false;
-        std::string  g_syslog_name;
+        std::string  g_syslog_name("default_syslog_name");
         static const char dev_assertion_msg[] =
             "Development assertions may indicate failures caused by incorrect "
             "engine usage.\n"
             "In "
-#ifdef MF_SERVER
+#ifdef SERVER_BUILD
             "production mode"
 #else
             "Release builds"
@@ -50,15 +68,10 @@ namespace geco
             "Please investigate potential misuses of the engine at the time of the "
             "failure.\n";
 
-        // init static variables
-        log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
-        bool log_msg_filter_t::shouldWriteTimePrefix = false;
-#if defined( SERVER_BUILD ) || defined( PLAYSTATION3 )
-        bool log_msg_filter_t::shouldWriteToConsole = true;
-#else
-        bool log_msg_filter_t::shouldWriteToConsole = false;
-#endif
 
+        //-------------------------------------------------------
+        //	Section: printf functions
+        //-------------------------------------------------------
 #if ENABLE_DPRINTF
         void vdprintf(const char * format, va_list argPtr, const char * prefix)
         {
@@ -149,6 +162,39 @@ namespace geco
 #endif
 
 
+        //-------------------------------------------------------
+        //	Section: main_thread_tracker_t
+        //-------------------------------------------------------
+        bool thread_local main_thread_tracker_t::is_curr_thread_main_thread_ = false;
+        // Instantiate it, so it initialises the flag to the main thread
+        static main_thread_tracker_t s_main_thread_tracker;
+
+
+
+        //-------------------------------------------------------
+        //	Section: log_msg_filter_t
+        //-------------------------------------------------------
+        log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
+        bool log_msg_filter_t::shouldWriteTimePrefix = false;
+#if defined( SERVER_BUILD ) || defined( PLAYSTATION3 )
+        bool log_msg_filter_t::shouldWriteToConsole = true;
+#else
+        bool log_msg_filter_t::shouldWriteToConsole = false;
+#endif
+
+
+
+        //-------------------------------------------------------
+        //	Section: log_msg_helper
+        //-------------------------------------------------------
+
+        /*static*/ bool log_msg_helper::show_error_dialogs_ = true;
+        /*static*/ bool log_msg_helper::critical_msg_occurs_ = false;
+        /*static*/ std::mutex* log_msg_helper::mutex_ = NULL;
+#ifdef WIN32
+        /*static*/ bool log_msg_helper::automated_test_ = false;
+#endif
+
         /**
         *	This is a helper function used by the CRITICAL_MSG macro.
         */
@@ -159,7 +205,6 @@ namespace geco
             this->critical_msg_aux(true, format, argPtr);
             va_end(argPtr);
         }
-
         void log_msg_helper::dev_critical_msg(const char * format, ...)
         {
             va_list argPtr;
@@ -167,21 +212,180 @@ namespace geco
             this->critical_msg_aux(true, format, argPtr);
             va_end(argPtr);
         }
-
         /**
         *	This is a helper function used by the CRITICAL_MSG macro.
         */
         void log_msg_helper::critical_msg_aux(bool isDevAssertion, const char * format, va_list argPtr)
         {
-            char buf[LOG_BUFSIZ];
-            geco_vsnprintf(buf, sizeof(buf), format, argPtr);
-            buf[sizeof(buf) - 1] = '\0';
+            char buffer[LOG_BUFSIZ];
+            geco_vsnprintf(buffer, sizeof(buffer), format, argPtr);
+            buffer[sizeof(buffer) - 1] = '\0';
             log_msg_helper::critical_msg_occurs_ = true;
 
 #if ENABLE_STACK_TRACKER
-
-
+            if (stack_tracker_t::stackSize() > 0)
+            {
+                std::string stack = stack_tracker_t::report();
+                strcat(buffer, NEW_LINE);
+                strcat(buffer, "Stack trace: ");
+                strcat(buffer, stack.c_str());
+                strcat(buffer, NEW_LINE);
+            }
 #endif
+
+            // send to syslog if it's been initialised
+#if !defined( _WIN32 ) && !defined( PLAYSTATION3 )
+            if (g_write2syslog)
+            {
+                syslog(LOG_CRIT, "%s", buffer);
+            }
+#endif
+            // output it as a normal message
+            this->message("%s", buffer);
+            if (isDevAssertion)
+            {
+                this->message("%s", dev_assertion_msg);
+            }
+
+            this->msg_back_trace();
+            if (isDevAssertion && !log_msg_filter_t::get_instance().has_dev_assert_)
+            {
+                // dev assert and we don't have dev asserts enabled
+                return;
+            }
+
+            // now do special critical message stuff
+            uint size = log_msg_filter_t::get_instance().critical_msg_cbs_.size();
+            if (size > 0)
+            {
+                for (uint i = 0; i < size; ++i)
+                {
+                    (*(log_msg_filter_t::get_instance().critical_msg_cbs_[i]))(buffer, (critical_msg_cb_tag*)0);
+                }
+            }
+
+#ifdef _XBOX360
+            {
+                OutputDebugStringA(buffer);
+
+                LPCWSTR buttons[] = { L"Exit" };
+                XOVERLAPPED         overlapped;					// Overlapped object for message box UI
+                MESSAGEBOX_RESULT   result;						// Message box button pressed result
+
+                ZeroMemory(&overlapped, sizeof(XOVERLAPPED));
+
+                char tcbuffer[BW_DEBUG_BUFSIZ * 2];
+                WCHAR wcbuffer[BW_DEBUG_BUFSIZ * 2];
+
+                vsnprintf(tcbuffer, ARRAY_SIZE(tcbuffer), format, argPtr);
+                tcbuffer[sizeof(tcbuffer) - 1] = '\0';
+
+                MultiByteToWideChar(CP_UTF8, 0, tcbuffer, -1, wcbuffer, ARRAYSIZE(wcbuffer));
+
+                DWORD dwRet = XShowMessageBoxUI(0,
+                    L"Critical Error",					// Message box title
+                    wcbuffer,							// Message string
+                    ARRAYSIZE(buttons),					// Number of buttons
+                    buttons,							// Button captions
+                    0,									// Button that gets focus
+                    XMB_ERRORICON,						// Icon to display
+                    &result,							// Button pressed result
+                    &overlapped);
+
+                //assert( dwRet == ERROR_IO_PENDING );
+
+                while (!XHasOverlappedIoCompleted(&overlapped))
+                {
+                    extern IDirect3DDevice9 *		g_pd3dDevice;
+                    g_pd3dDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0L);
+                    g_pd3dDevice->Present(0, 0, NULL, 0);
+                }
+
+                for (int i = 0; i < 60; i++)
+                {
+                    extern IDirect3DDevice9 *		g_pd3dDevice;
+                    g_pd3dDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0L);
+                    g_pd3dDevice->Present(0, 0, NULL, 0);
+                }
+
+                XLaunchNewImage("", 0);
+
+                //ENTER_DEBUGGER();
+            }
+
+#elif defined ( PLAYSTATION3 )
+            printf(buffer);
+            printf("\n");
+            ENTER_DEBUGGER();
+#elif !defined(_WIN32)
+
+            if (automated_test_)
+            {
+                _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+                log2file("Critical Error, aborting test.");
+                log2file(buffer);
+                abort();
+            }
+
+#if ENABLE_ENTER_DEBUGGER_MESSAGE
+            // Disable all abort() behaviour in case we call it
+            _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+
+            if (CriticalErrorHandler::get())
+            {
+                switch (CriticalErrorHandler::get()->ask(buffer))
+                {
+                case CriticalErrorHandler::ENTERDEBUGGER:
+                    CriticalErrorHandler::get()->recordInfo(false);
+                    ENTER_DEBUGGER();
+                    break;
+                case CriticalErrorHandler::EXITDIRECTLY:
+                    CriticalErrorHandler::get()->recordInfo(true);
+                    abort();
+                    break;
+                }
+            }
+            else
+                abort();
+#else // ENABLE_ENTER_DEBUGGER_MESSAGE
+            strcat(buffer, "\n\nThe application must exit.\n");
+            ::MessageBox(0, bw_utf8tow(buffer).c_str(), L"Critical Error Occurred", MB_ICONHAND | MB_OK);
+            abort();
+#endif// ENABLE_ENTER_DEBUGGER_MESSAGE
+#else
+
+            char	filename[512], hostname[256];
+            if (gethostname(hostname, sizeof(hostname)) != 0)
+                hostname[0] = 0;
+
+            char exeName[512];
+            const char * pExeName = "unknown";
+
+            int len = readlink("/proc/self/exe", exeName, sizeof(exeName) - 1);
+            if (len > 0)
+            {
+                exeName[len] = '\0';
+
+                char * pTemp = strrchr(exeName, '/');
+                if (pTemp != NULL)
+                {
+                    pExeName = pTemp + 1;
+                }
+            }
+
+            geco_snprintf(filename, sizeof(filename), "assert.%s.%s.%d.log", pExeName, hostname, getpid());
+
+            FILE * assertFile = geco_fopen(filename, "a");
+            fprintf(assertFile, "%s", buffer);
+            fclose(assertFile);
+
+            volatile uint64 crashTime = geco_timestamp(); // For reference in the coredump.
+            crashTime = crashTime; // Disable compiler warning about unused variable.
+
+            *(int*)NULL = 0;
+            typedef void(*BogusFunc)();
+            ((BogusFunc)NULL)();
+#endif // defined(_WIN32)
         }
 
     }

@@ -39,18 +39,25 @@
  * build server and client at same time is wrong
  */
 
-#ifdef CLIENT_BUILD
-#	define ENABLE_CLIENT_BUILD						1
-#else
-#	define ENABLE_CLIENT_BUILD						0
-#endif
-
+// MF_SERVER - CONSUMER_CLIENT
 #if defined( SERVER_BUILD ) && defined( CLIENT_BUILD )
 #error "CLIENT_BUILD and SERVER_BUILD macros should not be used at same time"
 #endif
 
 #if !defined( SERVER_BUILD ) && !defined( CLIENT_BUILD )
 #error "both of CLIENT_BUILD and SERVER_BUILD macro are not be used !"
+#endif
+
+#ifdef CLIENT_BUILD
+#	define ENABLE_CLIENT_BUILD						1
+#else
+#	define ENABLE_CLIENT_BUILD						0
+#endif
+
+#if !defined(_XBOX360) && !defined(PLAYSTATION3)
+#if defined(_DEBUG) && defined(SERVER_BUILD)
+#define ENABLE_MEMTRACKER
+#endif
 #endif
 
 /**
@@ -85,6 +92,8 @@
 #define ENABLE_DPRINTF     (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_DPRINTF)
 
 #define ENABLE_STACK_TRACKER    (!GECO_EXPORTER && (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_STACK_TRACKER))
+
+#define ENABLE_ENTER_DEBUGGER_MESSAGE	(!ENABLE_CLIENT_BUILD || FORCE_ENABLE_ENTER_DEBUGGER_MESSAGE)
 
 /*when debug, we enable file and line*/
 #ifdef _DEBUG
