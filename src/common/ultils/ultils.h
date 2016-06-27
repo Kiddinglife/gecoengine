@@ -18,8 +18,8 @@
  *
  */
 
-// http://www.cnblogs.com/nysanier/archive/2011/04/19/2020778.html
-// created on 02-June-2016 by Jackie Zhang
+ // http://www.cnblogs.com/nysanier/archive/2011/04/19/2020778.html
+ // created on 02-June-2016 by Jackie Zhang
 #ifndef _INCLUDE_GECO_ENGINE_ULTILS
 #define _INCLUDE_GECO_ENGINE_ULTILS
 
@@ -110,13 +110,97 @@ namespace geco
             out[strIndex++] = 0;
         }
 
+
+        //-------------------------------------------------------
+        //	Section: String and File Ultil Functions                                                   
+        //-------------------------------------------------------
 #if defined(_WIN32)
-        /*  Converts the given narrow string to the wide representation, using the
-         *  active code page on this system. Returns true if it succeeded, otherwise
+        /*
+         * @brief Converts the given narrow string to the wide representation.
+         * using theactive code page on this system. Returns true if it succeeded, otherwise
          *	false if there was a decoding error.
-         *  originally from bw_acptow() string_ultils.cpp line 67 */
-        bool multibyte2wchar(const char * src, std::wstring& output);
+         */
+        bool geco_acp2w(const char * src, std::wstring& output);
+        inline bool geco_acptow(const std::string & s, std::wstring& output)
+        {
+            return geco_acptow(s.c_str(), output);
+        }
+        inline std::wstring geco_acptow(const std::string & s)
+        {
+            std::wstring ret;
+            geco_acptow(s, ret);
+            return ret;
+        }
+
+        inline FILE* geco_fopen(const char* filename, const char* mode)
+        {
+            std::wstring wfilename;
+            std::wstring wmode;
+
+            geco_utf8tow(filename, wfilename);
+            geco_utf8tow(mode, wmode);
+
+            return _wfopen(wfilename.c_str(), wmode.c_str());
+        }
+
+        inline long geco_file_size(FILE* file)
+        {
+            long currentLocation = ftell(file);
+            if (currentLocation < 0)
+            {
+                currentLocation = 0;
+            }
+            /*set curr location to file beginning*/
+            int res = fseek(file, 0, SEEK_END);
+            if (res)
+            {
+                //ERRORLOG("bw_fileSize: fseek failed\n");
+                return -1;
+            }
+            long length = ftell(file);
+            /*set back curr location after getting file length*/
+            res = fseek(file, currentLocation, SEEK_SET);
+            if (res)
+            {
+                //ERRORLOG("bw_fileSize: fseek failed\n");
+                return -1;
+            }
+            return length;
+        }
+
+        std::wstring get_temp_file_path_name()
+        {
+            wchar_t tempDir[MAX_PATH + 1];
+            wchar_t tempFile[MAX_PATH + 1];
+
+            if (GetTempPath(MAX_PATH + 1, tempDir) < MAX_PATH)
+            {
+                if (GetTempFileName(tempDir, L"BWT", 0, tempFile))
+                {
+                    return tempFile;
+                }
+            }
+            return L"";
+        }
+#else
+#define geco_fopen fopen //bw_fopen might be used directly
 #endif
+
+        /**
+         * @brief Converts the given utf-8 string to the wide representation.
+         * Returns true if it succeeded, otherwise false if there was a decoding error.
+         */
+        bool geco_utf8tow(const char * s, std::wstring& output);
+        inline bool geco_utf8tow(const std::string & s, std::wstring& output)
+        {
+            return geco_utf8tow(s.c_str(), output);
+        }
+        inline std::wstring geco_utf8tow(const std::string & s)
+        {
+            std::wstring ret;
+            geco_utf8tow(s, ret);
+            return ret;
+        }
 
         /*============ timer bit operations ===============*/
         /**
@@ -124,10 +208,10 @@ namespace geco
          *  other number will be fine
          * */
 #if defined(__GNUC__) && !defined(TIMEOUT_DISABLE_BUILTIN_BITOPS)
-        /* First define ctz and clz functions; these are compiler-dependent if
-         * you want them to be fast. On GCC and clang and some others,
-         * we can use __builtin functions. They are not defined for n==0,
-         * but timeout.s never calls them with n==0 */
+         /* First define ctz and clz functions; these are compiler-dependent if
+          * you want them to be fast. On GCC and clang and some others,
+          * we can use __builtin functions. They are not defined for n==0,
+          * but timeout.s never calls them with n==0 */
         inline int ctz32(unsigned int val)
         {
             return __builtin_ctz(val);
@@ -145,8 +229,8 @@ namespace geco
             return __builtin_clzll(val);
         }
 #elif !defined(_MSC_VER) && !defined(TIMEOUT_DISABLE_BUILTIN_BITOPS)
-        /* On MSVC, we have these handy functions. We can ignore their return
-         * values, since we will never supply val == 0. */
+         /* On MSVC, we have these handy functions. We can ignore their return
+          * values, since we will never supply val == 0. */
         __inline int ctz32(unsigned long val)
         {
             DWORD zeros = 0;
@@ -176,8 +260,8 @@ namespace geco
 #else
         __inline int ctz64(uint64_t val)
         {
-            uint32_t lo = (uint32_t) val;
-            uint32_t hi = (uint32_t) (val >> 32);
+            uint32_t lo = (uint32_t)val;
+            uint32_t hi = (uint32_t)(val >> 32);
             return lo ? ctz32(lo) : 32 + ctz32(hi);
         }
         __inline int clz64(uint64_t val)
@@ -188,8 +272,8 @@ namespace geco
         }
 #endif
 #else
-        /*we have to impl these functions by ourselves*/
-        /* uint64_t will take 8 times assignment to be reversed */
+         /*we have to impl these functions by ourselves*/
+         /* uint64_t will take 8 times assignment to be reversed */
         inline void reverse(unsigned char *src, const unsigned int length)
         {
             unsigned char temp;

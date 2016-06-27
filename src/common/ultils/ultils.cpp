@@ -18,7 +18,7 @@
  *
  */
 
-// created on 02-June-2016 by Jackie Zhang
+ // created on 02-June-2016 by Jackie Zhang
 #include "ultils.h"
 namespace geco
 {
@@ -26,7 +26,7 @@ namespace geco
     {
 
 #ifdef _WIN32
-        bool multibyte2wchar(const char * src, std::wstring& output)
+        bool geco_acp2w(const char * src, std::wstring& output)
         {
             int len = MultiByteToWideChar(CP_ACP, 0, src, -1, NULL, 0);
             if (len <= 0)
@@ -42,6 +42,22 @@ namespace geco
                 //  we remove the \0 of the output.
                 output.resize(len);
                 int res = MultiByteToWideChar(CP_ACP, 0, src, -1, &output[0], len);
+                output.resize(output.length() - 1);
+                return res != 0;
+            }
+        }
+
+        bool geco_utf8tow(const char * src, std::wstring & output)
+        {
+            int len = MultiByteToWideChar(CP_UTF8, 0, src, -1, NULL, 0);
+            if (len <= 0)
+            {
+                return false;
+            }
+            else
+            {
+                output.resize(len);
+                int res = MultiByteToWideChar(CP_UTF8, 0, src, -1, &output[0], len);
                 output.resize(output.length() - 1);
                 return res != 0;
             }

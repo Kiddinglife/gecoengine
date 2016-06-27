@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <syslog.h>
 #endif
+#include <process.h>
 
 #include "../plateform.h"
 #include "../ultils/ultils.h"
@@ -94,7 +95,7 @@ namespace geco
             buf[sizeof(buf) - 1] = 0;
 
             std::wstring wbuf;
-            if (!geco::ultils::multibyte2wchar(buf, wbuf))
+            if (!geco::ultils::geco_acp2w(buf, wbuf))
             {
                 wbuf = L"[Error converting message string to wide]\n";
             }
@@ -170,7 +171,35 @@ namespace geco
         static main_thread_tracker_t s_main_thread_tracker;
 
 
+        //-------------------------------------------------------
+        //	Section: default_critical_msg_handler_t
+        //-------------------------------------------------------
+#if defined(_WIN32) && !defined(_XBOX)
+        class win32_critical_msg_handler_t : public default_critical_msg_handler_t
+        {
+            virtual Result ask(const char* msg)
+            {
+#ifdef BUILT_BY_BIGWORLD
+                CriticalMsgBox mb(msg, true);
+#else//BUILT_BY_BIGWORLD
+                CriticalMsgBox mb(msg, false);
+#endif//BUILT_BY_BIGWORLD
+                if (mb.doModal())
+                    return ENTERDEBUGGER;
 
+                return EXITDIRECTLY;
+            }
+            virtual void recordInfo(bool willExit)
+            {}
+        };
+        // win32 has default handler inilized
+        static win32_critical_msg_handler_t win32_critical_msg_handler;
+        default_critical_msg_handler_t*
+            default_critical_msg_handler_t::handler_ = &win32_critical_msg_handler;
+#else//defined(_WIN32)
+        default_critical_msg_handler_t*
+            default_critical_msg_handler_t::handler_ = NULL;
+#endif//defined(_WIN32)
         //-------------------------------------------------------
         //	Section: log_msg_filter_t
         //-------------------------------------------------------
@@ -317,7 +346,7 @@ namespace geco
             printf(buffer);
             printf("\n");
             ENTER_DEBUGGER();
-#elif !defined(_WIN32)
+#elif defined(_WIN32)
 
             if (automated_test_)
             {
@@ -331,16 +360,16 @@ namespace geco
             // Disable all abort() behaviour in case we call it
             _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 
-            if (CriticalErrorHandler::get())
+            if (default_critical_msg_handler_t::get())
             {
-                switch (CriticalErrorHandler::get()->ask(buffer))
+                switch (default_critical_msg_handler_t::get()->ask(buffer))
                 {
-                case CriticalErrorHandler::ENTERDEBUGGER:
-                    CriticalErrorHandler::get()->recordInfo(false);
+                case default_critical_msg_handler_t::ENTERDEBUGGER:
+                    default_critical_msg_handler_t::get()->recordInfo(false);
                     ENTER_DEBUGGER();
                     break;
-                case CriticalErrorHandler::EXITDIRECTLY:
-                    CriticalErrorHandler::get()->recordInfo(true);
+                case default_critical_msg_handler_t::EXITDIRECTLY:
+                    default_critical_msg_handler_t::get()->recordInfo(true);
                     abort();
                     break;
                 }
@@ -349,7 +378,7 @@ namespace geco
                 abort();
 #else // ENABLE_ENTER_DEBUGGER_MESSAGE
             strcat(buffer, "\n\nThe application must exit.\n");
-            ::MessageBox(0, bw_utf8tow(buffer).c_str(), L"Critical Error Occurred", MB_ICONHAND | MB_OK);
+            ::MessageBox(0, geco_utf8tow(buffer).c_str(), L"Critical Error Occurred", MB_ICONHAND | MB_OK);
             abort();
 #endif// ENABLE_ENTER_DEBUGGER_MESSAGE
 #else
@@ -375,7 +404,7 @@ namespace geco
 
             geco_snprintf(filename, sizeof(filename), "assert.%s.%s.%d.log", pExeName, hostname, getpid());
 
-            FILE * assertFile = geco_fopen(filename, "a");
+            FILE * assertFile = geco::ultils::geco_fopen(filename, "a");
             fprintf(assertFile, "%s", buffer);
             fclose(assertFile);
 

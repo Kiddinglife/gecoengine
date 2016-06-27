@@ -102,12 +102,44 @@ namespace geco
         //	Section: log_msg_filter_t
         //-------------------------------------------------------
 
-        /*Definition for the critical message callback functor*/
+        /*Definition for the critical message common callback functor*/
         struct critical_msg_cb_tag {};
         typedef std::function<void(const char* msg, critical_msg_cb_tag*)> critical_msg_cb_t;
 
         /**
-         *	Definition for the message callback functor. If the
+        *  @brief this is  the critical message specified callback class.
+        *  it serves as base class for classes that want to handle critical
+        *  messages in different ways, and also keeps track of the current critical
+        *  message handler through its static methods.
+        *  @note win32 has handler_r initialized
+        *  other plateforms has to create their own handler class by inherting this class
+        */
+        struct default_critical_msg_handler_t
+        {
+            static default_critical_msg_handler_t* handler_;
+        public:
+            enum Result
+            {
+                ENTERDEBUGGER = 0,
+                EXITDIRECTLY
+            };
+            static default_critical_msg_handler_t* get()
+            {
+                return handler_;
+            }
+            static default_critical_msg_handler_t* set(default_critical_msg_handler_t* handler)
+            {
+                default_critical_msg_handler_t* old = handler_;
+                handler_ = handler;
+                return old;
+            }
+            virtual ~default_critical_msg_handler_t() {}
+            virtual Result ask(const char* msg) = 0;
+            virtual void recordInfo(bool willExit) = 0;
+        };
+
+        /**
+         *	Definition for the common message common callback functor. If the
          *  function returns true, the default behaviour for
          *  displaying messages is ignored.
          **/
