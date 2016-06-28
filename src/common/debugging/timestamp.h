@@ -64,13 +64,15 @@ namespace geco
 #ifdef GECO_USE_RDTSC
 #pragma warning (push)
 #pragma warning (disable: 4035)
+        extern "C" uint64 asm_gettimestamp();
+#ifdef _AMD64_
+#define gettimestamp() asm_gettimestamp()
+#else
         inline uint64 gettimestamp()
         {
             __asm rdtsc
-            // MSVC complains about no return value here.
-            // According to the help, this warning is 'harmless', and
-            //  they even have example code which does it. Go figure.
         }
+#endif
 #pragma warning (pop)
 #else // GECO_USE_RDTSC
 #ifdef _XBOX360

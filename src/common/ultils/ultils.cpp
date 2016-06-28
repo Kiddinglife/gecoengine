@@ -26,7 +26,7 @@ namespace geco
     {
 
 #ifdef _WIN32
-        bool geco_acp2w(const char * src, std::wstring& output)
+        bool win_geco_acp2w(const char * src, std::wstring& output)
         {
             int len = MultiByteToWideChar(CP_ACP, 0, src, -1, NULL, 0);
             if (len <= 0)

@@ -121,13 +121,12 @@ extern void (* __malloc_alloc_oom_handler)();
 #define alloc_type_first 1
 #define alloc_type_second 2
 
+typedef void(*oom_handler_t)();
+
 //! 一级配置器  使用malloc()分配内存
 template<int inst>
 class malloc_alloc
 {
-    public:
-    typedef void(*oom_handler_t)();
-
     private:
 #ifndef GECO_STATIC_TEMPLATE_MEMBER_BUG
     //!! 如果编译器支持模板类静态成员, 则使用错误处理函数, 类似C++的set_new_handler()  
@@ -229,7 +228,7 @@ typedef malloc_alloc<0> malloc_allocator;
 //! initialize out-of-memory handler when malloc() fails
 #ifndef GECO_STATIC_TEMPLATE_MEMBER_BUG
 template <int inst>
-typename malloc_alloc<inst>::oom_handler_t malloc_alloc<inst>::oom_handler = 0;
+oom_handler_t malloc_alloc<inst>::oom_handler = 0;
 #endif
 
 //! simple_alloc中的接口其实就是STL标准中的allocator的接口  
@@ -419,8 +418,8 @@ class default_alloc
     public:
     default_alloc()
     {
-        memset(free_list, 0, NFREELISTS*sizeof(Unit*));
-        memset(pools_, 0, NFREELISTS*sizeof(void*));
+        memset((void*)free_list, 0, NFREELISTS*sizeof(Unit*));
+        memset((void*)pools_, 0, NFREELISTS*sizeof(void*));
         start_free = end_free = NULL;
         heap_size = pool_num = 0;
         alloc_units_size = 0;

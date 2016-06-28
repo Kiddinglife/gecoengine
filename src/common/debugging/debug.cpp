@@ -97,7 +97,7 @@ namespace geco
             buf[sizeof(buf) - 1] = 0;
 
             std::wstring wbuf;
-            if (!geco::ultils::geco_acp2w(buf, wbuf))
+            if (!geco::ultils::win_geco_acp2w(buf, wbuf))
             {
                 wbuf = L"[Error converting message string to wide]\n";
             }

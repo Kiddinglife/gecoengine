@@ -178,6 +178,7 @@
     <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
     <ClInclude Include="..\..\..\..\src\common\plateform.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-thread.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\ultils.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-malloc.h" />
   </ItemGroup>
@@ -191,7 +192,7 @@
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\..\src\common\debugging\asm_int3.asm">
+    <CustomBuild Include="..\..\..\..\src\common\debugging\asms.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /c %(fileName).asm</Command>

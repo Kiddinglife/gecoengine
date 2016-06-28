@@ -137,14 +137,14 @@ namespace geco
          *	false if there was a decoding error.
          */
         bool win_geco_acp2w(const char * src, std::wstring& output);
-        inline bool win_geco_acptow(const std::string & s, std::wstring& output)
+        inline bool win_geco_acp2w(const std::string & s, std::wstring& output)
         {
-            return geco_acptow(s.c_str(), output);
+            return win_geco_acp2w(s.c_str(), output);
         }
-        inline std::wstring win_geco_acptow(const std::string & s)
+        inline std::wstring win_geco_acp2w(const std::string & s)
         {
             std::wstring ret;
-            geco_acptow(s, ret);
+            win_geco_acp2w(s, ret);
             return ret;
         }
 #define geco_fopen win_fopen
@@ -184,7 +184,7 @@ namespace geco
             return length;
         }
 
-        std::wstring win_get_temp_file_path_name()
+        inline std::wstring win_get_temp_file_path_name()
         {
             wchar_t tempDir[MAX_PATH + 1];
             wchar_t tempFile[MAX_PATH + 1];
