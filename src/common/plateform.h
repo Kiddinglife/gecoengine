@@ -164,7 +164,7 @@ typedef uint32				uintptr;
 #define ARRAY_SIZE(v)				(sizeof(v) / sizeof(v[0]))
 
 /*print out*/
-#if defined(_unix_) || defined(_linux_) || defined( PLAYSTATION3 ) 
+#if defined(__unix__) || defined(__linux__) || defined( PLAYSTATION3 )
 #define geco_isnan isnan
 #define geco_isinf isinf
 #define geco_snprintf snprintf
@@ -320,7 +320,7 @@ inline const char * getUsername()
 */
 inline int mf_getpid()
 {
-#if defined(unix)
+#if defined(__unix__) || defined(__linux__)
     return getpid();
 #elif defined(_XBOX) || defined(_XBOX360) || defined( PLAYSTATION3 )
     return -1;
@@ -406,7 +406,8 @@ inline void debugMsgNULL(const char * /*format*/, ...)
 *	This function is used to strip the path and
 * return just the basename from a path string.
 */
-inline const char* get_pathbasename(const char * path, const char * module)
+#include <string.h>
+inline const char* get_base_path(const char * path, const char * module)
 {
     static char	 staticSpace[128];
     const char * pResult = path;

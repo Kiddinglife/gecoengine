@@ -40,19 +40,36 @@ GecoMalloc geco_malloc = _DefaultMalloc;
 GecoRealloc geco_realloc = _DefaultRealloc;
 GecoFree geco_free = _DefaultFree;
 
-static void* _DefaultMalloc_Ex(size_t size, const char *file, unsigned int line)
+#include "geco-ds-malloc.h"
+static geco::ds::single_client_alloc single_client_allocator;
+static geco::ds::multi_clients_alloc multi_clients_allocator;
+inline static void* _DefaultMalloc_Ex(size_t size, const char *file, unsigned int line)
 {
-    return malloc(size);
+    return single_client_allocator.allocate(size);
 }
-static void* _DefaultRealloc_Ex(void *p, size_t size, const char *file,
+inline static void* _DefaultRealloc_Ex(void *p, size_t old, size_t size, const char *file,
     unsigned int line)
 {
-    return realloc(p, size);
+    return single_client_allocator.reallocate(p, old, size);
 }
-static void _DefaultFree_Ex(void *p, size_t size, const char *file,
+inline static void _DefaultFree_Ex(void *p, size_t size, const char *file,
     unsigned int line)
 {
-    free(p);
+    single_client_allocator.deallocate(p, size);
+}
+inline static void* _DefaultMalloc_Ex_threads(size_t size, const char *file, unsigned int line)
+{
+    return multi_clients_allocator.allocate(size);
+}
+inline static void* _DefaultRealloc_Ex_threads(void *p, size_t old, size_t size, const char *file,
+    unsigned int line)
+{
+    return multi_clients_allocator.reallocate(p, old, size);
+}
+inline static void _DefaultFree_Ex_threads(void *p, size_t size, const char *file,
+    unsigned int line)
+{
+    multi_clients_allocator.deallocate(p, size);
 }
 
 /*
@@ -62,3 +79,7 @@ static void _DefaultFree_Ex(void *p, size_t size, const char *file,
 GecoMallocExt geco_malloc_ext = _DefaultMalloc_Ex;
 GecoReallocExt geco_realloc_ext = _DefaultRealloc_Ex;
 GecoFreeExt geco_free_ext = _DefaultFree_Ex;
+
+ GECO_EXPORT GecoMallocExt geco_malloc_ext_threads;
+ GECO_EXPORT GecoReallocExt geco_realloc_ext_threads;
+ GECO_EXPORT GecoFreeExt geco_free_ext_threads;

@@ -50,13 +50,17 @@ extern GECO_EXPORT GecoFree geco_free;
 
 typedef void * (*GecoMallocExt)(size_t size, const char *file,
         unsigned int line);
-typedef void * (*GecoReallocExt)(void *p, size_t size, const char *file,
+typedef void * (*GecoReallocExt)(void *p, size_t old, size_t size, const char *file,
         unsigned int line);
 typedef void (*GecoFreeExt)(void *p, size_t size, const char *file,
         unsigned int line);
 extern GECO_EXPORT GecoMallocExt geco_malloc_ext;
 extern GECO_EXPORT GecoReallocExt geco_realloc_ext;
 extern GECO_EXPORT GecoFreeExt geco_free_ext;
+
+extern GECO_EXPORT GecoMallocExt geco_malloc_ext_threads;
+extern GECO_EXPORT GecoReallocExt geco_realloc_ext_threads;
+extern GECO_EXPORT GecoFreeExt geco_free_ext_threads;
 
 /// new functions with different number of ctor params, up to 4
 template<class Type>
