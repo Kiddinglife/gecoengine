@@ -120,19 +120,19 @@ namespace geco
          * using theactive code page on this system. Returns true if it succeeded, otherwise
          *	false if there was a decoding error.
          */
-        bool geco_acp2w(const char * src, std::wstring& output);
-        inline bool geco_acptow(const std::string & s, std::wstring& output)
+        bool win_geco_acp2w(const char * src, std::wstring& output);
+        inline bool win_geco_acptow(const std::string & s, std::wstring& output)
         {
             return geco_acptow(s.c_str(), output);
         }
-        inline std::wstring geco_acptow(const std::string & s)
+        inline std::wstring win_geco_acptow(const std::string & s)
         {
             std::wstring ret;
             geco_acptow(s, ret);
             return ret;
         }
-
-        inline FILE* geco_fopen(const char* filename, const char* mode)
+#define geco_fopen win_fopen
+        inline FILE* win_fopen(const char* filename, const char* mode)
         {
             std::wstring wfilename;
             std::wstring wmode;
@@ -143,7 +143,7 @@ namespace geco
             return _wfopen(wfilename.c_str(), wmode.c_str());
         }
 
-        inline long geco_file_size(FILE* file)
+        inline long win_geco_file_size(FILE* file)
         {
             long currentLocation = ftell(file);
             if (currentLocation < 0)
@@ -168,7 +168,7 @@ namespace geco
             return length;
         }
 
-        std::wstring get_temp_file_path_name()
+        std::wstring win_get_temp_file_path_name()
         {
             wchar_t tempDir[MAX_PATH + 1];
             wchar_t tempFile[MAX_PATH + 1];
@@ -183,6 +183,7 @@ namespace geco
             return L"";
         }
 #else
+#include<stdio.h>
 #define geco_fopen fopen //bw_fopen might be used directly
 #endif
 

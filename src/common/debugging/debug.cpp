@@ -382,7 +382,6 @@ namespace geco
             abort();
 #endif// ENABLE_ENTER_DEBUGGER_MESSAGE
 #else
-
             char	filename[512], hostname[256];
             if (gethostname(hostname, sizeof(hostname)) != 0)
                 hostname[0] = 0;
@@ -404,7 +403,7 @@ namespace geco
 
             geco_snprintf(filename, sizeof(filename), "assert.%s.%s.%d.log", pExeName, hostname, getpid());
 
-            FILE * assertFile = geco::ultils::geco_fopen(filename, "a");
+            FILE * assertFile = geco_fopen(filename, "a");
             fprintf(assertFile, "%s", buffer);
             fclose(assertFile);
 
