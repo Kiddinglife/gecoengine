@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\common\debugging\debug.h" />
     <ClInclude Include="..\..\..\..\src\common\debugging\stack_tracker_t.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\timestamp.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
@@ -183,10 +184,19 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\common\debugging\debug.cpp" />
     <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\timestamp.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\ultils.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\src\common\debugging\asm_int3.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /c %(fileName).asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(fileName).obj</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

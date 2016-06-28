@@ -261,7 +261,13 @@ template <class T> inline const T & max(const T & a, const T & b) { return a < b
 #if defined( _XBOX360 )
 #define ENTER_DEBUGGER() DebugBreak()
 #elif defined( _WIN32 )
+extern "C" void asm_int3();
+#ifdef _AMD64_
+#define ENTER_DEBUGGER() asm_int3()
+#else
+ENTER_DEBUGGER();
 #define ENTER_DEBUGGER() __asm { int 3 }
+#endif
 #elif defined( PLAYSTATION3 )
 #define ENTER_DEBUGGER() __asm__ volatile ( ".int 0" )
 #else
@@ -400,7 +406,7 @@ inline void debugMsgNULL(const char * /*format*/, ...)
 *	This function is used to strip the path and
 * return just the basename from a path string.
 */
-inline const char* get_base_path(const char * path, const char * module)
+inline const char* get_pathbasename(const char * path, const char * module)
 {
     static char	 staticSpace[128];
     const char * pResult = path;

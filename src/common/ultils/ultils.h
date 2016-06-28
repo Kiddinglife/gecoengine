@@ -110,10 +110,26 @@ namespace geco
             out[strIndex++] = 0;
         }
 
-
         //-------------------------------------------------------
         //	Section: String and File Ultil Functions                                                   
         //-------------------------------------------------------
+
+        /**
+         * @brief Converts the given utf-8 string to the wide representation.
+         * Returns true if it succeeded, otherwise false if there was a decoding error.
+         */
+        bool geco_utf8tow(const char * s, std::wstring& output);
+        inline bool geco_utf8tow(const std::string & s, std::wstring& output)
+        {
+            return geco_utf8tow(s.c_str(), output);
+        }
+        inline std::wstring geco_utf8tow(const std::string & s)
+        {
+            std::wstring ret;
+            geco_utf8tow(s, ret);
+            return ret;
+        }
+
 #if defined(_WIN32)
         /*
          * @brief Converts the given narrow string to the wide representation.
@@ -186,21 +202,6 @@ namespace geco
 #define geco_fopen fopen //bw_fopen might be used directly
 #endif
 
-        /**
-         * @brief Converts the given utf-8 string to the wide representation.
-         * Returns true if it succeeded, otherwise false if there was a decoding error.
-         */
-        bool geco_utf8tow(const char * s, std::wstring& output);
-        inline bool geco_utf8tow(const std::string & s, std::wstring& output)
-        {
-            return geco_utf8tow(s.c_str(), output);
-        }
-        inline std::wstring geco_utf8tow(const std::string & s)
-        {
-            std::wstring ret;
-            geco_utf8tow(s, ret);
-            return ret;
-        }
 
         /*============ timer bit operations ===============*/
         /**

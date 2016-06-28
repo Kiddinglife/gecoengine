@@ -19,8 +19,10 @@
  */
 
  // created on 02-June-2016 by Jackie Zhang
+
  //#include "pch.hpp"
  //#include "string_utils.hpp"
+
 #include <stdio.h>      /* printf, vprintf*/
 #include <stdlib.h>     /* malloc */
 #include <string.h>     /* strlen, strcat */
@@ -179,13 +181,13 @@ namespace geco
         {
             virtual Result ask(const char* msg)
             {
-#ifdef BUILT_BY_BIGWORLD
+#ifdef BUILT_BY_GECO
                 CriticalMsgBox mb(msg, true);
-#else//BUILT_BY_BIGWORLD
-                CriticalMsgBox mb(msg, false);
-#endif//BUILT_BY_BIGWORLD
-                if (mb.doModal())
-                    return ENTERDEBUGGER;
+#else
+                // TODO CriticalMsgBox mb(msg, false);
+#endif
+                //if (mb.doModal())
+                //    return ENTERDEBUGGER;
 
                 return EXITDIRECTLY;
             }
@@ -359,8 +361,7 @@ namespace geco
 #if ENABLE_ENTER_DEBUGGER_MESSAGE
             // Disable all abort() behaviour in case we call it
             _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-
-            if (default_critical_msg_handler_t::get())
+            if (default_critical_msg_handler_t::get() != NULL)
             {
                 switch (default_critical_msg_handler_t::get()->ask(buffer))
                 {
