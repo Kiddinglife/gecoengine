@@ -484,6 +484,111 @@ namespace geco
         {}
 #endif
 
+        //-------------------------------------------------------
+        //	Section: Debug Macros
+        //-------------------------------------------------------
+#include <assert.h>
+#ifdef __ASSERT_FUNCTION
+#	define GECO_FUNCNAME __ASSERT_FUNCTION
+#else
+#		define GECO_FUNCNAME ""
+#endif
+
+#ifdef GECO_USE_ASSERTS
+#	define GECO_REAL_ASSERT assert(0);
+#else
+#	define GECO_REAL_ASSERT
+#endif
+
+/**
+* This macro should be used instead of assert.
+* @see GECO_ASSERT_DEBUG
+*/
+#if !defined( _RELEASE )
+#define GECO_ASSERT( exp )\
+if (!(exp))\
+{log_msg_helper().critical_msg(	"ASSERTION FAILED: " #exp "\n" __FILE__ "(%d)%s%s\n", \
+(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME); GECO_REAL_ASSERT}
+#else	// _RELEASE
+#define GECO_ASSERT( exp )
+#endif // !_RELEASE
+
+#ifdef _DEBUG
+// GECO_ASSERT_DEBUG is like GECO_ASSERT except only evaluated in debug builds.
+#	define GECO_ASSERT_DEBUG		GECO_ASSERT
+#else
+/**
+ *	This macro should be used instead of assert. It is enabled only
+ *	in debug builds, unlike MF_ASSERT which is enabled in both
+ *	debug and hybrid builds.
+ */
+#	define GECO_ASSERT_DEBUG( exp )
+#endif
+
+#if defined( SERVER_BUILD ) || !defined( _RELEASE )
+ /**
+  *	An assertion which is only lethal when not in a production environment.
+  *	These are disabled for client release builds.
+  */
+#define GECO_ASSERT_DEV( exp )													\
+if (!(exp)){log_msg_helper().dev_critical_msg("GECO_ASSERT_DEV FAILED: " #exp "\n"	\
+__FILE__ "(%d)%s%s\n",(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME );}
+#else
+ /**Empty versions of above function - not available on client release builds.*/
+#define GECO_ASSERT_DEV( exp )
+#endif
+
+ /**
+  *	An assertion which is only lethal when not in a production environment.
+  *	In a production environment, the block of code following the macro will
+  *	be executed if the assertion fails.
+  *	@see GECO_ASSERT_DEV
+  */
+#define GECO_ASSERT_DEV_IFNOT( exp )\
+if ((!( exp )) && (log_msg_helper().dev_critical_msg(\
+"GECO_ASSERT_DEV_IFNOT FAILED: " #exp "\n"	__FILE__ "(%d)%s%s\n",\
+(int __LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME ),true))		
+  // leave trailing block after message
+
+/** this is a placeholder until a better solution can be implemented. */
+#define GECO_EXIT(msg) {\
+			log_msg_helper().critical_msg("FATAL ERROR: " #msg "\n" __FILE__ "(%d)%s%s\n", (int)__LINE__,					\
+					*GECO_FUNCNAME ? " in " : "",								\
+					GECO_FUNCNAME );											\
+																			\
+			MF_REAL_ASSERT													\
+}
+
+  /**
+  *	This macro is used to assert a pre-condition.
+  *	@see GECO_ASSERT
+  *	@see POST
+  */
+#define PRE( exp )	GECO_ASSERT( exp )
+
+  /**
+  *	This macro is used to assert a post-condition.
+  *	@see GECO_ASSERT
+  *	@see PRE
+  */
+#define POST( exp )	GECO_ASSERT( exp )
+
+  /**
+   *	This macro is used to verify an expression. In non-release it
+   *	asserts on failure, and in release the expression is still
+   *	evaluated.
+   *	@see GECO_ASSERT
+   */
+#ifdef _RELEASE
+#define GECO_VERIFY( exp ) (exp)
+#define GECO_VERIFY_DEV( exp ) (exp)
+#else
+#define GECO_VERIFY GECO_ASSERT
+#define GECO_VERIFY_DEV GECO_ASSERT_DEV
+#endif
+
+
+
     }
 }
 #endif

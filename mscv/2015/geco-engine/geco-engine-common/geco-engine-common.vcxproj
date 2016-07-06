@@ -177,6 +177,7 @@
     <ClInclude Include="..\..\..\..\src\common\geco-engine-config.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
     <ClInclude Include="..\..\..\..\src\common\plateform.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\affinity.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-thread.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\ultils.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cpp" />
     <ClCompile Include="..\..\..\..\src\common\debugging\timestamp.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\affinity.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\ultils.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />

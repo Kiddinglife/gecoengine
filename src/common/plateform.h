@@ -451,4 +451,5 @@ typedef BW_compile_time_check< (test) != 0 > TmplImpl;\
 TmplImpl aTemp = TmplImpl( ERROR_##errormsg() );	\
 size_t x = sizeof( aTemp ); x += 1;} while (0)
 
+
 #endif

@@ -25,6 +25,14 @@
 
 //#define GECO_EXPORTER 0
 
+#if defined(_RELEASE) && defined( _DEBUG )
+#error "_RELEASE and _DEBUG macros should not be used at same time"
+#endif
+
+#if !defined( _RELEASE ) && !defined( _DEBUG )
+#error " _RELEASE and _DEBUG macro are not be used !"
+#endif
+
 /**
  * This define is used to control the conditional compilation of features
  * that will be removed from the client builds provided to the public.

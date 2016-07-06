@@ -98,11 +98,25 @@ namespace geco
 #error Unsupported platform!
 #endif
 
+        /**
+        *	This function tells you how many there are in a second. It caches its reply
+        *	after being called for the first time, however that call may take some time.
+        */
         uint64 stamps_per_sec();
-        double double_stamps_per_sec();
+
+        /**
+        *	This function tells you how many there are in a second as a double precision
+        *	floating point value. It caches its reply after being called for the first
+        *	time, however that call may take some time.
+        */
+        inline double stamps_per_sec_double()
+        {
+            static double stampsPerSecondCacheD = double(stamps_per_sec());
+            return stampsPerSecondCacheD;
+        }
         inline double stamps2sec(uint64 stamps)
         {
-            return double(stamps) / double_stamps_per_sec();
+            return double(stamps) / stamps_per_sec_double();
         }
 
     }
