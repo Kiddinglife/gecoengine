@@ -14,9 +14,9 @@ Int_3 ENDP
 // MSVC complains about no return value here.
 // According to the help, this warning is 'harmless', and
 //  they even have example code which does it. Go figure.
-asm_gettimestamp PROC 
-rdtsc // 指令
-ret   // 函数返回指令
-asm_gettimestamp ENDP 
+//gettimestamp PROC 
+//rdtsc // 指令
+//ret   // 函数返回指令
+//gettimestamp ENDP 
 
 END  // 文件结束

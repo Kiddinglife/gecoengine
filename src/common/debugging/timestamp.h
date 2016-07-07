@@ -39,15 +39,13 @@ namespace geco
         // under 2.4 kernels where two consecutive calls to gettimeofday may actually
         // return a result that goes backwards.
 #ifndef _XBOX360
-#ifndef __unix__
 # define GECO_USE_RDTSC
-#endif 
 #endif // _XBOX360
 
         /**
         * This function returns the processor's (real-time) clock cycle counter.
         */
-#ifdef unix
+#if defined(__unix__) || defined(__linux__)
         inline uint64 gettimestamp()
         {
             uint32 rethi, retlo;
@@ -64,9 +62,8 @@ namespace geco
 #ifdef GECO_USE_RDTSC
 #pragma warning (push)
 #pragma warning (disable: 4035)
-        extern "C" uint64 asm_gettimestamp();
 #ifdef _AMD64_
-#define gettimestamp() asm_gettimestamp()
+        extern "C" uint64 gettimestamp();
 #else
         inline uint64 gettimestamp()
         {
@@ -119,6 +116,67 @@ namespace geco
             return double(stamps) / stamps_per_sec_double();
         }
 
+        // ---------------------------------------------------------------------
+        // Section: TimeStamp
+        // ---------------------------------------------------------------------
+
+        /**
+         *	This class stores a value in stamps but has access functions in seconds.
+         */
+        struct time_stamp_t
+        {
+            time_stamp_t(uint64 stamps = 0) : stamp_(stamps) {}
+
+            operator uint64 &() { return stamp_; }
+            operator uint64() const { return stamp_; }
+
+            /**
+            *	This method returns this timestamp in seconds.
+            */
+            double inSeconds() const
+            {
+                return toSeconds(stamp_);
+            }
+            /**
+            *	This method sets this timestamp from seconds.
+            */
+            inline void setInSeconds(double seconds)
+            {
+                stamp_ = fromSeconds(seconds);
+            }
+
+            /**
+            *	This method returns the number of stamps from this TimeStamp to now.
+            */
+            inline time_stamp_t ageInStamps() const
+            {
+                return gettimestamp() - stamp_;
+            }
+            /**
+            *	This method returns the number of seconds from this TimeStamp to now.
+            */
+            inline double ageInSeconds() const
+            {
+                return toSeconds(this->ageInStamps());
+            }
+
+            /**
+            *	This static method converts a timestamp value into seconds.
+            */
+            static double toSeconds(uint64 stamps)
+            {
+                return double(stamps) / stamps_per_sec_double();
+            }
+            /**
+            *	This static method converts seconds into timestamps.
+            */
+            static time_stamp_t fromSeconds(double seconds)
+            {
+                return uint64(seconds * stamps_per_sec_double());
+            }
+
+            uint64	stamp_;
+        };
     }
 }
 #endif

@@ -66,14 +66,14 @@ static uint64 calc_stamps_pe_sec()
     QueryPerformanceCounter(&tvBefore);
     QueryPerformanceCounter(&tvBefore);
     QueryPerformanceCounter(&tvBefore);
-    stampBefore = gettimestamp();
+    //stampBefore = gettimestamp(); //FIXME
 
     Sleep(tvSleep);
 
     QueryPerformanceCounter(&tvAfter);
     QueryPerformanceCounter(&tvAfter);
     QueryPerformanceCounter(&tvAfter);
-    stampAfter = gettimestamp();
+    //stampAfter = gettimestamp(); //FIXME
 
     uint64 countDelta = tvAfter.QuadPart - tvBefore.QuadPart;
     uint64 stampDelta = stampAfter - stampBefore;
