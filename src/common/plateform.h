@@ -261,7 +261,7 @@ template <class T> inline const T & max(const T & a, const T & b) { return a < b
 #if defined( _XBOX360 )
 #define ENTER_DEBUGGER() DebugBreak()
 #elif defined( _WIN32 )
-extern "C" void asm_int3();
+extern "C" void _stdcall asm_int3();
 #ifdef _AMD64_
 #define ENTER_DEBUGGER() asm_int3()
 #else

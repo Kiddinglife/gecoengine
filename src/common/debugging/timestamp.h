@@ -63,7 +63,8 @@ namespace geco
 #pragma warning (push)
 #pragma warning (disable: 4035)
 #ifdef _AMD64_
-        extern "C" uint64 gettimestamp();
+        extern "C" uint64 _stdcall asm_time();
+#define gettimestamp() asm_time()
 #else
         inline uint64 gettimestamp()
         {
