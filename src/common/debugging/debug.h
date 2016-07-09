@@ -314,21 +314,22 @@ namespace geco
 			NUM_LOG_MSG
 		};
 
+		const char * prefixes[] =
+		{
+			"TRACE",
+			"DEBUG",
+			"INFO",
+			"NOTICE",
+			"WARNING",
+			"ERROR",
+			"CRITICAL",
+			"HACK",
+			"SCRIPT",
+			"ASSET"
+		};
+
 		inline const char * get_logmsg_prefix_str(LogMsgPriority p)
 		{
-			static const char * prefixes[] =
-			{
-				"TRACE",
-				"DEBUG",
-				"INFO",
-				"NOTICE",
-				"WARNING",
-				"ERROR",
-				"CRITICAL",
-				"HACK",
-				"SCRIPT",
-				"ASSET"
-			};
 			return (p >= 0 && (size_t)p < sizeof(prefixes)) ? prefixes[(int)p] : "";
 		}
 
@@ -500,10 +501,22 @@ namespace geco
 #define GECO_REAL_ASSERT
 #endif
 
-/**
-* This macro should be used instead of assert.
-* @see GECO_ASSERT_DEBUG
-*/
+#ifdef _DEBUG
+		// GECO_ASSERT_DEBUG is like GECO_ASSERT except only evaluated in debug builds.
+#define GECO_ASSERT_DEBUG		GECO_ASSERT
+#else
+		/**
+		*	This macro should be used instead of assert. It is enabled only
+		*	in debug builds, unlike MF_ASSERT which is enabled in both
+		*	debug and hybrid builds.
+		*/
+#define GECO_ASSERT_DEBUG( exp )
+#endif
+
+		/**
+		* This macro should be used instead of assert.
+		* @see GECO_ASSERT_DEBUG
+		*/
 #if !defined( _RELEASE )
 #define GECO_ASSERT( exp )\
 if (!(exp)){log_msg_helper().critical_msg(	"ASSERTION FAILED: " #exp "\n" __FILE__ "(%d)%s%s\n", \
@@ -512,28 +525,17 @@ if (!(exp)){log_msg_helper().critical_msg(	"ASSERTION FAILED: " #exp "\n" __FILE
 #define GECO_ASSERT( exp )
 #endif // !_RELEASE
 
-#ifdef _DEBUG
-// GECO_ASSERT_DEBUG is like GECO_ASSERT except only evaluated in debug builds.
-#	define GECO_ASSERT_DEBUG		GECO_ASSERT
-#else
-/**
- *	This macro should be used instead of assert. It is enabled only
- *	in debug builds, unlike MF_ASSERT which is enabled in both
- *	debug and hybrid builds.
- */
-#	define GECO_ASSERT_DEBUG( exp )
-#endif
 
 #if defined( SERVER_BUILD ) || !defined( _RELEASE )
- /**
-  *	An assertion which is only lethal when not in a production environment.
-  *	These are disabled for client release builds.
-  */
+		/**
+		 *	An assertion which is only lethal when not in a production environment.
+		 *	These are disabled for client release builds.
+		 */
 #define GECO_ASSERT_DEV( exp )													\
 if (!(exp)){log_msg_helper().dev_critical_msg("GECO_ASSERT_DEV FAILED: " #exp "\n"	\
 __FILE__ "(%d)%s%s\n",(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME );}
 #else
- /**Empty versions of above function - not available on client release builds.*/
+		/**Empty versions of above function - not available on client release builds.*/
 #define GECO_ASSERT_DEV( exp )
 #endif
 
@@ -583,6 +585,114 @@ if ((!( exp )) && (log_msg_helper().dev_critical_msg(\
 #endif
 
 
+   //-------------------------------------------------------
+   //	Section: 	*_MSG macros.
+   //-------------------------------------------------------
+
+   // This is the default s_componentPriority for files that does not
+   // have DECLARE_DEBUG_COMPONENT2(). Useful for hpp and ipp files that
+   // uses debug macros. s_componentPriority declared by
+   //	DECLARE_DEBUG_COMPONENT2() will have precedence over this one.
+		const int const_cpnt_priority = 0;
+
+		/// This macro prints a debug message with CRITICAL priority.
+		/// CRITICAL_MSG is always enabled no matter what the build target is.
+#define CRITICAL_MSG \
+		log_msg_helper(const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
+		/// This macro prints a development time only message CRITICAL priority.
+#define DEV_CRITICAL_MSG	CRITICAL_MSG
+
+#if ENABLE_MSG_LOGGING
+
+#define MSG_BACK_TRACE(PRIORITY)\
+log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
+
+#define TRACE_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_TRACE )
+#define DEBUG_BACKTRACE		MSG_BACK_TRACE( LOG_MSG_DEBUG )
+#define INFO_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_INFO )
+#define NOTICE_BACKTRACE	    MSG_BACK_TRACE( LOG_MSG_NOTICE )
+#define WARNING_BACKTRACE	MSG_BACK_TRACE( LOG_MSG_WARNING )
+#define ERROR_BACKTRACE		MSG_BACK_TRACE( LOG_MSG_ERROR )
+#define CRITICAL_BACKTRACE	    MSG_BACK_TRACE( LOG_MSG_CRITICAL )
+#define HACK_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_HACK )
+
+		// The following macros are used to display debug information. See comment at
+		// the top of this file.
+#define MSG_DEBUG(PRIORITY) log_msg_helper(const_cpnt_priority,PRIORITY).message
+
+		/// This macro prints a debug message with TRACE priority.
+#define TRACE_MSG		MSG_DEBUG( LOG_MSG_TRACE )
+		/// This macro prints a debug message with DEBUG priority.
+#define DEBUG_MSG		MSG_DEBUG( LOG_MSG_DEBUG )
+		/// This macro prints a debug message with INFO priority.
+#define INFO_MSG		    MSG_DEBUG( LOG_MSG_INFO )
+		/// This macro prints a debug message with NOTICE priority.
+#define NOTICE_MSG		MSG_DEBUG( LOG_MSG_NOTICE )
+		/// This macro prints a debug message with WARNING priority.
+#define WARNING_MSG	MSG_DEBUG( LOG_MSG_WARNING )
+		/// This macro prints a debug message with ERROR priority.
+#define ERROR_MSG	    MSG_DEBUG( LOG_MSG_ERROR )
+		/// This macro prints a debug message with HACK priority.
+#define HACK_MSG		MSG_DEBUG( LOG_MSG_HACK )
+		/// This macro prints a debug message with SCRIPT priority.
+#define SCRIPT_MSG		MSG_DEBUG( LOG_MSG_SCRIPT )
+#else
+#define NULL_MSG(...)														\
+	do																		\
+	{																		\
+		if (false)															\
+			printf(__VA_ARGS__);											\
+	}																		\
+	while (false)
+#define TRACE_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define DEBUG_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define INFO_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define NOTICE_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define WARNING_MSG(...)		NULL_MSG(__VA_ARGS__)
+#define ERROR_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define HACK_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define SCRIPT_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define DEV_CRITICAL_MSG(...)	NULL_MSG(__VA_ARGS__)
+#endif
+
+		/**
+		 *	This macro used to display trace information. Can be used later to add in
+		 *	our own callstack if necessary.
+		 */
+#define ENTER(className,methodName) TRACE_MSG( className "::" methodName "\n" )
+
+#ifndef _RELEASE
+#if ENABLE_WATCHERS
+		extern int init_watcher(int & value, const char * path);
+		/**
+		 *	@brief
+		 *   needs to be placed in a cpp file before any of the *_MSG macros can be used.
+		 *
+		 *	@param module
+		 *   The name (or path) of the watcher module that the component
+		 *   priority should be displayed in.
+		 *	@param priority	The initial component priority of the messages in the file.
+		 */
+#define DECLARE_DEBUG_COMPONENT2(module, priority)\
+static int const_cpnt_priority = priority;\
+static int IGNORE_THIS_COMPONENT_WATCHER_INIT =\
+init_watcher(const_cpnt_priority,get_base_path( __FILE__, module ) );
+#else
+#define DECLARE_DEBUG_COMPONENT2( module, priority )\
+static int const_cpnt_priority = priority;
+#endif
+#else
+#define DECLARE_DEBUG_COMPONENT2( module, priority )
+#endif
+
+
+		 /**
+		  *	needs to be placed in a cpp file before any of the *_MSG macros can be used.
+		  *
+		  *	@param priority	The initial component priority of the messages in the file.
+		  */
+#define DECLARE_DEBUG_COMPONENT(priority) \
+DECLARE_DEBUG_COMPONENT2( NULL, priority )
 
 	}
 }

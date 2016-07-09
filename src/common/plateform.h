@@ -395,13 +395,6 @@ inline bool isFloatValid(float f)
     return (intFloat.ui32 & 0x7f800000) != 0x7f800000;
 }
 
-/**
-*	This function eats the arguments of *_MSG macros when in Release mode
-*/
-inline void debugMsgNULL(const char * /*format*/, ...)
-{
-}
-
 /*
 *	This function is used to strip the path and
 * return just the basename from a path string.
