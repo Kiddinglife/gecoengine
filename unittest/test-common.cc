@@ -1,17 +1,31 @@
 #include "gtest/gtest.h"
+#include "common/plateform.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
+#include <functional>
+#include <binders.h>
+
+#include "common/ultils/ultils.h"
+#include "common/ultils/geco-ds-wheel-timer.h"
+#include "common/debugging/timestamp.h"
+#include "common/ds/array.h"
+#include "common/debugging/debug.h"
+
+using namespace geco::debugging;
+using namespace geco::ultils;
+using namespace geco::ds;
+
+DECLARE_DEBUG_COMPONENT2("TEST_COMMON_CPNT_LOGGER", geco::debugging::LOG_MSG_ERROR);
+
 /**
  *  unit tests have:
  *  1) TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
  *
  */
 
-#include "common/ultils/ultils.h"
-using namespace geco::ultils;
 static int naive_clz(int bits, uint64_t v)
 {
 	int r = 0;
@@ -103,7 +117,6 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
 	EXPECT_EQ(result, 0);
 }
 
-#include "common/ultils/geco-ds-wheel-timer.h"
 static int& test_bind(int& timer_type)
 {
 	int* a = new int;
@@ -116,9 +129,6 @@ static int* test_bind2(int* timer_type)
 	*a = 1;
 	return a;
 }
-
-#include <functional>
-#include <binders.h>
 
 typedef int& (*fn1)(int&); // cannot put fn1 to typedef function not typed !
 typedef std::function<int&(int&)> mycb;
@@ -141,6 +151,64 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_CB)
 
 }
 
+TEST(GECO_DEBUGGING_TIMESTAMP, test_gettimestamp_func)
+{
+	time_stamp_t stampt = time_stamp_t::fromSeconds(1.0);
+	EXPECT_EQ(time_stamp_t::toSeconds(stampt.stamp_), 1.0f);
+	stampt = gettimestamp();
+	sleep(1);
+	time_stamp_t ageinstamp = stampt.ageInStamps();
+	double ageinsec = stampt.ageInSeconds();
+	printf("%0.2f -> %lu\n", ageinsec, ageinstamp.stamp_);
+}
+
+TEST(GECO_DEBUGGING_MSGLOG, test_msg_macros)
+{
+	TRACE_STARTS("TRACE_STARTS", "test_msg_macros");
+	DEBUG_MSG("DEBUG_MSG %d\n", 12);
+	INFO_MSG("INFO_MSG %s\n", "hello world");
+	NOTICE_MSG("NOTICE_MSG %s\n", "hello world");
+	ERROR_MSG("ERROR_MSG %s\n", "hello world");
+}
+TEST(GECO_DEBUGGING_MSGLOG, test_geco_asset_dev)
+{
+	// Runtime disable fatal assertions
+	geco::debugging::log_msg_filter_t::get_instance().has_dev_assert_ = false;
+	// when has_dev_assert_ = false, GECO_ASSERT will not cause a REAL assert
+	GECO_ASSERT_DEV(false);
+
+	geco::debugging::log_msg_filter_t::get_instance().has_dev_assert_ = true;
+	// when has_dev_assert_ = true (default), GECO_ASSERT will cause a REAL assert like GECO_ASSERT_DEV
+	GECO_ASSERT_DEV(false);
+}
+
+TEST(GECO_DEBUGGING_MSGLOG, test_geco_asset_dev_if_not)
+{
+	// Runtime disable fatal assertions
+	log_msg_filter_t::get_instance().has_dev_assert_ = false;
+	// when has_dev_assert_ = false, GECO_ASSERT_DEV_IFNOT will not cause a REAL assert and the block ofcodes will be run
+GECO_ASSERT_DEV_IFNOT(false)
+{
+	INFO_MSG("GECO_ASSERT_DEV_IFNOT!\n");
+}
+GECO_ASSERT_DEV_IFNOT(true)
+{
+	INFO_MSG("you should not see this!\n");
+}
+
+log_msg_filter_t::get_instance()
+.has_dev_assert_ = true;
+// when has_dev_assert_ = true (default), GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
+GECO_ASSERT_DEV_IFNOT(true)
+{
+	INFO_MSG("i MA HERE\n");
+}
+GECO_ASSERT_DEV_IFNOT(false)
+{
+	INFO_MSG("you should not see this! beause already asseeted\n");
+}
+}
+
 #include "common/ultils/geco-ds-wheel-timer.h"
 using namespace geco::ultils;
 #define THE_END_OF_TIME ((timeout_t)-1)
@@ -148,34 +216,34 @@ using namespace geco::ultils;
 /* configuration for check_randomized */
 struct rand_cfg
 {
-	/* When creating timeouts, smallest possible delay */
-	timeout_t min_timeout;
-	/* When creating timeouts, largest possible delay */
-	timeout_t max_timeout;
-	/* First time to start the clock at. */
-	timeout_t start_at;
-	/* Do not advance the clock past this time. */
-	timeout_t end_at;
-	/* Number of timeouts to create and monitor. */
-	int n_timeouts;
-	/* Advance the clock by no more than this each step. */
-	timeout_t max_step;
-	/* Use relative timers and stepping */
-	int relative;
-	/* Every time the clock ticks, try removing this many timeouts at
-	 * random. */
-	int try_removing;
-	/* When we're done, advance the clock to the end of time. */
-	int finalize;
+/* When creating timeouts, smallest possible delay */
+timeout_t min_timeout;
+/* When creating timeouts, largest possible delay */
+timeout_t max_timeout;
+/* First time to start the clock at. */
+timeout_t start_at;
+/* Do not advance the clock past this time. */
+timeout_t end_at;
+/* Number of timeouts to create and monitor. */
+int n_timeouts;
+/* Advance the clock by no more than this each step. */
+timeout_t max_step;
+/* Use relative timers and stepping */
+int relative;
+/* Every time the clock ticks, try removing this many timeouts at
+ * random. */
+int try_removing;
+/* When we're done, advance the clock to the end of time. */
+int finalize;
 };
 /* Not very random */
 static timeout_t random_to(timeout_t min, timeout_t max)
 {
-	if (max <= min)
-		return min;
-	/* Not actually all that random, but should exercise the code. */
-	timeout_t rand64 = rand() * (timeout_t) INT_MAX + rand();
-	return min + (rand64 % (max - min));
+if (max <= min)
+	return min;
+/* Not actually all that random, but should exercise the code. */
+timeout_t rand64 = rand() * (timeout_t) INT_MAX + rand();
+return min + (rand64 % (max - min));
 }
 
 /*
@@ -202,270 +270,270 @@ static timeout_t random_to(timeout_t min, timeout_t max)
  */
 static wtimer_t* min_timeout(wtimers_t* T)
 {
-	struct wtimer_t *min = NULL;
-	unsigned i, j;
+struct wtimer_t *min = NULL;
+unsigned i, j;
 
-	for (i = 0; i < countof(T->wheel); i++)
+for (i = 0; i < countof(T->wheel); i++)
+{
+	for (j = 0; j < countof(T->wheel[i]); j++)
 	{
-		for (j = 0; j < countof(T->wheel[i]); j++)
+		for (auto& to : T->wheel[i][j])
 		{
-			for (auto& to : T->wheel[i][j])
-			{
-				if (min == NULL)
-					min = to;
-				if (to->abs_expires < min->abs_expires)
-					min = to;
-			}
+			if (min == NULL)
+				min = to;
+			if (to->abs_expires < min->abs_expires)
+				min = to;
 		}
 	}
-	return min;
+}
+return min;
 } /* timeouts_min() */
 
 /*the earlist pending timeout should greater than curr time after
  * get_exired_timer() called.*/
 bool timeouts_check(wtimers_t *T, FILE *fp)
 {
-	timeout_t timeout;
-	wtimer_t* to = min_timeout(T);
-	if (to != NULL)
-	{
-		check(to->abs_expires > T->curtime,
-				"missed timeout (expires:%" TIMEOUT_PRIu " <= curtime:%" TIMEOUT_PRIu ")\n",
-				to->abs_expires, T->curtime);
+timeout_t timeout;
+wtimer_t* to = min_timeout(T);
+if (to != NULL)
+{
+	check(to->abs_expires > T->curtime,
+			"missed timeout (expires:%" TIMEOUT_PRIu " <= curtime:%" TIMEOUT_PRIu ")\n",
+			to->abs_expires, T->curtime);
 
-		timeout = T->get_interval();
-		check(timeout <= to->abs_expires - T->curtime,
-				"wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
-				timeout, (to->abs_expires - T->curtime), to->abs_expires,
-				T->curtime);
+	timeout = T->get_interval();
+	check(timeout <= to->abs_expires - T->curtime,
+			"wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
+			timeout, (to->abs_expires - T->curtime), to->abs_expires,
+			T->curtime);
 
-		timeout = T->timout();
-		check(timeout <= to->abs_expires - T->curtime,
-				"wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
-				timeout, (to->abs_expires - T->curtime), to->abs_expires,
-				T->curtime);
-	}
+	timeout = T->timout();
+	check(timeout <= to->abs_expires - T->curtime,
+			"wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
+			timeout, (to->abs_expires - T->curtime), to->abs_expires,
+			T->curtime);
+}
+else
+{
+	timeout = T->timout();
+	if (!T->expired.empty())
+		check(timeout == 0,
+				"wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
+				timeout, TIMEOUT_C(0));
 	else
-	{
-		timeout = T->timout();
-		if (!T->expired.empty())
-			check(timeout == 0,
-					"wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
-					timeout, TIMEOUT_C(0));
-		else
-			check(timeout == ~TIMEOUT_C(0),
-					"wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
-					timeout, ~TIMEOUT_C(0));
-	}
-	return 1;
+		check(timeout == ~TIMEOUT_C(0),
+				"wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
+				timeout, ~TIMEOUT_C(0));
+}
+return 1;
 }
 
 static int check_randomized(const struct rand_cfg *cfg)
 {
-	printf("+++++++++++++++=CheckRandomized+++++++++++++++++\n");
-	uint64_t i, j, err;
-	int rv = 1;
-	wtimer_t* t = new wtimer_t[cfg->n_timeouts];
-	timeout_t* timeouts = new timeout_t[cfg->n_timeouts];
-	uint8_t *fired = new uint8_t[cfg->n_timeouts];
-	uint8_t *found = new uint8_t[cfg->n_timeouts];
-	uint8_t *deleted = new uint8_t[cfg->n_timeouts];
-	memset(t, 0, sizeof(wtimer_t) * cfg->n_timeouts);
-	memset(timeouts, 0, sizeof(timeout_t) * cfg->n_timeouts);
-	memset(fired, 0, sizeof(uint8_t) * cfg->n_timeouts);
-	memset(deleted, 0, sizeof(uint8_t) * cfg->n_timeouts);
-	memset(found, 0, sizeof(uint8_t) * cfg->n_timeouts);
+printf("+++++++++++++++=CheckRandomized+++++++++++++++++\n");
+uint64_t i, j, err;
+int rv = 1;
+wtimer_t* t = new wtimer_t[cfg->n_timeouts];
+timeout_t* timeouts = new timeout_t[cfg->n_timeouts];
+uint8_t *fired = new uint8_t[cfg->n_timeouts];
+uint8_t *found = new uint8_t[cfg->n_timeouts];
+uint8_t *deleted = new uint8_t[cfg->n_timeouts];
+memset(t, 0, sizeof(wtimer_t) * cfg->n_timeouts);
+memset(timeouts, 0, sizeof(timeout_t) * cfg->n_timeouts);
+memset(fired, 0, sizeof(uint8_t) * cfg->n_timeouts);
+memset(deleted, 0, sizeof(uint8_t) * cfg->n_timeouts);
+memset(found, 0, sizeof(uint8_t) * cfg->n_timeouts);
 
-	//check open
-	wtimers_t tos;
-	tos.open(TIMEOUT_mHZ);
-	EXPECT_EQ(tos.get_hz(), TIMEOUT_mHZ);
-	EXPECT_EQ(tos.curtime, 0);
-	for (i = 0; i < WHEEL_NUM; i++)
+//check open
+wtimers_t tos;
+tos.open(TIMEOUT_mHZ);
+EXPECT_EQ(tos.get_hz(), TIMEOUT_mHZ);
+EXPECT_EQ(tos.curtime, 0);
+for (i = 0; i < WHEEL_NUM; i++)
+{
+	EXPECT_EQ(tos.pending[i], 0);
+}
+
+timeout_t now = cfg->start_at;
+int n_added_pending = 0, cnt_added_pending = 0;
+int n_added_expired = 0, cnt_added_expired = 0;
+wtimer_iterator_t it_p, it_e, it_all;
+int p_done = 0, e_done = 0, all_done = 0;
+wtimer_t *to = NULL;
+const int rel = cfg->relative;
+
+EXPECT_EQ(!t || !timeouts || !fired || !found || !deleted, false);
+
+printf("---------------init and add all sample timers ---------------\n");
+tos.update(cfg->start_at);
+EXPECT_EQ(!!n_added_pending, tos.has_expiring_timer());
+EXPECT_EQ(!!n_added_expired, tos.has_expired_timer());
+
+for (i = 0; i < cfg->n_timeouts; ++i)
+{
+	t[i].init(rel ? 0 : ABS_TIMEOUT);
+	EXPECT_EQ(t[i].pending_wheel(), false);
+	EXPECT_EQ(t[i].pending_expired(), false);
+
+	timeouts[i] = random_to(cfg->min_timeout, cfg->max_timeout);
+	tos.add_timer(t + i, timeouts[i] - (rel ? now : 0));
+	if (timeouts[i] <= cfg->start_at)
 	{
-		EXPECT_EQ(tos.pending[i], 0);
-	}
-
-	timeout_t now = cfg->start_at;
-	int n_added_pending = 0, cnt_added_pending = 0;
-	int n_added_expired = 0, cnt_added_expired = 0;
-	wtimer_iterator_t it_p, it_e, it_all;
-	int p_done = 0, e_done = 0, all_done = 0;
-	wtimer_t *to = NULL;
-	const int rel = cfg->relative;
-
-	EXPECT_EQ(!t || !timeouts || !fired || !found || !deleted, false);
-
-	printf("---------------init and add all sample timers ---------------\n");
-	tos.update(cfg->start_at);
-	EXPECT_EQ(!!n_added_pending, tos.has_expiring_timer());
-	EXPECT_EQ(!!n_added_expired, tos.has_expired_timer());
-
-	for (i = 0; i < cfg->n_timeouts; ++i)
-	{
-		t[i].init(rel ? 0 : ABS_TIMEOUT);
 		EXPECT_EQ(t[i].pending_wheel(), false);
+		EXPECT_EQ(t[i].pending_expired(), true);
+		++n_added_expired;
+	}
+	else
+	{
+		EXPECT_EQ(t[i].pending_wheel(), true);
 		EXPECT_EQ(t[i].pending_expired(), false);
-
-		timeouts[i] = random_to(cfg->min_timeout, cfg->max_timeout);
-		tos.add_timer(t + i, timeouts[i] - (rel ? now : 0));
-		if (timeouts[i] <= cfg->start_at)
-		{
-			EXPECT_EQ(t[i].pending_wheel(), false);
-			EXPECT_EQ(t[i].pending_expired(), true);
-			++n_added_expired;
-		}
-		else
-		{
-			EXPECT_EQ(t[i].pending_wheel(), true);
-			EXPECT_EQ(t[i].pending_expired(), false);
-			++n_added_pending;
-		}
+		++n_added_pending;
 	}
+}
 
-	EXPECT_EQ(!!n_added_pending, tos.has_expiring_timer());
-	EXPECT_EQ(!!n_added_expired, tos.has_expired_timer());
+EXPECT_EQ(!!n_added_pending, tos.has_expiring_timer());
+EXPECT_EQ(!!n_added_expired, tos.has_expired_timer());
 
-	for (auto& to : tos.expired)
+for (auto& to : tos.expired)
+{
+	if (to)
 	{
-		if (to)
-		{
-			i = to - t;
-			++found[i];
-			++cnt_added_expired;
-		}
+		i = to - t;
+		++found[i];
+		++cnt_added_expired;
 	}
+}
 
-	for (i = 0; i < WHEEL_NUM; i++)
+for (i = 0; i < WHEEL_NUM; i++)
+{
+	for (j = 0; j < WHEEL_LEN; j++)
 	{
-		for (j = 0; j < WHEEL_LEN; j++)
+		int idx;
+		for (auto& to : tos.wheel[i][j])
 		{
-			int idx;
-			for (auto& to : tos.wheel[i][j])
+			if (to != NULL)
 			{
-				if (to != NULL)
-				{
-					idx = to - t;
-					++found[idx];
-					++cnt_added_pending;
-				}
+				idx = to - t;
+				++found[idx];
+				++cnt_added_pending;
 			}
 		}
 	}
+}
 
-	EXPECT_EQ(cnt_added_expired, n_added_expired);
-	EXPECT_EQ(n_added_pending, cnt_added_pending);
+EXPECT_EQ(cnt_added_expired, n_added_expired);
+EXPECT_EQ(n_added_pending, cnt_added_pending);
 
-	printf("\n---------------filter out all expired timers ---------------\n");
+printf("\n---------------filter out all expired timers ---------------\n");
+while (NULL != (to = tos.get_expired_timer()))
+{
+	i = to - &t[0];
+	EXPECT_EQ(&t[i], to);
+	EXPECT_GE(now, timeouts[i]);/* shouldn't have happened yet */
+	--n_added_expired; /* drop expired timeouts. */
+	++fired[i];
+}
+EXPECT_EQ(n_added_expired, 0);
+
+printf("\n---------------now we test pending timers---------------\n");
+while (now < cfg->end_at)
+{
+	int n_fired_this_time = 0;
+	timeout_t td = tos.timout();
+	timeout_t first_at = td + now;
+	timeout_t oldtime = now;
+	timeout_t step = random_to(1, cfg->max_step);
+	now += step;
+	int another;
+
+	if (rel)
+		tos.step(step);
+	else
+		tos.update(now);
+
+	for (i = 0; i < cfg->try_removing; ++i)
+	{
+		int idx = rand() % cfg->n_timeouts;
+		if (!fired[idx])
+		{
+			tos.stop_timer(&t[idx]);
+			++deleted[idx];
+		}
+	}
+
+	timeout_t tm = tos.timout();
+	another = (tm == 0);
 	while (NULL != (to = tos.get_expired_timer()))
 	{
-		i = to - &t[0];
-		EXPECT_EQ(&t[i], to);
-		EXPECT_GE(now, timeouts[i]);/* shouldn't have happened yet */
-		--n_added_expired; /* drop expired timeouts. */
-		++fired[i];
-	}
-	EXPECT_EQ(n_added_expired, 0);
-
-	printf("\n---------------now we test pending timers---------------\n");
-	while (now < cfg->end_at)
-	{
-		int n_fired_this_time = 0;
-		timeout_t td = tos.timout();
-		timeout_t first_at = td + now;
-		timeout_t oldtime = now;
-		timeout_t step = random_to(1, cfg->max_step);
-		now += step;
-		int another;
-
-		if (rel)
-			tos.step(step);
-		else
-			tos.update(now);
-
-		for (i = 0; i < cfg->try_removing; ++i)
-		{
-			int idx = rand() % cfg->n_timeouts;
-			if (!fired[idx])
-			{
-				tos.stop_timer(&t[idx]);
-				++deleted[idx];
-			}
-		}
-
+		EXPECT_EQ(another, 1); /* Thought we saw the last one! */
+		i = to - t;
+		EXPECT_EQ(t + i, to);
+		EXPECT_LE(timeouts[i], now);
+		EXPECT_GT(timeouts[i], oldtime);
+		EXPECT_GE(timeouts[i], first_at);
+		fired[i]++;
 		timeout_t tm = tos.timout();
 		another = (tm == 0);
-		while (NULL != (to = tos.get_expired_timer()))
-		{
-			EXPECT_EQ(another, 1); /* Thought we saw the last one! */
-			i = to - t;
-			EXPECT_EQ(t + i, to);
-			EXPECT_LE(timeouts[i], now);
-			EXPECT_GT(timeouts[i], oldtime);
-			EXPECT_GE(timeouts[i], first_at);
-			fired[i]++;
-			timeout_t tm = tos.timout();
-			another = (tm == 0);
-		}
-		EXPECT_EQ(n_fired_this_time && first_at > now, false);
-		EXPECT_EQ(another, 0);
-		EXPECT_TRUE(timeouts_check(&tos, stderr));
 	}
+	EXPECT_EQ(n_fired_this_time && first_at > now, false);
+	EXPECT_EQ(another, 0);
+	EXPECT_TRUE(timeouts_check(&tos, stderr));
+}
 
-	for (i = 0; i < cfg->n_timeouts; ++i)
+for (i = 0; i < cfg->n_timeouts; ++i)
+{
+	EXPECT_LE(fired[i], 1);/* Nothing fired twice. */
+	if (timeouts[i] <= now)
 	{
-		EXPECT_LE(fired[i], 1);/* Nothing fired twice. */
-		if (timeouts[i] <= now)
-		{
-			EXPECT_TRUE(fired[i] || deleted[i]); //CHECK ALREADY TIMEOUT
-		}
-		else
-		{
-			EXPECT_EQ(fired[i], 0); // CHECK NOT TIMEOUT
-		}
-
-		// FIRED !DELETED
-		// !FIRED !DELETED
-		// !FIRED DELETED
-		EXPECT_FALSE(fired[i] && deleted[i]);
-
-		if (cfg->finalize > 1)
-		{
-			if (!fired[i])
-				tos.stop_timer(&t[i]);
-		}
+		EXPECT_TRUE(fired[i] || deleted[i]); //CHECK ALREADY TIMEOUT
 	}
-
-	/* Now nothing more should fire between now and the end of time. */
-	if (cfg->finalize)
+	else
 	{
-		tos.update(THE_END_OF_TIME);
-		if (cfg->finalize > 1)
-		{
-			EXPECT_EQ(tos.get_expired_timer(), (wtimer_t* )0);
-			EXPECT_EQ(false, tos.has_expiring_timer());
-			EXPECT_EQ(false, tos.has_expired_timer());
-		}
+		EXPECT_EQ(fired[i], 0); // CHECK NOT TIMEOUT
 	}
-	rv = 0;
 
-	tos.close();
-	EXPECT_EQ(false, tos.has_expiring_timer());
-	EXPECT_EQ(false, tos.has_expired_timer());
+	// FIRED !DELETED
+	// !FIRED !DELETED
+	// !FIRED DELETED
+	EXPECT_FALSE(fired[i] && deleted[i]);
 
-	printf("\n---------------clearup---------------\n");
-	done: if (t)
-		delete[] t;
-	if (timeouts)
-		delete[] timeouts;
-	if (fired)
-		delete[] fired;
-	if (found)
-		delete[] found;
-	if (deleted)
-		delete[] deleted;
+	if (cfg->finalize > 1)
+	{
+		if (!fired[i])
+			tos.stop_timer(&t[i]);
+	}
+}
 
-	return rv;
+/* Now nothing more should fire between now and the end of time. */
+if (cfg->finalize)
+{
+	tos.update(THE_END_OF_TIME);
+	if (cfg->finalize > 1)
+	{
+		EXPECT_EQ(tos.get_expired_timer(), (wtimer_t* )0);
+		EXPECT_EQ(false, tos.has_expiring_timer());
+		EXPECT_EQ(false, tos.has_expired_timer());
+	}
+}
+rv = 0;
+
+tos.close();
+EXPECT_EQ(false, tos.has_expiring_timer());
+EXPECT_EQ(false, tos.has_expired_timer());
+
+printf("\n---------------clearup---------------\n");
+done: if (t)
+	delete[] t;
+if (timeouts)
+	delete[] timeouts;
+if (fired)
+	delete[] fired;
+if (found)
+	delete[] found;
+if (deleted)
+	delete[] deleted;
+
+return rv;
 }
 
 #define DO(fn) do {                             \
@@ -483,40 +551,40 @@ static int check_randomized(const struct rand_cfg *cfg)
 #include <stdio.h>
 static void ut_rotl()
 {
-	unsigned int testval = (UINT32_C(1) << 1) - 1;
-	printf("%#10X\n", testval);
-	testval = _rotl(testval, 0);
-	printf("%#10X\n", testval);
+unsigned int testval = (UINT32_C(1) << 1) - 1;
+printf("%#10X\n", testval);
+testval = _rotl(testval, 0);
+printf("%#10X\n", testval);
 }
 
 TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER)
 {
-	int j;
-	int n_failed = 0;
+int j;
+int n_failed = 0;
 
-	struct rand_cfg cfg1 =
-	{
-	/*min_timeout*/1,
-	/*max_timeout*/381,
-	/*start_at*/100,
-	/*end_at*/1000,
-	/*n_timeouts*/1,
-	/*max_step*/10,
-	/*relative*/0,
-	/*try_removing*/0,
-	/*finalize*/2 };
-	//DO_N(1, check_randomized(&cfg1));
+struct rand_cfg cfg1 =
+{
+/*min_timeout*/1,
+/*max_timeout*/381,
+/*start_at*/100,
+/*end_at*/1000,
+/*n_timeouts*/1,
+/*max_step*/10,
+/*relative*/0,
+/*try_removing*/0,
+/*finalize*/2 };
+//DO_N(1, check_randomized(&cfg1));
 }
 
 TEST(GECO_ENGINE_ULTILS, TEST_ROTL)
 {
-	// assume that currtime has 1 scale, eclapse has 4 scales on wheel 1.
-	//
-	wheel_t timeout_slotidx = (UINT64_C(1) << 4) - 1;
-	int currtime_scales = 1;
-	wheel_t pending = geco::ultils::rotl(timeout_slotidx, currtime_scales);
-	char buf[1024];
-	geco::ultils::Bitify(buf, sizeof(wheel_t) * 8, (unsigned char*) &pending);
-	printf("%s\n", buf);
+// assume that currtime has 1 scale, eclapse has 4 scales on wheel 1.
+//
+wheel_t timeout_slotidx = (UINT64_C(1) << 4) - 1;
+int currtime_scales = 1;
+wheel_t pending = geco::ultils::rotl(timeout_slotidx, currtime_scales);
+char buf[1024];
+geco::ultils::Bitify(buf, sizeof(wheel_t) * 8, (unsigned char*) &pending);
+printf("%s\n", buf);
 }
 

@@ -109,15 +109,8 @@ uint64 stamps_per_sec();
  *	floating point value. It caches its reply after being called for the first
  *	time, however that call may take some time.
  */
-inline double stamps_per_sec_double()
-{
-	static double stampsPerSecondCacheD = double(stamps_per_sec());
-	return stampsPerSecondCacheD;
-}
-inline double stamps2sec(uint64 stamps)
-{
-	return double(stamps) / stamps_per_sec_double();
-}
+double stamps_per_sec_double();
+double stamps2sec(uint64 stamps);
 
 // ---------------------------------------------------------------------
 // Section: TimeStamp
@@ -152,7 +145,7 @@ struct time_stamp_t
 	/**
 	 *	This method sets this timestamp from seconds.
 	 */
-	inline void setInSeconds(double seconds)
+	void setInSeconds(double seconds)
 	{
 		stamp_ = fromSeconds(seconds);
 	}
@@ -160,14 +153,14 @@ struct time_stamp_t
 	/**
 	 *	This method returns the number of stamps from this TimeStamp to now.
 	 */
-	inline time_stamp_t ageInStamps() const
+	time_stamp_t ageInStamps() const
 	{
 		return gettimestamp() - stamp_;
 	}
 	/**
 	 *	This method returns the number of seconds from this TimeStamp to now.
 	 */
-	inline double ageInSeconds() const
+	double ageInSeconds() const
 	{
 		return toSeconds(this->ageInStamps());
 	}
@@ -182,10 +175,7 @@ struct time_stamp_t
 	/**
 	 *	This static method converts seconds into timestamps.
 	 */
-	static time_stamp_t fromSeconds(double seconds)
-	{
-		return uint64(seconds * stamps_per_sec_double());
-	}
+	static time_stamp_t fromSeconds(double seconds);
 
 	uint64 stamp_;
 };

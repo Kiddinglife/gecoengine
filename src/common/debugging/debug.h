@@ -28,6 +28,7 @@
 #include <functional>
 #include <algorithm>
 
+#include "../plateform.h"
 #include "../geco-engine-config.h"
 #include "../ds/array.h"
 #include "../ultils/ultils.h"
@@ -91,8 +92,6 @@ namespace geco
 {
 namespace debugging
 {
-
-#define LOG_BUFSIZ 5012
 
 extern bool g_write2syslog;
 extern std::string g_syslog_name;
@@ -169,7 +168,7 @@ struct info_msg_cb_tag
 typedef std::function<bool(const char * msg, info_msg_cb_tag*)> info_msg_cb_t;
 
 /** This class is used to help filter log messages.*/
-struct log_msg_filter_t //oldname - DebugFilter
+struct log_msg_filter_t  //oldname - DebugFilter
 {
 
 	static log_msg_filter_t* s_instance_;
@@ -190,7 +189,8 @@ struct log_msg_filter_t //oldname - DebugFilter
 	// to this limit will be displayed.
 	int filter_threshold_;
 
-	// whether or not development time assertions should cause a real assertion.
+	// FALSE: GECO_ASSERT_DEV and GECO_ASSERT_DEV_IFNOT  DO_NOT cause a real assertion.
+	// TRUE: GECO_ASSERT_DEV and GECO_ASSERT_DEV_IFNOT  DO cause a real assertion.
 	bool has_dev_assert_;
 
 	log_msg_filter_t()
@@ -325,14 +325,7 @@ enum LogMsgPriority
 	NUM_LOG_MSG
 };
 
-const char * prefixes[] =
-{ "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR", "CRITICAL", "HACK",
-		"SCRIPT", "ASSET" };
-
-inline const char * get_logmsg_prefix_str(LogMsgPriority p)
-{
-	return (p >= 0 && (size_t) p < sizeof(prefixes)) ? prefixes[(int) p] : "";
-}
+const char * get_logmsg_prefix_str(LogMsgPriority p);
 
 //-------------------------------------------------------
 //	Section: log_msg_helper
@@ -384,6 +377,7 @@ struct log_msg_helper
 	void dev_critical_msg(const char * format, ...); // devCriticalMessage
 #endif
 
+	/** @brief Format: <executable path>(<mangled-function-name>+<function instruction offset>) [<eip>].*/
 	void msg_back_trace();
 	static void should_write2syslog(bool state = true)
 	{
@@ -483,10 +477,13 @@ inline void vdprintf(int componentPriority, int messagePriority,
 		const char * format, va_list argPtr, const char * prefix = NULL)
 {}
 #endif
+}
+}
 
 //-------------------------------------------------------
 //	Section: Debug Macros
 //-------------------------------------------------------
+#define LOG_BUFSIZ 5012
 #include <assert.h>
 #ifdef __ASSERT_FUNCTION
 #define GECO_FUNCNAME __ASSERT_FUNCTION
@@ -518,17 +515,17 @@ inline void vdprintf(int componentPriority, int messagePriority,
  */
 #if !defined( _RELEASE )
 #define GECO_ASSERT( exp )\
-if (!(exp)){log_msg_helper().critical_msg(	"ASSERTION FAILED: " #exp "\n" __FILE__ "(%d)%s%s\n", \
-(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME); GECO_REAL_ASSERT}
+if (!(exp)){log_msg_helper().critical_msg(	"ASSERTION FAILED: " #exp "\n" \
+__FILE__ "(%d)%s%s\n",(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME); GECO_REAL_ASSERT}
 #else	// _RELEASE
 #define GECO_ASSERT( exp )
 #endif // !_RELEASE
 
-#if defined( SERVER_BUILD ) || !defined( _RELEASE )
 /**
- *	An assertion which is only lethal when not in a production environment.
+ *	An assertion which is only avaiable IN PRODUCTION ENV THAT IS  when SERVER_BUILD　or DENUG ENABLED
  *	These are disabled for client release builds.
  */
+#if defined( SERVER_BUILD ) || !defined( _RELEASE )
 #define GECO_ASSERT_DEV( exp )													\
 if (!(exp)){log_msg_helper().dev_critical_msg("GECO_ASSERT_DEV FAILED: " #exp "\n"	\
 __FILE__ "(%d)%s%s\n",(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME );}
@@ -544,9 +541,8 @@ __FILE__ "(%d)%s%s\n",(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME
  *	@see GECO_ASSERT_DEV
  */
 #define GECO_ASSERT_DEV_IFNOT( exp )\
-if ((!( exp )) && (log_msg_helper().dev_critical_msg(\
-"GECO_ASSERT_DEV_IFNOT FAILED: " #exp "\n"	__FILE__ "(%d)%s%s\n",\
-(int __LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME ),true))		
+if ((!( exp )) && (log_msg_helper().dev_critical_msg("GECO_ASSERT_DEV_IFNOT FAILED: " #exp "\n"\
+__FILE__ "(%d)%s%s\n", (int )__LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME ),true))
 // leave trailing block after message
 
 /** this is a placeholder until a better solution can be implemented. */
@@ -585,13 +581,6 @@ if ((!( exp )) && (log_msg_helper().dev_critical_msg(\
 //-------------------------------------------------------
 //	Section: 	*_MSG macros.
 //-------------------------------------------------------
-
-// This is the default s_componentPriority for files that does not
-// have DECLARE_DEBUG_COMPONENT2(). Useful for hpp and ipp files that
-// uses debug macros. s_componentPriority declared by
-//	DECLARE_DEBUG_COMPONENT2() will have precedence over this one.
-const int const_cpnt_priority = 0;
-
 /// This macro prints a debug message with CRITICAL priority.
 /// CRITICAL_MSG is always enabled no matter what the build target is.
 #define CRITICAL_MSG \
@@ -613,8 +602,8 @@ log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 #define CRITICAL_BACKTRACE	    MSG_BACK_TRACE( LOG_MSG_CRITICAL )
 #define HACK_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_HACK )
 
-// The following macros are used to display debug information. See comment at
-// the top of this file.
+// The following macros are used to display debug information.
+// all msgs with pri lower than PRIORITY will NOT be printed out.
 #define MSG_DEBUG(PRIORITY) log_msg_helper(const_cpnt_priority,PRIORITY).message
 
 /// This macro prints a debug message with TRACE priority.
@@ -656,23 +645,32 @@ log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
  *	This macro used to display trace information. Can be used later to add in
  *	our own callstack if necessary.
  */
-#define ENTER(className,methodName) TRACE_MSG( className "::" methodName "\n" )
+#define TRACE_STARTS(className,methodName) TRACE_MSG( className "::" methodName "\n" )
+
+// This is the default s_componentPriority for files that does not
+// have DECLARE_DEBUG_COMPONENT2(). Useful for hpp and ipp files that
+// uses debug macros. s_componentPriority declared by
+//	DECLARE_DEBUG_COMPONENT2() will have precedence over this one.
+namespace
+{
+const int default_cpnt_priority = 0;
+}
 
 #ifndef _RELEASE
 #if ENABLE_WATCHERS
-extern int init_watcher(int & value, const char * path);
+extern int init_watcher(int& value, const char * path);
 /**
- *	@brief
- *   needs to be placed in a cpp file before any of the *_MSG macros can be used.
+ *	 @brief
+ *  needs to be placed in a cpp file before any of the *_MSG macros can be used.
  *
  *	@param module
- *   The name (or path) of the watcher module that the component
- *   priority should be displayed in.
+ * The name (or path) of the watcher module that the component
+ * priority should be displayed in.
  *	@param priority	The initial component priority of the messages in the file.
  */
 #define DECLARE_DEBUG_COMPONENT2(module, priority)\
 static int const_cpnt_priority = priority;\
-static int IGNORE_THIS_COMPONENT_WATCHER_INIT =\
+static int IGNORE_THIS_COMPONENT_WATCHER_INIT = \
 init_watcher(const_cpnt_priority,get_base_path( __FILE__, module ) );
 #else
 #define DECLARE_DEBUG_COMPONENT2( module, priority )\
@@ -690,6 +688,6 @@ static int const_cpnt_priority = priority;
 #define DECLARE_DEBUG_COMPONENT(priority) \
 DECLARE_DEBUG_COMPONENT2( NULL, priority )
 
-}
-}
+using namespace geco::debugging;
+
 #endif

@@ -274,29 +274,29 @@ ENTER_DEBUGGER();
 #define ENTER_DEBUGGER() asm( "int $3" )
 #endif
 
- /**
- *	This function returns user id.
- */
+/**
+*	This function returns user id.
+*/
 inline int getUserId()
 {
 #ifdef _WIN32
-    // VS2005:
+   // VS2005:
 #if _MSC_VER >= 1400
-    char uid[16];
-    size_t sz;
-    return getenv_s(&sz, uid, sizeof(uid), "UID") == 0 ? atoi(uid) : 0;
+   char uid[16];
+   size_t sz;
+   return getenv_s(&sz, uid, sizeof(uid), "UID") == 0 ? atoi(uid) : 0;
 
-    // VS2003:
+   // VS2003:
 #elif _MSC_VER < 1400
-    char * uid = getenv("UID");
-    return uid ? atoi(uid) : 0;
+   char * uid = getenv("UID");
+   return uid ? atoi(uid) : 0;
 #endif
 #elif defined( PLAYSTATION3 )
-    return 123;
+   return 123;
 #else
-    // Linux:
-    char * uid = getenv("UID");
-    return uid ? atoi(uid) : getuid();
+   // Linux:
+   char * uid = getenv("UID");
+   return uid ? atoi(uid) : getuid();
 #endif
 }
 
@@ -306,12 +306,12 @@ inline int getUserId()
 inline const char * getUsername()
 {
 #ifdef _WIN32
-    return "";
+   return "";
 #else
-    // Note: a string in a static area is returned. Do not store this pointer.
-    // See cuserid for details.
-    char * pUsername = cuserid(NULL);
-    return pUsername ? pUsername : "";
+   // Note: a string in a static area is returned. Do not store this pointer.
+   // See cuserid for details.
+   char * pUsername = cuserid(NULL);
+   return pUsername ? pUsername : "";
 #endif
 }
 
@@ -321,14 +321,13 @@ inline const char * getUsername()
 inline int mf_getpid()
 {
 #if defined(__unix__) || defined(__linux__)
-    return getpid();
+   return getpid();
 #elif defined(_XBOX) || defined(_XBOX360) || defined( PLAYSTATION3 )
-    return -1;
+   return -1;
 #else
-    return (int)GetCurrentProcessId();
+   return (int)GetCurrentProcessId();
 #endif
 }
-
 /**
 *  This class helps with using internal STL implementation details in
 *  different compilers.
@@ -337,12 +336,12 @@ template <class MAP> struct MapTypes
 {
 #ifdef _WIN32
 #if _MSC_VER>=1300 // VC7
-    typedef typename MAP::mapped_type & _Tref;
+   typedef typename MAP::mapped_type & _Tref;
 #else
-    typedef typename MAP::_Tref _Tref;
+   typedef typename MAP::_Tref _Tref;
 #endif
 #else
-    typedef typename MAP::mapped_type & _Tref;
+   typedef typename MAP::mapped_type & _Tref;
 #endif
 };
 
@@ -352,31 +351,31 @@ template <class MAP> struct MapTypes
 // use 0.0004 because most existing functions are using it
 inline bool almost_equal(const float f1, const float f2, const float epsilon = 0.0004f)
 {
-    return fabsf(f1 - f2) < epsilon;
+   return fabsf(f1 - f2) < epsilon;
 }
 inline bool almost_equal(const double d1, const double d2,
-    const double epsilon = 0.0004)
+   const double epsilon = 0.0004)
 {
-    return fabs(d1 - d2) < epsilon;
+   return fabs(d1 - d2) < epsilon;
 }
 inline bool almost_zero(const float f, const float epsilon = 0.0004f)
 {
-    return f < epsilon && f > -epsilon;
+   return f < epsilon && f > -epsilon;
 }
 inline bool almost_zero(const double d, const double epsilon = 0.0004)
 {
-    return d < epsilon && d > -epsilon;
+   return d < epsilon && d > -epsilon;
 }
 template<typename T>
 inline bool almost_equal(const T& c1, const T& c2, const float epsilon = 0.0004f)
 {
-    if (c1.size() != c2.size()) return false;
-    typename T::const_iterator iter1 = c1.begin();
-    typename T::const_iterator iter2 = c2.begin();
-    for (; iter1 != c1.end(); ++iter1, ++iter2)
-        if (!almost_equal(*iter1, *iter2, epsilon))
-            return false;
-    return true;
+   if (c1.size() != c2.size()) return false;
+   typename T::const_iterator iter1 = c1.begin();
+   typename T::const_iterator iter2 = c2.begin();
+   for (; iter1 != c1.end(); ++iter1, ++iter2)
+       if (!almost_equal(*iter1, *iter2, epsilon))
+           return false;
+   return true;
 }
 
 /**
@@ -384,15 +383,15 @@ inline bool almost_equal(const T& c1, const T& c2, const float epsilon = 0.0004f
 */
 union IntFloat
 {
-    float f;
-    uint32 ui32;
+   float f;
+   uint32 ui32;
 };
 
 inline bool isFloatValid(float f)
 {
-    IntFloat intFloat;
-    intFloat.f = f;
-    return (intFloat.ui32 & 0x7f800000) != 0x7f800000;
+   IntFloat intFloat;
+   intFloat.f = f;
+   return (intFloat.ui32 & 0x7f800000) != 0x7f800000;
 }
 
 /*
@@ -402,34 +401,33 @@ inline bool isFloatValid(float f)
 #include <string.h>
 inline const char* get_base_path(const char * path, const char * module)
 {
-    static char	 staticSpace[128];
-    const char * pResult = path;
-    const char * pSeparator;
+   static char	 staticSpace[128];
+   const char * pResult = path;
+   const char * pSeparator;
 
-    pSeparator = strrchr(pResult, '\\');
-    if (pSeparator != NULL)
-    {
-        pResult = pSeparator + 1;
-    }
+   pSeparator = strrchr(pResult, '\\');
+   if (pSeparator != NULL)
+   {
+       pResult = pSeparator + 1;
+   }
 
-    pSeparator = strrchr(pResult, '/');
-    if (pSeparator != NULL)
-    {
-        pResult = pSeparator + 1;
-    }
+   pSeparator = strrchr(pResult, '/');
+   if (pSeparator != NULL)
+   {
+       pResult = pSeparator + 1;
+   }
 
-    strcpy(staticSpace, "logger/cppThresholds/");
+   strcpy(staticSpace, "logger/cppThresholds/");
 
-    if (module != NULL)
-    {
-        strcat(staticSpace, module);
-        strcat(staticSpace, "/");
-    }
+   if (module != NULL)
+   {
+       strcat(staticSpace, module);
+       strcat(staticSpace, "/");
+   }
 
-    strcat(staticSpace, pResult);
-    return staticSpace;
+   strcat(staticSpace, pResult);
+   return staticSpace;
 }
-
 /**
 *	Static (i.e. compile-time) assert. Based off
 *	Modern C++ Design: Generic Programming and Design Patterns Applied

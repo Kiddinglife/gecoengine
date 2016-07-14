@@ -44,9 +44,14 @@
 #include "debug.h"
 #include "stack_tracker_t.h"
 #include "../plateform.h"
-#include "../ultils/ultils.h"
 #include "../ultils/geco-malloc.h"
 #include "timestamp.h"
+
+int init_watcher(int& value, const char * path)
+{
+	return 0;
+}
+DECLARE_DEBUG_COMPONENT2("CStdMF", 0);
 
 namespace geco
 {
@@ -55,7 +60,6 @@ namespace debugging
 //-------------------------------------------------------
 //	Section: globals
 //-------------------------------------------------------
-
 bool g_write2syslog = false;
 std::string g_syslog_name("default_syslog_name");
 static const char dev_assertion_msg[] =
@@ -70,6 +74,15 @@ static const char dev_assertion_msg[] =
 		", they do not cause the application to exit.\n"
 		"Please investigate potential misuses of the engine at the time of the "
 		"failure.\n";
+
+static const char * prefixes[] =
+{ "TRACE: ", "DEBUG: ", "INFO: ", "NOTICE: ", "WARN: ", "ERR: ", "CRIT: ",
+		"HACK: ", "SCRIPT: ", "ASSET: " };
+
+inline const char * get_logmsg_prefix_str(LogMsgPriority p)
+{
+	return (p >= 0 && (size_t) p < sizeof(prefixes)) ? prefixes[(int) p] : "";
+}
 
 //-------------------------------------------------------
 //	Section: printf functions
@@ -239,7 +252,7 @@ void log_msg_helper::critical_msg(const char * format, ...)
 {
 	va_list argPtr;
 	va_start(argPtr, format);
-	this->critical_msg_aux(true, format, argPtr);
+	this->critical_msg_aux(false, format, argPtr);
 	va_end(argPtr);
 }
 void log_msg_helper::dev_critical_msg(const char * format, ...)
@@ -256,8 +269,57 @@ void log_msg_helper::dev_critical_msg(const char * format, ...)
 #include <cxxabi.h>
 void log_msg_helper::msg_back_trace()
 {
-	void** trace_buf = geco_new_array<void*>(MAX_DEPTH, FILE_AND_LINE);
-	// TODO
+	void** trace_buf = new void*[MAX_DEPTH];
+	uint32 depth = backtrace(trace_buf, MAX_DEPTH);
+	char ** traceStringBuffer = backtrace_symbols(trace_buf, depth);
+
+	for (uint32 i = 0; i < depth; i++)
+	{
+		// Format: <executable path>(<mangled-function-name>+<function instruction offset>) [<eip>]
+		std::string functionName;
+		std::string traceString(traceStringBuffer[i]);
+		std::string::size_type begin = traceString.find('(');
+
+		bool gotFunctionName = (begin >= 0);
+		if (gotFunctionName)
+		{
+			// Skip the round bracket start.
+			++begin;
+			std::string::size_type bracketEnd = traceString.find(')', begin);
+			std::string::size_type end = traceString.rfind('+', bracketEnd);
+			std::string mangled(traceString.substr(begin, end - begin));
+
+			int status = 0;
+			size_t demangledBufferLength = 0;
+			char * demangledBuffer = abi::__cxa_demangle(mangled.c_str(), 0,
+					&demangledBufferLength, &status);
+
+			if (demangledBuffer)
+			{
+				functionName.assign(demangledBuffer, demangledBufferLength);
+				// __cxa_demangle allocates the memory for the demangled
+				// output using malloc(), we need to free it.
+#ifdef ENABLE_MEMTRACKER
+				//todo raw_free( demangledBuffer );
+#else
+				free(demangledBuffer);
+#endif
+			}
+			else
+			{
+				// Didn't demangle, but we did get a function name, use that.
+				functionName = mangled;
+			}
+		}
+		this->message("Stack: #%d %s\n", i,
+				(gotFunctionName) ? functionName.c_str() : traceString.c_str());
+	}
+#ifdef ENABLE_MEMTRACKER
+	//todo raw_free(traceStringBuffer);
+#else
+	free(traceStringBuffer);
+#endif
+	delete[] trace_buf;
 }
 #else
 inline void log_msg_helper::msg_back_trace()
@@ -433,7 +495,7 @@ void log_msg_helper::critical_msg_aux(bool isDevAssertion, const char * format,
 	fclose(assertFile);
 
 	volatile uint64 crashTime = gettimestamp(); // For reference in the coredump.
-
+	crashTime *= 1;
 	*(int*) NULL = 0;
 	typedef void (*BogusFunc)();
 	((BogusFunc) NULL)();
@@ -452,7 +514,7 @@ void log_msg_helper::message(const char * format, ...)
 
 #if !defined( _WIN32 ) && !defined( PLAYSTATION3 )
 	// send to syslog if it's been initialised
-	if ((should_write2syslog)
+	if (should_write2syslog
 			&& ((msg_priority_ == LOG_MSG_ERROR)
 					|| (msg_priority_ == LOG_MSG_CRITICAL)))
 	{
@@ -463,7 +525,54 @@ void log_msg_helper::message(const char * format, ...)
 		vsnprintf(buffer, sizeof(buffer), format, tmpArgPtr);
 		buffer[sizeof(buffer) - 1] = '\0';
 		va_end(tmpArgPtr);
-		syslog(LOG_CRIT, "%s", buffer);
+
+//#define	LOG_EMERG	0	/* system is unusable */
+//#define	LOG_ALERT	1	/* action must be taken immediately */
+//#define	LOG_CRIT	2	/* critical conditions */
+//#define	LOG_ERR		3	/* error conditions */
+//#define	LOG_WARNING	4	/* warning conditions */
+//#define	LOG_NOTICE	5	/* normal but significant condition */
+//#define	LOG_INFO	6	/* informational */
+//#define	LOG_DEBUG	7	/* debug-level messages */
+//		enum LogMsgPriority
+//		{
+//			LOG_MSG_TRACE,
+//			LOG_MSG_DEBUG,
+//			LOG_MSG_INFO,
+//			LOG_MSG_NOTICE,
+//			LOG_MSG_WARNING,
+//			LOG_MSG_ERROR,
+//			LOG_MSG_CRITICAL,
+//			LOG_MSG_HACK,
+//			LOG_MSG_SCRIPT,
+//			LOG_MSG_ASSET,
+//			NUM_LOG_MSG
+//		};
+
+		switch (msg_priority_)
+		{
+		case LOG_MSG_CRITICAL:
+			syslog(LOG_CRIT, "%s", buffer);
+			break;
+		case LOG_MSG_ERROR:
+			syslog(LOG_ERR, "%s", buffer);
+			break;
+		case LOG_MSG_WARNING:
+			syslog(LOG_WARNING, "%s", buffer);
+			break;
+		case LOG_MSG_NOTICE:
+			syslog(LOG_NOTICE, "%s", buffer);
+			break;
+		case LOG_MSG_INFO:
+			syslog(LOG_INFO, "%s", buffer);
+			break;
+		case LOG_MSG_DEBUG:
+			syslog(LOG_DEBUG, "%s", buffer);
+			break;
+		default: // TREATE OTHER MSG AS LOG_INFO
+			syslog(LOG_INFO, "%s", buffer);
+			break;
+		}
 	}
 #endif
 	// now do special critical message stuff
