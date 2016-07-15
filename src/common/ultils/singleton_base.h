@@ -80,4 +80,13 @@ public:
 #define GECO_SINGLETON_DEFI( TYPE ) \
 template <>	TYPE * base_singleton_t< TYPE >::s_pInstance = NULL;
 
+// another imple of singleton using static methods instead of inhertance
+#define GECO_STATIC_FACTORY_DELC(TYPE)\
+static TYPE* get_instance(void);\
+static void reclaim_instance(TYPE *i);
+
+#define GECO_STATIC_FACTORY_DEFIS(FATHER_TYPE, CHILD_TYPE)\
+FATHER_TYPE* FATHER_TYPE::get_instance(void){ return new CHILD_TYPE;}\
+void FATHER_TYPE::reclaim_instance(FATHER_TYPE* i){ delete i;}
+
 #endif /* SRC_COMMON_ULTILS_SINGLETON_BASE_H_ */
