@@ -9,16 +9,15 @@
 
 GECO_STATIC_FACTORY_DEFIS(geco_bit_stream_t, geco_bit_stream_t);
 
-geco_bit_stream_t::geco_bit_stream_t() :
-        allocated_bits_size_(GECO_STREAM_STACK_ALLOC_BITS), writable_bit_pos_(
-                0), readable_bit_pos_(0), uchar_data_(statck_buffer_), can_free_(
-                false), is_read_only_(false)
+geco_bit_stream_t::geco_bit_stream_t()
+        : allocated_bits_size_(GECO_STREAM_STACK_ALLOC_BITS), writable_bit_pos_(0), readable_bit_pos_(0), uchar_data_(
+                statck_buffer_), can_free_(false), is_read_only_(false)
 {
     memset(uchar_data_, 0, GECO_STREAM_STACK_ALLOC_BYTES);
 }
 
-geco_bit_stream_t::geco_bit_stream_t(const bit_size_t initialBytesAllocate) :
-        writable_bit_pos_(0), readable_bit_pos_(0), is_read_only_(false)
+geco_bit_stream_t::geco_bit_stream_t(const bit_size_t initialBytesAllocate)
+        : writable_bit_pos_(0), readable_bit_pos_(0), is_read_only_(false)
 {
     if (initialBytesAllocate <= GECO_STREAM_STACK_ALLOC_BYTES)
     {
@@ -31,7 +30,7 @@ geco_bit_stream_t::geco_bit_stream_t(const bit_size_t initialBytesAllocate) :
     else
     {
 
-//uchar_data_ = (uchar*) gMallocEx(initialBytesAllocate, TRACKE_MALLOC);
+        //uchar_data_ = (uchar*) gMallocEx(initialBytesAllocate, TRACKE_MALLOC);
         uchar_data_ = (uchar*) malloc(initialBytesAllocate);
         allocated_bits_size_ = BYTES_TO_BITS(initialBytesAllocate);
         can_free_ = true;
@@ -39,11 +38,9 @@ geco_bit_stream_t::geco_bit_stream_t(const bit_size_t initialBytesAllocate) :
         memset(uchar_data_, 0, initialBytesAllocate);
     }
 }
-geco_bit_stream_t::geco_bit_stream_t(uchar* src, const byte_size_t len,
-        bool copy/*=false*/) :
-        allocated_bits_size_(BYTES_TO_BITS(len)), writable_bit_pos_(
-                BYTES_TO_BITS(len)), readable_bit_pos_(0), can_free_(false), is_read_only_(
-                !copy)
+geco_bit_stream_t::geco_bit_stream_t(uchar* src, const byte_size_t len, bool copy/*=false*/)
+        : allocated_bits_size_(BYTES_TO_BITS(len)), writable_bit_pos_(BYTES_TO_BITS(len)), readable_bit_pos_(0), can_free_(
+                false), is_read_only_(!copy)
 {
     if (copy)
     {
@@ -52,13 +49,12 @@ geco_bit_stream_t::geco_bit_stream_t(uchar* src, const byte_size_t len,
             if (len <= GECO_STREAM_STACK_ALLOC_BYTES)
             {
                 uchar_data_ = statck_buffer_;
-                allocated_bits_size_ = BYTES_TO_BITS(
-                        GECO_STREAM_STACK_ALLOC_BYTES);
+                allocated_bits_size_ = BYTES_TO_BITS(GECO_STREAM_STACK_ALLOC_BYTES);
                 memset(uchar_data_, 0, GECO_STREAM_STACK_ALLOC_BYTES);
             }
             else
             {
-//                uchar_data_ = (uchar*) gMallocEx(len, TRACKE_MALLOC);
+                // uchar_data_ = (uchar*) gMallocEx(len, TRACKE_MALLOC);
                 uchar_data_ = (uchar*) malloc(len);
                 can_free_ = true;
                 memset(uchar_data_, 0, len);
@@ -84,8 +80,7 @@ geco_bit_stream_t::~geco_bit_stream_t()
     }
 }
 
-void geco_bit_stream_t::ReadMini(uchar* dest, const bit_size_t bits2Read,
-        bool isUnsigned)
+void geco_bit_stream_t::ReadMini(uchar* dest, const bit_size_t bits2Read, bool isUnsigned)
 {
     uint currByte;
     uchar byteMatch;
@@ -109,13 +104,13 @@ void geco_bit_stream_t::ReadMini(uchar* dest, const bit_size_t bits2Read,
         {
             // If we read a 1 then the data is byteMatch.
             ReadMini(isUnsigned);
-            if (isUnsigned) // Check that bit
+            if (isUnsigned)  // Check that bit
             {
                 //JINFO << "matched";
                 dest[currByte] = byteMatch;
                 currByte--;
             }
-            else /// the first byte is not matched
+            else  /// the first byte is not matched
             {
                 // Read the rest of the bytes
                 ReadBits(dest, (currByte + 1) << 3);
@@ -131,13 +126,13 @@ void geco_bit_stream_t::ReadMini(uchar* dest, const bit_size_t bits2Read,
         {
             // If we read a 1 then the data is byteMatch.
             ReadMini(isUnsigned);
-            if (isUnsigned) // Check that bit
+            if (isUnsigned)  // Check that bit
             {
                 //JINFO << "matched";
                 dest[currByte] = byteMatch;
                 currByte++;
             }
-            else /// the first byte is not matched
+            else  /// the first byte is not matched
             {
                 // Read the rest of the bytes
                 ReadBits(dest, bits2Read - (currByte << 3));
@@ -166,7 +161,7 @@ void geco_bit_stream_t::ReadMini(uchar* dest, const bit_size_t bits2Read,
 
 void geco_bit_stream_t::AppendBitsCouldRealloc(const bit_size_t bits2Append)
 {
-    bit_size_t newBitsAllocCount = bits2Append + writable_bit_pos_; /// official
+    bit_size_t newBitsAllocCount = bits2Append + writable_bit_pos_;  /// official
     //bit_size_t newBitsAllocCount = bits2Append + mWritingPosBits + 1;
 
     // If this assert hits then we need to specify mReadOnly as false
@@ -184,8 +179,8 @@ void geco_bit_stream_t::AppendBitsCouldRealloc(const bit_size_t bits2Append)
         /// Cap to 1 meg buffer to save on huge allocations
         // [11/16/2015 JACKIE]
         /// fix bug: newBitsAllocCount should plus 1MB if < 1MB, otherwise it should doule itself
-        if (newBitsAllocCount > 1048576) /// 1024B*1024 = 1048576B = 1024KB = 1MB
-            newBitsAllocCount += 1048576;
+        if (newBitsAllocCount > 1048576)  /// 1024B*1024 = 1048576B = 1024KB = 1MB
+        newBitsAllocCount += 1048576;
         else
             newBitsAllocCount <<= 1;
         // Use realloc and free so we are more efficient than delete and new for resizing
@@ -194,19 +189,16 @@ void geco_bit_stream_t::AppendBitsCouldRealloc(const bit_size_t bits2Append)
         {
             if (bytes2Alloc > GECO_STREAM_STACK_ALLOC_BYTES)
             {
-//                uchar_data_ = (uchar *) gMallocEx(bytes2Alloc, TRACKE_MALLOC);
+                //　uchar_data_ = (uchar *) gMallocEx(bytes2Alloc, TRACKE_MALLOC);
                 uchar_data_ = (uchar *) malloc(bytes2Alloc);
-                if (writable_bit_pos_ > 0)
-                    memcpy(uchar_data_, statck_buffer_,
-                            BITS_TO_BYTES(allocated_bits_size_));
+                if (writable_bit_pos_ > 0) memcpy(uchar_data_, statck_buffer_, BITS_TO_BYTES(allocated_bits_size_));
                 can_free_ = true;
             }
         }
         else
         {
             /// if allocate new memory, old data is copied and old memory is frred
-//            uchar_data_ = (uchar*) gReallocEx(uchar_data_, bytes2Alloc,
-//                    TRACKE_MALLOC);
+            //uchar_data_ = (uchar*) gReallocEx(uchar_data_, bytes2Alloc,TRACKE_MALLOC);
             uchar_data_ = (uchar*) realloc(uchar_data_, bytes2Alloc);
             can_free_ = true;
         }
@@ -214,12 +206,10 @@ void geco_bit_stream_t::AppendBitsCouldRealloc(const bit_size_t bits2Append)
         assert(uchar_data_ != 0);
     }
 
-    if (newBitsAllocCount > allocated_bits_size_)
-        allocated_bits_size_ = newBitsAllocCount;
+    if (newBitsAllocCount > allocated_bits_size_) allocated_bits_size_ = newBitsAllocCount;
 }
 
-void geco_bit_stream_t::ReadBits(uchar *dest, bit_size_t bits2Read,
-        bool alignRight /*= true*/)
+void geco_bit_stream_t::ReadBits(uchar *dest, bit_size_t bits2Read, bool alignRight /*= true*/)
 {
     /// Assume bits to write are 10101010+00001111,
     /// bits2Write = 4, rightAligned = true, and so
@@ -263,17 +253,15 @@ void geco_bit_stream_t::ReadBits(uchar *dest, bit_size_t bits2Read,
         bit_size_t offset = bits2Read & 7;
         if (offset > 0)
         {
-            if (alignRight)
-                dest[BITS_TO_BYTES(bits2Read) - 1] >>= (8 - offset);
+            if (alignRight) dest[BITS_TO_BYTES(bits2Read) - 1] >>= (8 - offset);
             else
                 dest[BITS_TO_BYTES(bits2Read) - 1] |= 0;
         }
         return;
-        // return true;
     }
 
     bit_size_t writePosByte = 0;
-    memset(dest, 0, BITS_TO_BYTES(bits2Read)); /// Must set all 0
+    memset(dest, 0, BITS_TO_BYTES(bits2Read));  /// Must set all 0
 
     /// Read one complete byte each time
     while (bits2Read > 0)
@@ -286,8 +274,7 @@ void geco_bit_stream_t::ReadBits(uchar *dest, bit_size_t bits2Read,
         /// secondly read right-fragment bits  ( if any ) in this byte
         if (startReadPosBits > 0 && bits2Read > (8 - startReadPosBits))
         {
-            dest[writePosByte] |= uchar_data_[readPosByte + 1]
-                    >> (8 - startReadPosBits);
+            dest[writePosByte] |= uchar_data_[readPosByte + 1] >> (8 - startReadPosBits);
         }
 
         if (bits2Read >= 8)
@@ -299,84 +286,64 @@ void geco_bit_stream_t::ReadBits(uchar *dest, bit_size_t bits2Read,
         else
         {
             // Reading a partial byte for the last byte, shift right so the data is aligned on the right
-            /*if (alignRight) dest[writePosByte] >>= (8 - bits2Read);*/
-
             //  [11/16/2015 JACKIE] Add: zero unused bits
-            if (alignRight)
-                dest[writePosByte] >>= (8 - bits2Read); /// right align result byte: 0000 1111
+            if (alignRight) dest[writePosByte] >>= (8 - bits2Read);  /// right align result byte: 0000 1111
             else
-                dest[writePosByte] |= 0; /// left align result byte: 1111 0000
-
-            ///  [11/15/2015 JACKIE] fix bug of not incrementing mReadingPosBits
+                dest[writePosByte] |= 0;  /// left align result byte: 1111 0000
+            //[11/15/2015 JACKIE] fix bug of not incrementing mReadingPosBits
             readable_bit_pos_ += bits2Read;
             bits2Read = 0;
         }
     }
-    //return true;
 }
 
-void geco_bit_stream_t::read_ranged_float(float &outFloat, float floatMin,
-        float floatMax)
+void geco_bit_stream_t::read_ranged_float(float &outFloat, float floatMin, float floatMax)
 {
     assert(floatMax > floatMin);
-
     ushort percentile;
     ReadMini(percentile);
-
-    outFloat = floatMin
-            + ((float) percentile / 65535.0f) * (floatMax - floatMin);
-    if (outFloat < floatMin)
-        outFloat = floatMin;
-    else if (outFloat > floatMax)
-        outFloat = floatMax;
+    outFloat = floatMin + ((float) percentile / 65535.0f) * (floatMax - floatMin);
+    if (outFloat < floatMin) outFloat = floatMin;
+    else if (outFloat > floatMax) outFloat = floatMax;
 }
 
-void geco_bit_stream_t::ReadAlignedBytes(uchar *dest,
-        const byte_size_t bytes2Read)
+void geco_bit_stream_t::ReadAlignedBytes(uchar *dest, const byte_size_t bytes2Read)
 {
     assert(bytes2Read > 0);
     assert(get_payloads() >= BYTES_TO_BITS(bytes2Read));
-    /// if (bytes2Read <= 0) return;
-
-    /// Byte align
+    // if (bytes2Read <= 0) return;
+    // Byte align
     align_readable_bit_pos();
-
-    /// read the data
+    // read the data
     memcpy(dest, uchar_data_ + (readable_bit_pos_ >> 3), bytes2Read);
     readable_bit_pos_ += bytes2Read << 3;
 }
 
-void geco_bit_stream_t::ReadAlignedBytes(char *dest, byte_size_t &bytes2Read,
-        const byte_size_t maxBytes2Read)
+void geco_bit_stream_t::ReadAlignedBytes(char *dest, byte_size_t &bytes2Read, const byte_size_t maxBytes2Read)
 {
-    bytes2Read = ReadBit();
-    ///ReadMini(bytes2Read);
-    if (bytes2Read > maxBytes2Read)
-        bytes2Read = maxBytes2Read;
-    if (bytes2Read == 0)
-        return;
+    ReadMini(bytes2Read);
+    if (bytes2Read > maxBytes2Read) bytes2Read = maxBytes2Read;
+    if (bytes2Read == 0) return;
     ReadAlignedBytes((uchar*) dest, bytes2Read);
 }
 
-void geco_bit_stream_t::ReadAlignedBytesAlloc(char **dest,
-        byte_size_t &bytes2Read, const byte_size_t maxBytes2Read)
+void geco_bit_stream_t::ReadAlignedBytesAlloc(char **dest, byte_size_t &bytes2Read, const byte_size_t maxBytes2Read)
 {
-//    gFreeEx(*dest, TRACKE_MALLOC);
-    free(*dest);
-    *dest = 0;
-    bytes2Read = ReadBit();
-    ///ReadMini(bytes2Read);
-    if (bytes2Read > maxBytes2Read)
-        bytes2Read = maxBytes2Read;
-    if (bytes2Read == 0)
-        return;
-//    *dest = (char*) gMallocEx(bytes2Read, TRACKE_MALLOC);
+    if (*dest != NULL)
+    {
+        //gFreeEx(*dest, TRACKE_MALLOC);
+        free(*dest);
+        *dest = 0;
+    }
+    ReadMini(bytes2Read);
+    if (bytes2Read > maxBytes2Read) bytes2Read = maxBytes2Read;
+    if (bytes2Read == 0) return;
+    // *dest = (char*) gMallocEx(bytes2Read, TRACKE_MALLOC);
     *dest = (char*) malloc(bytes2Read);
     ReadAlignedBytes((uchar*) *dest, bytes2Read);
 }
 
-void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write,
-        bool rightAligned /*= true*/)
+void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write, bool rightAligned /*= true*/)
 {
     /// Assume bits to write are 10101010+00001111,
     /// bits2Write = 4, rightAligned = true, and so
@@ -421,8 +388,7 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write,
 
         /// if @dataByte is the last byte to write, we have to convert this byte into
         /// stream internal data by shifting the bits in this last byte to left-aligned
-        if (bits2Write < 8 && rightAligned)
-            dataByte <<= 8 - bits2Write;
+        if (bits2Write < 8 && rightAligned) dataByte <<= 8 - bits2Write;
 
         /// The folowing if-else block will write one byte each time
         if (startWritePosBits == 0)
@@ -439,8 +405,7 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write,
             /// firstly write the as the same number of bits from @dataByte intot
             /// @data[mWritePosBits >> 3] to that in the right-half of
             /// @data[mWritePosBits >> 3]
-            uchar_data_[writable_bit_pos_ >> 3] |= dataByte
-                    >> startWritePosBits;
+            uchar_data_[writable_bit_pos_ >> 3] |= dataByte >> startWritePosBits;
 
             /// then to see if we have remaining bits in @dataByte to write
             /// 1. startWritePosBits > 0 means @data[mWritePosBits >> 3] is a partial byte
@@ -451,8 +416,7 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write,
             if (bits2Write > (8 - startWritePosBits))
             {
                 /// write remaining bits into the  byte next to @data[mWritePosBits >> 3]
-                uchar_data_[(writable_bit_pos_ >> 3) + 1] = (dataByte
-                        << (8 - startWritePosBits));
+                uchar_data_[(writable_bit_pos_ >> 3) + 1] = (dataByte << (8 - startWritePosBits));
             }
         }
 
@@ -462,15 +426,14 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write,
             writable_bit_pos_ += 8;
             bits2Write -= 8;
         }
-        else ///  it is the last (could be partial) byte we wrote in the above codes,
+        else  ///  it is the last (could be partial) byte we wrote in the above codes,
         {
             writable_bit_pos_ += bits2Write;
             bits2Write = 0;
         }
     }
 }
-void geco_bit_stream_t::Write(geco_bit_stream_t *jackieBits,
-        bit_size_t bits2Write)
+void geco_bit_stream_t::Write(geco_bit_stream_t *jackieBits, bit_size_t bits2Write)
 {
     assert(is_read_only_ == false);
     assert(bits2Write > 0);
@@ -491,8 +454,8 @@ void geco_bit_stream_t::Write(geco_bit_stream_t *jackieBits,
                 /// see if this src bit  is 1 or 0, 0x80 (16)= 128(10)= 10000000 (2)
                 if ((jackieBits->uchar_data_[jackieBits->readable_bit_pos_ >> 3]
                         & (0x80 >> (jackieBits->readable_bit_pos_ & 7))))
-                    // Write 1
-                    uchar_data_[writable_bit_pos_ >> 3] = 0x80;
+                // Write 1
+                uchar_data_[writable_bit_pos_ >> 3] = 0x80;
                 else
                     uchar_data_[writable_bit_pos_ >> 3] = 0;
             }
@@ -503,8 +466,7 @@ void geco_bit_stream_t::Write(geco_bit_stream_t *jackieBits,
                         & (0x80 >> (jackieBits->readable_bit_pos_ & 7))))
                 {
                     /// set dest bit to 1 if the src bit is 1,do-nothing if the src bit is 0
-                    uchar_data_[writable_bit_pos_ >> 3] |= 0x80
-                            >> (numberOfBitsMod8);
+                    uchar_data_[writable_bit_pos_ >> 3] |= 0x80 >> (numberOfBitsMod8);
                 }
                 else
                 {
@@ -519,32 +481,27 @@ void geco_bit_stream_t::Write(geco_bit_stream_t *jackieBits,
     }
     // call WriteBits() for efficient  because it writes one byte from src at one time much faster
     assert((jackieBits->readable_bit_pos_ & 7) == 0);
-    WriteBits(&jackieBits->uchar_data_[jackieBits->readable_bit_pos_ >> 3],
-            bits2Write, false);
+    WriteBits(&jackieBits->uchar_data_[jackieBits->readable_bit_pos_ >> 3], bits2Write, false);
     jackieBits->readable_bit_pos_ += bits2Write;
 }
 
-void geco_bit_stream_t::write_ranged_float(float src, float floatMin,
-        float floatMax)
+void geco_bit_stream_t::write_ranged_float(float src, float floatMin, float floatMax)
 {
     assert(floatMax > floatMin);
     assert(src < floatMax + .001f);
     assert(src >= floatMin - .001f);
 
     float percentile = 65535.0f * ((src - floatMin) / (floatMax - floatMin));
-    if (percentile < 0.0f)
-        percentile = 0.0;
-    if (percentile > 65535.0f)
-        percentile = 65535.0f;
+    if (percentile < 0.0f) percentile = 0.0;
+    if (percentile > 65535.0f) percentile = 65535.0f;
     //Write((uint16_t)percentile);
     WriteMini((ushort) percentile);
 }
 
-void geco_bit_stream_t::WriteMini(const uchar* src, const bit_size_t bits2Write,
-        const bool isUnsigned)
+void geco_bit_stream_t::WriteMini(const uchar* src, const bit_size_t bits2Write, const bool isUnsigned)
 {
     byte_size_t currByte;
-    uchar byteMatch = isUnsigned ? 0 : 0xFF; /// 0xFF=255=11111111
+    uchar byteMatch = isUnsigned ? 0 : 0xFF;  /// 0xFF=255=11111111
 
     if (!IsBigEndian())
     {
@@ -563,7 +520,7 @@ void geco_bit_stream_t::WriteMini(const uchar* src, const bit_size_t bits2Write,
                 Write(true);
                 currByte--;
             }
-            else /// the first byte is not matched
+            else  /// the first byte is not matched
             {
                 Write(false);
                 // Write the remainder of the data after writing bit false
@@ -591,7 +548,7 @@ void geco_bit_stream_t::WriteMini(const uchar* src, const bit_size_t bits2Write,
                 Write(true);
                 currByte++;
             }
-            else /// the first byte is not matched
+            else  /// the first byte is not matched
             {
                 Write(false);
                 // Write the remainder of the data after writing bit false
@@ -605,8 +562,8 @@ void geco_bit_stream_t::WriteMini(const uchar* src, const bit_size_t bits2Write,
 
     /// last byte
     if ((src[currByte] & 0xF0) == 0x00 || (src[currByte] & 0xF0) == 0xF0)
-    { /// the upper(left aligned) half of the last byte(now currByte == 0) is a 0000 (positive) or 1111 (nagative)
-      /// write a bit 1 and the remaining 4 bits.
+    {  /// the upper(left aligned) half of the last byte(now currByte == 0) is a 0000 (positive) or 1111 (nagative)
+       /// write a bit 1 and the remaining 4 bits.
         Write(true);
         WriteBits(src + currByte, 4, true);
     }
@@ -617,27 +574,21 @@ void geco_bit_stream_t::WriteMini(const uchar* src, const bit_size_t bits2Write,
     }
 }
 
-void geco_bit_stream_t::write_aligned_bytes(const uchar *src,
-        const byte_size_t numberOfBytesWrite)
+void geco_bit_stream_t::write_aligned_bytes(const uchar *src, const byte_size_t numberOfBytesWrite)
 {
     align_writable_bit_pos();
     Write((char*) src, numberOfBytesWrite);
 }
 
-void geco_bit_stream_t::write_aligned_bytes(const uchar *src,
-        const byte_size_t bytes2Write, const byte_size_t maxBytes2Write)
+void geco_bit_stream_t::write_aligned_bytes(const uchar *src, const byte_size_t bytes2Write,
+        const byte_size_t maxBytes2Write)
 {
+    WriteMini(bytes2Write);
     if (src == 0 || bytes2Write == 0)
     {
-        //  [11/15/2015 JACKIE] this is ooficial impl whixch will waste 4 bits
-        // actually we only nned to send one bit
-        ///WriteMini(bytes2Write);
-        WriteBitZero();
         return;
     }
-    WriteMini(bytes2Write);
-    write_aligned_bytes(src,
-            bytes2Write < maxBytes2Write ? bytes2Write : maxBytes2Write);
+    write_aligned_bytes(src, bytes2Write < maxBytes2Write ? bytes2Write : maxBytes2Write);
 }
 
 void geco_bit_stream_t::pad_zeros_up_to(uint bytes)
@@ -652,12 +603,10 @@ void geco_bit_stream_t::pad_zeros_up_to(uint bytes)
     }
 }
 
-void geco_bit_stream_t::Bitify(char* out, int mWritePosBits, unsigned char* mBuffer,
-        bool hide_zero_low_bytes)
+void geco_bit_stream_t::Bitify(char* out, int mWritePosBits, unsigned char* mBuffer, bool hide_zero_low_bytes)
 {
-    printf(
-            "[%dbits %dbytes]\ntop (low byte)-> bottom (high byte),\nright(low bit)->left(high bit):\n",
-            mWritePosBits, BITS_TO_BYTES(mWritePosBits));
+    printf("[%dbits %dbytes]\ntop (low byte)-> bottom (high byte),\nright(low bit)->left(high bit):\n", mWritePosBits,
+            BITS_TO_BYTES(mWritePosBits));
 
     if (mWritePosBits <= 0)
     {
@@ -674,8 +623,7 @@ void geco_bit_stream_t::Bitify(char* out, int mWritePosBits, unsigned char* mBuf
 
     for (outter = 0; outter < len; outter++)
     {
-        if (outter == len - 1)
-            stopPos = 8 - (((mWritePosBits - 1) & 7) + 1);
+        if (outter == len - 1) stopPos = 8 - (((mWritePosBits - 1) & 7) + 1);
         else
             stopPos = 0;
 
@@ -707,8 +655,7 @@ void geco_bit_stream_t::Bitify(bool hide_zero_low_bytes)
     Bitify(out, writable_bit_pos_, uchar_data_, hide_zero_low_bytes);
     printf("%s\n", out);
 }
-void geco_bit_stream_t::Hexlify(char* out, bit_size_t mWritePosBits,
-        uchar* mBuffer)
+void geco_bit_stream_t::Hexlify(char* out, bit_size_t mWritePosBits, uchar* mBuffer)
 {
     if (mWritePosBits <= 0)
     {

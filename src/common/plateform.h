@@ -159,8 +159,8 @@ struct uint24_t
 {
         unsigned int val;
 
-        uint24_t() :
-                val(0)
+        uint24_t()
+                : val(0)
         {
         }
         operator unsigned int()
@@ -373,9 +373,13 @@ template <class T> inline const T & max(const T & a, const T & b)
 #define GECO_MIN min
 #define GECO_MAX max
 #define NOMINMAX
+#undef geco_sleep
+#define geco_sleep Sleep
 #else
 #define GECO_MIN std::min
 #define GECO_MAX std::max
+#undef geco_sleep
+#define geco_sleep sleep
 #endif
 
 /*
@@ -510,13 +514,11 @@ template<class MAP> struct MapTypes
 #define IS_EQUAL_FLOAT(value1, value2) \
 (abs(value1 - value2) < std::numeric_limits<float>::epsilon())
 // use 0.0004 because most existing functions are using it
-inline bool almost_equal(const float f1, const float f2, const float epsilon =
-        0.0004f)
+inline bool almost_equal(const float f1, const float f2, const float epsilon = 0.0004f)
 {
     return fabsf(f1 - f2) < epsilon;
 }
-inline bool almost_equal(const double d1, const double d2,
-        const double epsilon = 0.0004)
+inline bool almost_equal(const double d1, const double d2, const double epsilon = 0.0004)
 {
     return fabs(d1 - d2) < epsilon;
 }
@@ -529,16 +531,13 @@ inline bool almost_zero(const double d, const double epsilon = 0.0004)
     return d < epsilon && d > -epsilon;
 }
 template<typename T>
-inline bool almost_equal(const T& c1, const T& c2,
-        const float epsilon = 0.0004f)
+inline bool almost_equal(const T& c1, const T& c2, const float epsilon = 0.0004f)
 {
-    if (c1.size() != c2.size())
-        return false;
+    if (c1.size() != c2.size()) return false;
     typename T::const_iterator iter1 = c1.begin();
     typename T::const_iterator iter2 = c2.begin();
     for (; iter1 != c1.end(); ++iter1, ++iter2)
-        if (!almost_equal(*iter1, *iter2, epsilon))
-            return false;
+        if (!almost_equal(*iter1, *iter2, epsilon)) return false;
     return true;
 }
 
