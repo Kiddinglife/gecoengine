@@ -22,8 +22,7 @@ namespace geco
 
 // 0000000000111111111122222222223333333333444444444455555555556666
 // 0123456789012345678901234567890123456789012345678901234567890123
-        static std::string Base64Table(
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+        static std::string Base64Table("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
 // Decode Table gives the index of any valid base64 character in the Base64 table]
 // 65 == A, 97 == a, 48 == 0, 43 == +, 47 == /
@@ -70,15 +69,13 @@ namespace geco
                 c = (data[i] >> 2) & 0x3f;
                 ret.push_back(Base64Table[c]);
                 c = (data[i] << 4) & 0x3f;
-                if (++i < len)
-                    c |= (data[i] >> 4) & 0x0f;
+                if (++i < len) c |= (data[i] >> 4) & 0x0f;
 
                 ret.push_back(Base64Table[c]);
                 if (i < len)
                 {
                     c = (data[i] << 2) & 0x3f;
-                    if (++i < len)
-                        c |= (data[i] >> 6) & 0x03;
+                    if (++i < len) c |= (data[i] >> 6) & 0x03;
 
                     ret.push_back(Base64Table[c]);
                 }
@@ -107,9 +104,8 @@ namespace geco
             return encode_base64(data.data(), data.size());
         }
 
-// Returns the length of the decoded string on success, otherwise -1.
-        int decode_base64(const std::string& data, char* results,
-                size_t bufSize)
+        // Returns the length of the decoded string on success, otherwise -1.
+        int decode_base64(const std::string& data, char* results, size_t bufSize)
         {
             // TODO: Deprecate this method or make it more fault tolerant.
             uint i;
@@ -135,8 +131,7 @@ namespace geco
                 if (++i < len)
                 {
                     c = data[i];
-                    if (fillchar == c)
-                        break;
+                    if (fillchar == c) break;
 
                     c = (char) DecodeTable[(unsigned char) data[i]];
                     c1 = ((c1 << 4) & 0xf0) | ((c >> 2) & 0xf);
@@ -146,8 +141,7 @@ namespace geco
                 if (++i < len)
                 {
                     c1 = data[i];
-                    if (fillchar == c1)
-                        break;
+                    if (fillchar == c1) break;
 
                     c1 = (char) DecodeTable[(unsigned char) data[i]];
                     c = ((c << 6) & 0xc0) | c1;
@@ -182,14 +176,11 @@ namespace geco
             for (i = 0; i < len; ++i)
             {
                 c = (char) DecodeTable[(unsigned char) inData[i]];
-                if (c == npc)
-                    return false;
+                if (c == npc) return false;
                 ++i;
-                if (i == len)
-                    return false;
+                if (i == len) return false;
                 c1 = (char) DecodeTable[(unsigned char) inData[i]];
-                if (c1 == npc)
-                    return false;
+                if (c1 == npc) return false;
                 c = (c << 2) | ((c1 >> 4) & 0x3);
                 outData.push_back(c);
                 if (++i < len)
@@ -202,8 +193,7 @@ namespace geco
                     }
 
                     c = (char) DecodeTable[(unsigned char) c];
-                    if (c == npc)
-                        return false;
+                    if (c == npc) return false;
                     c1 = ((c1 << 4) & 0xf0) | ((c >> 2) & 0xf);
                     outData.push_back(c1);
                 }
@@ -218,13 +208,24 @@ namespace geco
                     }
 
                     c1 = (char) DecodeTable[(unsigned char) c1];
-                    if (c1 == npc)
-                        return false;
+                    if (c1 == npc) return false;
                     c = ((c << 6) & 0xc0) | c1;
                     outData.push_back(c);
                 }
             }
             return true;
+        }
+
+        geco_bit_stream_t& operator>>(geco_bit_stream_t &is, MD5::Digest &d)
+        {
+            is.Read((char*) d.bytes, (uint) sizeof(d.bytes));
+            return is;
+        }
+
+        geco_bit_stream_t& operator<<(geco_bit_stream_t &os, const MD5::Digest &d)
+        {
+            os.Write((char*) d.bytes, (uint) sizeof(d.bytes));
+            return os;
         }
 
     }

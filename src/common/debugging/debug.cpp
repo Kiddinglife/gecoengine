@@ -47,11 +47,7 @@
 #include "../plateform.h"
 #include "../ultils/geco-malloc.h"
 
-int init_watcher(int& value, const char * path)
-{
-    return 0;
-}
-DECLARE_DEBUG_COMPONENT2("CStdMF", 0);
+DECLARE_DEBUG_COMPONENT2("engine-common-module-logger", 0);
 
 namespace geco
 {
@@ -62,10 +58,9 @@ namespace geco
 //-------------------------------------------------------
         bool g_write2syslog = false;
         std::string g_syslog_name("default_syslog_name");
-        static const char dev_assertion_msg[] =
-                "Development assertions may indicate failures caused by incorrect "
-                        "engine usage.\n"
-                        "In "
+        static const char dev_assertion_msg[] = "Development assertions may indicate failures caused by incorrect "
+                "engine usage.\n"
+                "In "
 #ifdef SERVER_BUILD
                 "production mode"
 #else
@@ -76,13 +71,11 @@ namespace geco
                 "failure.\n";
 
         static const char * prefixes[] =
-        { "TRACE: ", "DEBUG: ", "INFO: ", "NOTICE: ", "WARN: ", "ERR: ",
-                "CRIT: ", "HACK: ", "SCRIPT: ", "ASSET: " };
+        { "TRACE: ", "DEBUG: ", "INFO: ", "NOTICE: ", "WARN: ", "ERR: ", "CRIT: ", "HACK: ", "SCRIPT: ", "ASSET: " };
 
         inline const char * get_logmsg_prefix_str(LogMsgPriority p)
         {
-            return (p >= 0 && (size_t) p < sizeof(prefixes)) ?
-                    prefixes[(int) p] : "";
+            return (p >= 0 && (size_t) p < sizeof(prefixes)) ? prefixes[(int) p] : "";
         }
 
 //-------------------------------------------------------
@@ -128,8 +121,7 @@ namespace geco
                     time_t ttime = time(NULL);
                     char timebuff[32];
 
-                    if (strftime(timebuff, sizeof(timebuff), "%F %T: ",
-                            localtime(&ttime)) != 0)
+                    if (strftime(timebuff, sizeof(timebuff), "%F %T: ", localtime(&ttime)) != 0)
                     {
                         fprintf(stderr, "%s", timebuff);
                     }
@@ -150,8 +142,8 @@ namespace geco
         }
 
         /*prints a debug message if the input priorities satisfies thefilter*/
-        void vdprintf(int componentPriority, int messagePriority,
-                const char * format, va_list argPtr, const char * prefix)
+        void vdprintf(int componentPriority, int messagePriority, const char * format, va_list argPtr,
+                const char * prefix)
         {
             vdprintf(format, argPtr, prefix);
         }
@@ -180,8 +172,7 @@ namespace geco
 //-------------------------------------------------------
 //	Section: main_thread_tracker_t
 //-------------------------------------------------------
-        bool thread_local main_thread_tracker_t::is_curr_thread_main_thread_ =
-                false;
+        bool thread_local main_thread_tracker_t::is_curr_thread_main_thread_ = false;
 // Instantiate it, so it initialises the flag to the main thread
         static main_thread_tracker_t s_main_thread_tracker;
 
@@ -219,7 +210,7 @@ namespace geco
 //	Section: log_msg_filter_t
 //-------------------------------------------------------
         log_msg_filter_t* log_msg_filter_t::s_instance_ = NULL;
-        bool log_msg_filter_t::shouldWriteTimePrefix = false;
+        bool log_msg_filter_t::shouldWriteTimePrefix = true;
 #if defined( SERVER_BUILD ) || defined( PLAYSTATION3 )
         bool log_msg_filter_t::shouldWriteToConsole = true;
 #else
@@ -293,22 +284,17 @@ namespace geco
                 {
                     // Skip the round bracket start.
                     ++begin;
-                    std::string::size_type bracketEnd = traceString.find(')',
-                            begin);
-                    std::string::size_type end = traceString.rfind('+',
-                            bracketEnd);
+                    std::string::size_type bracketEnd = traceString.find(')', begin);
+                    std::string::size_type end = traceString.rfind('+', bracketEnd);
                     std::string mangled(traceString.substr(begin, end - begin));
 
                     int status = 0;
                     size_t demangledBufferLength = 0;
-                    char * demangledBuffer = abi::__cxa_demangle(
-                            mangled.c_str(), 0, &demangledBufferLength,
-                            &status);
+                    char * demangledBuffer = abi::__cxa_demangle(mangled.c_str(), 0, &demangledBufferLength, &status);
 
                     if (demangledBuffer)
                     {
-                        functionName.assign(demangledBuffer,
-                                demangledBufferLength);
+                        functionName.assign(demangledBuffer, demangledBufferLength);
                         // __cxa_demangle allocates the memory for the demangled
                         // output using malloc(), we need to free it.
 #ifdef ENABLE_MEMTRACKER
@@ -324,12 +310,10 @@ namespace geco
                         functionName = mangled;
                     }
                 }
-                this->message("Stack: #%d %s\n", i,
-                        (gotFunctionName) ?
-                                functionName.c_str() : traceString.c_str());
+                this->message("Stack: #%d %s\n", i, (gotFunctionName) ? functionName.c_str() : traceString.c_str());
             }
 #ifdef ENABLE_MEMTRACKER
-            free(traceStringBuffer); // this is incorrect should fix it up someday
+            free(traceStringBuffer);  // this is incorrect should fix it up someday
             //todo raw_free(traceStringBuffer);
 #else
             free(traceStringBuffer);
@@ -340,11 +324,11 @@ namespace geco
         inline void log_msg_helper::msg_back_trace()
         {}
 #endif
+
         /*
          * 	This is a helper function used by the CRITICAL_MSG macro.
          */
-        void log_msg_helper::critical_msg_aux(bool isDevAssertion,
-                const char * format, va_list argPtr)
+        void log_msg_helper::critical_msg_aux(bool isDevAssertion, const char * format, va_list argPtr)
         {
             char buffer[LOG_BUFSIZ];
             geco_vsnprintf(buffer, sizeof(buffer), format, argPtr);
@@ -377,20 +361,20 @@ namespace geco
                 this->message("%s", dev_assertion_msg);
             }
             this->msg_back_trace();
-            if (isDevAssertion
-                    && !log_msg_filter_t::get_instance().has_dev_assert_)
+            if (isDevAssertion && !log_msg_filter_t::get_instance().has_dev_assert_)
             {
                 // dev assert and we don't have dev asserts enabled
                 return;
             }
 
             // now do special critical message stuff
-            uint size =
-                    log_msg_filter_t::get_instance().critical_msg_cbs_.size();
-            for (uint i = 0; i < size; ++i)
+            for (uint i = 0; i < log_msg_filter_t::get_instance().critical_msg_cbs_.size(); ++i)
             {
-                (*(log_msg_filter_t::get_instance().critical_msg_cbs_[i]))(
-                        buffer, (critical_msg_cb_tag*) 0);
+                va_list tmpArgPtr;
+                geco_va_copy(tmpArgPtr, argPtr);
+                (*(log_msg_filter_t::get_instance().critical_msg_cbs_[i]))(cpn_priority_, msg_priority_, format,
+                        tmpArgPtr, (critical_msg_cb_tag*) 0);
+                va_end(tmpArgPtr);
             }
 
 #ifdef _XBOX360
@@ -399,7 +383,7 @@ namespace geco
 
                 LPCWSTR buttons[] =
                 {   L"Exit"};
-                XOVERLAPPED overlapped;	// Overlapped object for message box UI
+                XOVERLAPPED overlapped;  // Overlapped object for message box UI
                 MESSAGEBOX_RESULT result;// Message box button pressed result
 
                 ZeroMemory(&overlapped, sizeof(XOVERLAPPED));
@@ -483,8 +467,7 @@ namespace geco
 #endif// ENABLE_ENTER_DEBUGGER_MESSAGE
 #else
             char filename[512], hostname[256];
-            if (gethostname(hostname, sizeof(hostname)) != 0)
-                hostname[0] = 0;
+            if (gethostname(hostname, sizeof(hostname)) != 0) hostname[0] = 0;
 
             char exeName[512];
             const char * pExeName = "unknown";
@@ -501,14 +484,13 @@ namespace geco
                 }
             }
 
-            geco_snprintf(filename, sizeof(filename), "assert.%s.%s.%d.log",
-                    pExeName, hostname, getpid());
+            geco_snprintf(filename, sizeof(filename), "assert.%s.%s.%d.log", pExeName, hostname, getpid());
 
             FILE * assertFile = geco_fopen(filename, "a");
             fprintf(assertFile, "%s", buffer);
             fclose(assertFile);
 
-            volatile uint64 crashTime = gettimestamp(); // For reference in the coredump.
+            volatile uint64 crashTime = gettimestamp();  // For reference in the coredump.
             crashTime *= 1;
             *(int*) NULL = 0;
             typedef void (*BogusFunc)();
@@ -519,8 +501,7 @@ namespace geco
         void log_msg_helper::message(const char * format, ...)
         {
             // Break early if this message should be filtered out.
-            if (!log_msg_filter_t::should_accept(cpn_priority_, msg_priority_))
-                return;
+            if (!log_msg_filter_t::should_accept(cpn_priority_, msg_priority_)) return;
 
             bool handled = false;
             va_list argPtr;
@@ -528,9 +509,7 @@ namespace geco
 
 #if !defined( _WIN32 ) && !defined( PLAYSTATION3 )
             // send to syslog if it's been initialised
-            if (should_write2syslog
-                    && ((msg_priority_ == LOG_MSG_ERROR)
-                            || (msg_priority_ == LOG_MSG_CRITICAL)))
+            if (should_write2syslog && ((msg_priority_ == LOG_MSG_ERROR) || (msg_priority_ == LOG_MSG_CRITICAL)))
             {
                 char buffer[LOG_BUFSIZ * 2];
                 // Need to make a copy of the va_list here to avoid crashing on 64bit
@@ -540,80 +519,110 @@ namespace geco
                 buffer[sizeof(buffer) - 1] = '\0';
                 va_end(tmpArgPtr);
 
-//#define	LOG_EMERG	0	/* system is unusable */
-//#define	LOG_ALERT	1	/* action must be taken immediately */
-//#define	LOG_CRIT	2	/* critical conditions */
-//#define	LOG_ERR		3	/* error conditions */
-//#define	LOG_WARNING	4	/* warning conditions */
-//#define	LOG_NOTICE	5	/* normal but significant condition */
-//#define	LOG_INFO	6	/* informational */
-//#define	LOG_DEBUG	7	/* debug-level messages */
-//		enum LogMsgPriority
-//		{
-//			LOG_MSG_TRACE,
-//			LOG_MSG_DEBUG,
-//			LOG_MSG_INFO,
-//			LOG_MSG_NOTICE,
-//			LOG_MSG_WARNING,
-//			LOG_MSG_ERROR,
-//			LOG_MSG_CRITICAL,
-//			LOG_MSG_HACK,
-//			LOG_MSG_SCRIPT,
-//			LOG_MSG_ASSET,
-//			NUM_LOG_MSG
-//		};
-
-                switch (msg_priority_)
+                if (msg_priority_ == LOG_MSG_CRITICAL)
                 {
-                    case LOG_MSG_CRITICAL:
-                        syslog(LOG_CRIT, "%s", buffer);
-                        break;
-                    case LOG_MSG_ERROR:
-                        syslog(LOG_ERR, "%s", buffer);
-                        break;
-                    case LOG_MSG_WARNING:
-                        syslog(LOG_WARNING, "%s", buffer);
-                        break;
-                    case LOG_MSG_NOTICE:
-                        syslog(LOG_NOTICE, "%s", buffer);
-                        break;
-                    case LOG_MSG_INFO:
-                        syslog(LOG_INFO, "%s", buffer);
-                        break;
-                    case LOG_MSG_DEBUG:
-                        syslog(LOG_DEBUG, "%s", buffer);
-                        break;
-                    default: // TREATE OTHER MSG AS LOG_INFO
-                        syslog(LOG_INFO, "%s", buffer);
-                        break;
+                    syslog(LOG_CRIT, "%s", buffer);
+                }
+                else
+                {
+                    syslog(LOG_ERR, "%s", buffer);
                 }
             }
 #endif
 
-            uint size = log_msg_filter_t::get_instance().debug_msg_cbs_.size();
-            for (uint i = 0; i < size; ++i)
+            switch (msg_priority_)
             {
-                if (!handled)
-                {
-                    // Need to make a copy of the va_list here to avoid crashing on 64bit
-                    va_list tmpArgPtr;
-                    geco_va_copy(tmpArgPtr, argPtr);
-                    handled =
-                            (*(log_msg_filter_t::get_instance().debug_msg_cbs_[i]))(
-                                    cpn_priority_, msg_priority_, format,
-                                    tmpArgPtr, (debug_msg_cb_tag*) 0);
-                    va_end(tmpArgPtr);
-                }
+                case LOG_MSG_CRITICAL:
+                    // handle this individually in critical msg()
+                    break;
+                case LOG_MSG_ERROR:
+                    for (uint i = 0; i < log_msg_filter_t::get_instance().error_msg_cbs_.size(); ++i)
+                    {
+                        if (!handled)
+                        {
+                            va_list tmpArgPtr;
+                            geco_va_copy(tmpArgPtr, argPtr);
+                            handled = (*(log_msg_filter_t::get_instance().error_msg_cbs_[i]))(cpn_priority_,
+                                    msg_priority_, format, tmpArgPtr, (error_msg_cb_tag*) 0);
+                            va_end(tmpArgPtr);
+                        }
+                    }
+                    break;
+                case LOG_MSG_WARNING:
+                    for (uint i = 0; i < log_msg_filter_t::get_instance().warnning_msg_cbs_.size(); ++i)
+                    {
+                        if (!handled)
+                        {
+                            va_list tmpArgPtr;
+                            geco_va_copy(tmpArgPtr, argPtr);
+                            handled = (*(log_msg_filter_t::get_instance().warnning_msg_cbs_[i]))(cpn_priority_,
+                                    msg_priority_, format, tmpArgPtr, (warnning_msg_cb_tag*) 0);
+                            va_end(tmpArgPtr);
+                        }
+                    }
+                    break;
+                case LOG_MSG_NOTICE:
+                    for (uint i = 0; i < log_msg_filter_t::get_instance().notice_msg_cbs_.size(); ++i)
+                    {
+                        if (!handled)
+                        {
+                            va_list tmpArgPtr;
+                            geco_va_copy(tmpArgPtr, argPtr);
+                            handled = (*(log_msg_filter_t::get_instance().notice_msg_cbs_[i]))(cpn_priority_,
+                                    msg_priority_, format, tmpArgPtr, (notice_msg_cb_tag*) 0);
+                            va_end(tmpArgPtr);
+                        }
+                    }
+                    break;
+                case LOG_MSG_INFO:
+                    for (uint i = 0; i < log_msg_filter_t::get_instance().info_msg_cbs_.size(); ++i)
+                    {
+                        if (!handled)
+                        {
+                            va_list tmpArgPtr;
+                            geco_va_copy(tmpArgPtr, argPtr);
+                            handled = (*(log_msg_filter_t::get_instance().info_msg_cbs_[i]))(cpn_priority_,
+                                    msg_priority_, format, tmpArgPtr, (info_msg_cb_tag*) 0);
+                            va_end(tmpArgPtr);
+                        }
+                    }
+                    break;
+                case LOG_MSG_DEBUG:
+                    for (uint i = 0; i < log_msg_filter_t::get_instance().debug_msg_cbs_.size(); ++i)
+                    {
+                        if (!handled)
+                        {
+                            va_list tmpArgPtr;
+                            geco_va_copy(tmpArgPtr, argPtr);
+                            handled = (*(log_msg_filter_t::get_instance().debug_msg_cbs_[i]))(cpn_priority_,
+                                    msg_priority_, format, tmpArgPtr, (debug_msg_cb_tag*) 0);
+                            va_end(tmpArgPtr);
+                        }
+                    }
+                    break;
+                default:  // treat other msg as criti msg
+                    for (uint i = 0; i < log_msg_filter_t::get_instance().critical_msg_cbs_.size(); ++i)
+                    {
+                        if (!handled)
+                        {
+                            va_list tmpArgPtr;
+                            geco_va_copy(tmpArgPtr, argPtr);
+                            handled = (*(log_msg_filter_t::get_instance().critical_msg_cbs_[i]))(cpn_priority_,
+                                    msg_priority_, format, tmpArgPtr, (critical_msg_cb_tag*) 0);
+                            va_end(tmpArgPtr);
+                        }
+                    }
+                    break;
             }
 
+            // defaut handler is simply to print it out if no cb invoked
             if (!handled)
             {
                 if (0 <= msg_priority_&&
                 msg_priority_ < int(sizeof(prefixes) / sizeof(prefixes[0])) &&
                 prefixes[msg_priority_] != NULL)
                 {
-                    vdprintf(cpn_priority_, msg_priority_, format, argPtr,
-                            prefixes[msg_priority_]);
+                    vdprintf(cpn_priority_, msg_priority_, format, argPtr, prefixes[msg_priority_]);
                 }
                 else
                 {

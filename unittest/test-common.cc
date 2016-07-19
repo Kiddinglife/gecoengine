@@ -151,16 +151,16 @@ TEST(GECO_DEBUGGING_TIMESTAMP, test_gettimestamp_func)
     double ageinsec = stampt.ageInSeconds();
     printf("%0.2f -> %lu\n", ageinsec, ageinstamp.stamp_);
 }
-//TEST(GECO_DEBUGGING_MSGLOG, test_msg_macros)
-//{
-//	Leave("test_msg_macros", "test_msg_macros");
-//	Enter("test_msg_macros", "test_msg_macros");
-//	TRACE_MSG("TRACE_MSG\n");
-//	DEBUG_MSG("DEBUG_MSG %d\n", 12);
-//	INFO_MSG("INFO_MSG %s\n", "hello world");
-//	NOTICE_MSG("NOTICE_MSG %s\n", "hello world");
-//	ERROR_MSG("ERROR_MSG %s\n", "hello world");
-//}
+TEST(GECO_DEBUGGING_MSGLOG, test_msg_macros)
+{
+    Leave("test_msg_macros", "test_msg_macros");
+    Enter("test_msg_macros", "test_msg_macros");
+    TRACE_MSG("TRACE_MSG\n");
+    DEBUG_MSG("DEBUG_MSG %d\n", 12);
+    INFO_MSG("INFO_MSG %s\n", "hello world");
+    NOTICE_MSG("NOTICE_MSG %s\n", "hello world");
+    ERROR_MSG("ERROR_MSG %s\n", "hello world");
+}
 //TEST(GECO_DEBUGGING_MSGLOG, test_geco_asset_dev)
 //{
 //	// Runtime disable fatal assertions

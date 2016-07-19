@@ -96,6 +96,9 @@ namespace geco
     namespace debugging
     {
 
+        //-------------------------------------------------------
+        //  Section: globals
+        //-------------------------------------------------------
         extern bool g_write2syslog;
         extern std::string g_syslog_name;
 
@@ -107,7 +110,9 @@ namespace geco
         struct critical_msg_cb_tag
         {
         };
-        typedef std::function<void(const char* msg, critical_msg_cb_tag*)> critical_msg_cb_t;
+        typedef std::function<
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                        critical_msg_cb_tag*)> critical_msg_cb_t;
 
         /**
          *  @brief this is  the critical message specified callback class.
@@ -129,8 +134,7 @@ namespace geco
                 {
                     return handler_;
                 }
-                static default_critical_msg_handler_t* set(
-                        default_critical_msg_handler_t* handler)
+                static default_critical_msg_handler_t* set(default_critical_msg_handler_t* handler)
                 {
                     default_critical_msg_handler_t* old = handler_;
                     handler_ = handler;
@@ -152,24 +156,42 @@ namespace geco
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority,
-                        const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
                         debug_msg_cb_tag*)> debug_msg_cb_t;
 
         struct error_msg_cb_tag
         {
         };
-        typedef std::function<bool(const char * msg, error_msg_cb_tag*)> error_msg_cb_t;
+        typedef std::function<
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                        error_msg_cb_tag*)> error_msg_cb_t;
 
         struct warnning_msg_cb_tag
         {
         };
-        typedef std::function<bool(const char * msg, warnning_msg_cb_tag*)> warnning_msg_cb_t;
+        typedef std::function<
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                        warnning_msg_cb_tag*)> warnning_msg_cb_t;
 
         struct info_msg_cb_tag
         {
         };
-        typedef std::function<bool(const char * msg, info_msg_cb_tag*)> info_msg_cb_t;
+        typedef std::function<
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list, info_msg_cb_tag*)> info_msg_cb_t;
+
+        struct notice_msg_cb_tag
+        {
+        };
+        typedef std::function<
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                        notice_msg_cb_tag*)> notice_msg_cb_t;
+
+        struct trace_msg_cb_tag
+        {
+        };
+        typedef std::function<
+                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                        trace_msg_cb_tag*)> trace_msg_cb_t;
 
         /** This class is used to help filter log messages.*/
         struct log_msg_filter_t  //oldname - DebugFilter
@@ -178,16 +200,21 @@ namespace geco
                 static log_msg_filter_t* s_instance_;
                 static bool shouldWriteTimePrefix;
                 static bool shouldWriteToConsole;
+
                 typedef geco::ds::array_t<critical_msg_cb_t*> critical_msg_cbs_t;
                 typedef geco::ds::array_t<error_msg_cb_t*> error_msg_cbs_t;
                 typedef geco::ds::array_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
                 typedef geco::ds::array_t<debug_msg_cb_t*> debug_msg_cbs_t;
                 typedef geco::ds::array_t<info_msg_cb_t*> info_msg_cbs_t;
+                typedef geco::ds::array_t<notice_msg_cb_t*> notice_msg_cbs_t;
+                typedef geco::ds::array_t<trace_msg_cb_t*> trace_msg_cbs_t;
                 critical_msg_cbs_t critical_msg_cbs_;
                 error_msg_cbs_t error_msg_cbs_;
                 warnning_msg_cbs_t warnning_msg_cbs_;
                 debug_msg_cbs_t debug_msg_cbs_;
                 info_msg_cbs_t info_msg_cbs_;
+                notice_msg_cbs_t notice_msg_cbs_;
+                trace_msg_cbs_t trace_msg_cbs_;
 
                 // Only messages with a message priority greater than or equal
                 // to this limit will be displayed.
@@ -205,6 +232,9 @@ namespace geco
                     error_msg_cbs_.reserve(64);
                     warnning_msg_cbs_.reserve(64);
                     debug_msg_cbs_.reserve(64);
+                    info_msg_cbs_.reserve(64);
+                    notice_msg_cbs_.reserve(64);
+                    trace_msg_cbs_.reserve(64);
                 }
 
                 /** This method returns the singleton instance of this class.*/
@@ -233,13 +263,9 @@ namespace geco
                  * priority >= filter_threshold_
                  * when component_priority > filter_threshold_, only accept msg with
                  * priority >= component_priority */
-                static bool should_accept(int component_priority,
-                        int msg_riority)
+                static bool should_accept(int component_priority, int msg_riority)
                 {
-                    return (msg_riority
-                            >= MAX(
-                                    log_msg_filter_t::get_instance().filter_threshold_,
-                                    component_priority));
+                    return (msg_riority >= MAX(log_msg_filter_t::get_instance().filter_threshold_, component_priority));
                 }
 
                 /**
@@ -249,7 +275,7 @@ namespace geco
                 unsigned int add(critical_msg_cb_t * pCallback)
                 {
                     critical_msg_cbs_.push_back(pCallback);
-                    return (debug_msg_cbs_.size() - 1);
+                    return (critical_msg_cbs_.size() - 1);
                 }
                 /**
                  *	@brief This method sets a callback associated with a error message,
@@ -258,7 +284,7 @@ namespace geco
                 unsigned int add(error_msg_cb_t * pCallback)
                 {
                     error_msg_cbs_.push_back(pCallback);
-                    return (debug_msg_cbs_.size() - 1);
+                    return (error_msg_cbs_.size() - 1);
                 }
                 /**
                  *	@brief This method sets a callback associated with a warnning message,
@@ -267,7 +293,7 @@ namespace geco
                 unsigned int add(warnning_msg_cb_t * pCallback)
                 {
                     warnning_msg_cbs_.push_back(pCallback);
-                    return (debug_msg_cbs_.size() - 1);
+                    return (warnning_msg_cbs_.size() - 1);
                 }
                 /**
                  *	@brief This method sets a callback associated with a info message,
@@ -276,7 +302,16 @@ namespace geco
                 unsigned int add(info_msg_cb_t * pCallback)
                 {
                     info_msg_cbs_.push_back(pCallback);
-                    return (debug_msg_cbs_.size() - 1);
+                    return (info_msg_cbs_.size() - 1);
+                }
+                /**
+                 *  @brief This method sets a callback associated with a info message,
+                 *  log_msg_filter_t now owns the object pointed to by pCallback.
+                 * @return index of the position where this cb is stored*/
+                unsigned int add(notice_msg_cb_t * pCallback)
+                {
+                    notice_msg_cbs_.push_back(pCallback);
+                    return (notice_msg_cbs_.size() - 1);
                 }
                 /**
                  * @brief sets a callback associated with a debug message.
@@ -289,7 +324,15 @@ namespace geco
                     debug_msg_cbs_.push_back(pCallback);
                     return (debug_msg_cbs_.size() - 1);
                 }
-
+                /**
+                 *  @brief This method sets a callback associated with a info message,
+                 *  log_msg_filter_t now owns the object pointed to by pCallback.
+                 * @return index of the position where this cb is stored*/
+                unsigned int add(trace_msg_cb_t * pCallback)
+                {
+                    trace_msg_cbs_.push_back(pCallback);
+                    return (trace_msg_cbs_.size() - 1);
+                }
                 void remove(unsigned int idx, critical_msg_cb_tag*)
                 {
                     critical_msg_cbs_.remove_fast(idx);
@@ -309,6 +352,14 @@ namespace geco
                 void remove(unsigned int idx, info_msg_cb_tag*)
                 {
                     info_msg_cbs_.remove_fast(idx);
+                }
+                void remove(unsigned int idx, trace_msg_cb_tag*)
+                {
+                    trace_msg_cbs_.remove_fast(idx);
+                }
+                void remove(unsigned int idx, notice_msg_cb_tag*)
+                {
+                    notice_msg_cbs_.remove_fast(idx);
                 }
         };
 
@@ -351,23 +402,19 @@ namespace geco
                 int cpn_priority_;
                 int msg_priority_;
 
-                log_msg_helper(int componentPriority, int messagePriority) :
-                        cpn_priority_(componentPriority), msg_priority_(
-                                messagePriority)
+                log_msg_helper(int componentPriority, int messagePriority)
+                        : cpn_priority_(componentPriority), msg_priority_(messagePriority)
                 {
                 }
-                log_msg_helper() :
-                        cpn_priority_(0), msg_priority_(LOG_MSG_CRITICAL)
+                log_msg_helper()
+                        : cpn_priority_(0), msg_priority_(LOG_MSG_CRITICAL)
                 {
                 }
 
 #ifndef _WIN32
-                void message(const char * format, ...)
-                        __attribute__((format(printf, 2, 3)));
-                void critical_msg(const char * format, ...)
-                        __attribute__((format(printf, 2, 3)));
-                void dev_critical_msg(const char * format, ...)
-                        __attribute__((format(printf, 2, 3)));
+                void message(const char * format, ...) __attribute__((format(printf, 2, 3)));
+                void critical_msg(const char * format, ...) __attribute__((format(printf, 2, 3)));
+                void dev_critical_msg(const char * format, ...) __attribute__((format(printf, 2, 3)));
 #else
                 static bool automated_test_;
                 static void log2file(const char* line);
@@ -381,7 +428,7 @@ namespace geco
                  * If DebugFilter::hasDevelopmentAssertions() is true, this will cause a proper
                  *	critical message otherwise, it'll behaviour similar to a normal error
                  *	message. */
-                void dev_critical_msg(const char * format, ...); // devCriticalMessage
+                void dev_critical_msg(const char * format, ...);  // devCriticalMessage
 #endif
 
                 /**
@@ -403,16 +450,14 @@ namespace geco
                  */
                 static void show_error_dialogs(bool show)
                 {
-                    if (mutex_ == NULL)
-                        mutex_ = new std::mutex;
+                    if (mutex_ == NULL) mutex_ = new std::mutex;
                     mutex_->lock();
                     show_error_dialogs_ = show;
                     mutex_->unlock();
                 }
                 static bool show_error_dialogs()
                 {
-                    if (mutex_ == NULL)
-                        mutex_ = new std::mutex;
+                    if (mutex_ == NULL) mutex_ = new std::mutex;
                     mutex_->lock();
                     bool show_error_dialogs = show_error_dialogs_;
                     mutex_->unlock();
@@ -420,13 +465,11 @@ namespace geco
                 }
 
                 //criticalMessageHelper
-                void critical_msg_aux(bool isDevAssertion, const char * format,
-                        va_list argPtr);
+                void critical_msg_aux(bool isDevAssertion, const char * format, va_list argPtr);
 
                 static void fini()
                 {
-                    if (mutex_)
-                        delete mutex_;
+                    if (mutex_) delete mutex_;
                     mutex_ = NULL;
                     log_msg_filter_t::free_instance();
                 }
@@ -464,10 +507,9 @@ namespace geco
 #if ENABLE_DPRINTF
 // This function prints a debug message.
 #ifndef _WIN32
-        void dprintf(const char * format, ...)
-                __attribute__((format(printf, 1, 2)));
-        void dprintf(int componentPriority, int messagePriority,
-                const char * format, ...) __attribute__((format(printf, 3, 4)));
+        void dprintf(const char * format, ...) __attribute__((format(printf, 1, 2)));
+        void dprintf(int componentPriority, int messagePriority, const char * format, ...)
+                __attribute__((format(printf, 3, 4)));
 #else
         void dprintf(const char * format, ...);
         void dprintf(int componentPriority, int messagePriority,
@@ -475,8 +517,7 @@ namespace geco
 #endif
         void vdprintf(const char * format, va_list argPtr, const char * prefix =
         NULL);
-        void vdprintf(int componentPriority, int messagePriority,
-                const char * format, va_list argPtr,
+        void vdprintf(int componentPriority, int messagePriority, const char * format, va_list argPtr,
                 const char * prefix = NULL);
 #else
 /// This function prints a debug message.
@@ -605,13 +646,13 @@ __FILE__ "(%d)%s%s\n", (int )__LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAM
 /// This macro prints a debug message with CRITICAL priority.
 /// CRITICAL_MSG is always enabled no matter what the build target is.
 #define CRITICAL_MSG \
-log_msg_helper(const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
+geco::debugging::log_msg_helper(const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
 /// This macro prints a development time only message CRITICAL priority.
 #define DEV_CRITICAL_MSG	CRITICAL_MSG
 
 #if ENABLE_MSG_LOGGING
 #define MSG_BACK_TRACE(PRIORITY)\
-log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
+geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 #define TRACE_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_TRACE )
 #define DEBUG_BACKTRACE		MSG_BACK_TRACE( LOG_MSG_DEBUG )
 #define INFO_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_INFO )
@@ -623,7 +664,7 @@ log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 
 // The following macros are used to display debug information.
 // all msgs with pri lower than PRIORITY will NOT be printed out.
-#define MSG_DEBUG(PRIORITY) log_msg_helper(const_cpnt_priority,PRIORITY).message
+#define MSG_DEBUG(PRIORITY) geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).message
 /// This macro prints a debug message with TRACE priority.
 #define TRACE_MSG		MSG_DEBUG( LOG_MSG_TRACE )
 /// This macro prints a debug message with DEBUG priority.
@@ -699,7 +740,5 @@ static int const_cpnt_priority = priority;
  */
 #define DECLARE_DEBUG_COMPONENT(priority) \
 DECLARE_DEBUG_COMPONENT2( NULL, priority )
-
-using namespace geco::debugging;
 
 #endif
