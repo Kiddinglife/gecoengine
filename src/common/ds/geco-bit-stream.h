@@ -1098,6 +1098,12 @@ class geco_bit_stream_t
         /// @return void
         /// @notice templateType for this function must be a float or double
         template<class templateType>
+        void ReadNormVector(templateType &x, templateType &y)
+        {
+            read_ranged_float(x, -1.0f, 1.0f);
+            read_ranged_float(y, -1.0f, 1.0f);
+        }
+        template<class templateType>
         void ReadNormVector(templateType &x, templateType &y, templateType &z)
         {
             read_ranged_float(x, -1.0f, 1.0f);
@@ -1115,6 +1121,25 @@ class geco_bit_stream_t
         /// @return void
         /// @notice templateType for this function must be a float or double
         template<class templateType>
+        void ReadVector(templateType &x, templateType &y)
+        {
+            float magnitude;
+            Read(magnitude);
+
+            if (magnitude > 0.00001f)
+            {
+                ReadMini(x);
+                ReadMini(y);
+                x *= magnitude;
+                y *= magnitude;
+            }
+            else
+            {
+                x = 0.0;
+                y = 0.0;
+            }
+        }
+        template<class templateType>
         void ReadVector(templateType &x, templateType &y, templateType &z)
         {
             float magnitude;
@@ -1122,17 +1147,6 @@ class geco_bit_stream_t
 
             if (magnitude > 0.00001f)
             {
-                //float cx = 0.0f, cy = 0.0f, cz = 0.0f;
-                //ReadMini(cx);
-                //ReadMini(cy);
-                //ReadMini(cz);
-                //x = cx;
-                //y = cy;
-                //z = cz;
-                //x *= magnitude;
-                //y *= magnitude;
-                //z *= magnitude;
-
                 ReadMini(x);
                 ReadMini(y);
                 ReadMini(z);
@@ -1388,7 +1402,6 @@ class geco_bit_stream_t
         /// @param [in] [float floatMin] Predetermined mini value of f
         /// @param [in] [float floatMax] Predetermined max value of f
         /// @return bool
-        /// @notice
         /// @author mengdi[Jackie]
         void write_ranged_float(float src, float floatMin, float floatMax);
 
@@ -1883,6 +1896,12 @@ class geco_bit_stream_t
         /// Will further compress y or z axis aligned vectors.
         /// templateType for this function must be a float or double
         /// @see
+        template<class templateType> void write_normal_vector(templateType x, templateType y)
+        {
+            assert(x <= 1.01 && y <= 1.01 && x >= -1.01 && y >= -1.01);
+            write_ranged_float((float) x, -1.0f, 1.0f);
+            write_ranged_float((float) y, -1.0f, 1.0f);
+        }
         template<class templateType> void write_normal_vector(templateType x, templateType y, templateType z)
         {
             assert(x <= 1.01 && y <= 1.01 && z <= 1.01 && x >= -1.01 && y >= -1.01 && z >= -1.01);
@@ -1900,6 +1919,16 @@ class geco_bit_stream_t
         /// so only use if accuracy is not important
         /// templateType for this function must be a float or double
         /// @see
+        template<class templateType> void write_vector(templateType x, templateType y)
+        {
+            templateType magnitude = sqrt(x * x + y * y);
+            Write((float) magnitude);
+            if (magnitude > 0.00001f)
+            {
+                WriteMini((float) (x / magnitude));
+                WriteMini((float) (y / magnitude));
+            }
+        }
         template<class templateType> void write_vector(templateType x, templateType y, templateType z)
         {
             templateType magnitude = sqrt(x * x + y * y + z * z);
