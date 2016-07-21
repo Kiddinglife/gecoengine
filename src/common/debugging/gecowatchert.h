@@ -845,6 +845,7 @@ namespace geco
             CLASS * pNull = NULL;
             return new value_watcher_t<TYPE>(pNull->*memberPtr, access);
         }
+
 #endif
     }
 }
