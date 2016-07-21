@@ -34,6 +34,7 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <functional>
 
 #include "../plateform.h"
 #include "../geco-engine-config.h"
@@ -45,7 +46,7 @@ namespace geco
     {
 #if ENABLE_WATCHERS
 
-        class watcher_path_request_v2;
+        class geco_watcher_base_t;
         class watcher_path_request;
         class watcher_visitor_t;
 
@@ -61,7 +62,7 @@ namespace geco
             // for the type he defines
             // operator >> (geco_bit_stream& is, user_type type)
             // operator << (geco_bit_stream& is, user_type type)
-            WVT_USER_DEFINED = 0,
+            WVT_USER_DEFINED,
             WVT_INTEGER,
             WVT_FLOATING,
             WVT_STRING,
@@ -75,6 +76,7 @@ namespace geco
             WVT_VECTOR4,
             WVT_NORMAL_VECTOR4,
             WVT_ORTH_METRIX,
+            WVT_UNKNOWN,
             WVT_COUNT
         };
 
@@ -98,6 +100,375 @@ namespace geco
          *  @ingroup WatcherModule
          */
         const char WATCHER_PATH_SEPARATOR = '/';
+
+        /**
+         * Interface to allow a WatcherPathRequest to notify
+         * a calling context of successfull completion.
+         */
+        struct watcher_request_handler_t
+        {
+                /**
+                 * Notify the implementing class of a path request completion.
+                 * @param pathRequest The WatcherPathRequest that has been completed.
+                 * @param count       The number of replies contained in the path request.
+                 */
+                virtual void on_request_complete(watcher_path_request & pathRequest, int32 count) = 0;
+                /**
+                 * Create a new WatcherPathRequest associated with the current packet.
+                 * @param path The watcher path the request will query.
+                 * @returns A pointer to a WatcherPathRequest on success, NULL on error.
+                 */
+                virtual watcher_path_request * create_request(std::string & path) = 0;
+        };
+
+        /**
+         * WatcherPathRequest is a handler class to allow an asyncronous request
+         * of a single watcher path.
+         */
+        class watcher_path_request
+        {
+            protected:
+                std::string request_path_;
+                watcher_request_handler_t* wprn_ptr_;
+
+            public:
+                watcher_path_request(const std::string & path)
+                        : wprn_ptr_( NULL), request_path_(path)
+                {
+                }
+                watcher_path_request()
+                        : wprn_ptr_( NULL)
+                {
+                }
+                virtual ~watcher_path_request()
+                {
+                }
+                /**
+                 * Initiate watcher value retreival for the current path request.
+                 */
+                virtual void get_watcher_value()
+                {
+                }
+                /**
+                 * Initiate a watcher path set operation after data to use
+                 * has been placed into the WatcherPathRequest via @see setResult().
+                 * @returns true on success, false on failure.
+                 */
+                virtual bool set_watcher_value()
+                {
+                    return false;
+                }
+                /**
+                 * Accessor method for the watcher path associated with the
+                 * current instance.
+                 */
+                const std::string & getPath() const
+                {
+                    return this->request_path_;
+                }
+                /**
+                 * Setup the pointer back to the creator of this class to notify
+                 * on completion.
+                 */
+                void setParent(watcher_request_handler_t *parent)
+                {
+                    wprn_ptr_ = parent;
+                }
+                /**
+                 * Check if we have been told about a creator, and notify them of our
+                 * completion.
+                 */
+                virtual void notify(int32 replies = 1)
+                {
+                    if (wprn_ptr_ != NULL)
+                    {
+                        wprn_ptr_->on_request_complete(*this, replies);
+                    }
+                }
+
+                /**
+                 * Notification method called by visitChildren with the number of children
+                 * that we will be told about.
+                 */
+                virtual void add_watcher_num(uint count)
+                {
+                }
+                /**
+                 * Notification of a child watcher entry as called from visitChildren.
+                 */
+                virtual bool add_watcher_path(const void *base, const char *path, std::string & label,
+                        geco_watcher_base_t &watcher)
+                {
+                    return false;
+                }
+                /**
+                 * Return a pointer to the complete data set that should be used
+                 * to create the watcher packet response.
+                 */
+                virtual const char *get_data()
+                {
+                    return NULL;
+                }
+                /**
+                 * Return the size of the data that is returned by getData().
+                 */
+                virtual int32 get_data_size()
+                {
+                    return 0;
+                }
+        };
+
+        class watcher_path_request_v2: public watcher_path_request
+        {
+            private:
+                // Data obtained from the watcher nub to use in a set operation.
+                char *set_data_;
+                // Output stream for the watcher path requests data
+                geco_bit_stream_t result_;
+                // Input stream for the watcher path requests data
+                geco_bit_stream_t set_stream_;
+                // True when the path request is visiting children and shouldn't notify parent of completion.
+                bool is_visiting_dirs_;
+                // Our creator to notify on completion.
+                watcher_request_handler_t *parent_;
+                // Original path requested via watcher nub, used when visiting directories and requestPath_ may be altered.
+                std::string origin_request_path_;
+
+            public:
+                watcher_path_request_v2(const std::string& path)
+                        : watcher_path_request(path), set_data_(NULL), is_visiting_dirs_(false), parent_(
+                        NULL)
+                {
+                }
+                virtual ~watcher_path_request_v2()
+                {
+                }
+                virtual void set_result_stream(const std::string & desc, const WatcherMode & mode,
+                        geco_watcher_base_t * watcher, const void *base);
+                virtual void get_watcher_value();
+                virtual bool set_watcher_value();
+
+                /*
+                 * Methods used by visitChildren
+                 */
+                virtual bool add_watcher_path(const void *base, const char *path, std::string & label,
+                        geco_watcher_base_t &watcher);
+                virtual void add_watcher_num(uint count)
+                {
+                    result_.WriteMini(count);
+                }
+
+                /**
+                 * Notify the Path Request of data to be used during a forwarding watcher
+                 * call.
+                 *
+                 * This is used in a component when it receives the Mercury call to
+                 * callWatcher. It will construct the path request and place the data
+                 * sent via mercury into the path request which is then used to apply
+                 * to the watcher path on the current component.
+                 *
+                 * @param data The pre-streamed data to use when performing a watcher SET.
+                 *
+                 * @returns true on success, false on error.
+                 */
+                void set_data(geco_bit_stream_t& data)
+                {
+                    set_stream_.reset();
+                    set_stream_.Write(data);
+                }
+                virtual const char *get_data()
+                {
+                    return result_.char_data();
+                }
+                virtual int32 get_data_size()
+                {
+                    return BITS_TO_BYTES(result_.get_payloads());
+                }
+                geco_bit_stream_t & get_result_stream()
+                {
+                    return result_;
+                }
+                geco_bit_stream_t& get_value_stream()
+                {
+                    return set_stream_;
+                }
+
+        };
+
+        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Section Starts: string and watcher value : protocol v1
+        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // set operations
+        template<class VALUE_TYPE>
+        bool watcherstr2val(const char * valueStr, VALUE_TYPE &value)
+        {
+            std::stringstream stream;
+            stream.write(valueStr, std::streamsize(strlen(valueStr)));
+            stream.seekg(0, std::ios::beg);
+            stream >> value;
+            return !stream.bad();
+        }
+        inline bool watcherstr2val(const char * valueStr, bool & value)
+        {
+            if (geco_stricmp(valueStr, "true") == 0)
+            {
+                value = true;
+            }
+            else if (geco_stricmp(valueStr, "false") == 0)
+            {
+                value = false;
+            }
+            else
+            {
+                std::stringstream stream;
+                stream.write(valueStr, std::streamsize(strlen(valueStr)));
+                stream.seekg(0, std::ios::beg);
+                stream >> value;
+                return !stream.bad();
+            }
+            return true;
+        }
+        inline bool watcherstr2val(const char * valueStr, const char *& value)
+        {
+            value = valueStr;
+            return true;
+        }
+        inline bool watcherstr2val(const char * valueStr, std::string & value)
+        {
+            value = valueStr;
+            return true;
+        }
+        // get operations of protocol v1
+        template<class VALUE_TYPE>
+        std::string watcherval2str(const VALUE_TYPE & value)
+        {
+            std::stringstream stream;
+            stream << value;
+            return stream.str();
+        }
+        inline std::string watcherval2str(const std::string & value)
+        {
+            return value;
+        }
+        inline std::string watcherval2str(bool value)
+        {
+            return value ? "true" : "false";
+        }/* protocol v1 ends */
+
+        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Section: Stream between Watcher Value : protocol 2
+        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // GET  operations of protocol v2
+        template<class ValueType>
+        bool watcherstream2val(geco_bit_stream_t & result, WatcherValueType& type, ValueType& value, WatcherMode& mode)
+        {
+            result.ReadMini(type);
+            result.ReadMini(mode);
+            switch (type)
+            {
+                case WVT_USER_DEFINED:
+                    result >> value;
+                    break;
+                case WVT_INTEGER:
+                    result.ReadMini(value);
+                    break;
+                case WVT_FLOATING:
+                    result.ReadMini(value);
+                    break;
+                case WVT_TYPE:
+                    result.ReadMini(value);
+                    break;
+                case WVT_STRING:
+                    result.ReadMini(value);
+                    break;
+                case WVT_VECTOR2:
+                    result.ReadVector(value.x, value.y);
+                    break;
+                case WVT_NORMAL_VECTOR2:
+                    result.ReadNormVector(value.x, value.y);
+                    break;
+                case WVT_VECTOR3:
+                    result.ReadVector(value.x, value.y, value.z);
+                    break;
+                case WVT_NORMAL_VECTOR3:
+                    result.ReadNormVector(value.x, value.y, value.z);
+                    break;
+                case WVT_BLOB:
+                    uint bytes2Write;
+                    result.ReadMini(bytes2Write);
+                    result.ReadAlignedBytes((uchar*) value, bytes2Write);
+                    break;
+                default:
+                    printf("watcherval2stream()::no such watcher value type (%d)!\n", type);
+                    abort();
+                    break;
+            }
+            return true;
+        }
+        // SET operations of protocol v2
+        template<class ValueType>
+        void watcherval2stream(geco_bit_stream_t & result, const WatcherValueType type, const ValueType & value,
+                const WatcherMode & mode, const uint bytes2Write = 0)
+        {
+            switch (type)
+            {
+                case WVT_USER_DEFINED:
+                    result.WriteMini((uchar) WVT_USER_DEFINED);
+                    result.WriteMini((uchar) mode);
+                    result << value;
+                    break;
+                case WVT_INTEGER:
+                    result.WriteMini((uchar) WVT_INTEGER);
+                    result.WriteMini((uchar) mode);
+                    result.WriteMini(value);
+                    break;
+                case WVT_FLOATING:
+                    result.WriteMini((uchar) WVT_FLOATING);
+                    result.WriteMini((uchar) mode);
+                    result.WriteMini(value);
+                    break;
+                case WVT_TYPE:
+                    result.WriteMini((uchar) WVT_TYPE);
+                    result.WriteMini((uchar) mode);
+                    result.WriteMini(value);
+                    break;
+                case WVT_STRING:
+                    result.WriteMini((uchar) WVT_STRING);
+                    result.WriteMini((uchar) mode);
+                    result.WriteMini(value);
+                    break;
+                case WVT_VECTOR2:
+                    result.WriteMini((uchar) WVT_VECTOR2);
+                    result.WriteMini((uchar) mode);
+                    result.write_vector(value.x, value.y);
+                    break;
+                case WVT_NORMAL_VECTOR2:
+                    result.WriteMini((uchar) WVT_NORMAL_VECTOR2);
+                    result.WriteMini((uchar) mode);
+                    result.write_normal_vector(value.x, value.y);
+                    break;
+                case WVT_VECTOR3:
+                    result.WriteMini((uchar) WVT_VECTOR3);
+                    result.WriteMini((uchar) mode);
+                    result.write_vector(value.x, value.y, value.z);
+                    break;
+                case WVT_NORMAL_VECTOR3:
+                    result.WriteMini((uchar) WVT_NORMAL_VECTOR3);
+                    result.WriteMini((uchar) mode);
+                    result.write_normal_vector(value.x, value.y, value.z);
+                    break;
+                case WVT_BLOB:
+                    result.WriteMini((uchar) WVT_BLOB);
+                    result.WriteMini((uchar) mode);
+                    result.WriteMini(bytes2Write);
+                    result.write_aligned_bytes((const uchar*) value, bytes2Write);
+                    break;
+                default:
+                    printf("watcherstream2val()::no such watcher value type (%d)!\n", type);
+                    abort();
+                    break;
+            }
+        }/*protocol v2 ends*/
 
         /**
          *  @brief This class is the base class for all debug value watchers.
@@ -229,6 +600,7 @@ namespace geco
                 {
                     return false;
                 }
+
                 /**
                  *  This method visits each child of a directory watcher.
                  *  @param base     This is a pointer used by a number of Watchers. It is
@@ -241,10 +613,12 @@ namespace geco
                  *  @return True if the children were visited, false if specified watcher
                  *      could not be found or is not a directory watcher.
                  */
-                virtual bool visit_watcher(const void * base, const char *path, watcher_path_request & pathRequest)
+
+                virtual bool visit_children(const void * base, const char *path, watcher_path_request& pathRequest)
                 {
                     return false;
                 }
+
                 /**
                  *  This method visits each child of a directory watcher.
                  *
@@ -262,7 +636,7 @@ namespace geco
                  *  @return True if the children were visited, false if specified watcher
                  *      could not be found or is not a directory watcher.
                  */
-                bool visit_watcher(const void * base, const char * path, watcher_visitor_t & visitor)
+                bool visit_children(const void * base, const char * path, watcher_visitor_t & visitor)
                 {
                     return false;
                 }
@@ -410,12 +784,11 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path) && access_ == WT_READ_WRITE)
                     {
                         const TYPE & useValue = *(const TYPE*) (((const uintptr) &rValue_) + ((const uintptr) base));
-                        // todo
-//                        if (read_watcher_value(pathRequest.get_value(), valtype_, useValue, access_))
-//                        {
-//                            write_watcher_value(pathRequest.get_result(), valtype_, useValue, access_, size_);
-//                            pathRequest.set_result(comment_, access_, this, base);
-//                        }
+                        if (watcherstream2val(pathRequest.get_value_stream(), valtype_, useValue, access_))
+                        {
+                            watcherval2stream(pathRequest.get_result_stream(), valtype_, useValue, access_, size_);
+                            pathRequest.set_result_stream(comment_, access_, this, base);
+                        }
                     }
                     else
                     {
@@ -444,14 +817,14 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))
                     {
                         const TYPE & useValue = *(const TYPE*) (((const uintptr) &rValue_) + ((const uintptr) base));
-                        //write_watcher_value(pathRequest.get_result(), valtype_, useValue, access_, size_);
-                        //pathRequest.set_result(comment_, mode, this, base);
+                        watcherval2stream(pathRequest.get_result_stream(), valtype_, useValue, access_, size_);
+                        pathRequest.set_result_stream(comment_, access_, this, base);
                         return true;
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
-                        //write_watcher_value(pathRequest.get_result(), WVT_STRING, comment_, WT_READ_ONLY, size_);
-                        //pathRequest.set_result(comment_, WT_READ_ONLY, this, base);
+                        watcherval2stream(pathRequest.get_result_stream(), WVT_STRING, comment_, WT_READ_ONLY, size_);
+                        pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
                         return true;
                     }
                     else
@@ -459,7 +832,6 @@ namespace geco
                         return false;
                     }
                 }
-
         };
 
         template<class TYPE>
@@ -473,181 +845,6 @@ namespace geco
             CLASS * pNull = NULL;
             return new value_watcher_t<TYPE>(pNull->*memberPtr, access);
         }
-
-        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        //             Section Starts: transform between watcher string and value
-        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        //             for set operations: protocol 1
-        template<class VALUE_TYPE>
-        bool watcherstr2val(const char * valueStr, VALUE_TYPE &value)
-        {
-            std::stringstream stream;
-            stream.write(valueStr, std::streamsize(strlen(valueStr)));
-            stream.seekg(0, std::ios::beg);
-            stream >> value;
-            return !stream.bad();
-        }
-        inline bool watcherstr2val(const char * valueStr, bool & value)
-        {
-            if (geco_stricmp(valueStr, "true") == 0)
-            {
-                value = true;
-            }
-            else if (geco_stricmp(valueStr, "false") == 0)
-            {
-                value = false;
-            }
-            else
-            {
-                std::stringstream stream;
-                stream.write(valueStr, std::streamsize(strlen(valueStr)));
-                stream.seekg(0, std::ios::beg);
-                stream >> value;
-                return !stream.bad();
-            }
-            return true;
-        }
-        inline bool watcherstr2val(const char * valueStr, const char *& value)
-        {
-            value = valueStr;
-            return true;
-        }
-        inline bool watcherstr2val(const char * valueStr, std::string & value)
-        {
-            value = valueStr;
-            return true;
-        }
-        //   for GET operations: protocol 1
-        template<class VALUE_TYPE>
-        std::string watcherval2str(const VALUE_TYPE & value)
-        {
-            std::stringstream stream;
-            stream << value;
-            return stream.str();
-        }
-        inline std::string watcherval2str(const std::string & value)
-        {
-            return value;
-        }
-        inline std::string watcherval2str(bool value)
-        {
-            return value ? "true" : "false";
-        }/* Section Ends: transform between watcher string and value */
-
-        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Section: Stream >> WatcherValue (for SET/READ operations: protocol 2)
-        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        template<class ValueType>
-        bool read_watcher_value(geco_bit_stream_t & result, WatcherValueType& type, ValueType& value, WatcherMode& mode)
-        {
-            result.ReadMini(type);
-            result.ReadMini(mode);
-            switch (type)
-            {
-                case WVT_USER_DEFINED:
-                    result >> value;
-                    break;
-                case WVT_INTEGER:
-                    result.ReadMini(value);
-                    break;
-                case WVT_FLOATING:
-                    result.ReadMini(value);
-                    break;
-                case WVT_TYPE:
-                    result.ReadMini(value);
-                    break;
-                case WVT_STRING:
-                    result.ReadMini(value);
-                    break;
-                case WVT_VECTOR2:
-                    result.ReadVector(value.x, value.y);
-                    break;
-                case WVT_NORMAL_VECTOR2:
-                    result.ReadNormVector(value.x, value.y);
-                    break;
-                case WVT_VECTOR3:
-                    result.ReadVector(value.x, value.y, value.z);
-                    break;
-                case WVT_NORMAL_VECTOR3:
-                    result.ReadNormVector(value.x, value.y, value.z);
-                    break;
-                case WVT_BLOB:
-                    uint bytes2Write;
-                    result.ReadMini(bytes2Write);
-                    result.ReadAlignedBytes((uchar*) value, bytes2Write);
-                    break;
-                default:
-                    return false;
-                    break;
-            }
-            return true;
-        }
-        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Section: Stream  <<  WatcherValue (for GET operations: protocol 2)
-        //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        template<class ValueType>
-        void write_watcher_value(geco_bit_stream_t & result, const WatcherValueType type, const ValueType & value,
-                const WatcherMode & mode, const uint bytes2Write = 0)
-        {
-            switch (type)
-            {
-                case WVT_USER_DEFINED:
-                    result.WriteMini((uchar) WVT_USER_DEFINED);
-                    result.WriteMini((uchar) mode);
-                    result << value;
-                    break;
-                case WVT_INTEGER:
-                    result.WriteMini((uchar) WVT_INTEGER);
-                    result.WriteMini((uchar) mode);
-                    result.WriteMini(value);
-                    break;
-                case WVT_FLOATING:
-                    result.WriteMini((uchar) WVT_FLOATING);
-                    result.WriteMini((uchar) mode);
-                    result.WriteMini(value);
-                    break;
-                case WVT_TYPE:
-                    result.WriteMini((uchar) WVT_TYPE);
-                    result.WriteMini((uchar) mode);
-                    result.WriteMini(value);
-                    break;
-                case WVT_STRING:
-                    result.WriteMini((uchar) WVT_STRING);
-                    result.WriteMini((uchar) mode);
-                    result.WriteMini(value);
-                    break;
-                case WVT_VECTOR2:
-                    result.WriteMini((uchar) WVT_VECTOR2);
-                    result.WriteMini((uchar) mode);
-                    result.write_vector(value.x, value.y);
-                    break;
-                case WVT_NORMAL_VECTOR2:
-                    result.WriteMini((uchar) WVT_NORMAL_VECTOR2);
-                    result.WriteMini((uchar) mode);
-                    result.write_normal_vector(value.x, value.y);
-                    break;
-                case WVT_VECTOR3:
-                    result.WriteMini((uchar) WVT_VECTOR3);
-                    result.WriteMini((uchar) mode);
-                    result.write_vector(value.x, value.y, value.z);
-                    break;
-                case WVT_NORMAL_VECTOR3:
-                    result.WriteMini((uchar) WVT_NORMAL_VECTOR3);
-                    result.WriteMini((uchar) mode);
-                    result.write_normal_vector(value.x, value.y, value.z);
-                    break;
-                case WVT_BLOB:
-                    result.WriteMini((uchar) WVT_BLOB);
-                    result.WriteMini((uchar) mode);
-                    result.WriteMini(bytes2Write);
-                    result.write_aligned_bytes((const uchar*) value, bytes2Write);
-                    break;
-                default:
-                    abort();
-                    break;
-            }
-        }
-
 #endif
     }
 }

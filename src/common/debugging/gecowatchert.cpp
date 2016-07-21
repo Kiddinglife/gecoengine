@@ -12,6 +12,84 @@ using namespace geco::debugging;
 #include "debug.h"
 DECLARE_DEBUG_COMPONENT2("engine-common-module-logger", 0);
 
+// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- -　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+// 　　　　　　　　　　　　　　　　　　　　　　　　　Section: watcher_path_request_v2 impls
+// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- -　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+void watcher_path_request_v2::set_result_stream(const std::string & desc, const WatcherMode & mode,
+        geco_watcher_base_t * watcher, const void *base)
+{
+    if (mode == WT_DIRECTORY && !is_visiting_dirs_)
+    {
+        is_visiting_dirs_ = true;
+        origin_request_path_ = request_path_;
+        watcher->visit_children(base, NULL, *this);
+        request_path_ = origin_request_path_;
+        is_visiting_dirs_ = false;
+        // Ready to fill in the packet now
+        this->notify();
+    }
+    else if (mode != WT_INVALID)
+    {
+        // At this point we have type, mode, size, and data on the stream
+        // (as that is filled before calling this function)
+        // Ready to fill in the packet now
+        // Tell our parent we have collected all our data
+        if (!is_visiting_dirs_)
+        {
+            this->notify();
+        }
+    }
+}
+void watcher_path_request_v2::get_watcher_value()
+{
+    if (!geco_watcher_base_t::get_root_watcher().get_value_to_stream(NULL, request_path_.c_str(), *this))
+    {
+        result_.WriteMini((uchar) WVT_UNKNOWN);
+        result_.WriteMini((uchar) WT_READ_ONLY);
+        result_.WriteMini(false);
+        // And notify the parent of our failure.
+        this->notify();
+    }
+}
+bool watcher_path_request_v2::set_watcher_value()
+{
+    bool status = geco_watcher_base_t::get_root_watcher().set_value_from_stream(NULL, request_path_.c_str(), *this);
+    if (!status)
+    {
+        result_.WriteMini((uchar) WVT_UNKNOWN);
+        result_.WriteMini((uchar) WT_READ_ONLY);
+        result_.WriteMini(status);
+        // We're pretty much done setting watcher value (failed)
+        // Ready to fill in the packet now
+        this->notify();
+    }
+    return true;
+}
+bool watcher_path_request_v2::add_watcher_path(const void *base, const char *path, std::string & label,
+        geco_watcher_base_t &watcher)
+{
+    std::string desc;
+    if (origin_request_path_.size() > 0) request_path_ = origin_request_path_ + "/" + label;
+    else
+        request_path_ = label;
+    // Push the directory entry onto the result stream
+    // We are using a reference to the correct watcher now, so no need
+    // to pass in the path to search for.
+    bool status = watcher.get_value_to_stream(base, NULL, *this);
+    if (!status)
+    {
+        // If the get operation failed, we still need to notify the parent
+        // so it can continue with its response.
+        result_.WriteMini((uchar) WVT_UNKNOWN);
+        result_.WriteMini((uchar) WT_READ_ONLY);
+        result_.WriteMini(status);
+    }
+    // Directory entries require an appended label
+    result_.WriteMini(label);
+    // Always need to return true from the version 2 protocol
+    // otherwise the stream won't be completed.
+    return true;
+}
 // -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
 // 　　　　　　　　　　　　　　　　　　　　　　　　　Section: geco_watcher_t
 // -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
