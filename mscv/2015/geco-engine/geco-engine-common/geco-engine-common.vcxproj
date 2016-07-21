@@ -118,6 +118,10 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).lib</OutputFile>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -194,11 +198,11 @@
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\..\src\common\debugging\asms.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    <CustomBuild Include="asm64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /c %(fileName).asm</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(fileName).obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ml64 /c %(fileName).asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(fileName).obj</Outputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

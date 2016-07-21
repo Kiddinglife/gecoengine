@@ -1,25 +1,24 @@
 /*
-* Geco Gaming Company
-* All Rights Reserved.
-* Copyright (c)  2016 GECOEngine.
-*
-* GECOEngine is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GECOEngine is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
+ * Geco Gaming Company
+ * All Rights Reserved.
+ * Copyright (c)  2016 GECOEngine.
+ *
+ * GECOEngine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GECOEngine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
 
-* You should have received a copy of the GNU Lesser General Public License
-* along with KBEngine.  If not, see <http://www.gnu.org/licenses/>.
-*
-*/
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with KBEngine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 // created on 02-June-2016 by Jackie Zhang
-
 #ifndef _INCLUDE_GECO_ENGINE_CONFIG
 #define _INCLUDE_GECO_ENGINE_CONFIG
 
@@ -27,10 +26,6 @@
 
 #if defined(_RELEASE) && defined( _DEBUG )
 #error "_RELEASE and _DEBUG macros should not be used at same time"
-#endif
-
-#if !defined( _RELEASE ) && !defined( _DEBUG )
-#error " _RELEASE and _DEBUG macro are not be used !"
 #endif
 
 /**
@@ -50,10 +45,6 @@
 // MF_SERVER - CONSUMER_CLIENT
 #if defined( SERVER_BUILD ) && defined( CLIENT_BUILD )
 #error "CLIENT_BUILD and SERVER_BUILD macros should not be used at same time"
-#endif
-
-#if !defined( SERVER_BUILD ) && !defined( CLIENT_BUILD )
-#error "both of CLIENT_BUILD and SERVER_BUILD macro are not be used !"
 #endif
 
 #ifdef CLIENT_BUILD
@@ -97,11 +88,11 @@
 #define FORCE_ENABLE_PYTHON_LOG						0
 #define FORCE_ENABLE_STACK_TRACKER					0
 
-#define ENABLE_DPRINTF     (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_DPRINTF)
-
-#define ENABLE_STACK_TRACKER    (!GECO_EXPORTER && (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_STACK_TRACKER))
-
-#define ENABLE_ENTER_DEBUGGER_MESSAGE	(!ENABLE_CLIENT_BUILD || FORCE_ENABLE_ENTER_DEBUGGER_MESSAGE)
+#define ENABLE_MSG_LOGGING (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_MSG_LOGGING)
+#define ENABLE_DPRINTF (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_DPRINTF)
+#define ENABLE_STACK_TRACKER (!GECO_EXPORTER && (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_STACK_TRACKER))
+#define ENABLE_ENTER_DEBUGGER_MESSAGE (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_ENTER_DEBUGGER_MESSAGE)
+#define ENABLE_WATCHERS (!ENABLE_CLIENT_BUILD || FORCE_ENABLE_WATCHERS)
 
 /*when debug, we enable file and line*/
 #ifdef _DEBUG
