@@ -255,7 +255,7 @@ bool geco_watcher_director_t::set_value_from_stream(void * base, const char * pa
     }
 }
 bool geco_watcher_director_t::get_value_to_string(const void * base, const char * path, std::string & result,
-        std::string & desc, WatcherMode & mode) const
+        std::string & desc, WatcherMode & mode)
 {
     if (geco_watcher_director_t::is_empty_path(path))
     {
@@ -280,7 +280,7 @@ bool geco_watcher_director_t::get_value_to_string(const void * base, const char 
     }
 }
 bool geco_watcher_director_t::get_value_to_stream(const void * base, const char * path,
-        watcher_path_request_v2 & pathRequest) const
+        watcher_path_request_v2 & pathRequest)
 {
     return false;
 }
@@ -291,10 +291,9 @@ bool geco_watcher_director_t::get_value_to_stream(const void * base, const char 
 /// This helper function is used to watch the component priorities.
 int init_watcher(int& value, const char * path)
 {
-    // WatcherPtr pWatcher = new DataWatcher<int>(value, Watcher::WT_READ_WRITE);
-    // geco_watcher_base_t::get_root_watcher().add_watcher(path, pWatcher);
+    geco_watcher_base_t* pWatcher = new value_watcher_t<int>(WVT_INTEGER, value, sizeof(int), WT_READ_WRITE, NULL);
+    geco_watcher_base_t::get_root_watcher().add_watcher(path, *pWatcher);
     return 0;
 }
-
 #endif
 
