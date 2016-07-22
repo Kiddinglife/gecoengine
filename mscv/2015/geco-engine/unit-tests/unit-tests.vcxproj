@@ -192,8 +192,11 @@
     <None Include="..\..\..\..\unittest\readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\unittest\test-common.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-auth.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-debugging.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-geco-bit-stream.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-timer.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

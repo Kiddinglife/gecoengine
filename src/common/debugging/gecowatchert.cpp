@@ -15,9 +15,9 @@ using namespace std::placeholders;
 
 DECLARE_DEBUG_COMPONENT2("engine-common-module-logger", 0);
 
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- -　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
-// 　　　　　　　　　　　　　　　　　　　　　　　　　Section: watcher_path_request_v1 impls
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- -　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - 
+// 　　　　　　　　　　　　　　Section: watcher_path_request_v1 impls
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - 
 bool watcher_path_request_v1::set_watcher_value()
 {
     if (!geco_watcher_base_t::get_root_watcher().set_from_string(NULL, request_path_.c_str(), setopt_string_.c_str()))
@@ -63,9 +63,9 @@ void watcher_path_request_v1::get_watcher_value()
     }
 }
 
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- -　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
-// 　　　　　　　　　　　　　　　　　　　　　　　　　Section: watcher_path_request_v2 impls
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- -　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
+// 　　　　　　　　　　　　Section: watcher_path_request_v2 impls
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 void watcher_path_request_v2::set_result_stream(const std::string & desc, const WatcherMode & mode,
         geco_watcher_base_t * watcher, const void *base)
 {
@@ -141,9 +141,9 @@ bool watcher_path_request_v2::add_watcher_path(const void *base, const char *pat
     return true;
 }
 
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- - -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
-// 　　　　　　　　　　　　　　　　　　　　　　　　geco_watcher_t impls
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- - -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
+// 　　　　　　　　　　　                       geco_watcher_t impls
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 static geco_watcher_base_t* root_watcher_gptr = NULL;
 geco_watcher_base_t & geco_watcher_base_t::get_root_watcher()
 {
@@ -176,9 +176,9 @@ void geco_watcher_base_t::partition_path(const std::string path, std::string & n
     }
 }
 
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- 　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
-// 　　　　　　　　　　　　　　　　　　　　　　　　　Section: geco_watcher_director_t
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　- 　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
+// 　　　　　　　　　　　　 Section: geco_watcher_director_t
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 watcher_directory_t* geco_watcher_director_t::find_child(const char * path) const
 {
     if (path == NULL) return NULL;
@@ -357,9 +357,9 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
     return false;
 }
 
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　　　　　　　　　　　　　　　Section: Helper functions
-// -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 /// This helper function is used to watch the component priorities.
 int init_value_watcher(int& value, const char * path)
 {
