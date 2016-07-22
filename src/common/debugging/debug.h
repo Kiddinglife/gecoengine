@@ -711,7 +711,6 @@ const int default_cpnt_priority = 0;
 
 #ifndef _RELEASE
 #if ENABLE_WATCHERS
-extern int init_watcher(int& value, const char * path);
 /**
  *	 @brief
  *  needs to be placed in a cpp file before any of the *_MSG macros can be used.
@@ -721,10 +720,12 @@ extern int init_watcher(int& value, const char * path);
  * priority should be displayed in.
  *	@param priority	The initial component priority of the messages in the file.
  */
+//impled in watcher.cpp
+extern int init_value_watcher(int& value, const char * path);
 #define DECLARE_DEBUG_COMPONENT2(module, priority)\
 static int const_cpnt_priority = priority;\
 static int IGNORE_THIS_COMPONENT_WATCHER_INIT = \
-init_watcher(const_cpnt_priority,get_base_path( __FILE__, module ) );
+init_value_watcher(const_cpnt_priority,get_base_path( __FILE__, module ) );
 #else
 #define DECLARE_DEBUG_COMPONENT2( module, priority )\
 static int const_cpnt_priority = priority;

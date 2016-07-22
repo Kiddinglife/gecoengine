@@ -289,10 +289,13 @@ bool geco_watcher_director_t::get_value_to_stream(const void * base, const char 
 // 　　　　　　　　　　　　　　　　　　　　　　　　　Section: Helper functions
 // -　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-　-　-　-　-　-　-　-　- -　-　-　-　- -　-　-　-　-　-　-
 /// This helper function is used to watch the component priorities.
-int init_watcher(int& value, const char * path)
+int init_value_watcher(int& value, const char * path)
 {
-    geco_watcher_base_t* pWatcher = new value_watcher_t<int>(WVT_INTEGER, value, sizeof(int), WT_READ_WRITE, NULL);
-    geco_watcher_base_t::get_root_watcher().add_watcher(path, *pWatcher);
+    if (path != NULL)
+    {
+        new value_watcher_t<int>(WVT_INTEGER, value, sizeof(int), WT_READ_WRITE, NULL);
+        return 1;
+    }
     return 0;
 }
 #endif
