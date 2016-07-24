@@ -806,7 +806,7 @@ namespace geco
 		*	@ingroup WatcherModule
 		*/
 		template <class RETURN_TYPE>
-		class func_retval_watcher_t : public geco_watcher_base_t
+		class func_watcher_t : public geco_watcher_base_t
 		{
 		private:
 			RETURN_TYPE&(*getFunction_)();
@@ -823,7 +823,7 @@ namespace geco
 			*	constructor cannot (it's certainly not going to delete itself
 			*	anyway).
 			*/
-			explicit func_retval_watcher_t(RETURN_TYPE&(*getFunction)(),
+			explicit func_watcher_t(RETURN_TYPE&(*getFunction)(),
 				void(*setFunction)(RETURN_TYPE&) = NULL,
 				const char * path = NULL, WatcherValueType valtype = 0) :
 				geco_watcher_base_t("i am  func_retval_watcher"),
@@ -864,12 +864,206 @@ namespace geco
 						ret = true;
 						(*setFunction_)(value);
 						write_watcher_value_to_stream(pathRequest.get_result_stream(), valtype_, useValue, WT_READ_WRITE);
-						pathRequest.set_result_stream(comment_, access_, this, base);
+						pathRequest.set_result_stream(comment_, WT_READ_WRITE, this, base);
 					}
 				}
 				return ret;
 			}
+
+			virtual bool get_as_string(const void * base, const char * path, std::string & result,
+				std::string & desc, WatcherMode & mode)
+			{
+				if (geco_watcher_director_t::is_empty_path(path))
+				{
+					result = write_watcher_value_to_string((*getFunction_)());
+					mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
+					desc = this->comment_;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			virtual bool get_as_stream(const void * base, const char * path,
+				watcher_path_request_v2 & pathRequest) const
+			{
+				if (geco_watcher_director_t::is_empty_path(path))
+				{
+					WatcherMode mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
+					write_watcher_value_to_stream(pathRequest.get_result_stream(), valtype_, (*getFunction_)(), mode);
+					pathRequest.set_result_stream(comment_, mode, this, base);
+					return true;
+				}
+				else if (geco_watcher_director_t::is_doc_path(path))
+				{
+					write_watcher_value_to_stream(pathRequest.get_result_stream(), valtype_, comment_, WT_READ_ONLY);
+					pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
 		};
+
+		/**
+		*	This templatised class is used to store debug values that are a member of a
+		*	class.
+		*
+		*	@see WatcherModule
+		*	@ingroup WatcherModule
+		*/
+		template <class RETURN_TYPE, class OBJECT_TYPE>
+		class method_watcher_t : public geco_watcher_base_t
+		{
+		private:
+
+			typedef RETURN_TYPE(OBJECT_TYPE::*GetMethodType)() const;
+			typedef void (OBJECT_TYPE::*SetMethodType)(RETURN_TYPE);
+
+			OBJECT_TYPE * pObject_;
+			RETURN_TYPE(OBJECT_TYPE::*getMethod_)() const;
+			void (OBJECT_TYPE::*setMethod_)(RETURN_TYPE);
+			WatcherValueType valtype_;
+
+		public:
+			/// @name Construction/Destruction
+			//@{
+			/**
+			*	Constructor.
+			*	This constructor should only be called from the Debug::addValue
+			*	function.
+			*/
+			method_watcher_t(
+				GetMethodType getMethod,
+				SetMethodType setMethod = NULL,
+				const char * path = NULL,
+				WatcherValueType valtype = 0) :
+				geco_watcher_base_t("i am method watcher"),
+				pObject_(NULL),
+				getMethod_(getMethod),
+				setMethod_(setMethod),
+				valtype_(valtype)
+			{
+				if (path != NULL)
+					geco_watcher_base_t::get_root_watcher().add_watcher(pth, *this, NULL);
+			}
+
+			method_watcher_t(OBJECT_TYPE & rObject,
+				GetMethodType getMethod,
+				SetMethodType setMethod = NULL,
+				const char * path = NULL,
+				WatcherValueType valtype = 0) :
+				geco_watcher_base_t("i am method watcher"),
+				pObject_(&rObject),
+				getMethod_(getMethod),
+				setMethod_(setMethod),
+				valtype_(valtype)
+			{
+				if (path != NULL)
+					geco_watcher_base_t::get_root_watcher().add_watcher(pth, *this, NULL);
+			}
+
+			virtual bool set_from_string(void * base, const char * path, const char * valueStr)
+			{
+				if (geco_watcher_director_t::is_empty_path(path) && && setMethod_ != NULL)
+				{
+					RETURN_TYPE useValue;
+					if (read_watcher_value_from_string(valueStr, useValue))
+					{
+						OBJECT_TYPE & useObject =
+							*(OBJECT_TYPE*)(((uintptr)pObject_) + ((uintptr)base));
+						(useObject.*setMethod_)(value);
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				return false;
+			}
+			virtual bool set_from_stream(void * base, const char * path, watcher_path_request_v2& pathRequest)
+			{
+				bool ret = false;
+				if (geco_watcher_director_t::is_empty_path(path) && (setFunction_ != NULL))
+				{
+					RETURN_TYPE useValue;
+					if (read_watcher_value_from_stream(pathRequest.get_value_stream(), valtype_, useValue, WT_READ_WRITE))
+					{
+						ret = true;
+						OBJECT_TYPE & useObject =
+							*(OBJECT_TYPE*)(((uintptr)pObject_) + ((uintptr)base));
+						(useObject.*setMethod_)(value);
+						// push the result into the reply stream
+						// assuming mode RW because we have already set
+						write_watcher_value_to_stream(pathRequest.get_result_stream(), valtype_, useValue, WT_READ_WRITE);
+						pathRequest.set_result_stream(comment_, WT_READ_WRITE, this, base);
+					}
+				}
+				return ret;
+			}
+
+			virtual bool get_as_string(const void * base, const char * path, std::string & result,
+				std::string & desc, WatcherMode & mode)
+			{
+				if (geco_watcher_director_t::is_empty_path(path))
+				{
+					if (getMethod_ == (GetMethodType)NULL)
+					{
+						result = "getMethod_ == (GetMethodType)NULL";
+						mode = WT_READ_ONLY;
+						desc = comment_;
+						return true;
+					}
+					const OBJECT_TYPE & useObject = *(OBJECT_TYPE*)(
+						((const uintptr)pObject_) + ((const uintptr)base));
+					result = write_watcher_value_to_string((useObject.*getMethod_)());
+					mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
+					desc = this->comment_;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			virtual bool get_as_stream(const void * base, const char * path,
+				watcher_path_request_v2 & pathRequest) const
+			{
+
+				if (geco_watcher_director_t::is_empty_path(path))
+				{
+					if (getMethod_ == (GetMethodType)NULL)
+					{
+						watcherValueToStream(pathRequest.get_result_stream(),
+							"getMethod_ == (GetMethodType)NULL", WT_READ_ONLY);
+						pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
+						return true;
+					}
+
+					const OBJECT_TYPE & useObject = *(OBJECT_TYPE*)(
+						((const uintptr)pObject_) + ((const uintptr)base));
+					WatcherMode mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
+					write_watcher_value_to_stream(pathRequest.get_result_stream(), valtype_, (useObject.*getMethod_)(), mode);
+					pathRequest.set_result_stream(comment_, mode, this, base);
+					return true;
+				}
+				else if (geco_watcher_director_t::is_doc_path(path))
+				{
+					write_watcher_value_to_stream(pathRequest.get_result_stream(), valtype_, comment_, WT_READ_ONLY);
+					pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		};
+
 
 #endif
 	}
