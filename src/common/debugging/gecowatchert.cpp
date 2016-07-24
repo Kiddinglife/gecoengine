@@ -365,7 +365,8 @@ int init_value_watcher(int& value, const char * path)
 {
     if (path != NULL)
     {
-        new value_watcher_t<int>(WVT_INTEGER, value, WT_READ_WRITE, NULL);
+		geco_watcher_base_t* ptr =new value_watcher_t<int>(WVT_INTEGER, value, WT_READ_WRITE, path);
+		geco_watcher_base_t::get_root_watcher().add_watcher(path, *ptr, NULL);
         return 1;
     }
     return 0;
