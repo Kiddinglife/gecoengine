@@ -560,6 +560,7 @@ inline bool isFloatValid(float f)
 /*
  *	This function is used to strip the path and
  * return just the basename from a path string.
+ *　sample base path: logger/cppThresholds/ENGINE-UNITTEST-LOGGER/test-auth.cc
  */
 #include <string.h>
 inline const char* get_base_path(const char * path, const char * module)

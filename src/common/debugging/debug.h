@@ -721,10 +721,10 @@ const int default_cpnt_priority = 0;
  *	@param priority	The initial component priority of the messages in the file.
  */
 //impled in watcher.cpp
-extern int init_value_watcher(int& value, const char * path);
+extern bool init_value_watcher(int& value, const char * path);
 #define DECLARE_DEBUG_COMPONENT2(module, priority)\
 static int const_cpnt_priority = priority;\
-static int IGNORE_THIS_COMPONENT_WATCHER_INIT = \
+static bool IGNORE_THIS_COMPONENT_WATCHER_INIT = \
 init_value_watcher(const_cpnt_priority,get_base_path( __FILE__, module ) );
 #else
 #define DECLARE_DEBUG_COMPONENT2( module, priority )\

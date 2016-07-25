@@ -1,22 +1,22 @@
 /*
-* Geco Gaming Company
-* All Rights Reserved.
-* Copyright (c)  2016 GECOEngine.
-*
-* GECOEngine is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GECOEngine is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
+ * Geco Gaming Company
+ * All Rights Reserved.
+ * Copyright (c)  2016 GECOEngine.
+ *
+ * GECOEngine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GECOEngine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
 
-* You should have received a copy of the GNU Lesser General Public License
-* along with KBEngine.  If not, see <http://www.gnu.org/licenses/>.
-*
-*/
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with KBEngine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 /*
  * geco-bit-stream.h
@@ -442,21 +442,28 @@ class geco_bit_stream_t
         //{
         //  return outTemplateVar.Deserialize(this);
         //}
-
-        inline void Read(char *&varString)
+        inline void Read(std::string&varString)
         {
-            //GecoString::Read(varString, this);
+            uint bytes2Read;
+            ReadMini(bytes2Read);
+            if (bytes2Read > varString.capacity()) varString.resize(bytes2Read);
+            ReadAlignedBytes((uchar*) varString.data(), bytes2Read);
+        }
+        inline void Read(uchar *varString)
+        {
+            uint bytes2Read;
+            ReadMini(bytes2Read);
+            ReadAlignedBytes(varString, bytes2Read);
+        }
+        inline void Read(char *varString)
+        {
+            Read((uchar*) varString);
         }
         //
         //inline bool Read(wchar_t *&varString)
         //{
         //  return RakWString::Deserialize(varString, this);
         //}
-
-        inline void Read(uchar *&varString)
-        {
-            //GecoString::Read((char*)varString, this);
-        }
 
         /// @brief Read any integral type from a bitstream.
         /// @details If the written value differed from the value
@@ -558,6 +565,10 @@ class geco_bit_stream_t
 
         /// For strings
         inline void ReadMini(GecoString &outTemplateVar)
+        {
+            //outTemplateVar.ReadMini(this, false);
+        }
+        inline void ReadMini(std::string &outTemplateVar)
         {
             //outTemplateVar.ReadMini(this, false);
         }
@@ -1179,17 +1190,18 @@ class geco_bit_stream_t
         //  src.serialize(this);
         //}
 
-        inline void Write(const char * const &inStringVar)
+        inline void WriteString(const char* inStringVar)
         {
-            //GecoString::Write(inStringVar, this);
+//            WriteMini((uint) sizeof(value));
+//            write_aligned_bytes((const uchar*) inStringVar, sizeof(value));
         }
 
-        inline void Write(const wchar_t * const &inStringVar)
+        inline void WriteString(const wchar_t * const &inStringVar)
         {
             //JackieWString::serialize(inStringVar, this);
         }
 
-        inline void Write(const uchar * const &src)
+        inline void WriteString(const uchar *src)
         {
             Write((const char*) src);
         }
@@ -1411,8 +1423,9 @@ class geco_bit_stream_t
             WriteMini((uint) ((varCopy + 1.0) * 2147483648.0));
         }
 
-        /// Compress the string
-
+        /// Compress the string the difference of string and blob is that
+        /// blob is always sending without compress, string is always compressed by hafman tree
+        /// of you can send uncompreswsed string but this is not the default operation of the bit stream
         inline void WriteMini(const GecoString &src)
         {
             //src.WriteMini(this, 0, false);
@@ -1425,7 +1438,7 @@ class geco_bit_stream_t
 
         inline void WriteMini(const char * const &inStringVar)
         {
-            //GecoString::WriteMini(inStringVar, this);
+            //GecoString::WriteMini(inStringVar, this); todo using hafman tree
         }
 
         inline void WriteMini(const wchar_t * const &inStringVar)
