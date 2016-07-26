@@ -651,11 +651,19 @@ namespace geco
                  *  @return True if the children were visited, false if specified watcher
                  *      could not be found or is not a directory watcher.
                  */
-                bool visit_children(const void * base, const char * path, watcher_path_request_v1& visitor)
+                virtual bool visit_children(const void * base, const char * path, watcher_path_request_v1& visitor)
                 {
                     return false;
                 }
 
+                virtual void walk_all_paths(std::string& path, std::string& buf, int& num, bool print)
+                {
+                    num++;
+                    path.replace(path.length() - 1, 1, "\0");
+                    path.append("\n");
+                    buf.append(path);
+                    if (print) printf("%s", path.c_str());
+                }
                 //@}
                 /// @name Static methods
                 //@{
@@ -744,6 +752,19 @@ namespace geco
                     char * pSeparator = strchr((char*) path, WATCHER_PATH_SEPARATOR);
                     if (pSeparator == NULL) return NULL;
                     return pSeparator + 1;
+                }
+
+                virtual void walk_all_paths(std::string& path, std::string& buf, int& num, bool print)
+                {
+                    std::string pathold = path;
+                    auto iter = container_.begin();
+                    while (iter != container_.end())
+                    {
+                        path += (*iter).label + "/";
+                        iter->watcher->walk_all_paths(path, buf, num, print);
+                        path = pathold;
+                        ++iter;
+                    }
                 }
         };
 
@@ -1309,6 +1330,9 @@ namespace geco
      GECO_WATCH_METHOD("GECO_WATCH_FUNC->WVT_TYPE->GECO_WATCH_METHOD",
      WVT_TYPE, example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
      "GECO_WATCH_FUNC->WVT_STRING->GECO_WATCH_METHOD");
+
+     std::string path;std::string paths ;int num = 0;
+     geco_watcher_base_t::get_root_watcher().walk_all_paths(path,paths,num,printout)
 
      */
 #define GECO_WATCH_VALUE geco::debugging::add_value_watcher

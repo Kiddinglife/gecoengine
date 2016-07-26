@@ -124,14 +124,35 @@ TEST(GECO_DEBUGGING_WATCHER, test_value_stream)
     }
 }
 
-TEST(GECO_DEBUGGING_WATCHER, test_add_watcher)
+TEST(GECO_DEBUGGING_WATCHER, test_add_remove_watcher)
 {
+    const char* path1 = "GECO_WATCH_VALUE/WVT_INTEGER/WT_READ_ONLY";
+    int value = 11;
+    geco_watcher_base_t* pChild = new value_watcher_t<int>(WVT_INTEGER, value, sizeof(int), WT_READ_WRITE, path1);
+    EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().add_watcher(path1, *pChild, NULL));
+   // GECO_WATCH_VALUE(path1,value,WVT_INTEGER, sizeof(int),WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
 
-}
-TEST(GECO_DEBUGGING_WATCHER, test_remove_watcher)
-{
+    const char* path2 = "GECO_WATCH_VALUE/WVT_INTEGER/WT_READ_WRITE";
+    value = 2;
+    pChild = new value_watcher_t<int>(WVT_INTEGER, value, sizeof(int), WT_READ_WRITE, path2);
+    EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().add_watcher(path2, *pChild, NULL));
+    //GECO_WATCH_VALUE(path2,value,WVT_INTEGER, sizeof(int), WT_READ_WRITE "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_WRITE");
 
+    std::string path;
+    std::string paths;
+    int num = 0;
+    geco_watcher_base_t::get_root_watcher().walk_all_paths(path, paths, num, true);
+
+    EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().remove_watcher(path2));
+
+    path.clear();
+    paths.clear();
+    num = 0;
+    geco_watcher_base_t::get_root_watcher().walk_all_paths(path, paths, num, true);
+
+    EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().remove_watcher(path1));
 }
+
 TEST(GECO_DEBUGGING_WATCHER, test_set_watcher_from_stream)
 {
 
@@ -151,7 +172,7 @@ TEST(GECO_DEBUGGING_WATCHER, test_get_watcher_to_stream)
 
 void req1_cb(watcher_path_request & pathRequest, int32 count)
 {
-   INFO_MSG("req1_cb:count->%d\n", count);
+    INFO_MSG("req1_cb:count->%d\n", count);
     WatcherMode mode;
     WatcherValueType type;
     std::string desc;

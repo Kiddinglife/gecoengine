@@ -185,15 +185,22 @@ watcher_directory_t* geco_watcher_director_t::find_child(const char * path) cons
     if (path == NULL) return NULL;
     char* pseparator = strchr((char*) path, WATCHER_PATH_SEPARATOR);
     uint cmp_len = (pseparator == NULL) ? strlen(path) : (pseparator - path);
+
+//    char* label = new char[cmp_len + 1];
+//    label[cmp_len] = '\0';
+//    memcpy(label, path, cmp_len);
+//    TRACE_MSG("search for  child label %s\n", label);
+
     watcher_directory_t* ptr = NULL;
     if (cmp_len != 0)
     {
         auto iter = container_.begin();
-        while (iter != container_.end() && ptr != NULL)
+        while (iter != container_.end() && ptr == NULL)
         {
-            printf("(*iter).label.c_str(%s)\n", (*iter).label.c_str());
+            TRACE_MSG("label %s\n", (*iter).label.c_str());
             if (cmp_len == (*iter).label.length() && strncmp(path, (*iter).label.c_str(), cmp_len) == 0)
             {
+                TRACE_MSG("found it!\n");
                 ptr = (watcher_directory_t*) (&(*iter));
             }
             ++iter;
@@ -204,15 +211,15 @@ watcher_directory_t* geco_watcher_director_t::find_child(const char * path) cons
 bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t& pChild, void * withBase)
 {
     bool was_added = false;
-
     if (this->is_empty_path(path))
     {
         ERROR_MSG("geco_watcher_director_t::add_watcher() tried to add unnamed child (no trailing slashes please)\n");
     }
-    else if(strchr(path, '/') == NULL)  // path is actually watcher name
+    else if(strchr(path, '/') == NULL)  // appending value
     {
         if (this->find_child(path) == NULL)
-        {        //make sure we do not add it twice
+        {
+            //make sure we do not add it twice
             watcher_directory_t newdir;
             newdir.watcher = &pChild;
             newdir.base = withBase;
@@ -221,13 +228,14 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             container_.insert( iter, newdir );
             was_added = true;
+            TRACE_MSG("append watcher %s, container size %d!\n\n",newdir.label.c_str(), container_.size());
         }
-        else  // it is a child
+        else  //existed value
         {
-            WARNING_MSG( "geco_watcher_director_t::add_watcher()  add existed watcher (%s) is NOT allowed ! \n", path );
+            WARNING_MSG( "geco_watcher_director_t::add_watcher()  add existed watcher label (%s) is NOT allowed ! \n", path );
         }
     }
-    else
+    else  // it is child dir watcher
     {
         watcher_directory_t* pFound = this->find_child(path);
         if (pFound == NULL)
@@ -242,12 +250,12 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             auto iter = container_.begin();
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             pFound = &(*(container_.insert( iter, newdir )));
+            TRACE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), container_.size());
         }
         // recusice call add_watcher, this will create new watcher dir if needed
         // finally result is a new path is built and the watcher itself is added
         if(pFound != NULL)
         {
-            printf("get_path_tail : %s\n",geco_watcher_director_t::get_path_tail(path));
             was_added = pFound->watcher->add_watcher(geco_watcher_director_t::get_path_tail(path), pChild, withBase);
         }
     }
@@ -267,6 +275,7 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
             {
                 if (pseparator == NULL)
                 {
+                    TRACE_MSG(" delete watcher (%s) sucesseds\n",(*iter).label.c_str());
                     container_.erase(iter);
                     return true;
                 }
@@ -282,7 +291,7 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
 }
 bool geco_watcher_director_t::set_from_string(void * base, const char * path, const char * valueStr)
 {
-    printf("geco_watcher_director_t->set_from_string called (path %s, val(%s))\n", path,valueStr );
+    printf("geco_watcher_director_t->set_from_string called (path %s, val(%s))\n", path, valueStr);
     watcher_directory_t* pChild = this->find_child(path);
     if (pChild != NULL)
     {
