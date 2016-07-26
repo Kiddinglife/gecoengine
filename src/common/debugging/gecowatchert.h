@@ -58,14 +58,52 @@ namespace geco
          */
         enum WatcherValueType
         {
-            // user must implement the following functions in its cpp file
-            // for the type he defines
             WVT_INTEGER,
             WVT_FLOATING,
             WVT_STRING,
             WVT_TUPLE,
             WVT_TYPE,
-            WVT_BLOB,  // this should not be used, because any blob can be divided into basic types and tranfer
+            WVT_BLOB, 	//raw bytes data no endian swap and compression applied when transferred
+
+			/*
+			WVT_USER_DEFINED should not be used,
+			because any WVT_USER_DEFINED can be divided into basic types and tranfered
+			for the sake of easyness, for any user defined types with operator << and >>,
+			user MUST impl a pair of write_value_to_stream and read_value_from_stream in this file
+
+			@example
+			struct ExampleClass
+			{
+			int a;
+			};
+			geco_bit_stream_t& operator << (geco_bit_stream_t &os, const ExampleClass &d)
+			{
+			os.WriteMini(d.a);
+			return os;
+			}
+			geco_bit_stream_t& operator >> (geco_bit_stream_t &is,  ExampleClass &d)
+			{
+			is.ReadMini(d.a);
+			return is;
+			}
+			// todo dd more write and read for any other types that have gloval operator << and >>
+			inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const WatcherValueType type,
+			ExampleClass& value, const WatcherMode mode, const uint bytes)
+			{
+			if (type != WVT_USER_DEFINED) abort();
+			result.WriteMini((uchar)type);
+			result.WriteMini((uchar)mode);
+			result << value;
+			}
+			inline bool read_watcher_value_from_stream(geco_bit_stream_t & result, WatcherValueType& type, ExampleClass& value,
+			WatcherMode& mode, uint& bytes2Write)
+			{
+			result.WriteMini((uchar)type);
+			result.WriteMini((uchar)mode);
+			result >> value;
+			}
+			*/
+			WVT_USER_DEFINED,
             WVT_UNKNOWN,
         };
 
@@ -378,9 +416,6 @@ namespace geco
                 case WVT_TYPE:
                     result.ReadMini(value);
                     break;
-                case WVT_STRING:
-                    result.ReadMini(value);
-                    break;
                 default:
                     printf("write_watcher_value()::no such watcher value type (%d)!\n", type);
                     abort();
@@ -443,11 +478,6 @@ namespace geco
                     result.WriteMini((uchar) mode);
                     result.WriteMini(value);
                     break;
-                case WVT_STRING:
-                    result.WriteMini((uchar) WVT_STRING);
-                    result.WriteMini((uchar) mode);
-                    result.WriteMini(value);
-                    break;
                 default:
                     printf("read_watcher_value()::no such watcher value type (%d)!\n", type);
                     abort();
@@ -457,28 +487,39 @@ namespace geco
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const WatcherValueType type, uchar* value,
                 const WatcherMode mode, const uint bytes)
         {
-            if (type != WVT_BLOB && type != WVT_STRING) return;
-            result.WriteMini((uchar) type);
-            result.WriteMini((uchar) mode);
-            result.WriteMini(bytes);
-            result.write_aligned_bytes(value, bytes);
+			if (type == WVT_BLOB)
+			{
+				result.WriteMini((uchar)type);
+				result.WriteMini((uchar)mode);
+				result.WriteMini(bytes);
+				result.write_aligned_bytes(value, bytes);
+			}
+			else if (type == WVT_STRING)
+			{
+				//todo use hafman tree
+			}
+			else
+				abort();
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const WatcherValueType type, char* value,
-                const WatcherMode mode, const uint& bytes)
+                const WatcherMode mode, const uint bytes)
         {
             return write_watcher_value_to_stream(result, type, (uchar*) value, mode, bytes);
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const WatcherValueType type,
                 std::string& value, const WatcherMode mode, const uint bytes)
         {
-            if (type != WVT_STRING) return;
-            result.WriteMini((uchar) type);
-            result.WriteMini((uchar) mode);
-            result.WriteMini(bytes);
-            result.write_aligned_bytes((uchar*) value.c_str(), bytes);
-        }
+			if (type == WVT_STRING)
+			{
+				result.WriteMini((uchar)type);
+				result.WriteMini((uchar)mode);
+				result.WriteMini(bytes);
+				result.write_aligned_bytes((uchar*)value.c_str(), bytes);
+			}
+			else
+				abort();
+        } /*protocol v2 ends*/
 
-        /*protocol v2 ends*/
 
         /**
          *  @brief This class is the base class for all debug value watchers.
