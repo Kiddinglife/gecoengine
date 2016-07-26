@@ -58,7 +58,13 @@ void watcher_path_request_v1::get_watcher_value()
         // Add the result onto the final result stream
         write_watcher_value_to_stream(result_, WVT_STRING, request_path_, WT_READ_ONLY, request_path_.length());
         write_watcher_value_to_stream(result_, WVT_STRING, result, WT_READ_ONLY, result.length());
-        if (use_desc_) write_watcher_value_to_stream(result_, WVT_STRING, desc, WT_READ_ONLY, desc.length());
+        if (use_desc_)
+        {
+            write_watcher_value_to_stream(result_, WVT_INTEGER, true, WT_READ_ONLY, sizeof(true));
+            write_watcher_value_to_stream(result_, WVT_STRING, desc, WT_READ_ONLY, desc.length());
+        }
+        else
+            write_watcher_value_to_stream(result_, WVT_INTEGER, false, WT_READ_ONLY, sizeof(false));
         // Tell our parent we have collected all our data
         this->notify();
     }
@@ -67,7 +73,7 @@ void watcher_path_request_v1::get_watcher_value()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　　Section: watcher_path_request_v2 impls
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
-void watcher_path_request_v2::set_result_stream(const std::string & desc, const WatcherMode & mode,
+void watcher_path_request_v2::set_result_stream(const std::string & desc, const WatcherMode mode,
         geco_watcher_base_t * watcher, const void *base)
 {
     if (mode == WT_DIRECTORY && !is_visiting_dirs_)
@@ -197,10 +203,8 @@ watcher_directory_t* geco_watcher_director_t::find_child(const char * path) cons
         auto iter = container_.begin();
         while (iter != container_.end() && ptr == NULL)
         {
-            TRACE_MSG("label %s\n", (*iter).label.c_str());
             if (cmp_len == (*iter).label.length() && strncmp(path, (*iter).label.c_str(), cmp_len) == 0)
             {
-                TRACE_MSG("found it!\n");
                 ptr = (watcher_directory_t*) (&(*iter));
             }
             ++iter;
@@ -275,8 +279,8 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
             {
                 if (pseparator == NULL)
                 {
-                    TRACE_MSG(" delete watcher (%s) sucesseds\n",(*iter).label.c_str());
                     container_.erase(iter);
+                   // TRACE_MSG(" delete watcher (%s) sucesseds\n",(*iter).label.c_str());
                     return true;
                 }
                 else
@@ -291,7 +295,6 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
 }
 bool geco_watcher_director_t::set_from_string(void * base, const char * path, const char * valueStr)
 {
-    printf("geco_watcher_director_t->set_from_string called (path %s, val(%s))\n", path, valueStr);
     watcher_directory_t* pChild = this->find_child(path);
     if (pChild != NULL)
     {
