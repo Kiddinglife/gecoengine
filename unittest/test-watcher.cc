@@ -22,7 +22,7 @@ using namespace geco::debugging;
 using namespace geco::ultils;
 using namespace geco::ds;
 
-DECLARE_DEBUG_COMPONENT2("ENGINE-UNITTEST-LOGGER", 0);
+DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 
 TEST(GECO_DEBUGGING_WATCHER, test_value_string)
 {
@@ -66,13 +66,13 @@ TEST(GECO_DEBUGGING_WATCHER, test_value_stream)
     {
 
         int int_in = 12;
-        write_watcher_value_to_stream(ret, WVT_INTEGER, int_in, WT_READ_WRITE, sizeof(int));
+        write_watcher_value_to_stream(ret, int_in, WT_READ_WRITE);
         uint64 uint64_in = 234726728;
-        write_watcher_value_to_stream(ret, WVT_INTEGER, uint64_in, WT_READ_WRITE, sizeof(uint64));
+        write_watcher_value_to_stream(ret, uint64_in, WT_READ_WRITE);
         float float_in = 12.001f;
-        write_watcher_value_to_stream(ret, WVT_FLOATING, float_in, WT_READ_ONLY, sizeof(int));
+        write_watcher_value_to_stream(ret, float_in, WT_READ_ONLY);
         double double_in = 12.00000001;
-        write_watcher_value_to_stream(ret, WVT_FLOATING, double_in, WT_READ_ONLY, sizeof(double));
+        write_watcher_value_to_stream(ret, double_in, WT_READ_ONLY);
         char blob_in[32] =
         { 0 };
         blob_in[0] = 0;
@@ -80,37 +80,29 @@ TEST(GECO_DEBUGGING_WATCHER, test_value_stream)
         blob_in[2] = 2;
         blob_in[15] = 15;
         blob_in[31] = 31;
-        write_watcher_value_to_stream(ret, WVT_BLOB, blob_in, WT_READ_ONLY, 32);
+        write_watcher_value_to_stream(ret, blob_in, WT_READ_ONLY, 32);
         char str_in[] = "hello worldhello world2hello world2hello world2";
-        write_watcher_value_to_stream(ret, WVT_STRING, str_in, WT_READ_ONLY, sizeof(str_in));
+        write_watcher_value_to_stream(ret, str_in, WT_READ_ONLY, sizeof(str_in));
         std::string string_in = "hello world2hello world2hello world2hello world2hello world2";
-        write_watcher_value_to_stream(ret, WVT_STRING, string_in, WT_READ_ONLY, string_in.length());
+        write_watcher_value_to_stream(ret, string_in, WT_READ_ONLY);
 
         uint bytes;
         int int_out;
         read_watcher_value_from_stream(ret, type, int_out, mode, bytes);
         EXPECT_EQ(int_in, int_out);
         EXPECT_EQ(mode, WT_READ_WRITE);
-        EXPECT_EQ(type, WVT_INTEGER);
-        EXPECT_EQ(bytes, sizeof(int));
         uint64 uint64_out;
         read_watcher_value_from_stream(ret, type, uint64_out, mode, bytes);
         EXPECT_EQ(uint64_in, uint64_out);
         EXPECT_EQ(mode, WT_READ_WRITE);
-        EXPECT_EQ(type, WVT_INTEGER);
-        EXPECT_EQ(bytes, sizeof(uint64));
         float float_out;
         read_watcher_value_from_stream(ret, type, float_out, mode, bytes);
         EXPECT_EQ(float_in, float_out);
         EXPECT_EQ(mode, WT_READ_ONLY);
-        EXPECT_EQ(type, WVT_FLOATING);
-        EXPECT_EQ(bytes, sizeof(float));
         double double_out;
         read_watcher_value_from_stream(ret, type, double_out, mode, bytes);
         EXPECT_EQ(double_in, double_out);
         EXPECT_EQ(mode, WT_READ_ONLY);
-        EXPECT_EQ(type, WVT_FLOATING);
-        EXPECT_EQ(bytes, sizeof(double));
         char blob_out[32] =
         { 0 };
         read_watcher_value_from_stream(ret, type, blob_out, mode, bytes);
@@ -123,7 +115,7 @@ TEST(GECO_DEBUGGING_WATCHER, test_value_stream)
         read_watcher_value_from_stream(ret, type, str_out, mode, bytes);
         EXPECT_STREQ(str_in, str_out);
         EXPECT_EQ(mode, WT_READ_ONLY);
-        EXPECT_EQ(type, WVT_STRING);
+        EXPECT_EQ(type, WVT_BLOB);
         EXPECT_EQ(bytes, sizeof(str_in));
         std::string string_out;
         read_watcher_value_from_stream(ret, type, string_out, mode, bytes);
@@ -147,7 +139,7 @@ class ExampleClass
     private:
         int a;
 };
-static std::string stringval("");
+static std::string stringval("hello man");
 static std::string& get_val()
 {
     return stringval;
@@ -159,20 +151,20 @@ static void set_val(std::string& a)
 TEST(GECO_DEBUGGING_WATCHER, test_add_remove_value_func_method_watchers)
 {
     const char* path1 = "WVT_INTEGER/WT_READ_ONLY/GECO_WATCH_VALUE";
-    GECO_WATCH_VALUE(path1,value,WVT_INTEGER, (uint)sizeof(int),WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
+    GECO_WATCH_VALUE(path1,value,WVT_INT32, sizeof(int),WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
 
     ExampleClass example;
     const char* path2 = "WVT_INTEGER/WT_READ_WRITE/GECO_WATCH_METHOD";
-    GECO_WATCH_METHOD(path2,WVT_INTEGER, (uint)sizeof(int),example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
+    GECO_WATCH_METHOD(path2,WVT_INT32, sizeof(int),example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
     "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
 
     const char* path3 = "WVT_STRING/WT_READ_WRITE/GECO_WATCH_FUNC";
-    GECO_WATCH_FUNC(path3,WVT_STRING, (uint)stringval.length(),CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
+    GECO_WATCH_FUNC(path3,WVT_STRING, stringval.length(),CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
 
     std::string path;
     std::string paths;
     int num = 0;
-    geco_watcher_base_t::get_root_watcher().walk_all_paths(path, paths, num, true);
+    geco_watcher_base_t::get_root_watcher().walk_all_files(path, paths, num, true);
 
     EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().remove_watcher(path3));
     EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().remove_watcher(path1));
@@ -181,7 +173,7 @@ TEST(GECO_DEBUGGING_WATCHER, test_add_remove_value_func_method_watchers)
     path.clear();
     paths.clear();
     num = 0;
-    geco_watcher_base_t::get_root_watcher().walk_all_paths(path, paths, num, true);
+    geco_watcher_base_t::get_root_watcher().walk_all_files(path, paths, num, true);
 }
 
 static void req1_cb(watcher_path_request & pathRequest, int32 count)
@@ -199,7 +191,7 @@ static void req1_cb(watcher_path_request & pathRequest, int32 count)
     geco_bit_stream_t& is = ((watcher_path_request_v1&) pathRequest).get_result_stream();
     read_watcher_value_from_stream(is, type, reqpath, mode, bytes);
     read_watcher_value_from_stream(is, type, result, mode, bytes);
-    read_watcher_value_from_stream(is, type, desc, mode, bytes);
+    //read_watcher_value_from_stream(is, type, desc, mode, bytes);
     if (desc) read_watcher_value_from_stream(is, type, descstr, mode, bytes);
 
     EXPECT_STREQ(reqpath.c_str(), "logger/cppThresholds/ENGINE-UNITTEST-LOGGER/cc");
@@ -209,7 +201,7 @@ static void req1_cb(watcher_path_request & pathRequest, int32 count)
     std::string path;
     std::string paths;
     int num = 0;
-    geco_watcher_base_t::get_root_watcher().walk_all_paths(path, paths, num, true);
+    geco_watcher_base_t::get_root_watcher().walk_all_files(path, paths, num, true);
 
     EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().remove_watcher(reqpath.c_str()));
 }
@@ -218,7 +210,7 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v1)
     //this is done in remote endpoint
     int hp = 100;
     const char* path = "logger/cppThresholds/ENGINE-UNITTEST-LOGGER/cc";
-    GECO_WATCH_VALUE(path, hp,WVT_INTEGER, sizeof(int), WT_READ_WRITE, "log cc value");
+    GECO_WATCH_VALUE(path, hp,WVT_INT32, sizeof(int), WT_READ_WRITE, "log cc value");
 
     // this is done in another endpoint to query
     watcher_path_request_v1 req1(path, true);
@@ -229,43 +221,88 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v1)
 
 static void req2_cb(watcher_path_request & pathRequest, int32 count)
 {
-    ASSERT_EQ(count, 1);
-
-    WatcherMode mode;
-    WatcherValueType type;
-    uint bytes;
-    bool desc;
-    std::string result;
-    std::string reqpath;
-    std::string descstr;
-
-    geco_bit_stream_t& is = ((watcher_path_request_v1&) pathRequest).get_result_stream();
-    read_watcher_value_from_stream(is, type, reqpath, mode, bytes);
-    read_watcher_value_from_stream(is, type, result, mode, bytes);
-    read_watcher_value_from_stream(is, type, desc, mode, bytes);
-    if (desc) read_watcher_value_from_stream(is, type, descstr, mode, bytes);
-
-    EXPECT_STREQ(reqpath.c_str(), "logger/cppThresholds/ENGINE-UNITTEST-LOGGER/cc");
-    EXPECT_STREQ(result.c_str(), "25000");
-    if (desc) EXPECT_STREQ(descstr.c_str(), "log cc value");
-
-    std::string path;
-    std::string paths;
-    int num = 0;
-    geco_watcher_base_t::get_root_watcher().walk_all_paths(path, paths, num, true);
-
-    EXPECT_TRUE(geco_watcher_base_t::get_root_watcher().remove_watcher(reqpath.c_str()));
+    // this will be called when on comple path is walked
+//    geco_bit_stream_t& is = pathRequest.get_result_stream();
+//    uchar mode;
+//    uchar valtype;
+//    uint child_size;
+//    std::string mypath;
+//    std::string val;
+//    while (is.get_payloads() > 0)
+//    {
+//        is.ReadMini(valtype);
+//        if (valtype == WT_DIRECTORY)
+//        {
+//            is.ReadMini(child_size);
+//            is.Read(mypath);
+//            TRACE_MSG("req2_cb::read [WT_DIRECTORY, %d, %s]\n", child_size, mypath.c_str());
+//        }
+//        else  // watcher
+//        {
+//            is.ReadMini(mode);
+//            is.Read(mypath);
+//            is.Read(val);
+//            TRACE_MSG("req2_cb::read [type %d, mode %d, path %s, val %s]\n",valtype, mode, mypath.c_str(), val.c_str());
+//        }
+//    }
 }
 TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v2)
 {
     //this is done in remote endpoint
     int hp = 100;
-    const char* path = "logger/cppThresholds/ENGINE-UNITTEST-LOGGER/cc";
-    GECO_WATCH_VALUE(path, hp,WVT_INTEGER, sizeof(int), WT_READ_WRITE, "log cc value");
+    const char* path = "logger/cppThresholds/test_watcher_path_request_v2";
+    GECO_WATCH_VALUE(path, hp,WVT_INT32, sizeof(int), WT_READ_WRITE, "log cc value");
+
+    const char* path1 = "WVT_INTEGER/WT_READ_ONLY/GECO_WATCH_VALUE";
+    GECO_WATCH_VALUE(path1,value,WVT_INT32, sizeof(int),WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
+
+    ExampleClass example;
+    int a = 1;
+    example.setValue(a);
+    const char* path2 = "WVT_INTEGER/WT_READ_WRITE/GECO_WATCH_METHOD";
+    GECO_WATCH_METHOD(path2,WVT_INT32, sizeof(int),example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
+    "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
+
+    const char* path3 = "WVT_STRING/WT_READ_WRITE/GECO_WATCH_FUNC";
+    GECO_WATCH_FUNC(path3,WVT_STRING, stringval.length(),CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
+    printf("============================================\n");
+
+    std::string tmp;
+    std::string paths;
+    int num = 0;
+
+    geco_watcher_base_t::get_root_watcher().walk_all_files(tmp, paths, num, true);
+    printf("============================================\n");
 
     // this is done in another endpoint to query
     watcher_path_request_v2 req2(path);
+    req2.set_request_complete_cb(req2_cb);
+    geco_watcher_base_t::get_root_watcher().visit_children(0, 0, req2);
+
+    printf("============================================\n");
+    // now all paths are stored in is
+    geco_bit_stream_t& is = req2.get_result_stream();
+    uchar mode;
+    uchar valtype;
+    uint child_size;
+    std::string mypath;
+    std::string val;
+    while (is.get_payloads() > 0)
+    {
+        is.ReadMini(valtype);
+        if (valtype == WT_DIRECTORY)
+        {
+            is.ReadMini(child_size);
+            is.Read(mypath);
+            TRACE_MSG("req2_cb::read [WT_DIRECTORY, %d, %s]\n", child_size, mypath.c_str());
+        }
+        else  // watcher
+        {
+            is.ReadMini(mode);
+            is.Read(mypath);
+            is.Read(val);
+            TRACE_MSG("req2_cb::read [ %d, %d,  %s, %s]\n",valtype, mode, mypath.c_str(), val.c_str());
+        }
+    }
+
 }
-
-
-

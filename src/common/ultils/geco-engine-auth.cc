@@ -9,7 +9,7 @@
 #include "../debugging/debug.h"
 using namespace geco::debugging;
 
-DECLARE_DEBUG_COMPONENT2("GECO-ENGINE-COMMON-MODULE-LOGGER", 0);
+DECLARE_DEBUG_COMPONENT2("COMM", 0);
 
 namespace geco
 {

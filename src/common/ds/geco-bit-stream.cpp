@@ -359,8 +359,7 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write, bool 
     /// start write first 3 bits 101 after shifting to right by , 00000 101
     /// write result                                                                      00010 101
 
-    assert(is_read_only_ == false);
-    assert(bits2Write > 0);
+    if(is_read_only_ || !bits2Write) return;
 
     //if( mReadOnly ) return false;
     //if( bits2Write == 0 ) return false;

@@ -446,7 +446,7 @@ class geco_bit_stream_t
         {
             uint bytes2Read;
             ReadMini(bytes2Read);
-            if (bytes2Read > varString.capacity()) varString.resize(bytes2Read);
+            varString.resize(bytes2Read);
             ReadAlignedBytes((uchar*) varString.data(), bytes2Read);
         }
         inline void Read(uchar *varString)
@@ -1184,6 +1184,14 @@ class geco_bit_stream_t
         {
             //src.Write(this);
         }
+
+        inline void Write(const std::string &src)
+        {
+            uint len = src.length();
+            WriteMini(len);
+            write_aligned_bytes((uchar*) src.c_str(), len);
+        }
+
         //
         //inline void WriteFrom(const RakWString &src)
         //{

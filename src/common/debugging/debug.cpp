@@ -47,7 +47,7 @@
 #include "../plateform.h"
 #include "../ultils/geco-malloc.h"
 
-DECLARE_DEBUG_COMPONENT2("engine-common-module-logger", 0);
+DECLARE_DEBUG_COMPONENT2("COMM", 0);
 
 namespace geco
 {

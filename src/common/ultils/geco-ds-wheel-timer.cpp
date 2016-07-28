@@ -22,7 +22,7 @@
 #include "geco-ds-wheel-timer.h"
 #include <assert.h>
 #include "../../common/debugging/debug.h"
-
+DECLARE_DEBUG_COMPONENT2("ULTILS_MODULE/TIMER", 0);
 namespace geco
 {
 

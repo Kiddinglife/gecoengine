@@ -20,7 +20,7 @@ using namespace geco::debugging;
 using namespace geco::ultils;
 using namespace geco::ds;
 
-DECLARE_DEBUG_COMPONENT2("ENGINE-UNITTEST-LOGGER", 0);
+DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 
 TEST(GECO_ULTILS, test_base64)
 {
