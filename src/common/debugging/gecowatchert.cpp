@@ -96,7 +96,8 @@ void watcher_path_request_v2::set_result_stream(const std::string & desc, const 
 {
     if (mode == WT_DIRECTORY)
     {
-        std::string old(origin_request_path_);
+        std::string old;
+        old = origin_request_path_;
         origin_request_path_ = request_path_;
         watcher->visit_children(base, NULL, *this);
         origin_request_path_ = old;
@@ -384,7 +385,8 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
         uint size = container_.size();
         pathRequest.get_result_stream().WriteMini(size);
         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-        TRACE_MSG("write [WT_DIRECTORY, %d, %s]\n",size, pathRequest.get_request_path().c_str());
+        pathRequest.get_result_stream().Write(comment_);
+        TRACE_MSG("write [%d,%d,%s,%s]\n",(int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(),comment_);
         pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
         return true;
     }

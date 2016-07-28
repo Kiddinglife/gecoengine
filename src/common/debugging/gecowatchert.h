@@ -77,7 +77,6 @@ namespace geco
             WVT_STRING,
             WVT_TUPLE,
             WVT_TYPE,
-            WVT_BLOB,  //raw bytes data no endian swap and compression applied when transferred
 
             /*
              WVT_USER_DEFINED should not be used,
@@ -601,18 +600,17 @@ namespace geco
             uint bytes = value.length();
             result.WriteMini(bytes);
             result.write_aligned_bytes((uchar*) value.c_str(), bytes);
-        } /*protocol v2 ends*/
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const char* value, WatcherMode mode)
-        {
-            return write_watcher_value_to_stream(result, (char*) value, mode);
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, char* value, WatcherMode mode)
         {
-            static std::string buf;
-            buf.clear();
-            buf.append((char*) value);
+            std::string buf= value;
             write_watcher_value_to_stream(result, buf, mode);
         }
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const char* value, WatcherMode mode)
+        {
+            return write_watcher_value_to_stream(result, (char*) value, mode);
+        }/*protocol v2 ends*/
+
         /**
          *  @brief This class is the base class for all debug value watchers.
          *   It is part of the@ref WatcherModule.
@@ -954,8 +952,9 @@ namespace geco
                         pathRequest.get_result_stream().WriteMini((uchar) this->access_);
                         pathRequest.get_result_stream().Write(write_watcher_value_to_string(useValue));
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
+                        pathRequest.get_result_stream().Write(this->comment_);
                         pathRequest.set_result_stream(comment_, access_, this, base);
-                        dprintf("write [mode %d, %s, %s]\n", access_, pathRequest.get_request_path().c_str(),
+                        dprintf("write [%d,%s,%s]\n", access_, pathRequest.get_request_path().c_str(),
                                 write_watcher_value_to_string(useValue).c_str());
                         return true;
                     }
@@ -1060,9 +1059,10 @@ namespace geco
                         pathRequest.get_result_stream().WriteMini((uchar) mode);
                         pathRequest.get_result_stream().Write(write_watcher_value_to_string((*getFunction_)()));
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
+                        pathRequest.get_result_stream().Write(this->comment_);
                         //write_watcher_value_to_stream(pathRequest.get_result_stream(), (*getFunction_)(), mode, bytes_);
                         pathRequest.set_result_stream(comment_, mode, this, base);
-                        dprintf("write [mode %d, %s, %s]\n", mode, pathRequest.get_request_path().c_str(),
+                        dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                 write_watcher_value_to_string((*getFunction_)()).c_str());
                         return true;
                     }
@@ -1194,16 +1194,17 @@ namespace geco
                         {
                             const RETURN_TYPE& useValue = (useObject.*getMethod_)();
                             pathRequest.get_result_stream().Write(write_watcher_value_to_string(useValue));
-                            dprintf("write [mode %d, %s, %s]\n", mode, pathRequest.get_request_path().c_str(),
+                            dprintf("write [%d,%s,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     write_watcher_value_to_string(useValue).c_str());
                         }
                         else
                         {
                             pathRequest.get_result_stream().Write(write_watcher_value_to_string("None"));
-                            dprintf("write [mode %d, %s, %s]\n", mode, pathRequest.get_request_path().c_str(),
+                            dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     write_watcher_value_to_string("No Get Method !").c_str());
                         }
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
+                        pathRequest.get_result_stream().Write(this->comment_);
                         // write_watcher_value_to_stream(pathRequest.get_result_stream(), useval, mode, bytes_);
                         pathRequest.set_result_stream(comment_, mode, this, base);
                         return true;

@@ -15,7 +15,7 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
         // also responsible for initializing Google Test.  Therefore there's
         // no need for calling testing::InitGoogleTest() separately.
         testing::InitGoogleMock(&argc, argv);
-       //::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.test_watcher_path_request_v2";
+       ::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.test_watcher_path_request_v2";
         int retval = 0;
         retval = RUN_ALL_TESTS();
         return retval;

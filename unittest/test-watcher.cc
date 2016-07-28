@@ -194,13 +194,14 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v1)
 
 static void req2_cb(watcher_path_request & pathRequest, int32 count)
 {
-    printf("---------------\n");
+    printf("---------------\n"); // mode, size/value, path. comment
     // this will be called when on comple path is walked
     geco_bit_stream_t& is = pathRequest.get_result_stream();
     uchar mode;
     uint child_size;
     std::string mypath;
     std::string val;
+    std::string comment;
     while (is.get_payloads() > 0)
     {
         is.ReadMini(mode);
@@ -208,13 +209,15 @@ static void req2_cb(watcher_path_request & pathRequest, int32 count)
         {
             is.ReadMini(child_size);
             is.Read(mypath);
-            TRACE_MSG("req2_cb::read [WT_DIRECTORY, %d, %s]\n", child_size, mypath.c_str());
+            is.Read(comment);
+            TRACE_MSG("req2_cb::read [%d,%d,%s,%s]\n", WT_DIRECTORY,child_size, mypath.c_str(),comment.c_str());
         }
         else  // watcher
         {
             is.Read(val);
             is.Read(mypath);
-            TRACE_MSG("req2_cb::read [ mode %d,  %s, %s]\n", mode, val.c_str(),mypath.c_str());
+            is.Read(comment);
+            TRACE_MSG("req2_cb::read [ %d,%s,%s,%s]\n", mode, val.c_str(),mypath.c_str(),comment.c_str());
         }
     }
     printf("---------------\n");

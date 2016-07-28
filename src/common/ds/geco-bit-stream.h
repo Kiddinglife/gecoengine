@@ -1198,10 +1198,12 @@ class geco_bit_stream_t
         //  src.serialize(this);
         //}
 
-        inline void WriteString(const char* inStringVar)
+        inline void Write(const char* inStringVar)
         {
-//            WriteMini((uint) sizeof(value));
-//            write_aligned_bytes((const uchar*) inStringVar, sizeof(value));
+            static std::string buf;
+            buf.clear();
+            buf.append(inStringVar);
+            Write(buf);
         }
 
         inline void WriteString(const wchar_t * const &inStringVar)
@@ -1209,7 +1211,7 @@ class geco_bit_stream_t
             //JackieWString::serialize(inStringVar, this);
         }
 
-        inline void WriteString(const uchar *src)
+        inline void Write(const uchar *src)
         {
             Write((const char*) src);
         }
