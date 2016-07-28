@@ -52,12 +52,12 @@ void watcher_path_request_v1::get_watcher_value()
     else if (mode != WT_INVALID)
     {
         // Add the result onto the final result stream
-        write_watcher_value_to_stream(result_, request_path_, WT_READ_ONLY, request_path_.length());
-        write_watcher_value_to_stream(result_, result, WT_READ_ONLY, result.length());
+        write_watcher_value_to_stream(result_, request_path_, WT_READ_ONLY);
+        write_watcher_value_to_stream(result_, result, WT_READ_ONLY);
         if (use_desc_)
         {
-            write_watcher_value_to_stream(result_, true, WT_READ_ONLY, sizeof(true));
-            write_watcher_value_to_stream(result_, desc, WT_READ_ONLY, desc.length());
+            write_watcher_value_to_stream(result_, true, WT_READ_ONLY);
+            write_watcher_value_to_stream(result_, desc, WT_READ_ONLY);
         }
         else
             write_watcher_value_to_stream(result_, false, WT_READ_ONLY, sizeof(false));
@@ -71,26 +71,19 @@ bool watcher_path_request_v1::on_visit_dirwt_child(WatcherMode mode, const std::
 {
     std::string path;
     // add up dir name and make it path
-    if (request_path_.size() > 0)
-    {
-        path = request_path_ + "/" + label;
-    }
-    else
-    {
-        path = label;
-    }
+    request_path_.size() > 0 ? path = request_path_ + "/" + label : path = label;
 
     // Add the result onto the final result stream
-    write_watcher_value_to_stream(result_, path, WT_READ_ONLY, path.length());
-    write_watcher_value_to_stream(result_, valueStr, WT_READ_ONLY, valueStr.length());
+    write_watcher_value_to_stream(result_, path, WT_READ_ONLY);
+    write_watcher_value_to_stream(result_, valueStr, WT_READ_ONLY);
     if (use_desc_)
     {
-        write_watcher_value_to_stream(result_, true, WT_READ_ONLY, sizeof(true));
-        write_watcher_value_to_stream(result_, desc, WT_READ_ONLY, desc.length());
+        write_watcher_value_to_stream(result_, true, WT_READ_ONLY);
+        write_watcher_value_to_stream(result_, desc, WT_READ_ONLY);
     }
     else
     {
-        write_watcher_value_to_stream(result_, false, WT_READ_ONLY, sizeof(false));
+        write_watcher_value_to_stream(result_, false, WT_READ_ONLY);
     }
     this->replies_count_++;
     return true;
@@ -165,9 +158,9 @@ bool watcher_path_request_v2::add_watcher_path(const void *base, const char *pat
     std::string desc;
     origin_request_path_.size() > 0 ? request_path_ = origin_request_path_ + "/" + label : request_path_ = label;
 
-    // Push the directory entry onto the result stream
-    // We are using a reference to the correct watcher now, so no need
-    // to pass in the path to search for.
+// Push the directory entry onto the result stream
+// We are using a reference to the correct watcher now, so no need
+// to pass in the path to search for.
     bool status = watcher.get_as_stream(base, NULL, *this);
 
     if (!status)
@@ -180,8 +173,8 @@ bool watcher_path_request_v2::add_watcher_path(const void *base, const char *pat
         result_.WriteMini(status);
         return false;
     }
-    // Always need to return true from the asyn version 2 protocol
-    // otherwise the stream won't be completed.
+// Always need to return true from the asyn version 2 protocol
+// otherwise the stream won't be completed.
     return true;
 }
 
@@ -269,7 +262,7 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             container_.insert( iter, newdir );
             was_added = true;
-            TRACE_MSG("append watcher %s, container size %d!\n\n",newdir.label.c_str(), container_.size());
+            TRACE_MSG("append watcher %s, container size %d!\n\n",newdir.label.c_str(), (int)container_.size());
         }
         else  //existed value
         {
@@ -291,7 +284,7 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             auto iter = container_.begin();
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             pFound = &(*(container_.insert( iter, newdir )));
-            TRACE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), container_.size());
+            TRACE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), (int)container_.size());
         }
         // recusice call add_watcher, this will create new watcher dir if needed
         // finally result is a new path is built and the watcher itself is added
@@ -397,7 +390,7 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
     }
     else if (geco_watcher_director_t::is_doc_path(path))
     {
-        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY, bytes_);
+        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
         pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
         return true;
     }
@@ -454,7 +447,7 @@ bool init_value_watcher(int& value, const char * path)
     int ret;
     if (path != NULL)
     {
-        geco_watcher_base_t* ptr = new value_watcher_t<int>(WVT_INT32, value, sizeof(int), WT_READ_WRITE, path);
+        geco_watcher_base_t* ptr = new value_watcher_t<int>(value, WT_READ_WRITE, path);
         ret = geco_watcher_base_t::get_root_watcher().add_watcher(path, *ptr, NULL);
     }
     else
