@@ -76,9 +76,10 @@ namespace geco
             WVT_DOUBLE,
             WVT_STRING,
             WVT_TUPLE,
+			WVT_TYPE,
             /*
-             WVT_USER_DEFINED should not be used,
-             because any WVT_USER_DEFINED can be divided into basic types and tranfered
+             Add the identifier like WVT_USER_DEFINED
+             any defined complicated types  can be divided into basic types and tranfered
              for the sake of easyness, for any user defined types with operator << and >>,
              user MUST impl a pair of write_value_to_stream and read_value_from_stream in this file
 
@@ -98,23 +99,20 @@ namespace geco
              return is;
              }
              // todo dd more write and read for any other types that have gloval operator << and >>
-             inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const WatcherValueType type,
-             ExampleClass& value, const WatcherMode mode, const uint bytes)
+             inline void write_watcher_value_to_stream(geco_bit_stream_t & result,ExampleClass& value)
              {
-             if (type != WVT_USER_DEFINED) abort();
+			 uchar tmp;
              result.WriteMini((uchar)type);
              result.WriteMini((uchar)mode);
              result << value;
              }
-             inline bool read_watcher_value_from_stream(geco_bit_stream_t & result, WatcherValueType& type, ExampleClass& value,
-             WatcherMode& mode, uint& bytes2Write)
+             inline bool read_watcher_value_from_stream(geco_bit_stream_t & result, ExampleClass& value,WatcherMode& mode)
              {
-             result.WriteMini((uchar)type);
+             result.WriteMini((uchar)WVT_USER_DEFINED);
              result.WriteMini((uchar)mode);
              result >> value;
              }
              */
-            WVT_USER_DEFINED,
             WVT_UNKNOWN,
         };
 
