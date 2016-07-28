@@ -124,15 +124,15 @@ static void set_val(std::string& a)
 TEST(GECO_DEBUGGING_WATCHER, test_add_remove_value_func_method_watchers)
 {
     const char* path1 = "WVT_INTEGER/WT_READ_ONLY/GECO_WATCH_VALUE";
-    GECO_WATCH_VALUE(path1,value,WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
+    GECO_WATCH(path1,value,WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
 
     ExampleClass example;
     const char* path2 = "WVT_INTEGER/WT_READ_WRITE/GECO_WATCH_METHOD";
-    GECO_WATCH_METHOD(path2,example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
+    GECO_WATCH(path2,example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
     "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
 
     const char* path3 = "WVT_STRING/WT_READ_WRITE/GECO_WATCH_FUNC";
-    GECO_WATCH_FUNC(path3, CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
+    GECO_WATCH(path3, CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
 
     std::string path;
     std::string paths;
@@ -183,7 +183,7 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v1)
     //this is done in remote endpoint
     int hp = 100;
     const char* path = "logger/cppThresholds/ENGINE-UNITTEST-LOGGER/cc";
-    GECO_WATCH_VALUE(path, hp, WT_READ_WRITE, "log cc value");
+    GECO_WATCH(path, hp, WT_READ_WRITE, "log cc value");
 
     // this is done in another endpoint to query
     watcher_path_request_v1 req1(path, true);
@@ -224,20 +224,20 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v2)
     //this is done in remote endpoint
     int hp = 100;
     const char* path = "logger/cppThresholds/test_watcher_path_request_v2";
-    GECO_WATCH_VALUE(path, hp, WT_READ_WRITE, "log cc value");
+    GECO_WATCH(path, hp, WT_READ_WRITE, "log cc value");
 
     const char* path1 = "WVT_INTEGER/WT_READ_ONLY/GECO_WATCH_VALUE";
-    GECO_WATCH_VALUE(path1,value,WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
+    GECO_WATCH(path1,value,WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
 
     ExampleClass example;
     int a = 1;
     example.setValue(a);
     const char* path2 = "WVT_INTEGER/WT_READ_WRITE/GECO_WATCH_METHOD";
-    GECO_WATCH_METHOD(path2,example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
+    GECO_WATCH(path2,example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
     "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
 
     const char* path3 = "WVT_STRING/WT_READ_WRITE/GECO_WATCH_FUNC";
-    GECO_WATCH_FUNC(path3,CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
+    GECO_WATCH(path3,CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
     printf("============================================\n");
 
     std::string tmp;

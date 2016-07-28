@@ -23,6 +23,8 @@
  *
  *  Created on: 18Jul.,2016
  *      Author: jackiez
+ *
+ * see unit test  test-watcher.cc in ubittests project for details how it is used
  */
 
 #ifndef SRC_COMMON_DEBUGGING_GECOWATCHERT_H_
@@ -992,8 +994,8 @@ namespace geco
                  *	constructor cannot (it's certainly not going to delete itself
                  *	anyway).
                  */
-                explicit func_watcher_t(RETURN_TYPE&(*getFunction)(),
-                        void (*setFunction)(RETURN_TYPE&) = NULL, const char * path = NULL)
+                explicit func_watcher_t(RETURN_TYPE&(*getFunction)(), void (*setFunction)(RETURN_TYPE&) = NULL,
+                        const char * path = NULL)
                         : getFunction_(getFunction), setFunction_(setFunction)
                 {
                     /*	if (path != NULL)
@@ -1225,7 +1227,7 @@ namespace geco
          *	@ingroup WatcherModule
          */
         template<class TYPE>
-        geco_watcher_base_t* add_value_watcher(const char * path, TYPE& rValue, WatcherMode access = WT_READ_WRITE,
+        geco_watcher_base_t* add_watcher(const char * path, TYPE& rValue, WatcherMode access = WT_READ_WRITE,
                 const char * comment = NULL)
         {
             geco_watcher_base_t* ptr = new value_watcher_t<TYPE>(rValue, access, path);
@@ -1247,7 +1249,7 @@ namespace geco
          *	@ingroup WatcherModule
          */
         template<class RETURN_TYPE>
-        geco_watcher_base_t* add_func_watcher(const char * path, RETURN_TYPE&(*getFunction)(),
+        geco_watcher_base_t* add_watcher(const char * path, RETURN_TYPE&(*getFunction)(),
                 void (*setFunction)(RETURN_TYPE&) = NULL, const char * comment = NULL)
         {
             geco_watcher_base_t* ptr = new func_watcher_t<RETURN_TYPE>(getFunction, setFunction, path);
@@ -1263,7 +1265,7 @@ namespace geco
         }
 
         template<class RETURN_TYPE, class OBJECT_TYPE>
-        geco_watcher_base_t* add_method_watcher(const char * path, OBJECT_TYPE & rObject,
+        geco_watcher_base_t* add_watcher(const char * path, OBJECT_TYPE & rObject,
                 RETURN_TYPE& (OBJECT_TYPE::*getMethod)(), void (OBJECT_TYPE::*setMethod)(RETURN_TYPE&) = NULL,
                 const char * comment = NULL)
         {
@@ -1281,26 +1283,6 @@ namespace geco
             return ptr;
         }
 
-    /**
-     *	This is a simple macro that helps us do casting.
-     *	This allows us to do
-     *
-     *	@code
-     *	MF_WATCH(  "Comms/Desired in",
-     *		g_server,
-     *		MF_ACCESSORS( uint32, ServerConnection, bandwidthFromServer ) );
-     *	@endcode
-
-     * instead of
-     *
-     *	@code
-     *	MF_WATCH( "Comms/Desired in",
-     *		g_server,
-     *		(uint32 (MyClass::*)() const)(MyClass::bandwidthFromServer),
-     *		(void   (MyClass::*)(uint32))(MyClass::bandwidthFromServer) );
-     *	@endcode
-     *	@ingroup WatcherModule
-     */
 #define CAST_METHOD_RW( TYPE, CLASS, rMETHOD,wMETHOD )							\
 	static_cast< TYPE& (CLASS::*)()>(&CLASS::rMETHOD),			\
 	static_cast< void (CLASS::*)(TYPE&)   >(&CLASS::wMETHOD)
@@ -1309,11 +1291,6 @@ namespace geco
 	static_cast<TYPE& (*)()>(rFUNC),			\
 	static_cast< void (*)(TYPE&)   >(wFUNC)
 
-    /**
-     *	This macro is like MF_ACCESSORS except that the read accessor is NULL.
-     *	@see MF_ACCESSORS
-     *	@ingroup WatcherModule
-     */
 #define CAST_METHOD_R( TYPE, CLASS, METHOD )					\
 	static_cast< TYPE& (CLASS::*)()>( NULL ),					\
 	static_cast< void (CLASS::*)(TYPE&)   >( &CLASS::METHOD )
@@ -1322,123 +1299,7 @@ namespace geco
 	static_cast<TYPE& (*)()>(rFUNC),			\
 	static_cast< void (*)(TYPE&)   >(NULL)
 
-    /**
-     *	This macro is used to watch a value at run-time for debugging purposes. This
-     *	value can then be inspected and changed at run-time through a variety of
-     *	methods. These include using the Web interface or using the in-built menu
-     *	system in an appropriate build of the client. (This is displayed by pressing
-     *	\<F7\>.)
-     *
-     *	The simplest usage of this macro is when you want to watch a fixed variable
-     *	such as a global or a variable that is static to a file, class, or method.
-     *	The macro should be called once during initialisation for each value that
-     *	is to be watched.
-     *
-     *	For example, to watch a value that is static to a file, do the following:
-     *
-     *	@code
-     *	static int myValue = 72;
-     *	...
-     *	MF_WATCH( "myValue", myValue );
-     *	@endcode
-     *
-     *	This allows you to inspect and change the value of @a myValue. The first
-     *	argument to the macro is a string specifying the path associated with this
-     *	value. This is used in displaying and setting this value via the different
-     *	%Watcher interfaces.
-     *
-     *	If you want to not allow the value to be changed using the Watch interfaces,
-     *	include the extra argument Watcher::WT_READ_ONLY.
-     *
-     *	@code
-     *	MF_WATCH( "myValue", myValue, WT_READ_ONLY );
-     *	@endcode
-     *
-     *	Any type of value can be watched as long as it has streaming operators to
-     *	ostream and istream.
-     *
-     *	You can also look at a value associated with an object using accessor
-     *	methods on that object.
-     *
-     *	For example, if you had the following class:
-     *	@code
-     *	class ExampleClass
-     *	{
-     *		public:
-     *			int getValue() const;
-     *			void setValue( int setValue ) const;
-     *	};
-     *
-     *	ExampleClass exampleObject_;
-     *	@endcode
-     *
-     *	You can watch this value as follows:
-     *	@code
-     *	MF_WATCH( "some value", exampleObject_,
-     *			ExampleClass::getValue,
-     *			ExampleClass::setValue );
-     *	@endcode
-     *
-     *	If you have overloaded your accessor methods, use the @ref MF_ACCESSORS
-     *	macro to help with casting.
-     *
-     *	If you want the value to be read-only, do not add the set accessor to the
-     *	macro call.
-     *	@code
-     *	MF_WATCH( "some value", exampleObject_,
-     *			ExampleClass::getValue );
-     *	@endcode
-     *
-     *	If you want to watch a value and the accessors take and return a reference
-     *	to the object, instead of a copy of the object.
-     *
-     *	@ingroup WatcherModule
-     *
-     int hp = 100;
-     GECO_WATCH_VALUE("GECO_WATCH_VALUE/WVT_INTEGER/WT_READ_ONLY", hp,
-     WVT_INTEGER, WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
-
-     static int& get_val()
-     {
-     int a = 0;
-     return a;
-     }
-     static void set_val(int& a)
-     {
-     int a = 0;
-     }
-     GECO_WATCH_FUNC("GECO_WATCH_FUNC/WVT_INTEGER/CAST_FUNC_R.",
-     WVT_INTEGER, CAST_FUNC_R(int, get_val), "GECO_WATCH_FUNC->WVT_INTEGER->CAST_FUNC_R.");
-     GECO_WATCH_FUNC("GECO_WATCH_FUNC/WVT_STRING/CAST_FUNC_RW",
-     WVT_STRING, CAST_FUNC_RW(int, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
-
-     class ExampleClass
-     {
-     public:
-     int& getValue()
-     {
-     return a;
-     }
-     void setValue(int& setValue)
-     {
-     a = setValue;
-     }
-
-     private:
-     int a;
-     };
-     ExampleClass example;
-     GECO_WATCH_METHOD("GECO_WATCH_FUNC->WVT_TYPE->GECO_WATCH_METHOD",
-     WVT_TYPE, example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
-     "GECO_WATCH_FUNC->WVT_STRING->GECO_WATCH_METHOD");
-
-     std::string path;std::string paths ;int num = 0;
-     geco_watcher_base_t::get_root_watcher().walk_all_paths(path,paths,num,printout)
-
-     */
-#define GECO_WATCH_VALUE geco::debugging::add_value_watcher
-#define GECO_WATCH_FUNC geco::debugging::add_func_watcher
-#define GECO_WATCH_METHOD geco::debugging::add_method_watcher
+#define GECO_WATCH geco::debugging::add_watcher
 #endif
     }
 }
