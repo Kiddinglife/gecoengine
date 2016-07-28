@@ -31,27 +31,27 @@ TEST(GECO_DEBUGGING_WATCHER, test_value_string)
     for (int i = 0; i < 100000; i++)
     {
         int int_ret;
-        valstr = write_watcher_value_to_string((int) 12);
-        read_watcher_value_from_string(valstr.c_str(), int_ret);
+        valstr = watcher_value_to_string((int) 12);
+        watcher_string_to_value(valstr.c_str(), int_ret);
         EXPECT_EQ((int )12, int_ret);
 
         float float_ret;
-        valstr = write_watcher_value_to_string(12.001f);
-        read_watcher_value_from_string(valstr.c_str(), float_ret);
+        valstr = watcher_value_to_string(12.001f);
+        watcher_string_to_value(valstr.c_str(), float_ret);
         EXPECT_EQ(12.001f, float_ret);
 
         std::string str_ret;
         std::string str_input("hello world");
-        valstr = write_watcher_value_to_string(str_input);
-        read_watcher_value_from_string(valstr.c_str(), str_ret);
+        valstr = watcher_value_to_string(str_input);
+        watcher_string_to_value(valstr.c_str(), str_ret);
         EXPECT_STRCASEEQ(str_input.c_str(), str_ret.c_str());
 
         bool bool_ret;
-        valstr = write_watcher_value_to_string(true);
-        read_watcher_value_from_string(valstr.c_str(), bool_ret);
+        valstr = watcher_value_to_string(true);
+        watcher_string_to_value(valstr.c_str(), bool_ret);
         EXPECT_TRUE(bool_ret);
-        valstr = write_watcher_value_to_string(false);
-        read_watcher_value_from_string(valstr.c_str(), bool_ret);
+        valstr = watcher_value_to_string(false);
+        watcher_string_to_value(valstr.c_str(), bool_ret);
         EXPECT_FALSE(bool_ret);
     }
 }

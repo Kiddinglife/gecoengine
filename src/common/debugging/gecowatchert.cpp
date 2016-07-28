@@ -96,8 +96,7 @@ void watcher_path_request_v2::set_result_stream(const std::string & desc, const 
 {
     if (mode == WT_DIRECTORY)
     {
-        std::string old;
-        old = origin_request_path_;
+		std::string old(origin_request_path_);
         origin_request_path_ = request_path_;
         watcher->visit_children(base, NULL, *this);
         origin_request_path_ = old;
