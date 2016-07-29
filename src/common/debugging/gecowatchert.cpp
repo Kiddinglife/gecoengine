@@ -27,9 +27,12 @@ bool watcher_path_request_v1::set_watcher_value()
 }
 void watcher_path_request_v1::get_watcher_value()
 {
-    std::string desc;
+    static std::string desc;
+    static std::string result;
     WatcherMode mode;
-    std::string result;
+    desc.clear();
+    result.clear();
+
     if (!geco_watcher_base_t::get_root_watcher().get_as_string(NULL, request_path_.c_str(), result, desc, mode))
     {
         ERROR_MSG("get_watcher_value():get_as_string return FALSE!\n");
@@ -69,25 +72,36 @@ void watcher_path_request_v1::get_watcher_value()
 bool watcher_path_request_v1::on_visit_dirwt_child(WatcherMode mode, const std::string & label,
         const std::string & desc, const std::string & valueStr)
 {
-    std::string path;
-    // add up dir name and make it path
-    request_path_.size() > 0 ? path = request_path_ + "/" + label : path = label;
+    static std::string path;
+    path.clear();
 
-    // Add the result onto the final result stream
-    write_watcher_value_to_stream(result_, path, WT_READ_ONLY);
-    write_watcher_value_to_stream(result_, valueStr, WT_READ_ONLY);
+    path += valueStr;
+    // add up dir name and make it path
+    request_path_.size() > 0 ? path += request_path_ + "/" + label : path = label;
     if (use_desc_)
     {
-        write_watcher_value_to_stream(result_, true, WT_READ_ONLY);
-        write_watcher_value_to_stream(result_, desc, WT_READ_ONLY);
+        path += desc;
     }
-    else
-    {
-        write_watcher_value_to_stream(result_, false, WT_READ_ONLY);
-    }
+    path += "\n";
+    // Add the result onto the final result stream
+    result_.Write(path);
     this->replies_count_++;
+    printf("%s", path.c_str());
     return true;
 }
+bool watcher_path_request_v1::add_watcher_path(const void *base, const char *path, std::string & label,
+        geco_watcher_base_t &watcher)
+{
+    static std::string valstr;
+    static std::string desc;
+    valstr.clear();
+    valstr.clear();
+    WatcherMode mode;
+    watcher.get_as_string(base, path, valstr, desc, mode);
+    this->on_visit_dirwt_child(mode, label, desc, valstr);
+    return watcher.visit_children(base, NULL, *this);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　　Section: watcher_path_request_v2 impls
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
@@ -96,27 +110,12 @@ void watcher_path_request_v2::set_result_stream(const std::string & desc, const 
 {
     if (mode == WT_DIRECTORY)
     {
-		std::string old(origin_request_path_);
+        std::string old(origin_request_path_);
         origin_request_path_ = request_path_;
         watcher->visit_children(base, NULL, *this);
         origin_request_path_ = old;
         request_path_ = origin_request_path_;
         this->notify();
-        /*
-         * this will build a up-down dir  tree
-         * dir,0,2/5/8/
-         * dir,0,2/5/9/
-         * sent above
-         * dir,2,2/5/
-         * dir,0,2/6/
-         * dir,0,2/7/
-         * sent above
-         * dir,3,2/
-         * sent above
-         * .......same tree to above
-         * sent above
-         * dir,3,/   //last is root
-         */
     }
     else if (mode != WT_INVALID)
     {
@@ -354,7 +353,7 @@ bool geco_watcher_director_t::get_as_string(const void * base, const char * path
 {
     if (geco_watcher_director_t::is_empty_path(path))
     {
-        result = "<dir>";
+        result = "<DIR>";
         mode = WatcherMode::WT_DIRECTORY;
         desc = this->comment_;
         return true;
@@ -378,14 +377,11 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
 {
     if (geco_watcher_director_t::is_empty_path(path))
     {
-        //protocol formate
-        // WT_DIRECTORY dirsize dirpath +[watcher]
         pathRequest.get_result_stream().WriteMini((uchar) WT_DIRECTORY);
-        uint size = container_.size();
-        pathRequest.get_result_stream().WriteMini(size);
+        pathRequest.get_result_stream().WriteMini((int) container_.size());
         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
         pathRequest.get_result_stream().Write(comment_);
-        TRACE_MSG("write [%d,%d,%s,%s]\n",(int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(),comment_);
+        TRACE_MSG("write [%d,%d,%s,%s]\n",(int)WT_DIRECTORY, (int)container_.size(), pathRequest.get_request_path().c_str(),comment_);
         pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
         return true;
     }

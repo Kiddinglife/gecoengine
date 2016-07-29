@@ -23,6 +23,7 @@
  *
  *  Created on: 18Jul.,2016
  *      Author: jackiez
+ *   TODO on 29 Jul, 2016, combine reqv1 and reqv2.
  *
  * see unit test  test-watcher.cc in ubittests project for details how it is used
  */
@@ -76,7 +77,7 @@ namespace geco
             WVT_DOUBLE,
             WVT_STRING,
             WVT_TUPLE,
-			WVT_TYPE,
+            WVT_TYPE,
             /*
              Add the identifier like WVT_USER_DEFINED
              any defined complicated types  can be divided into basic types and tranfered
@@ -101,7 +102,7 @@ namespace geco
              // todo dd more write and read for any other types that have gloval operator << and >>
              inline void write_watcher_value_to_stream(geco_bit_stream_t & result,ExampleClass& value)
              {
-			 uchar tmp;
+             uchar tmp;
              result.WriteMini((uchar)type);
              result.WriteMini((uchar)mode);
              result << value;
@@ -147,14 +148,13 @@ namespace geco
         typedef std::function<void(watcher_path_request & pathRequest, int32 count)> on_wt_path_req_complete_t;
 
         /**
-         * Create a new WatcherPathRequest associated with the current packet.
+         * Create a new WatcherPathRequest from  the current packet
          * @param path The watcher path the request will query.
          * @returns A pointer to a WatcherPathRequest on success, NULL on error.
          */
         //  watcher_path_request * create_request(std::string & path);
         /**
-         * WatcherPathRequest is a handler class to allow an asyncronous request
-         * of a single watcher path.
+         * WatcherPathRequest is a handler class to allow an asyncronous request of a single watcher path.
          */
         class watcher_path_request
         {
@@ -169,80 +169,45 @@ namespace geco
                         : request_path_(path)
                 {
                 }
+                watcher_path_request(const char* path, const on_wt_path_req_complete_t& on_complete_cb)
+                        : request_path_(path), on_complete_cb_(on_complete_cb)
+                {
+                }
                 virtual ~watcher_path_request()
                 {
                 }
-                /**
-                 * Initiate watcher value retreival for the current path request.
-                 */
+                /// @brief Initiate watcher value retreival for the current path request.
                 virtual void get_watcher_value()
                 {
                 }
                 /**
                  * Initiate a watcher path set operation after data to use
-                 * has been placed into the WatcherPathRequest via @see setResult().
+                 * has been placed into us via @see set_result_stream().
                  * @returns true on success, false on failure.
                  */
                 virtual bool set_watcher_value()
                 {
                     return false;
                 }
-                /**
-                 * Accessor method for the watcher path associated with the
-                 * current instance.
-                 */
                 const std::string & get_request_path() const
                 {
                     return this->request_path_;
                 }
-
-                /**
-                 * Setup the pointer back to the creator of this class to notify
-                 * on completion.
-                 */
+                ///  Setup the pointer back to the creator of this class to notify on completion.
                 void set_request_complete_cb(const on_wt_path_req_complete_t& cb)
                 {
                     on_complete_cb_ = cb;
                 }
-                /**
-                 * Check if we have been told about a creator, and notify them of our
-                 * completion.
-                 */
+                /// notify upper layer  of our completion.
                 void notify(int32 replies = 1)
                 {
                     on_complete_cb_(*this, replies);
                 }
-
-                /**
-                 * Notification method called by visitChildren with the number of children
-                 * that we will be told about.
-                 */
-                virtual void add_watcher_num(uint count)
-                {
-                    result_.WriteMini(count);
-                }
-                /**
-                 * Notification of a child watcher entry as called from visitChildren.
-                 */
+                /// Notification of a child watcher entry as called from visitChildren.*/
                 virtual bool add_watcher_path(const void *base, const char *path, std::string & label,
                         geco_watcher_base_t &watcher)
                 {
                     return false;
-                }
-                /**
-                 * Return a pointer to the complete data set that should be used
-                 * to create the watcher packet response.
-                 */
-                virtual const char *get_data()
-                {
-                    return NULL;
-                }
-                /**
-                 * Return the size of the data that is returned by getData().
-                 */
-                virtual int32 get_data_size()
-                {
-                    return 0;
                 }
                 geco_bit_stream_t& get_result_stream()
                 {
@@ -273,8 +238,9 @@ namespace geco
                  */
                 bool on_visit_dirwt_child(WatcherMode, const std::string & label, const std::string & desc,
                         const std::string & valueStr);
-
-                //  set a value to be used to set watcher value
+                virtual bool add_watcher_path(const void *base, const char *path, std::string & label,
+                        geco_watcher_base_t &watcher);
+                //  set a value to be used to in setopt of  watcher value
                 void set_setopt_string(const char *valueStr)
                 {
                     setopt_string_ = valueStr;
@@ -287,14 +253,12 @@ namespace geco
                 char *set_data_;
                 // Input stream for the watcher path requests data
                 geco_bit_stream_t set_stream_;
-                // True when the path request is visiting children and shouldn't notify parent of completion.
-                bool is_visiting_dirs_;
                 // Original path requested via watcher nub, used when visiting directories and requestPath_ may be altered.
                 std::string origin_request_path_;
 
             public:
                 watcher_path_request_v2(const char* path)
-                        : watcher_path_request(path), set_data_(NULL), is_visiting_dirs_(false)
+                        : watcher_path_request(path), set_data_(NULL)
                 {
                 }
                 virtual ~watcher_path_request_v2()
@@ -308,10 +272,6 @@ namespace geco
                 // Methods used by visit_children()
                 virtual bool add_watcher_path(const void *base, const char *path, std::string & label,
                         geco_watcher_base_t &watcher);
-                virtual void add_watcher_num(uint count)
-                {
-                    result_.WriteMini(count);
-                }
 
                 /**
                  * Notify the Path Request of data to be used during a forwarding watcher
@@ -331,11 +291,16 @@ namespace geco
                     set_stream_.reset();
                     set_stream_.Write(data);
                 }
-                virtual const char *get_data()
+                /**
+                 * Return a pointer to the complete data set that should be used
+                 * to create the watcher packet response.
+                 */
+                const char *get_data()
                 {
                     return result_.char_data();
                 }
-                virtual int32 get_data_size()
+                /// Return the size of the data that is returned by get_data().
+                int32 get_data_size()
                 {
                     return BITS_TO_BYTES(result_.get_payloads());
                 }
@@ -343,7 +308,6 @@ namespace geco
                 {
                     return set_stream_;
                 }
-
         };
 
         //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -599,7 +563,7 @@ namespace geco
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, char* value, WatcherMode mode)
         {
-            std::string buf= value;
+            std::string buf = value;
             write_watcher_value_to_stream(result, buf, mode);
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const char* value, WatcherMode mode)
@@ -752,8 +716,7 @@ namespace geco
                  */
                 virtual bool visit_children(const void * base, const char *path, watcher_path_request& pathRequest)
                 {
-                    printf("VISIT IS CALLED\n");
-                    return false;
+                    return true;
                 }
 
                 virtual void walk_all_files(std::string& path, std::string& buf, int& num, bool print)
@@ -945,10 +908,10 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))  //this is visit children called
                     {
                         const TYPE & useValue = *(const TYPE*) (((const uintptr) &rValue_) + ((const uintptr) base));
-                        pathRequest.get_result_stream().WriteMini((uchar) this->access_);
-                        pathRequest.get_result_stream().Write(watcher_value_to_string(useValue));
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(),
+                                watcher_value_to_string(useValue), access_);
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-                        pathRequest.get_result_stream().Write(this->comment_);
+                        pathRequest.get_result_stream().Write(comment_);
                         pathRequest.set_result_stream(comment_, access_, this, base);
                         dprintf("write [%d,%s,%s]\n", access_, pathRequest.get_request_path().c_str(),
                                 watcher_value_to_string(useValue).c_str());
@@ -1052,10 +1015,10 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))
                     {
                         WatcherMode mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
-                        pathRequest.get_result_stream().WriteMini((uchar) mode);
-                        pathRequest.get_result_stream().Write(watcher_value_to_string((*getFunction_)()));
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(),
+                                watcher_value_to_string((*getFunction_)()), mode);
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-                        pathRequest.get_result_stream().Write(this->comment_);
+                        pathRequest.get_result_stream().Write(comment_);
                         //write_watcher_value_to_stream(pathRequest.get_result_stream(), (*getFunction_)(), mode, bytes_);
                         pathRequest.set_result_stream(comment_, mode, this, base);
                         dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
@@ -1140,6 +1103,12 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path) && (setMethod_ != NULL))
                     {
                         RETURN_TYPE useValue;
+                        uchar valtype;
+                        uchar mode;
+                           std::string val;
+                           uint child_size;
+                           std::string mypath;
+                           std::string comment;
                         if (read_watcher_value_from_stream(pathRequest.get_value_stream(), useValue))
                         {
                             ret = true;
@@ -1185,22 +1154,22 @@ namespace geco
                     {
                         OBJECT_TYPE & useObject = *(OBJECT_TYPE*) (((uintptr) pObject_) + ((uintptr) base));
                         WatcherMode mode = (setMethod_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
-                        pathRequest.get_result_stream().WriteMini((uchar) mode);
                         if (getMethod_ != (GetMethodType) NULL)
                         {
                             const RETURN_TYPE& useValue = (useObject.*getMethod_)();
-                            pathRequest.get_result_stream().Write(watcher_value_to_string(useValue));
+                            write_watcher_value_to_stream(pathRequest.get_result_stream(),
+                                    watcher_value_to_string(useValue), mode);
                             dprintf("write [%d,%s,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     watcher_value_to_string(useValue).c_str());
                         }
                         else
                         {
-                            pathRequest.get_result_stream().Write(watcher_value_to_string("None"));
+                            write_watcher_value_to_stream(pathRequest.get_result_stream(), "None", mode);
                             dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     watcher_value_to_string("No Get Method !").c_str());
                         }
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-                        pathRequest.get_result_stream().Write(this->comment_);
+                        pathRequest.get_result_stream().Write(comment_);
                         // write_watcher_value_to_stream(pathRequest.get_result_stream(), useval, mode, bytes_);
                         pathRequest.set_result_stream(comment_, mode, this, base);
                         return true;

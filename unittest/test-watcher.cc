@@ -124,12 +124,12 @@ static void set_val(std::string& a)
 TEST(GECO_DEBUGGING_WATCHER, test_add_remove_value_func_method_watchers)
 {
     const char* path1 = "WVT_INTEGER/WT_READ_ONLY/GECO_WATCH_VALUE";
-    GECO_WATCH(path1,value,WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
+    GECO_WATCH(path1, value, WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
 
     ExampleClass example;
     const char* path2 = "WVT_INTEGER/WT_READ_WRITE/GECO_WATCH_METHOD";
-    GECO_WATCH(path2,example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
-    "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
+    GECO_WATCH(path2, example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
+            "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
 
     const char* path3 = "WVT_STRING/WT_READ_WRITE/GECO_WATCH_FUNC";
     GECO_WATCH(path3, CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
@@ -190,11 +190,19 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v1)
     req1.set_request_complete_cb(req1_cb);  // do network things in this cb
     req1.set_setopt_string("25000");
     req1.set_watcher_value();    // set value that will be sent to remote endpoint and update the value
+
+    watcher_path_request_v1 req1_2("");
+    std::string tmp;
+    std::string paths;
+    int num = 0;
+    geco_watcher_base_t::get_root_watcher().walk_all_files(tmp, paths, num, true);
+    geco_watcher_base_t::get_root_watcher().visit_children(0, 0, req1_2);
 }
 
 static void req2_cb(watcher_path_request & pathRequest, int32 count)
 {
-    printf("---------------\n"); // mode, size/value, path. comment
+    return;
+    printf("---------------\n");  // mode, size/value, path. comment
     // this will be called when on comple path is walked
     geco_bit_stream_t& is = pathRequest.get_result_stream();
     uchar mode;
@@ -224,59 +232,78 @@ static void req2_cb(watcher_path_request & pathRequest, int32 count)
 }
 TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v2)
 {
+    /*
+     *  request stream is comprised of
+     *  [watcher type uchar] - (string/bool/int ...for data watcher, WVT_DIRECTORY for dir watcher)
+     *  [dir size uint] only dir watcher has this
+     *  [watcher mode uchar] - (read only/read write for data watcher, none for dir watcher)
+     *  [watcher value variable] - none for dir watcher
+     *  [watcher path string] - all have this
+     *  [comment existed bool]
+     *  [watcher comment string] none
+     */
+
     //this is done in remote endpoint
     int hp = 100;
     const char* path = "logger/cppThresholds/test_watcher_path_request_v2";
     GECO_WATCH(path, hp, WT_READ_WRITE, "log cc value");
 
     const char* path1 = "WVT_INTEGER/WT_READ_ONLY/GECO_WATCH_VALUE";
-    GECO_WATCH(path1,value,WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
+    GECO_WATCH(path1, value, WT_READ_ONLY, "GECO_WATCH_VALUE->WVT_INTEGER->WT_READ_ONLY");
 
     ExampleClass example;
     int a = 1;
     example.setValue(a);
     const char* path2 = "WVT_INTEGER/WT_READ_WRITE/GECO_WATCH_METHOD";
-    GECO_WATCH(path2,example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
-    "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
+    GECO_WATCH(path2, example, CAST_METHOD_RW(int, ExampleClass, getValue, setValue),
+            "GECO_WATCH_METHOD->WVT_INTEGER->GECO_WATCH_METHOD");
 
     const char* path3 = "WVT_STRING/WT_READ_WRITE/GECO_WATCH_FUNC";
-    GECO_WATCH(path3,CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
+    GECO_WATCH(path3, CAST_FUNC_RW(std::string, get_val, set_val), "GECO_WATCH_FUNC->WVT_STRING->CAST_FUNC_RW");
     printf("============================================\n");
 
     std::string tmp;
     std::string paths;
     int num = 0;
-
     geco_watcher_base_t::get_root_watcher().walk_all_files(tmp, paths, num, true);
+
     printf("============================================\n");
 
     // this is done in another endpoint to query
     watcher_path_request_v2 req2(path);
     req2.set_request_complete_cb(req2_cb);
-    geco_watcher_base_t::get_root_watcher().visit_children(0, 0, req2);
+    geco_watcher_base_t::get_root_watcher().visit_children(0, "logger/cppThresholds", req2);
 
     printf("============================================\n");
     // now all paths are stored in is
-//    geco_bit_stream_t& is = req2.get_result_stream();
-//    uchar mode;
-//    uint child_size;
-//    std::string mypath;
-//    std::string val;
-//    while (is.get_payloads() > 0)
-//    {
-//        is.ReadMini(mode);
-//        if (mode == WT_DIRECTORY)
-//        {
-//            is.ReadMini(child_size);
-//            is.Read(mypath);
-//            TRACE_MSG("req2_cb::read [WT_DIRECTORY, %d, %s]\n", child_size, mypath.c_str());
-//        }
-//        else  // watcher
-//        {
-//            is.Read(val);
-//            is.Read(mypath);
-//            TRACE_MSG("req2_cb::read [ mode %d,  %s, %s]\n", mode, val.c_str(),mypath.c_str());
-//        }
-//    }
+    printf("---------------\n");  // mode, size/value, path. comment
+    // this will be called when on comple path is walked
+    geco_bit_stream_t& is = req2.get_result_stream();
+    uchar valtype;
+    uchar mode;
+    std::string val;
+    uint child_size;
+    std::string mypath;
+    std::string comment;
+    while (is.get_payloads() > 0)
+    {
+        is.ReadMini(valtype);
+        if (valtype == WT_DIRECTORY)
+        {
+            is.ReadMini(child_size);
+            is.Read(mypath);
+            is.Read(comment);
+            TRACE_MSG("req2_cb::read[type %d,child size %d,path %s,comment %s]\n", WT_DIRECTORY,child_size, mypath.c_str(),comment.c_str());
+        }
+        else  // watcher
+        {
+            is.ReadMini(mode);
+            is.Read(val);
+            is.Read(mypath);
+            is.Read(comment);
+            TRACE_MSG("req2_cb::read[type %d,mode %d,val %s,path %s,comment %s]\n", valtype, mode, val.c_str(),mypath.c_str(),comment.c_str());
+        }
+    }
+    printf("---------------\n");
 
 }

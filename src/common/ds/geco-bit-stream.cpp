@@ -316,7 +316,7 @@ void geco_bit_stream_t::ReadAlignedBytes(uchar *dest, const byte_size_t bytes2Re
     align_readable_bit_pos();
     // read the data
     memcpy(dest, uchar_data_ + (readable_bit_pos_ >> 3), bytes2Read);
-    readable_bit_pos_ += bytes2Read << 3;
+    readable_bit_pos_ += (bytes2Read << 3);
 }
 
 void geco_bit_stream_t::ReadAlignedBytes(char *dest, byte_size_t &bytes2Read, const byte_size_t maxBytes2Read)
@@ -359,7 +359,7 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write, bool 
     /// start write first 3 bits 101 after shifting to right by , 00000 101
     /// write result                                                                      00010 101
 
-    if(is_read_only_ || !bits2Write) return;
+    if (is_read_only_ || !bits2Write) return;
 
     //if( mReadOnly ) return false;
     //if( bits2Write == 0 ) return false;
