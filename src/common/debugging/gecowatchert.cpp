@@ -105,27 +105,6 @@ bool watcher_path_request_v1::add_watcher_path(const void *base, const char *pat
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　　Section: watcher_path_request_v2 impls
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
-void watcher_path_request_v2::set_result_stream(const std::string & desc, const WatcherMode mode,
-        geco_watcher_base_t * watcher, const void *base)
-{
-    if (mode == WT_DIRECTORY)
-    {
-        std::string old(origin_request_path_);
-        origin_request_path_ = request_path_;
-        watcher->visit_children(base, NULL, *this);
-        origin_request_path_ = old;
-        request_path_ = origin_request_path_;
-        this->notify();
-    }
-    else if (mode != WT_INVALID)
-    {
-        // At this point we have type, mode, size, and data on the stream
-        // (as that is filled before calling this function)
-        // Ready to fill in the packet now
-        // Tell our parent we have collected all our data
-        this->notify();
-    }
-}
 void watcher_path_request_v2::get_watcher_value()
 {
     if (!geco_watcher_base_t::get_root_watcher().get_as_stream(NULL, request_path_.c_str(), *this))
@@ -378,17 +357,31 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
     if (geco_watcher_director_t::is_empty_path(path))
     {
         pathRequest.get_result_stream().WriteMini((uchar) WT_DIRECTORY);
-        pathRequest.get_result_stream().WriteMini((int) container_.size());
+        uint size = container_.size();
+        pathRequest.get_result_stream().WriteMini(size);
         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
         pathRequest.get_result_stream().Write(comment_);
-        TRACE_MSG("write [%d,%d,%s,%s]\n",(int)WT_DIRECTORY, (int)container_.size(), pathRequest.get_request_path().c_str(),comment_);
-        pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
+        TRACE_MSG("write [%d,%d,%s,%s]\n",(int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(),comment_);
+
+        std::string old(pathRequest.origin_request_path_);
+        pathRequest.origin_request_path_ = pathRequest.request_path_;
+        this->visit_children(base, NULL, pathRequest);
+        pathRequest.origin_request_path_ = old;
+        pathRequest.request_path_ = pathRequest.origin_request_path_;
+        pathRequest.notify();
+
+        //pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
         return true;
     }
     else if (geco_watcher_director_t::is_doc_path(path))
     {
         write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
-        pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
+        std::string old(pathRequest.origin_request_path_);
+        pathRequest.origin_request_path_ = pathRequest.request_path_;
+        this->visit_children(base, NULL, pathRequest);
+        pathRequest.origin_request_path_ = old;
+        pathRequest.request_path_ = pathRequest.origin_request_path_;
+        pathRequest.notify();
         return true;
     }
     else

@@ -298,7 +298,25 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v2)
         else  // watcher
         {
             is.ReadMini(mode);
-            is.Read(val);
+            switch(valtype)
+            {
+                case WatcherValueType::WVT_INT32:
+                int int32v;
+                is.ReadMini(int32v);
+                val = watcher_value_to_string(int32v);
+                break;
+                case WatcherValueType::WVT_UINT32:
+                uint uint32v;
+                is.ReadMini(uint32v);
+                val = watcher_value_to_string(uint32v);
+                break;
+                case WatcherValueType::WVT_STRING:
+                uint bytes2Write;
+                is.ReadMini(bytes2Write);
+                val.resize(bytes2Write);
+                is.ReadAlignedBytes((uchar*) val.data(), bytes2Write);
+                break;
+            }
             is.Read(mypath);
             is.Read(comment);
             TRACE_MSG("req2_cb::read[type %d,mode %d,val %s,path %s,comment %s]\n", valtype, mode, val.c_str(),mypath.c_str(),comment.c_str());

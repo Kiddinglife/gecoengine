@@ -156,15 +156,13 @@ namespace geco
         /**
          * WatcherPathRequest is a handler class to allow an asyncronous request of a single watcher path.
          */
-        class watcher_path_request
+        struct watcher_path_request
         {
-            public:
                 std::string request_path_;
                 // Output stream for the watcher path requests data
                 geco_bit_stream_t result_;
                 on_wt_path_req_complete_t on_complete_cb_;
 
-            public:
                 watcher_path_request(const char* path)
                         : request_path_(path)
                 {
@@ -215,14 +213,12 @@ namespace geco
                 }
         };
 
-        class watcher_path_request_v1: public watcher_path_request
+        struct watcher_path_request_v1: public watcher_path_request
         {
-            private:
                 std::string setopt_string_;  //!< String used in set operations for this path request
                 uint replies_count_;  //!< Number of watcher path replies contained in this path request.
                 bool use_desc_;  //!< True if the watcher request reply should contain a description.
 
-            public:
                 watcher_path_request_v1(const char* path, bool use_use_desc = false)
                         : watcher_path_request(path), replies_count_(1), use_desc_(use_use_desc)
                 {
@@ -246,9 +242,8 @@ namespace geco
                     setopt_string_ = valueStr;
                 }
         };
-        class watcher_path_request_v2: public watcher_path_request
+        struct watcher_path_request_v2: public watcher_path_request
         {
-            private:
                 // Data obtained from the watcher nub to use in a set operation.
                 char *set_data_;
                 // Input stream for the watcher path requests data
@@ -256,7 +251,6 @@ namespace geco
                 // Original path requested via watcher nub, used when visiting directories and requestPath_ may be altered.
                 std::string origin_request_path_;
 
-            public:
                 watcher_path_request_v2(const char* path)
                         : watcher_path_request(path), set_data_(NULL)
                 {
@@ -264,8 +258,6 @@ namespace geco
                 virtual ~watcher_path_request_v2()
                 {
                 }
-                virtual void set_result_stream(const std::string & desc, const WatcherMode mode,
-                        geco_watcher_base_t * watcher, const void *base);
                 virtual void get_watcher_value();
                 virtual bool set_watcher_value();
 
@@ -882,7 +874,7 @@ namespace geco
                         {
                             ret = true;
                             write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_);
-                            pathRequest.set_result_stream(comment_, access_, this, base);
+                            pathRequest.notify();
                         }
                     }
                     return ret;
@@ -908,19 +900,18 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))  //this is visit children called
                     {
                         const TYPE & useValue = *(const TYPE*) (((const uintptr) &rValue_) + ((const uintptr) base));
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(),
-                                watcher_value_to_string(useValue), access_);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_);
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
                         pathRequest.get_result_stream().Write(comment_);
-                        pathRequest.set_result_stream(comment_, access_, this, base);
                         dprintf("write [%d,%s,%s]\n", access_, pathRequest.get_request_path().c_str(),
                                 watcher_value_to_string(useValue).c_str());
+                        pathRequest.notify();
                         return true;
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
                         write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
-                        pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
+                        pathRequest.notify();
                         return true;
                     }
                     else
@@ -989,7 +980,7 @@ namespace geco
                             ret = true;
                             (*setFunction_)(useValue);
                             write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, WT_READ_WRITE);
-                            pathRequest.set_result_stream(comment_, WT_READ_WRITE, this, base);
+                            pathRequest.notify();
                         }
                     }
                     return ret;
@@ -1015,20 +1006,18 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))
                     {
                         WatcherMode mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(),
-                                watcher_value_to_string((*getFunction_)()), mode);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), (*getFunction_)(), mode);
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
                         pathRequest.get_result_stream().Write(comment_);
-                        //write_watcher_value_to_stream(pathRequest.get_result_stream(), (*getFunction_)(), mode, bytes_);
-                        pathRequest.set_result_stream(comment_, mode, this, base);
                         dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                 watcher_value_to_string((*getFunction_)()).c_str());
+                        pathRequest.notify();
                         return true;
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
                         write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
-                        pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
+                        pathRequest.notify();
                         return true;
                     }
                     else
@@ -1102,22 +1091,45 @@ namespace geco
                     bool ret = false;
                     if (geco_watcher_director_t::is_empty_path(path) && (setMethod_ != NULL))
                     {
-                        RETURN_TYPE useValue;
                         uchar valtype;
                         uchar mode;
-                           std::string val;
-                           uint child_size;
-                           std::string mypath;
-                           std::string comment;
-                        if (read_watcher_value_from_stream(pathRequest.get_value_stream(), useValue))
+                        static std::string mypath;
+                        static std::string comment;
+                        mypath.clear();
+                        comment.clear();
+
+                        pathRequest.get_value_stream().ReadMini(valtype);
+                        if (valtype != WT_DIRECTORY)
                         {
-                            ret = true;
-                            OBJECT_TYPE & useObject = *(OBJECT_TYPE*) (((uintptr) pObject_) + ((uintptr) base));
-                            (useObject.*setMethod_)(useValue);
-                            // push the result into the reply stream
-                            // assuming mode RW because we have already set
-                            write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, WT_READ_WRITE);
-                            pathRequest.set_result_stream(comment_, WT_READ_WRITE, this, base);
+                            pathRequest.get_value_stream().ReadMini(mode);
+                            if (mode == WT_READ_WRITE)
+                            {
+                                RETURN_TYPE useValue;
+                                if (read_watcher_value_from_stream(pathRequest.get_value_stream(), useValue))
+                                {
+                                    ret = true;
+                                    OBJECT_TYPE & useObject = *(OBJECT_TYPE*) (((uintptr) pObject_) + ((uintptr) base));
+                                    (useObject.*setMethod_)(useValue);
+                                    // push the result into the reply stream
+                                    // assuming mode RW because we have already set
+                                    pathRequest.get_value_stream().Read(mypath);
+                                    pathRequest.get_value_stream().Read(comment);
+                                    if (comment != "None" && comment != "") comment_ = comment.c_str();
+                                    write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue,
+                                            WT_READ_WRITE);
+                                    pathRequest.get_value_stream().Write(mypath);
+                                    pathRequest.get_value_stream().Write(comment);
+                                    pathRequest.notify();
+                                }
+                            }
+                            else
+                            {
+                                //todo error
+                            }
+                        }
+                        else
+                        {
+                            //todo error
                         }
                     }
                     return ret;
@@ -1157,8 +1169,7 @@ namespace geco
                         if (getMethod_ != (GetMethodType) NULL)
                         {
                             const RETURN_TYPE& useValue = (useObject.*getMethod_)();
-                            write_watcher_value_to_stream(pathRequest.get_result_stream(),
-                                    watcher_value_to_string(useValue), mode);
+                            write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, mode);
                             dprintf("write [%d,%s,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     watcher_value_to_string(useValue).c_str());
                         }
@@ -1170,14 +1181,13 @@ namespace geco
                         }
                         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
                         pathRequest.get_result_stream().Write(comment_);
-                        // write_watcher_value_to_stream(pathRequest.get_result_stream(), useval, mode, bytes_);
-                        pathRequest.set_result_stream(comment_, mode, this, base);
+                        pathRequest.notify();
                         return true;
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
                         write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
-                        pathRequest.set_result_stream(comment_, WT_READ_ONLY, this, base);
+                        pathRequest.notify();
                         return true;
                     }
                     else
