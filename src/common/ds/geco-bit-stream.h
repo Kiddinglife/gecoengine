@@ -35,6 +35,7 @@
 #include <cstring>
 #include <cmath>
 #include <cassert>
+#include <string>
 
 //#include "geco-export.h"
 //#include "geco-namesapces.h"

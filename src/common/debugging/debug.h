@@ -221,7 +221,7 @@ namespace geco
                 int filter_threshold_;
 
                 // FALSE: GECO_ASSERT_DEV and GECO_ASSERT_DEV_IFNOT  DO_NOT cause a real assertion.
-                // TRUE: GECO_ASSERT_DEV and GECO_ASSERT_DEV_IFNOT  DO cause a real assertion.
+                // defualt TRUE: GECO_ASSERT_DEV and GECO_ASSERT_DEV_IFNOT  DO cause a real assertion.
                 bool has_dev_assert_;
 
                 log_msg_filter_t()

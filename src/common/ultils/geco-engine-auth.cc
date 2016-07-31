@@ -9,7 +9,7 @@
 #include "../debugging/debug.h"
 using namespace geco::debugging;
 
-DECLARE_DEBUG_COMPONENT2("COMM", 0);
+DECLARE_DEBUG_COMPONENT2("COMM/ULTILS/AUTH", 0);
 
 namespace geco
 {
@@ -216,17 +216,17 @@ namespace geco
             return true;
         }
 
-        geco_bit_stream_t& operator>>(geco_bit_stream_t &is, MD5::Digest &d)
-        {
-            is.Read((char*) d.bytes, (uint) sizeof(d.bytes));
-            return is;
-        }
+        //geco_bit_stream_t& operator>>(geco_bit_stream_t &is, MD5::Digest &d)
+        //{
+        //    is.Read((char*) d.bytes, (uint) sizeof(d.bytes));
+        //    return is;
+        //}
 
-        geco_bit_stream_t& operator<<(geco_bit_stream_t &os, const MD5::Digest &d)
-        {
-            os.Write((char*) d.bytes, (uint) sizeof(d.bytes));
-            return os;
-        }
+        //geco_bit_stream_t& operator<<(geco_bit_stream_t &os, const MD5::Digest &d)
+        //{
+        //    os.Write((char*) d.bytes, (uint) sizeof(d.bytes));
+        //    return os;
+        //}
 
     }
 }
