@@ -55,15 +55,9 @@ void watcher_path_request_v1::get_watcher_value()
 	else if (mode != WT_INVALID)
 	{
 		// Add the result onto the final result stream
-		write_watcher_value_to_stream(result_, request_path_, WT_READ_ONLY);
 		write_watcher_value_to_stream(result_, result, WT_READ_ONLY);
-		if (use_desc_)
-		{
-			write_watcher_value_to_stream(result_, true, WT_READ_ONLY);
-			write_watcher_value_to_stream(result_, desc, WT_READ_ONLY);
-		}
-		else
-			write_watcher_value_to_stream(result_, false, WT_READ_ONLY, sizeof(false));
+		result_.Write(request_path_);
+        result_.Write(desc);
 		// Tell our parent we have collected all our data
 		this->notify();
 	}
@@ -194,32 +188,6 @@ void geco_watcher_base_t::partition_path(const std::string path, std::string & n
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　　 Section: geco_watcher_director_t
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
-watcher_directory_t* geco_watcher_director_t::find_child(const char * path) const
-{
-	if (path == NULL) return NULL;
-	char* pseparator = strchr((char*)path, WATCHER_PATH_SEPARATOR);
-	uint cmp_len = (pseparator == NULL) ? strlen(path) : (pseparator - path);
-
-	//    char* label = new char[cmp_len + 1];
-	//    label[cmp_len] = '\0';
-	//    memcpy(label, path, cmp_len);
-	//    TRACE_MSG("search for  child label %s\n", label);
-
-	watcher_directory_t* ptr = NULL;
-	if (cmp_len != 0)
-	{
-		auto iter = container_.begin();
-		while (iter != container_.end() && ptr == NULL)
-		{
-			if (cmp_len == (*iter).label.length() && strncmp(path, (*iter).label.c_str(), cmp_len) == 0)
-			{
-				ptr = (watcher_directory_t*)(&(*iter));
-			}
-			++iter;
-		}
-	}
-	return ptr;
-}
 bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t& pChild, void * withBase)
 {
 	bool was_added = false;
