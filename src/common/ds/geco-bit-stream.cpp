@@ -309,9 +309,9 @@ void geco_bit_stream_t::read_ranged_float(float &outFloat, float floatMin, float
 
 void geco_bit_stream_t::ReadAlignedBytes(uchar *dest, const byte_size_t bytes2Read)
 {
-    assert(bytes2Read > 0);
-    assert(get_payloads() >= BYTES_TO_BITS(bytes2Read));
-    // if (bytes2Read <= 0) return;
+//    assert(bytes2Read > 0);
+//    assert(get_payloads() >= BYTES_TO_BITS(bytes2Read));
+    if (bytes2Read <= 0 || get_payloads() < BYTES_TO_BITS(bytes2Read)) return;
     // Byte align
     align_readable_bit_pos();
     // read the data

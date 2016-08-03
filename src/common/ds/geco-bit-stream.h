@@ -447,14 +447,17 @@ class geco_bit_stream_t
         {
             uint bytes2Read;
             ReadMini(bytes2Read);
-            varString.resize(bytes2Read);
-            ReadAlignedBytes((uchar*) varString.data(), bytes2Read);
+            if (bytes2Read > 0)
+            {
+                varString.resize(bytes2Read);
+                ReadAlignedBytes((uchar*) varString.data(), bytes2Read);
+            }
         }
         inline void Read(uchar *varString)
         {
             uint bytes2Read;
             ReadMini(bytes2Read);
-            ReadAlignedBytes(varString, bytes2Read);
+            if (bytes2Read > 0) ReadAlignedBytes(varString, bytes2Read);
         }
         inline void Read(char *varString)
         {
@@ -1190,7 +1193,7 @@ class geco_bit_stream_t
         {
             uint len = src.length();
             WriteMini(len);
-            write_aligned_bytes((uchar*) src.c_str(), len);
+            if (len > 0) write_aligned_bytes((uchar*) src.c_str(), len);
         }
 
         //

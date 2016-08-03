@@ -61,23 +61,22 @@ TEST(GECO_DEBUGGING_WATCHER, transformation_between_watchervalue_and_request_str
     geco_bit_stream_t ret;
     uchar mode;
     uchar type;
-    std::string path;
-    std::string comment;
-    for (int i = 0; i < 100000; i++)
+    std::string path="";
+    std::string comment="";
+    for (int i = 0; i < 10000; i++)
     {
-
         int int_in = 12;
-        write_watcher_value_to_stream(ret, int_in, WT_READ_WRITE);
+        write_watcher_value_to_stream(ret, int_in, WT_READ_WRITE, path, comment);
         uint64 uint64_in = 234726728;
-        write_watcher_value_to_stream(ret, uint64_in, WT_READ_WRITE);
+        write_watcher_value_to_stream(ret, uint64_in, WT_READ_WRITE, path, comment);
         float float_in = 12.001f;
-        write_watcher_value_to_stream(ret, float_in, WT_READ_ONLY);
+        write_watcher_value_to_stream(ret, float_in, WT_READ_ONLY, path, comment);
         double double_in = 12.00000001;
-        write_watcher_value_to_stream(ret, double_in, WT_READ_ONLY);
+        write_watcher_value_to_stream(ret, double_in, WT_READ_ONLY, path, comment);
         char str_in[] = "hello worldhello world2hello world2hello world2";
-        write_watcher_value_to_stream(ret, str_in, WT_READ_ONLY);
+        write_watcher_value_to_stream(ret, str_in, WT_READ_ONLY, path, comment);
         std::string string_in = "hello world2hello world2hello world2hello world2hello world2";
-        write_watcher_value_to_stream(ret, string_in, WT_READ_ONLY);
+        write_watcher_value_to_stream(ret, string_in, WT_READ_ONLY, path, comment);
 
         uint bytes;
         int int_out;

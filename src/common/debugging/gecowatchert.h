@@ -481,9 +481,9 @@ namespace geco
         {
             result.ReadMini(valtype);
             result.ReadMini(mode);
-            uint bytes2Write;
-            result.ReadMini(bytes2Write);
-            result.ReadAlignedBytes(value, bytes2Write);
+            result.Read(value);
+            result.Read(path);
+            result.Read(comment);
             return true;
         }
         inline bool read_watcher_value_from_stream(geco_bit_stream_t & result, char* value, uchar& valtype, uchar& mode,
@@ -496,93 +496,124 @@ namespace geco
         {
             result.ReadMini(valtype);
             result.ReadMini(mode);
-            uint bytes2Write;
-            result.ReadMini(bytes2Write);
-            value.resize(bytes2Write);
-            result.ReadAlignedBytes((uchar*) value.data(), bytes2Write);
+            result.Read(value);
+            result.Read(path);
+            result.Read(comment);
             if (valtype != WVT_STRING) return false;
             return true;
         }
         // SET operations of protocol v2
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int8 value, const WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int8 value, const WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT8);
             result.WriteMini((uchar) mode);
             result.WriteMini(value, false);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint8 value, const WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint8 value, const WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT8);
             result.WriteMini((uchar) mode);
             result.WriteMini(value);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int16 value, const WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int16 value, const WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT16);
             result.WriteMini((uchar) mode);
             result.WriteMini(value, false);
+            result.Write(path);
+            result.Write(comment);
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint16 value,
-                const WatcherMode mode)
+                const WatcherMode mode, const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT16);
             result.WriteMini((uchar) mode);
             result.WriteMini(value);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int64 value, const WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int64 value, const WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT64);
             result.WriteMini((uchar) mode);
             result.WriteMini(value, false);
+            result.Write(path);
+            result.Write(comment);
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint64 value,
-                const WatcherMode mode)
+                const WatcherMode mode, const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT64);
             result.WriteMini((uchar) mode);
             result.WriteMini(value);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int value, WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int value, WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT32);
             result.WriteMini((uchar) mode);
             result.WriteMini(value, false);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint value, WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint value, WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT32);
             result.WriteMini((uchar) mode);
             result.WriteMini(value);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const float value, WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const float value, WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT32);
             result.WriteMini((uchar) mode);
             result.Write(value);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const double value, WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const double value, WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_INT32);
             result.WriteMini((uchar) mode);
             result.Write(value);
+            result.Write(path);
+            result.Write(comment);
         }
         inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const std::string& value,
-                WatcherMode mode)
+                WatcherMode mode, const std::string& path, const std::string& comment)
         {
             result.WriteMini((uchar) WVT_STRING);
             result.WriteMini((uchar) mode);
-            uint bytes = value.length();
-            result.WriteMini(bytes);
-            result.write_aligned_bytes((uchar*) value.c_str(), bytes);
+            result.Write(value);
+            result.Write(path);
+            result.Write(comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, char* value, WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, char* value, WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
-            std::string buf = value;
-            write_watcher_value_to_stream(result, buf, mode);
+            static std::string buf;
+            buf.clear();
+            buf = value;
+            write_watcher_value_to_stream(result, buf, mode, path, comment);
         }
-        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const char* value, WatcherMode mode)
+        inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const char* value, WatcherMode mode,
+                const std::string& path, const std::string& comment)
         {
-            return write_watcher_value_to_stream(result, (char*) value, mode);
+            return write_watcher_value_to_stream(result, (char*) value, mode, path, comment);
         }/*protocol v2 ends*/
 
         /**
@@ -931,7 +962,6 @@ namespace geco
                                 if (mode == WT_READ_WRITE)
                                 {
                                     ret = true;
-                                    write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_);
                                     // push the result into the reply stream
                                     // assuming mode RW because we have already set
                                     if (comment != "None" && comment != "") comment_ = comment.c_str();
@@ -942,10 +972,9 @@ namespace geco
                                                 pathRequest.request_path_.c_str())->label =
                                                 pathRequest.request_path_.substr(pos);
                                     }
-                                    write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue,
-                                            WT_READ_WRITE);
-                                    pathRequest.get_value_stream().Write(mypath);
-                                    pathRequest.get_value_stream().Write(comment);
+                                    pathRequest.get_result_stream().reset();
+                                    write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_,
+                                            mypath, comment);
                                     pathRequest.notify();
                                 }
                                 else
@@ -986,9 +1015,8 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))  //this is visit children called
                     {
                         const TYPE & useValue = *(const TYPE*) (((const uintptr) &rValue_) + ((const uintptr) base));
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_);
-                        pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-                        pathRequest.get_result_stream().Write(comment_);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_,
+                                pathRequest.get_request_path(), comment_);
                         dprintf("write [%d,%s,%s]\n", access_, pathRequest.get_request_path().c_str(),
                                 watcher_value_to_string(useValue).c_str());
                         pathRequest.notify();
@@ -996,7 +1024,8 @@ namespace geco
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY,
+                                pathRequest.get_request_path(), comment_);
                         pathRequest.notify();
                         return true;
                     }
@@ -1076,8 +1105,6 @@ namespace geco
                                 {
                                     ret = true;
                                     (*setFunction_)(useValue);
-                                    write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue,
-                                            WT_READ_WRITE);
                                     // push the result into the reply stream
                                     // assuming mode RW because we have already set
                                     if (comment != "None" && comment != "") comment_ = comment.c_str();
@@ -1089,9 +1116,7 @@ namespace geco
                                                 pathRequest.request_path_.substr(pos);
                                     }
                                     write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue,
-                                            WT_READ_WRITE);
-                                    pathRequest.get_value_stream().Write(mypath);
-                                    pathRequest.get_value_stream().Write(comment);
+                                            WT_READ_WRITE, mypath, comment);
                                     pathRequest.notify();
                                 }
                                 else
@@ -1132,9 +1157,8 @@ namespace geco
                     if (geco_watcher_director_t::is_empty_path(path))
                     {
                         WatcherMode mode = (setFunction_ != NULL) ? WT_READ_WRITE : WT_READ_ONLY;
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(), (*getFunction_)(), mode);
-                        pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-                        pathRequest.get_result_stream().Write(comment_);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), (*getFunction_)(), mode,
+                                pathRequest.get_request_path(), comment_);
                         dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                 watcher_value_to_string((*getFunction_)()).c_str());
                         pathRequest.notify();
@@ -1142,7 +1166,8 @@ namespace geco
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY,
+                                pathRequest.get_request_path(), comment_);
                         pathRequest.notify();
                         return true;
                     }
@@ -1245,9 +1270,7 @@ namespace geco
                                                 pathRequest.request_path_.substr(pos);
                                     }
                                     write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue,
-                                            WT_READ_WRITE);
-                                    pathRequest.get_value_stream().Write(mypath);
-                                    pathRequest.get_value_stream().Write(comment);
+                                            WT_READ_WRITE, mypath, comment);
                                     pathRequest.notify();
                                 }
                                 else
@@ -1302,24 +1325,25 @@ namespace geco
                         if (getMethod_ != (GetMethodType) NULL)
                         {
                             const RETURN_TYPE& useValue = (useObject.*getMethod_)();
-                            write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, mode);
+                            write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, mode,
+                                    pathRequest.request_path_, comment_);
                             dprintf("write [%d,%s,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     watcher_value_to_string(useValue).c_str());
                         }
                         else
                         {
-                            write_watcher_value_to_stream(pathRequest.get_result_stream(), "None", mode);
+                            write_watcher_value_to_stream(pathRequest.get_result_stream(), "None", mode,
+                                    pathRequest.request_path_, comment_);
                             dprintf("write [%d,%s,%s]\n", mode, pathRequest.get_request_path().c_str(),
                                     watcher_value_to_string("No Get Method !").c_str());
                         }
-                        pathRequest.get_result_stream().Write(pathRequest.get_request_path());
-                        pathRequest.get_result_stream().Write(comment_);
                         pathRequest.notify();
                         return true;
                     }
                     else if (geco_watcher_director_t::is_doc_path(path))
                     {
-                        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
+                        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY,
+                                pathRequest.request_path_, comment_);
                         pathRequest.notify();
                         return true;
                     }
