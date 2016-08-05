@@ -665,11 +665,10 @@ void geco_bit_stream_t::Hexlify(char* out, bit_size_t mWritePosBits, uchar* mBuf
     {
         sprintf(out + Index * 3, "%02x ", mBuffer[Index]);
     }
-
 }
 void geco_bit_stream_t::Hexlify(void)
 {
     char out[4096];
-    Hexlify(out, writable_bit_pos_, uchar_data_);
+    geco_bit_stream_t::Hexlify(out, writable_bit_pos_, uchar_data_);
     printf("%s\n", out);
 }

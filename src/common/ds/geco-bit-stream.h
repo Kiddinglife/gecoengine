@@ -1697,33 +1697,38 @@ class geco_bit_stream_t
         {
             if (DoEndianSwap()) ReverseBytes(uchar_data_ + byteOffset, length);
         }
-
+        inline byte_size_t get_bytes_length()
+        {
+            return BITS_TO_BYTES(writable_bit_pos_);
+        }
         /// @brief Makes a copy of the internal data for you @param _data
         /// will point to the stream. Partial bytes are left aligned.
         /// @param[out] _data The allocated copy of GetData().
-        /// @return The length in bits of the stream.
+        /// @return The length in bytes of remaining bytes between start_offset and BITS_TO_BYTES(writable_bit_pos_)
         /// @pre _data points to valid and enough memory space.
-        /// caller may need use BITS_TO_BYTES(writable_bit_pos_) to get the
-        /// length of data to copy
+        /// caller may need use get_bytes_length() to get the
+        /// length of data in the stream
         /// @note all bytes are copied besides the bytes in get_payloads().
-        bit_size_t copy_data(uchar* _data) const
+        inline bit_size_t copy_data(uchar* dest, byte_size_t size2copy=0, byte_size_t start_offset = 0)
         {
             assert(writable_bit_pos_ > 0);
+            assert(BITS_TO_BYTES(writable_bit_pos_) >= (size2copy+start_offset));
             // we leave memory allocation to caller which is more flexable
-//            _data = (uchar*) gMallocEx(BITS_TO_BYTES(writable_bit_pos_),
-//                    TRACKE_MALLOC);
-            memcpy(_data, uchar_data_, sizeof(uchar) * BITS_TO_BYTES(writable_bit_pos_));
-            return writable_bit_pos_;
+            if (size2copy == 0) size2copy = get_bytes_length();
+            memcpy(dest, uchar_data_ + start_offset, sizeof(uchar) * size2copy);
+            return BITS_TO_BYTES(writable_bit_pos_) - start_offset;
         }
 
         ///@brief Ignore data we don't intend to read
-        void skip_read_bits(const bit_size_t numberOfBits)
+        /// @ret the old read pos
+        bit_size_t skip_read_bits(const bit_size_t numberOfBits)
         {
             readable_bit_pos_ += numberOfBits;
+            return readable_bit_pos_ - numberOfBits;
         }
-        void skip_read_bytes(const byte_size_t numberOfBytes)
+        byte_size_t skip_read_bytes(const byte_size_t numberOfBytes)
         {
-            skip_read_bits(BYTES_TO_BITS(numberOfBytes));
+            return (skip_read_bits(BYTES_TO_BITS(numberOfBytes)) >> 3);
         }
 
         // @pre: writable_bit_pos_ is on the byte boundary
@@ -1831,10 +1836,6 @@ class geco_bit_stream_t
 
             readable_bit_pos_ += 32;
         }
-
-        ///@brief text-print bits starting from @data to @mWritingPosBits
-        void PrintBit(void);
-        void PrintHex(void);
 
         /// @briefAssume we have value of 00101100   00000000   Little Endian
         /// the required bits are 8(0000000)+2(first 2 bits from left to right in 00101100)
