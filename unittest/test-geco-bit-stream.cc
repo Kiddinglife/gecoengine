@@ -25,9 +25,9 @@ DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 
 struct vec
 {
-        float x;
-        float y;
-        float z;
+    float x;
+    float y;
+    float z;
 };
 TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
 {
@@ -116,6 +116,11 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
             s8.WriteMini(int8);
 
             s8.WriteBits(&particialByte, 7, false);
+
+            //if (i == 1)
+            //{
+            //    s8.Bitify();
+            //}
         }
 
         geco_bit_stream_t s9;
@@ -337,9 +342,9 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed)
             s9.Read(uint24);
             EXPECT_TRUE(uint24.val == 24);
 
-//            guid_t guidd;
-//            s9.Read(guidd);
-//            EXPECT_TRUE(guid == guidd);
+            //            guid_t guidd;
+            //            s9.Read(guidd);
+            //            EXPECT_TRUE(guid == guidd);
 
             uint24_t mini_uint24 = 0;
             s9.Read(mini_uint24);

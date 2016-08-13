@@ -17,6 +17,7 @@ GTEST_API_ int main(int argc, char** argv)
 	// no need for calling testing::InitGoogleTest() separately.
 	testing::InitGoogleMock(&argc, argv);
 
+    ::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";
 	//::testing::GTEST_FLAG(filter) = "GECO_ULTILS.encode64_when_given_string_and_then_decode64_back_to_string_result_should_be_same";
 	//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.test_msg_macros";
 	//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.geco_asset_dev_if_not_does_block_codes_will_not_run_when_has_dev_assert_is_true";

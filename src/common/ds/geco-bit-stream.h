@@ -56,9 +56,9 @@
 #define SignedInteger false
 
 /// Threshold at which to do a malloc / free rather than pushing data onto a fixed stack
-/// for the bitstream class. 256 is an arbitrary size, just picking something likely to be larger
+/// for the bitstream class. 512 is an arbitrary size, just picking something likely to be larger
 /// than  most packets
-#define GECO_STREAM_STACK_ALLOC_BYTES 256
+#define GECO_STREAM_STACK_ALLOC_BYTES 512
 #define GECO_STREAM_STACK_ALLOC_BITS (BYTES_TO_BITS(GECO_STREAM_STACK_ALLOC_BYTES))
 
 // another imple of singleton using static methods instead of inhertance
@@ -358,8 +358,6 @@ class geco_bit_stream_t
         {
             assert(get_payloads() >= 1);
             //if (get_payloads() < 1) return;
-            // Has to be on a different line for Mac
-            // Is it faster to just write it out here?
             dest = (uchar_data_[readable_bit_pos_ >> 3] & (0x80 >> (readable_bit_pos_ & 7))) != 0;
             readable_bit_pos_++;
         }
@@ -409,7 +407,6 @@ class geco_bit_stream_t
         /// @notice will align @mReadPosBIts to byte-boundary internally
         /// @see  align_readable_bit_pos()
         /// @author mengdi[Jackie]
-
         inline void Read(uint24_t &dest)
         {
             assert(get_payloads() >= 24);
@@ -481,14 +478,6 @@ class geco_bit_stream_t
             bool dataWritten;
             Read(dataWritten);
             if (dataWritten) Read(dest);
-        }
-
-        /// @brief Read a bool from a bitstream.
-        /// @param[in] outTemplateVar The value to read
-
-        inline void ReadChangedValue(bool &dest)
-        {
-            return Read(dest);
         }
 
         /// @Brief Assume the input source points to a compressed native type.
@@ -1252,20 +1241,6 @@ class geco_bit_stream_t
                 Write(true);
                 Write(latestVal);
             }
-        }
-
-        /// @func WriteChanged
-        /// @brief write a bool delta. Same thing as just calling Write
-        /// @access  public
-        /// @param [in] const bool & currentValue
-        /// @param [in] const bool & lastValue
-        /// @return void
-        /// @author mengdi[Jackie]
-
-        inline void WriteChangedValue(const bool &currentValue, const bool &lastValue)
-        {
-            (void) lastValue;
-            Write(currentValue);
         }
 
         /// @brief WriteDelta when you don't know what the last value is, or there is no last value.
