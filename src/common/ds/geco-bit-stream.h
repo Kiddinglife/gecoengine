@@ -1996,6 +1996,9 @@ class geco_bit_stream_t
             }
         }
 
+        int					FloatToBits(float f, int exponentBits, int mantissaBits);
+        float				BitsToFloat(int i, int exponentBits, int mantissaBits);
+
         /// Can only print 4096 size of uchar no materr is is bit or byte
         /// mainly used for dump binary data
         static void Bitify(char* out, int mWritePosBits, unsigned char* mBuffer, bool hide_zero_low_bytes = false);

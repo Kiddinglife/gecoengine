@@ -602,6 +602,67 @@ void geco_bit_stream_t::pad_zeros_up_to(uint bytes)
     }
 }
 
+#define INTSIGNBITSET(i)		(((const unsigned long)(i)) >> 31)
+#define IEEE_FLT_MANTISSA_BITS	23
+#define IEEE_FLT_EXPONENT_BITS	8
+#define IEEE_FLT_EXPONENT_BIAS	127
+#define IEEE_FLT_SIGN_BIT		31
+
+int geco_bit_stream_t::FloatToBits(float f, int exponentBits, int mantissaBits) {
+    int i, sign, exponent, mantissa, value;
+
+    assert(exponentBits >= 2 && exponentBits <= 8);
+    assert(mantissaBits >= 2 && mantissaBits <= 23);
+
+    int maxBits = (((1 << (exponentBits - 1)) - 1) << mantissaBits) | ((1 << mantissaBits) - 1);
+    int minBits = (((1 << exponentBits) - 2) << mantissaBits) | 1;
+
+    float max = BitsToFloat(maxBits, exponentBits, mantissaBits);
+    float min = BitsToFloat(minBits, exponentBits, mantissaBits);
+
+    if (f >= 0.0f) {
+        if (f >= max) {
+            return maxBits;
+        }
+        else if (f <= min) {
+            return minBits;
+        }
+    }
+    else {
+        if (f <= -max) {
+            return (maxBits | (1 << (exponentBits + mantissaBits)));
+        }
+        else if (f >= -min) {
+            return (minBits | (1 << (exponentBits + mantissaBits)));
+        }
+    }
+
+    exponentBits--;
+    i = *reinterpret_cast<int *>(&f);
+    sign = (i >> IEEE_FLT_SIGN_BIT) & 1;
+    exponent = ((i >> IEEE_FLT_MANTISSA_BITS) & ((1 << IEEE_FLT_EXPONENT_BITS) - 1)) - IEEE_FLT_EXPONENT_BIAS;
+    mantissa = i & ((1 << IEEE_FLT_MANTISSA_BITS) - 1);
+    value = sign << (1 + exponentBits + mantissaBits);
+    value |= ((INTSIGNBITSET(exponent) << exponentBits) | (abs(exponent) & ((1 << exponentBits) - 1))) << mantissaBits;
+    value |= mantissa >> (IEEE_FLT_MANTISSA_BITS - mantissaBits);
+    return value;
+}
+
+float geco_bit_stream_t::BitsToFloat(int i, int exponentBits, int mantissaBits) {
+    static int exponentSign[2] = { 1, -1 };
+    int sign, exponent, mantissa, value;
+
+    assert(exponentBits >= 2 && exponentBits <= 8);
+    assert(mantissaBits >= 2 && mantissaBits <= 23);
+
+    exponentBits--;
+    sign = i >> (1 + exponentBits + mantissaBits);
+    exponent = ((i >> mantissaBits) & ((1 << exponentBits) - 1)) * exponentSign[(i >> (exponentBits + mantissaBits)) & 1];
+    mantissa = (i & ((1 << mantissaBits) - 1)) << (IEEE_FLT_MANTISSA_BITS - mantissaBits);
+    value = sign << IEEE_FLT_SIGN_BIT | (exponent + IEEE_FLT_EXPONENT_BIAS) << IEEE_FLT_MANTISSA_BITS | mantissa;
+    return *reinterpret_cast<float *>(&value);
+}
+
 void geco_bit_stream_t::Bitify(char* out, int mWritePosBits, unsigned char* mBuffer, bool hide_zero_low_bytes)
 {
     printf("[%dbits %dbytes]\ntop (low byte)-> bottom (high byte),\nright(low bit)->left(high bit):\n", mWritePosBits,
