@@ -27,17 +27,17 @@ using namespace geco::ds;
  *  ranged *-ranged-*()
  *  bit packed *Mini()
  */
-//TEST(GecoMemoryStreamTestCase, test_float_compression)
-//{
-//    int fi = geco_bit_stream_t::FloatToBits(123456.789);
-//    float intf = geco_bit_stream_t::BitsToFloat(fi);
-//    geco_bit_stream_t s8((uchar*) &fi, sizeof(int), false);
-//    s8.Bitify();
-//    printf("%d, %.6f\n", fi, intf);
-//    geco_bit_stream_t s9((uchar*) &intf, sizeof(uchar), false);
-//    s9.Bitify();
-//}
-//
+TEST(GecoMemoryStreamTestCase, test_float_compression)
+{
+    int fi = geco_bit_stream_t::FloatToBits(0.789);
+    float intf = geco_bit_stream_t::BitsToFloat(fi);
+    geco_bit_stream_t s8((uchar*)&fi, sizeof(int), false);
+    s8.Bitify();
+    printf("%d, %.6f\n", fi, intf);
+    geco_bit_stream_t s9((uchar*)&intf, sizeof(uchar), false);
+    s9.Bitify();
+}
+
 //TEST(GecoMemoryStreamTestCase, test_run_length)
 //{
 //    // 111 000 000 100 00 -> 111 000+10 100 00
@@ -63,9 +63,9 @@ DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 
 struct vec
 {
-        float x;
-        float y;
-        float z;
+    float x;
+    float y;
+    float z;
 };
 TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
 {
@@ -85,10 +85,10 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
     // guid_t guid(123);
     //NetworkAddress addr("192.168.1.107", 32000);
     vec vector_ =
-            { 0.2f, -0.4f, -0.8f };
+    { 0.2f, -0.4f, -0.8f };
     vec vector__ =
-            { 2.234f, -4.78f, -32.2f };
-    float outFloat = 0.123;
+    { 2.234f, -4.78f, -32.2f };
+    float outFloat = -0.123;
     uint curr = 12;
     uint min = 8;
     uint max = 64;
@@ -114,7 +114,7 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
         for (uint i = 1; i <= looptimes; i++)
         {
             s8.WriteMini(uint24);
-           s8.write_ranged_float(outFloat, -1.0f, 1.0f);
+            s8.write_ranged_float(outFloat, -1.0f, 1.0f);
             //s8.WriteMini(guid);
 
             s8.WriteMini(uint24);
@@ -168,7 +168,7 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
         if (i == 0)
         {
             printf("uncompressed  '%.5f' MB\n",
-                    float(BITS_TO_BYTES(s9.get_payloads()) / 1024 / 1024));
+                float(BITS_TO_BYTES(s9.get_payloads()) / 1024 / 1024));
         }
 
         for (uint i = 1; i <= looptimes; i++)
@@ -178,6 +178,8 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes)
             EXPECT_TRUE(uint24.val == 24);
             float muf;
             s9.read_ranged_float(muf, -1.0f, 1.0f);
+            EXPECT_TRUE(fabs(muf - outFloat) <= 0.0001f);
+
 
             //guid_t guidd;
             //s9.ReadMini(guidd);
@@ -300,9 +302,9 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed)
     //guid_t guid(123);
     //NetworkAddress addr("192.168.1.107", 32000);
     vec vector_ =
-            { 0.2f, -0.4f, -0.8f };
+    { 0.2f, -0.4f, -0.8f };
     vec vector__ =
-            { 2.234f, -4.78f, -32.2f };
+    { 2.234f, -4.78f, -32.2f };
 
     uint curr = 12;
     uint min = 8;
@@ -377,7 +379,7 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed)
         if (i == 0)
         {
             printf("uncompressed  '%.5f' MB\n",
-                    float(BITS_TO_BYTES(s9.get_payloads()) / 1024 / 1024));
+                float(BITS_TO_BYTES(s9.get_payloads()) / 1024 / 1024));
         }
 
         for (uint i = 1; i <= looptimes; i++)
@@ -388,7 +390,7 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed)
 
             float mf;
             s9.Read(mf);
-            EXPECT_TRUE(fabs(mf-ufloat) < 0.0001f);
+            EXPECT_TRUE(fabs(mf - ufloat) < 0.0001f);
 
             //            guid_t guidd;
             //            s9.Read(guidd);

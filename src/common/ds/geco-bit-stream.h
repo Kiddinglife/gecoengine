@@ -368,6 +368,7 @@ class geco_bit_stream_t
             assert(get_payloads() >= sizeof(int));
             int v;
             Read(v);
+            //dest = fabs(BitsToFloat(v));
             dest = fabs(BitsToFloat(v));
         }
 
@@ -549,20 +550,6 @@ class geco_bit_stream_t
         inline void ReadMini(bool &dest)
         {
             Read(dest);
-        }
-        /// For values between -1 and 1
-        inline void ReadMini(float &dest)
-        {
-            ushort compressedFloat;
-            ReadMini(compressedFloat);
-            dest = ((float) compressedFloat / 32767.5f - 1.0f);
-        }
-        /// For values between -1 and 1
-        inline void ReadMini(double &dest)
-        {
-            uint compressedFloat;
-            ReadMini(compressedFloat);
-            dest = ((double) compressedFloat / 2147483648.0 - 1.0);
         }
 
         /// For strings
@@ -1094,7 +1081,7 @@ class geco_bit_stream_t
         {
             if (sizeof(IntergralType) == 1)
             {
-                WriteBits((uchar*) &src, BYTES_TO_BITS(sizeof(IntergralType)), true);
+                WriteBits((uchar*) &src, BYTES_TO_BITS(sizeof(IntergralType)));
             }
             else
             {
@@ -1103,11 +1090,11 @@ class geco_bit_stream_t
                 {
                     uchar output[sizeof(IntergralType)];
                     ReverseBytes((uchar*) &src, output, sizeof(IntergralType));
-                    WriteBits(output, BYTES_TO_BITS(sizeof(IntergralType)), true);
+                    WriteBits(output, BYTES_TO_BITS(sizeof(IntergralType)));
                 }
                 else
 #endif
-                    WriteBits((uchar*) &src, BYTES_TO_BITS(sizeof(IntergralType)), true);
+                    WriteBits((uchar*) &src, BYTES_TO_BITS(sizeof(IntergralType)));
             }
         }
 
@@ -1126,7 +1113,8 @@ class geco_bit_stream_t
 
         inline void Write(const float &src)
         {
-            int v = FloatToBits(fabs(src));
+            //int v = FloatToBits(fabs(src));
+            int v = FloatToBits(src);
             Write(v);
         }
 
@@ -1419,23 +1407,6 @@ class geco_bit_stream_t
         inline void WriteMini(const bool &src)
         {
             Write(src);
-        }
-        inline void WriteMini(const float &src)
-        {
-            assert(src > -1.01f && src < 1.01f);
-            float varCopy = src;
-            if (varCopy < -1.0f) varCopy = -1.0f;
-            if (varCopy > 1.0f) varCopy = 1.0f;
-            WriteMini((ushort) ((varCopy + 1.0f) * 32767.5f));
-        }
-        ///@notice For values between -1 and 1
-        inline void WriteMini(const double &src)
-        {
-            assert(src > -1.01f && src < 1.01f);
-            double varCopy = src;
-            if (varCopy < -1.0f) varCopy = -1.0f;
-            if (varCopy > 1.0f) varCopy = 1.0f;
-            WriteMini((uint) ((varCopy + 1.0) * 2147483648.0));
         }
 
         /// Compress the string the difference of string and blob is that
@@ -1797,7 +1768,7 @@ class geco_bit_stream_t
 
             readable_bit_pos_ += 16;
         }
-
+        
         void WriteFourAlignedBytes(const char *inByteArray)
         {
             assert((writable_bit_pos_ & 7) == 0);
