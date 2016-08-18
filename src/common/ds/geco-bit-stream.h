@@ -248,7 +248,7 @@ class geco_bit_stream_t
         ///@brief payload are actually the unread bits wriitten bits - read_bits
         /// @access public
         inline bit_size_t get_payloads(void) const
-        {
+                {
             return writable_bit_pos_ - readable_bit_pos_;
         }
 
@@ -261,7 +261,7 @@ class geco_bit_stream_t
         /// if mWritingPosBits = 8, will need 1 byte to hold 8 written bits (0 bits wasted)
         /// @author mengdi[Jackie]
         inline byte_size_t get_written_bytes(void) const
-        {
+                {
             return BITS_TO_BYTES(writable_bit_pos_);
         }
 
@@ -270,7 +270,7 @@ class geco_bit_stream_t
         /// @access public
         /// @author mengdi[Jackie]
         inline bit_size_t get_written_bits(void) const
-        {
+                {
             return writable_bit_pos_;
         }
 
@@ -309,11 +309,12 @@ class geco_bit_stream_t
         /// @access public
         /// @param [out] [unsigned uchar * dest]  The destination array
         /// @param [in] [bit_size_t bitsRead] The number of bits to read
-        /// @param [in] [const bool alignRight]  If true bits will be right aligned
+        /// @param [in] [const bool alignRight]  the alignment of dest byte
+        /// If true bits will be right aligned. otherwise, no shofts
         /// @returns void
         /// @remarks
-        /// 1.jackie stream internal data are aligned to the left side of byte boundary.
-        /// 2.user data are aligned to the right side of byte boundary.
+        /// 1.jackie stream internal data are aligned to the left side of byte boundary.so alignRight should be false
+        /// 2.user data are aligned to the right side of byte boundary, so alignRight shouldbe true
         /// @notice
         /// 1.use True to read to user data
         /// 2.use False to read this stream to another stream
@@ -360,6 +361,14 @@ class geco_bit_stream_t
             //if (get_payloads() < 1) return;
             dest = (uchar_data_[readable_bit_pos_ >> 3] & (0x80 >> (readable_bit_pos_ & 7))) != 0;
             readable_bit_pos_++;
+        }
+
+        inline void Read(float &dest)
+        {
+            assert(get_payloads() >= sizeof(int));
+            int v;
+            Read(v);
+            dest = fabs(BitsToFloat(v));
         }
 
         /// TODO MOVE THIS into network_address_t by operator <<
@@ -627,7 +636,8 @@ class geco_bit_stream_t
         }
 
         template<class IntegerType>
-        void ReadIntegerRange(IntegerType &value, const IntegerType minimum, const IntegerType maximum,
+        void ReadIntegerRange(IntegerType &value, const IntegerType minimum,
+                const IntegerType maximum,
                 bool allowOutsideRange = false)
         {
             /// get the high byte bits size
@@ -670,7 +680,8 @@ class geco_bit_stream_t
         /// we do nothing for little endian.
         /// @see
         template<class templateType>
-        void ReadIntegerRange(templateType &value, const templateType minimum, const templateType maximum,
+        void ReadIntegerRange(templateType &value, const templateType minimum,
+                const templateType maximum,
                 const int requiredBits, bool allowOutsideRange)
         {
             assert(maximum >= minimum);
@@ -731,13 +742,16 @@ class geco_bit_stream_t
         /// @param [in] const byte_size_t maxBytes2Read
         /// @brief  Same as ReadAlignedBytesSafe() but allocates the memory
         /// for you using new, rather than assuming it is safe to write to
-        void ReadAlignedBytesAlloc(char **dest, byte_size_t &bytes2Read, const byte_size_t maxBytes2Read);
+        void ReadAlignedBytesAlloc(char **dest, byte_size_t &bytes2Read,
+                const byte_size_t maxBytes2Read);
 
         // @brief return 1 if the next data read is a 1, 0 if it is a 0
         ///@access public
         inline uint ReadBit(void)
         {
-            uint result = ((uchar_data_[readable_bit_pos_ >> 3] & (0x80 >> (readable_bit_pos_ & 7))) != 0) ? 1 : 0;
+            uint result =
+                    ((uchar_data_[readable_bit_pos_ >> 3] & (0x80 >> (readable_bit_pos_ & 7))) != 0) ?
+                            1 : 0;
             readable_bit_pos_++;
             return result;
         }
@@ -862,8 +876,10 @@ class geco_bit_stream_t
         /// @return true on success, false on failure.
         ///@notice templateType for this function must be a float or double
         template<class templateType>
-        void ReadOrthMatrix(templateType &m00, templateType &m01, templateType &m02, templateType &m10,
-                templateType &m11, templateType &m12, templateType &m20, templateType &m21, templateType &m22)
+        void ReadOrthMatrix(templateType &m00, templateType &m01, templateType &m02,
+                templateType &m10,
+                templateType &m11, templateType &m12, templateType &m20, templateType &m21,
+                templateType &m22)
         {
             float qw, qx, qy, qz;
             ReadNormQuat(qw, qx, qy, qz);
@@ -909,11 +925,12 @@ class geco_bit_stream_t
         /// @access      public
         /// @param [in] [const uchar * src] source array
         /// @param [in] [bit_size_t bits2Write] the number of bits to write
-        /// @param [in] [bool rightAligned] if true particial bits will be right aligned
+        /// @param [in] [bool rightAligned] the alignment of src byte
+        /// if true particial bits will be left aligned, otherwise, no shift
         /// @returns void
         /// @remarks
-        /// 1.jackie stream internal data are aligned to the left side of byte boundary.
-        /// 2.user data are aligned to the right side of byte boundary.
+        /// 1.jackie stream internal data are aligned to the left side of byte boundary. so rightAlign should be false
+        /// 2.user data are usually aligned to the right side of byte boundary. so rightAlign should be true
         /// @notice
         /// 1.Use true to write user data to jackie stream
         /// 2.Use False to write this jackie stream internal data to another stream
@@ -962,7 +979,8 @@ class geco_bit_stream_t
         template<class IntergralType>
         void WritePtr(IntergralType *src)
         {
-            if (sizeof(IntergralType) == 1) WriteBits((uchar*) src, BYTES_TO_BITS(sizeof(IntergralType)), true);
+            if (sizeof(IntergralType) == 1) WriteBits((uchar*) src,
+                    BYTES_TO_BITS(sizeof(IntergralType)), true);
             else
             {
 #ifndef DO_NOT_SWAP_ENDIAN
@@ -1009,7 +1027,8 @@ class geco_bit_stream_t
             // Write bit 1
             bit_size_t shift = writable_bit_pos_ & 7;
             shift == 0 ?
-                    uchar_data_[writable_bit_pos_ >> 3] = 0x80 : uchar_data_[writable_bit_pos_ >> 3] |= 0x80 >> shift;
+                         uchar_data_[writable_bit_pos_ >> 3] = 0x80 :
+                         uchar_data_[writable_bit_pos_ >> 3] |= 0x80 >> shift;
             writable_bit_pos_++;
         }
 
@@ -1047,7 +1066,8 @@ class geco_bit_stream_t
         /// @param[in] inputLength the size of input.
         /// @param[in] maxBytesWrite max bytes to write
         /// @notice Won't write beyond maxBytesWrite
-        void write_aligned_bytes(const uchar *src, const byte_size_t bytes2Write, const byte_size_t maxBytes2Write);
+        void write_aligned_bytes(const uchar *src, const byte_size_t bytes2Write,
+                const byte_size_t maxBytes2Write);
 
         /// @func Write
         /// @brief write a float into 2 bytes, spanning the range,
@@ -1102,6 +1122,12 @@ class geco_bit_stream_t
             if (src == true) WriteBitOne();
             else
                 WriteBitZero();
+        }
+
+        inline void Write(const float &src)
+        {
+            int v = FloatToBits(fabs(src));
+            Write(v);
         }
 
         /// TODO MOVE THIS into network_address_t by operator <<
@@ -1482,7 +1508,8 @@ class geco_bit_stream_t
         /// This does require that @param mini and @param max are fixed
         /// values for a given line of code for the life of the program
         /// @see
-        template<class IntegerType> void write_ranged_integer(const IntegerType value, const IntegerType mini,
+        template<class IntegerType> void write_ranged_integer(const IntegerType value,
+                const IntegerType mini,
                 const IntegerType max, bool allowOutsideRange = false)
         {
             IntegerType diff = max - mini;
@@ -1506,7 +1533,8 @@ class geco_bit_stream_t
         /// the high byte of 00101100 that was put in low address can be written correctly
         /// for little endian, we do nothing.
         template<class IntegerType>
-        void write_ranged_integer(const IntegerType value, const IntegerType mini, const IntegerType max,
+        void write_ranged_integer(const IntegerType value, const IntegerType mini,
+                const IntegerType max,
                 const int requiredBits, bool allowOutsideRange = false)
         {
             assert(max >= mini);
@@ -1555,7 +1583,8 @@ class geco_bit_stream_t
             write_ranged_float((float) x, -1.0f, 1.0f);
             write_ranged_float((float) y, -1.0f, 1.0f);
         }
-        template<class templateType> void write_normal_vector(templateType x, templateType y, templateType z)
+        template<class templateType> void write_normal_vector(templateType x, templateType y,
+                templateType z)
         {
             assert(x <= 1.01 && y <= 1.01 && z <= 1.01 && x >= -1.01 && y >= -1.01 && z >= -1.01);
             write_ranged_float((float) x, -1.0f, 1.0f);
@@ -1582,7 +1611,8 @@ class geco_bit_stream_t
                 WriteMini((float) (y / magnitude));
             }
         }
-        template<class templateType> void write_vector(templateType x, templateType y, templateType z)
+        template<class templateType> void write_vector(templateType x, templateType y,
+                templateType z)
         {
             templateType magnitude = sqrt(x * x + y * y + z * z);
             Write((float) magnitude);
@@ -1603,7 +1633,8 @@ class geco_bit_stream_t
         /// @notice
         /// templateType for this function must be a float or double
         /// @see
-        template<class templateType> void write_normal_quat(templateType w, templateType x, templateType y,
+        template<class templateType> void write_normal_quat(templateType w, templateType x,
+                templateType y,
                 templateType z)
         {
             Write((bool) (w < 0.0));
@@ -1627,8 +1658,10 @@ class geco_bit_stream_t
         /// Use (18 bits to 6 bytes) +4 bits instead of 36
         /// templateType for this function must be a float or double
         /// @see write_normal_quat()
-        template<class templateType> void write_orth_matrix(templateType m00, templateType m01, templateType m02,
-                templateType m10, templateType m11, templateType m12, templateType m20, templateType m21,
+        template<class templateType> void write_orth_matrix(templateType m00, templateType m01,
+                templateType m02,
+                templateType m10, templateType m11, templateType m12, templateType m20,
+                templateType m21,
                 templateType m22)
         {
             double qw;
@@ -1684,7 +1717,8 @@ class geco_bit_stream_t
         /// caller may need use get_bytes_length() to get the
         /// length of data in the stream
         /// @note all bytes are copied besides the bytes in get_payloads().
-        inline bit_size_t copy_data(uchar* dest, byte_size_t size2copy=0, byte_size_t start_offset = 0)
+        inline bit_size_t copy_data(uchar* dest, byte_size_t size2copy = 0,
+                byte_size_t start_offset = 0)
         {
             assert(writable_bit_pos_ > 0);
             assert(BITS_TO_BYTES(writable_bit_pos_) >= (size2copy+start_offset));
@@ -1735,7 +1769,7 @@ class geco_bit_stream_t
                 uchar_data_[(writable_bit_pos_ >> 3) + 1] = inByteArray[0];
             }
             else
-#endif
+            #endif
             {
                 uchar_data_[(writable_bit_pos_ >> 3) + 0] = inByteArray[0];
                 uchar_data_[(writable_bit_pos_ >> 3) + 1] = inByteArray[1];
@@ -1755,7 +1789,7 @@ class geco_bit_stream_t
                 inOutByteArray[1] = uchar_data_[(readable_bit_pos_ >> 3) + 0];
             }
             else
-#endif
+            #endif
             {
                 inOutByteArray[0] = uchar_data_[(readable_bit_pos_ >> 3) + 0];
                 inOutByteArray[1] = uchar_data_[(readable_bit_pos_ >> 3) + 1];
@@ -1777,7 +1811,7 @@ class geco_bit_stream_t
                 uchar_data_[(writable_bit_pos_ >> 3) + 3] = inByteArray[0];
             }
             else
-#endif
+            #endif
             {
                 uchar_data_[(writable_bit_pos_ >> 3) + 0] = inByteArray[0];
                 uchar_data_[(writable_bit_pos_ >> 3) + 1] = inByteArray[1];
@@ -1801,7 +1835,7 @@ class geco_bit_stream_t
                 inOutByteArray[3] = uchar_data_[(readable_bit_pos_ >> 3) + 0];
             }
             else
-#endif
+            #endif
             {
                 inOutByteArray[0] = uchar_data_[(readable_bit_pos_ >> 3) + 0];
                 inOutByteArray[1] = uchar_data_[(readable_bit_pos_ >> 3) + 1];
@@ -1811,6 +1845,24 @@ class geco_bit_stream_t
 
             readable_bit_pos_ += 32;
         }
+        void WriteBitOnes(uint num)
+        {
+            assert(num > 0);
+            while (num-- > 0)
+            {
+                this->WriteBitOne();
+            }
+        }
+        void WriteBitZeros(uint num)
+        {
+            assert(num > 0);
+            while (num-- > 0)
+            {
+                this->WriteBitZero();
+            }
+        }
+        void WriteMini(geco_bit_stream_t& src);
+        void ReadMini(geco_bit_stream_t& dest);
 
         /// @briefAssume we have value of 00101100   00000000   Little Endian
         /// the required bits are 8(0000000)+2(first 2 bits from left to right in 00101100)
@@ -1996,12 +2048,13 @@ class geco_bit_stream_t
             }
         }
 
-        int					FloatToBits(float f, int exponentBits, int mantissaBits);
-        float				BitsToFloat(int i, int exponentBits, int mantissaBits);
+        static int FloatToBits(float f, int exponentBits = 8, int mantissaBits = 23);
+        static float BitsToFloat(int i, int exponentBits = 8, int mantissaBits = 23);
 
         /// Can only print 4096 size of uchar no materr is is bit or byte
         /// mainly used for dump binary data
-        static void Bitify(char* out, int mWritePosBits, unsigned char* mBuffer, bool hide_zero_low_bytes = false);
+        static void Bitify(char* out, int mWritePosBits, unsigned char* mBuffer,
+                bool hide_zero_low_bytes = false);
         void Bitify(bool hide_zero_low_bytes = false);
         static void Hexlify(char* outstr, bit_size_t bitsPrint, uchar* src);
         void Hexlify(void);

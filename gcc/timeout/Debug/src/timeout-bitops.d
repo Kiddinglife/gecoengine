@@ -1,1 +1,1 @@
-src/timeout-bitops.d: ../src/timeout-bitops.c
+src/timeout-bitops.o: ../src/timeout-bitops.c
