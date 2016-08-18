@@ -21,6 +21,12 @@ using namespace geco::debugging;
 using namespace geco::ultils;
 using namespace geco::ds;
 
+/**
+ * prefer the list below:
+ *  delta *-changed()
+ *  ranged *-ranged-*()
+ *  bit packed *Mini()
+ */
 //TEST(GecoMemoryStreamTestCase, test_float_compression)
 //{
 //    int fi = geco_bit_stream_t::FloatToBits(123456.789);
