@@ -48,7 +48,7 @@
  * A message is only displayed if its priority is not less than
  * DebugFilter::filterThreshold() plus the component's priority.
  *
- *	@param TRACE_MSG
+ *	@param VERBOSE_MSG
  * Used to display trace information. That is, when you enter a method.
  *
  *	@param DEBUG_MSG
@@ -369,7 +369,7 @@ namespace geco
          */
         enum LogMsgPriority
         {
-            LOG_MSG_TRACE,
+            LOG_MSG_VERBOSE,
             LOG_MSG_DEBUG,
             LOG_MSG_INFO,
             LOG_MSG_NOTICE,
@@ -623,8 +623,8 @@ __FILE__ "(%d)%s%s\n", (int )__LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAM
  *	This macro used to display trace information. Can be used later to add in
  *	our own callstack if necessary.
  */
-#define Enter(className,methodName) TRACE_MSG( "Enter " className "::" methodName "\n" )
-#define Leave(className,methodName) TRACE_MSG( "Leave " className "::" methodName "\n" )
+#define Enter(className,methodName) VERBOSE_MSG( "Enter " className "::" methodName "\n" )
+#define Leave(className,methodName) VERBOSE_MSG( "Leave " className "::" methodName "\n" )
 
 /**
  *	This macro is used to verify an expression. In non-release it
@@ -653,7 +653,7 @@ geco::debugging::log_msg_helper(const_cpnt_priority,LOG_MSG_CRITICAL ).critical_
 #if ENABLE_MSG_LOGGING
 #define MSG_BACK_TRACE(PRIORITY)\
 geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
-#define TRACE_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_TRACE )
+#define TRACE_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_VERBOSE )
 #define DEBUG_BACKTRACE		MSG_BACK_TRACE( LOG_MSG_DEBUG )
 #define INFO_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_INFO )
 #define NOTICE_BACKTRACE	    MSG_BACK_TRACE( LOG_MSG_NOTICE )
@@ -666,7 +666,7 @@ geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 // all msgs with pri lower than PRIORITY will NOT be printed out.
 #define MSG_DEBUG(PRIORITY) geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).message
 /// This macro prints a debug message with TRACE priority.
-#define TRACE_MSG		MSG_DEBUG( LOG_MSG_TRACE )
+#define VERBOSE_MSG		MSG_DEBUG( LOG_MSG_VERBOSE )
 /// This macro prints a debug message with DEBUG priority.
 #define DEBUG_MSG		MSG_DEBUG( LOG_MSG_DEBUG )
 /// This macro prints a debug message with INFO priority.
@@ -689,7 +689,7 @@ geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 			printf(__VA_ARGS__);											\
 	}																		\
 	while (false)
-#define TRACE_MSG(...)			NULL_MSG(__VA_ARGS__)
+#define VERBOSE_MSG(...)			NULL_MSG(__VA_ARGS__)
 #define DEBUG_MSG(...)			NULL_MSG(__VA_ARGS__)
 #define INFO_MSG(...)			NULL_MSG(__VA_ARGS__)
 #define NOTICE_MSG(...)			NULL_MSG(__VA_ARGS__)

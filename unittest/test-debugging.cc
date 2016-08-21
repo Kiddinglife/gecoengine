@@ -20,7 +20,7 @@ TEST(GECO_DEBUGGING_MSGLOG, test_msg_macros)
 {
 	Leave("test_msg_macros", "test_msg_macros");
 	Enter("test_msg_macros", "test_msg_macros");
-	TRACE_MSG("TRACE_MSG\n");
+	VERBOSE_MSG("VERBOSE_MSG\n");
 	DEBUG_MSG("DEBUG_MSG %d\n", 12);
 	INFO_MSG("INFO_MSG %s\n", "hello world");
 	NOTICE_MSG("NOTICE_MSG %s\n", "hello world");

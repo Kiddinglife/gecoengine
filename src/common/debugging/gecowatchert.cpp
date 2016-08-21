@@ -9,7 +9,7 @@
 
 #if ENABLE_WATCHERS
 
-DECLARE_DEBUG_COMPONENT2("COMM", 0);
+DECLARE_DEBUG_COMPONENT2("COMM", LOG_MSG_DEBUG);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - 
 // 　　　　　　　　　　　　　　Section: watcher_path_request_v1 impls
@@ -206,7 +206,7 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             container_.insert(iter, newdir);
             was_added = true;
-            TRACE_MSG("append watcher %s, container size %d!\n\n", newdir.label.c_str(), (int)container_.size());
+            VERBOSE_MSG("append watcher %s, container size %d!\n\n", newdir.label.c_str(), (int)container_.size());
         }
         else  //existed value
         {
@@ -228,7 +228,7 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             auto iter = container_.begin();
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             pFound = &(*(container_.insert(iter, newdir)));
-            TRACE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), (int)container_.size());
+            VERBOSE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), (int)container_.size());
         }
         // recusice call add_watcher, this will create new watcher dir if needed
         // finally result is a new path is built and the watcher itself is added
@@ -254,7 +254,7 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
                 if (pseparator == NULL)
                 {
                     container_.erase(iter);
-                    // TRACE_MSG(" delete watcher (%s) sucesseds\n",(*iter).label.c_str());
+                    // VERBOSE_MSG(" delete watcher (%s) sucesseds\n",(*iter).label.c_str());
                     return true;
                 }
                 else
@@ -327,7 +327,7 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
         pathRequest.get_result_stream().WriteMini(size);
         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
         pathRequest.get_result_stream().Write(comment_);
-        TRACE_MSG("write [%d,%d,%s,%s]\n", (int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(), comment_);
+        DEBUG_MSG("write dir watcher [%d,%d,%s,%s]\n", (int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(), comment_);
 
         std::string old(pathRequest.origin_request_path_);
         pathRequest.origin_request_path_ = pathRequest.request_path_;
