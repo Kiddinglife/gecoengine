@@ -111,7 +111,8 @@ namespace geco
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list,
                         critical_msg_cb_tag*)> critical_msg_cb_t;
 
         /**
@@ -125,7 +126,7 @@ namespace geco
         struct default_critical_msg_handler_t
         {
                 static default_critical_msg_handler_t* handler_;
-            public:
+                public:
                 enum Result
                 {
                     ENTERDEBUGGER = 0, EXITDIRECTLY
@@ -156,41 +157,47 @@ namespace geco
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list,
                         debug_msg_cb_tag*)> debug_msg_cb_t;
 
         struct error_msg_cb_tag
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list,
                         error_msg_cb_tag*)> error_msg_cb_t;
 
         struct warnning_msg_cb_tag
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list,
                         warnning_msg_cb_tag*)> warnning_msg_cb_t;
 
         struct info_msg_cb_tag
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list, info_msg_cb_tag*)> info_msg_cb_t;
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list, info_msg_cb_tag*)> info_msg_cb_t;
 
         struct notice_msg_cb_tag
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list,
                         notice_msg_cb_tag*)> notice_msg_cb_t;
 
         struct trace_msg_cb_tag
         {
         };
         typedef std::function<
-                bool(int component_priority, int msg_priority, const char * format, va_list args_list,
+                bool(int component_priority, int msg_priority, const char * format,
+                        va_list args_list,
                         trace_msg_cb_tag*)> trace_msg_cb_t;
 
         /** This class is used to help filter log messages.*/
@@ -265,7 +272,9 @@ namespace geco
                  * priority >= component_priority */
                 static bool should_accept(int component_priority, int msg_riority)
                 {
-                    return (msg_riority >= MAX(log_msg_filter_t::get_instance().filter_threshold_, component_priority));
+                    return (msg_riority
+                            >= MAX(log_msg_filter_t::get_instance().filter_threshold_,
+                                    component_priority));
                 }
 
                 /**
@@ -414,8 +423,9 @@ namespace geco
 #ifndef _WIN32
                 void message(const char * format, ...) __attribute__((format(printf, 2, 3)));
                 void critical_msg(const char * format, ...) __attribute__((format(printf, 2, 3)));
-                void dev_critical_msg(const char * format, ...) __attribute__((format(printf, 2, 3)));
-#else
+                void dev_critical_msg(const char * format, ...)
+                        __attribute__((format(printf, 2, 3)));
+                #else
                 static bool automated_test_;
                 static void log2file(const char* line);
                 void message(const char * format, ...);
@@ -517,7 +527,8 @@ namespace geco
 #endif
         void vdprintf(const char * format, va_list argPtr, const char * prefix =
         NULL);
-        void vdprintf(int componentPriority, int messagePriority, const char * format, va_list argPtr,
+        void vdprintf(int componentPriority, int messagePriority, const char * format,
+                va_list argPtr,
                 const char * prefix = NULL);
 #else
 /// This function prints a debug message.
@@ -652,7 +663,7 @@ geco::debugging::log_msg_helper(const_cpnt_priority,LOG_MSG_CRITICAL ).critical_
 
 #if ENABLE_MSG_LOGGING
 #define MSG_BACK_TRACE(PRIORITY)\
-geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
+geco::debugging::log_msg_helper(::const_cpnt_priority,PRIORITY).msg_back_trace
 #define TRACE_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_VERBOSE )
 #define DEBUG_BACKTRACE		MSG_BACK_TRACE( LOG_MSG_DEBUG )
 #define INFO_BACKTRACE		    MSG_BACK_TRACE( LOG_MSG_INFO )
@@ -664,7 +675,7 @@ geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 
 // The following macros are used to display debug information.
 // all msgs with pri lower than PRIORITY will NOT be printed out.
-#define MSG_DEBUG(PRIORITY) geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).message
+#define MSG_DEBUG(PRIORITY) geco::debugging::log_msg_helper(::const_cpnt_priority,PRIORITY).message
 /// This macro prints a debug message with TRACE priority.
 #define VERBOSE_MSG		MSG_DEBUG( LOG_MSG_VERBOSE )
 /// This macro prints a debug message with DEBUG priority.
@@ -706,7 +717,7 @@ geco::debugging::log_msg_helper(const_cpnt_priority,PRIORITY).msg_back_trace
 //	DECLARE_DEBUG_COMPONENT2() will have precedence over this one.
 namespace
 {
-const int default_cpnt_priority = 0;
+     const int const_cpnt_priority = 0;
 }
 
 #ifndef _RELEASE
@@ -725,7 +736,7 @@ extern bool init_value_watcher(int& value, const char * path);
 #define DECLARE_DEBUG_COMPONENT2(module, priority)\
 static int const_cpnt_priority = priority;\
 static bool IGNORE_THIS_COMPONENT_WATCHER_INIT = \
-init_value_watcher(const_cpnt_priority,get_base_path( __FILE__, module ) );
+init_value_watcher(::const_cpnt_priority,get_base_path( __FILE__, module ) );
 #else
 #define DECLARE_DEBUG_COMPONENT2( module, priority )\
 static int const_cpnt_priority = priority;
