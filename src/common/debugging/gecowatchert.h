@@ -44,7 +44,6 @@
 #include "../ds/geco-bit-stream.h"
 
 #include "debug.h"
-using namespace geco::debugging;
 using namespace std::placeholders;
 
 namespace geco
