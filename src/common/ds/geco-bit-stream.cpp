@@ -214,7 +214,7 @@ void HuffmanEncodingTree::EncodeArray(unsigned char *input, size_t sizeInBytes,
 		unsigned short remainingBits = (unsigned short) (8
 				- (output->get_written_bits() & 7));
 		CharacterEncoding tmp = { 0, remainingBits };
-		auto pos = upper_bound(encodingTableSorted.begin(),
+		auto pos = std::upper_bound(encodingTableSorted.begin(),
 				encodingTableSorted.end(), &tmp, cmp_char_encoding_bitslen);
 		output->WriteBits((*pos)->encoding, remainingBits, false); // Data is left aligned
 #ifdef _DEBUG
