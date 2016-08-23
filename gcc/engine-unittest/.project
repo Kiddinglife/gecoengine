@@ -31,6 +31,11 @@
 			<locationURI>PARENT-3-PROJECT_LOC/bw2</locationURI>
 		</link>
 		<link>
+			<name>source</name>
+			<type>2</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Seriousness/server/source</locationURI>
+		</link>
+		<link>
 			<name>unittest</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/unittest</locationURI>

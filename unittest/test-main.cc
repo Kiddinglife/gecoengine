@@ -18,6 +18,7 @@ GTEST_API_ int main(int argc, char** argv)
 	testing::InitGoogleMock(&argc, argv);
 
    // ::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";
+    //::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_haffman_compression";
     //::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_float_compression";
    // ::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_run_length";
 	//::testing::GTEST_FLAG(filter) = "GECO_ULTILS.encode64_when_given_string_and_then_decode64_back_to_string_result_should_be_same";
