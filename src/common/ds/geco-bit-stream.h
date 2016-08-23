@@ -39,6 +39,7 @@
 
 #include <list>
 #include <map>
+#include <vector>
 
 //#include "geco-export.h"
 //#include "geco-namesapces.h"

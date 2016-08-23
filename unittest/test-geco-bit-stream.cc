@@ -77,7 +77,7 @@ TEST(GecoMemoryStreamTestCase, test_geco_string_compressor) {
 	writer.Write(originstr);
 	writer.Read(recvstr);
 	EXPECT_STREQ(originstr.c_str(), recvstr.c_str());
-	printf("original bytes: %d, comprssed byts %d, compression ratio %.2f%\n",
+	printf("original bytes: %d, comprssed byts %d, compression ratio %.2f\n",
 			originstr.length(), writer.get_written_bytes(),
 			(originstr.length() - writer.get_written_bytes())
 					/ (float) originstr.length() * 100);
