@@ -9,7 +9,7 @@
 #include "../debugging/debug.h"
 using namespace geco::debugging;
 
-DECLARE_DEBUG_COMPONENT2("GECO-ENGINE-COMMON-MODULE-LOGGER", 0);
+DECLARE_DEBUG_COMPONENT2("COMM/ULTILS/AUTH", 0);
 
 namespace geco
 {
@@ -18,15 +18,15 @@ namespace geco
 
         static const char fillchar = '=';
         static const std::string::size_type np = std::string::npos;
-        static const char npc = (char) np;
+        static const char npc = (char)np;
 
-// 0000000000111111111122222222223333333333444444444455555555556666
-// 0123456789012345678901234567890123456789012345678901234567890123
+        // 0000000000111111111122222222223333333333444444444455555555556666
+        // 0123456789012345678901234567890123456789012345678901234567890123
         static std::string Base64Table("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
-// Decode Table gives the index of any valid base64 character in the Base64 table]
-// 65 == A, 97 == a, 48 == 0, 43 == +, 47 == /
-// 0  1  2  3  4  5  6  7  8  9
+        // Decode Table gives the index of any valid base64 character in the Base64 table]
+        // 65 == A, 97 == a, 48 == 0, 43 == +, 47 == /
+        // 0  1  2  3  4  5  6  7  8  9
         static std::string::size_type DecodeTable[] =
         { np, np, np, np, np, np, np, np, np, np,  // 0 - 9
                 np, np, np, np, np, np, np, np, np, np,  //10 -19
@@ -54,7 +54,7 @@ namespace geco
                 np, np, np, np, np, np, np, np, np, np,  //230 -239
                 np, np, np, np, np, np, np, np, np, np,  //240 -249
                 np, np, np, np, np, np               //250 -256
-                };
+        };
 
         std::string encode_base64(const char* data, size_t len)
         {
@@ -117,15 +117,15 @@ namespace geco
             if (len > bufSize)
             {
                 ERROR_MSG(
-                "Base64::decode - destination buffer not large enough\n");
+                    "Base64::decode - destination buffer not large enough\n");
                 return -1;
             }
 
             for (i = 0; i < len; ++i)
             {
-                c = (char) DecodeTable[(unsigned char) data[i]];
+                c = (char)DecodeTable[(unsigned char)data[i]];
                 ++i;
-                c1 = (char) DecodeTable[(unsigned char) data[i]];
+                c1 = (char)DecodeTable[(unsigned char)data[i]];
                 c = (c << 2) | ((c1 >> 4) & 0x3);
                 results[d++] = c;
                 if (++i < len)
@@ -133,7 +133,7 @@ namespace geco
                     c = data[i];
                     if (fillchar == c) break;
 
-                    c = (char) DecodeTable[(unsigned char) data[i]];
+                    c = (char)DecodeTable[(unsigned char)data[i]];
                     c1 = ((c1 << 4) & 0xf0) | ((c >> 2) & 0xf);
                     results[d++] = c1;
                 }
@@ -143,7 +143,7 @@ namespace geco
                     c1 = data[i];
                     if (fillchar == c1) break;
 
-                    c1 = (char) DecodeTable[(unsigned char) data[i]];
+                    c1 = (char)DecodeTable[(unsigned char)data[i]];
                     c = ((c << 6) & 0xc0) | c1;
                     results[d++] = c;
                 }
@@ -175,11 +175,11 @@ namespace geco
 
             for (i = 0; i < len; ++i)
             {
-                c = (char) DecodeTable[(unsigned char) inData[i]];
+                c = (char)DecodeTable[(unsigned char)inData[i]];
                 if (c == npc) return false;
                 ++i;
                 if (i == len) return false;
-                c1 = (char) DecodeTable[(unsigned char) inData[i]];
+                c1 = (char)DecodeTable[(unsigned char)inData[i]];
                 if (c1 == npc) return false;
                 c = (c << 2) | ((c1 >> 4) & 0x3);
                 outData.push_back(c);
@@ -192,7 +192,7 @@ namespace geco
                         break;
                     }
 
-                    c = (char) DecodeTable[(unsigned char) c];
+                    c = (char)DecodeTable[(unsigned char)c];
                     if (c == npc) return false;
                     c1 = ((c1 << 4) & 0xf0) | ((c >> 2) & 0xf);
                     outData.push_back(c1);
@@ -207,7 +207,7 @@ namespace geco
                         break;
                     }
 
-                    c1 = (char) DecodeTable[(unsigned char) c1];
+                    c1 = (char)DecodeTable[(unsigned char)c1];
                     if (c1 == npc) return false;
                     c = ((c << 6) & 0xc0) | c1;
                     outData.push_back(c);
@@ -216,17 +216,17 @@ namespace geco
             return true;
         }
 
-        geco_bit_stream_t& operator>>(geco_bit_stream_t &is, MD5::Digest &d)
-        {
-            is.Read((char*) d.bytes, (uint) sizeof(d.bytes));
-            return is;
-        }
+        //geco_bit_stream_t& operator>>(geco_bit_stream_t &is, MD5::Digest &d)
+        //{
+        //    is.Read((char*) d.bytes, (uint) sizeof(d.bytes));
+        //    return is;
+        //}
 
-        geco_bit_stream_t& operator<<(geco_bit_stream_t &os, const MD5::Digest &d)
-        {
-            os.Write((char*) d.bytes, (uint) sizeof(d.bytes));
-            return os;
-        }
+        //geco_bit_stream_t& operator<<(geco_bit_stream_t &os, const MD5::Digest &d)
+        //{
+        //    os.Write((char*) d.bytes, (uint) sizeof(d.bytes));
+        //    return os;
+        //}
 
     }
 }
