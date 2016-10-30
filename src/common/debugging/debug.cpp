@@ -44,7 +44,7 @@
 #include "debug.h"
 #include "stack_tracker_t.h"
 #include "timestamp.h"
-#include "../plateform.h"
+#include "../../plateform.h"
 #include "../ultils/geco-malloc.h"
 
 DECLARE_DEBUG_COMPONENT2("COMM", 0);

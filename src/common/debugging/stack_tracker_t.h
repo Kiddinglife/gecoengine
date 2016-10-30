@@ -28,8 +28,8 @@
 // another push/pop to happen, causing this to assert again, ad infinitum.
 #include <cassert>
 #include <thread>
-#include "../geco-engine-config.h"
-#include "../plateform.h"
+#include "../../geco-engine-config.h"
+#include "../../plateform.h"
 
 namespace geco
 {

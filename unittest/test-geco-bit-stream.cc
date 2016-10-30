@@ -15,7 +15,7 @@
 #include "gtest/gtest.h"
 #include "common/debugging/debug.h"
 #include "common/ds/geco-bit-stream.h"
-#include "common/plateform.h"
+#include "plateform.h"
 
 using namespace geco::debugging;
 using namespace geco::ultils;
@@ -66,21 +66,34 @@ TEST(GecoMemoryStreamTestCase, test_haffman_compression) {
 }
 
 TEST(GecoMemoryStreamTestCase, test_geco_string_compressor) {
-	std::string originstr =
-			"By default, an endpoint SHOULD always transmit to"
-					"the primary path,unless the SCTP user explicitly specifies the destination "
-					"transport address(and possibly source transport address) to use."
-					"An endpoint SHOULD transmit reply chunks (e.g., SACK, HEARTBEAT ACK";
+    std::string originstr;
+    originstr.resize(1024);
+    std::string recvstr;
+    recvstr.resize(1024);
+    geco_bit_stream_t writer;
+    //originstr =
+    //    "By default, an endpoint SHOULD always transmit to"
+    //    "the primary path,unless the SCTP user explicitly specifies the destination "
+    //    "transport address(and possibly source transport address) to use."
+    //    "An endpoint SHOULD transmit reply chunks (e.g., SACK, HEARTBEAT ACK";
+    originstr = "this watcher watches the method return values for the player positions";
 
-	std::string recvstr;
-	geco_bit_stream_t writer;
-	writer.Write(originstr);
-	writer.Read(recvstr);
-	EXPECT_STREQ(originstr.c_str(), recvstr.c_str());
-	printf("original bytes: %d, comprssed byts %d, compression ratio %.2f\n",
-			originstr.length(), writer.get_written_bytes(),
-			(originstr.length() - writer.get_written_bytes())
-					/ (float) originstr.length() * 100);
+    writer.Write(originstr);
+    writer.Read(recvstr);
+    EXPECT_STREQ(originstr.c_str(), recvstr.c_str());
+        printf("original bytes: %d, comprssed byts %d, compression ratio %.2f\n",
+            originstr.length(), writer.get_written_bytes(),
+            (originstr.length() - writer.get_written_bytes())
+            / (float)originstr.length() * 100);
+    writer.reset();
+
+    for (int i = 0; i < 100000; i++)
+    {
+        writer.Write(originstr);
+        writer.Read(recvstr);
+        EXPECT_STREQ(originstr.c_str(), recvstr.c_str());
+         writer.reset();
+    }
 }
 
 /**
@@ -98,27 +111,6 @@ TEST(GecoMemoryStreamTestCase, test_float_compression) {
 	geco_bit_stream_t s9((uchar*) &intf, sizeof(uchar), false);
 	s9.Bitify();
 }
-
-//TEST(GecoMemoryStreamTestCase, test_run_length)
-//{
-//    // 111 000 000 100 00 -> 111 000+10 100 00
-//    geco_bit_stream_t s8;
-//
-//    // 111
-//    s8.WriteBitOnes(3);
-//    //+ 000 000
-//    s8.WriteBitZeros(6);
-//
-//    // + 100 00
-//    s8.WriteBitOne();
-//    s8.WriteBitZeros(4);
-//    s8.Bitify();
-//
-//    geco_bit_stream_t s9;
-//    s9.WriteMini(s8);
-//
-//    s9.Bitify();
-//}
 
 DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 

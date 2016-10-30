@@ -28,8 +28,8 @@
 #include <functional>
 #include <algorithm>
 
-#include "../plateform.h"
-#include "../geco-engine-config.h"
+#include "../../plateform.h"
+#include "../../geco-engine-config.h"
 #include "../ds/array.h"
 #include "../ultils/ultils.h"
 #include "../ultils/geco-malloc.h"
@@ -675,7 +675,7 @@ geco::debugging::log_msg_helper(::const_cpnt_priority,PRIORITY).msg_back_trace
 
 // The following macros are used to display debug information.
 // all msgs with pri lower than PRIORITY will NOT be printed out.
-#define MSG_DEBUG(PRIORITY) log_msg_helper(::const_cpnt_priority,PRIORITY).message
+#define MSG_DEBUG(PRIORITY) geco::debugging::log_msg_helper(::const_cpnt_priority,PRIORITY).message
 /// This macro prints a debug message with TRACE priority.
 #define VERBOSE_MSG		MSG_DEBUG( LOG_MSG_VERBOSE )
 /// This macro prints a debug message with DEBUG priority.

@@ -13,7 +13,7 @@
 #include <functional>
 #include "gtest/gtest.h"
 #include "common/debugging/debug.h"
-#include "common/plateform.h"
+#include "plateform.h"
 #include "common/ultils/geco-ds-wheel-timer.h"
 #include "common/debugging/timestamp.h"
 
@@ -23,10 +23,32 @@ using namespace geco::ds;
 
 DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 
+TEST(GECO_DEBUGGING_TIMESTAMP, test_gettimestamp_func)
+{
+    double secs = 0;
+    bool ret;
+    time_stamp_t stampt = gettimestamp();
+    double ageinsec;
+    uint64 ageinstamp;
+    for (uint i = 0; i < 1000000; i++)
+    {
+        secs = (double)1 / (i + 1);
+        stampt = time_stamp_t::fromSecs(secs);
+        ASSERT_EQ(almost_equal(time_stamp_t::toSecs(stampt.stamp_), secs), true);
+
+        stampt = gettimestamp();
+        ageinsec = stampt.agesInSec();
+        ageinstamp = stampt.ageInStamps(); 
+        ASSERT_GT(ageinsec, 0);
+        ASSERT_GT(ageinstamp, 0);
+    }
+    printf("%.15f secs, %" PRIu64 " stamps\n", ageinsec, ageinstamp);
+}
+
 static int naive_clz(int bits, uint64_t v)
 {
     int r = 0;
-    uint64_t bit = ((uint64_t) 1) << (bits - 1);
+    uint64_t bit = ((uint64_t)1) << (bits - 1);
     while (bit && 0 == (v & bit))
     {
         r++;
@@ -48,7 +70,7 @@ static int naive_ctz(int bits, uint64_t v)
 }
 static int check(uint64_t vv)
 {
-    uint32_t v32 = (uint32_t) vv;
+    uint32_t v32 = (uint32_t)vv;
     if (vv == 0)
     {
         return 1; /* c[tl]z64(0) is undefined. */
@@ -86,7 +108,8 @@ static int check(uint64_t vv)
 TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_BIT_OPS)
 {
     uint64_t testcases[] =
-    { 13371337 * 10, 100, 385789752, 82574, (((uint64_t) 1) << 63) + (((uint64_t) 1) << 31) + 10101 };
+    { 13371337 * 10, 100, 385789752, 82574, (((uint64_t)1) << 63) + (((uint64_t)1) << 31)
+            + 10101 };
 
     unsigned int i;
     const unsigned int n = sizeof(testcases) / sizeof(testcases[0]);
@@ -126,7 +149,7 @@ using namespace std::placeholders;
 // adds visibility of _1, _2, _3,...
 TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_CB)
 {
-   mycb f = std::bind(test_bind, _1);
+    mycb f = std::bind(test_bind, _1);
     int a = 1;
     int& ret = f(a);
     EXPECT_EQ(1, ret);
@@ -138,48 +161,37 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER_CB)
     delete ret2;
 }
 
-TEST(GECO_DEBUGGING_TIMESTAMP, test_gettimestamp_func)
-{
-    time_stamp_t stampt = time_stamp_t::fromSeconds(1.0);
-    EXPECT_EQ(time_stamp_t::toSeconds(stampt.stamp_), 1.0f);
-    stampt = gettimestamp();
-    geco_sleep(1);
-    time_stamp_t ageinstamp = stampt.ageInStamps();
-    double ageinsec = stampt.ageInSeconds();
-    printf("%0.2f -> %lu\n", ageinsec, ageinstamp.stamp_);
-}
-
 #define THE_END_OF_TIME ((timeout_t)-1)
 #define FAIL() do{printf("Failure on line %d\n", __LINE__); goto done;} while (0)
 /* configuration for check_randomized */
 struct rand_cfg
 {
-        /* When creating timeouts, smallest possible delay */
-        timeout_t min_timeout;
-        /* When creating timeouts, largest possible delay */
-        timeout_t max_timeout;
-        /* First time to start the clock at. */
-        timeout_t start_at;
-        /* Do not advance the clock past this time. */
-        timeout_t end_at;
-        /* Number of timeouts to create and monitor. */
-        int n_timeouts;
-        /* Advance the clock by no more than this each step. */
-        timeout_t max_step;
-        /* Use relative timers and stepping */
-        int relative;
-        /* Every time the clock ticks, try removing this many timeouts at
-         * random. */
-        int try_removing;
-        /* When we're done, advance the clock to the end of time. */
-        int finalize;
+    /* When creating timeouts, smallest possible delay */
+    timeout_t min_timeout;
+    /* When creating timeouts, largest possible delay */
+    timeout_t max_timeout;
+    /* First time to start the clock at. */
+    timeout_t start_at;
+    /* Do not advance the clock past this time. */
+    timeout_t end_at;
+    /* Number of timeouts to create and monitor. */
+    int n_timeouts;
+    /* Advance the clock by no more than this each step. */
+    timeout_t max_step;
+    /* Use relative timers and stepping */
+    int relative;
+    /* Every time the clock ticks, try removing this many timeouts at
+     * random. */
+    int try_removing;
+    /* When we're done, advance the clock to the end of time. */
+    int finalize;
 };
 /* Not very random */
 static timeout_t random_to(timeout_t min, timeout_t max)
 {
     if (max <= min) return min;
     /* Not actually all that random, but should exercise the code. */
-    timeout_t rand64 = rand() * (timeout_t) INT_MAX + rand();
+    timeout_t rand64 = rand() * (timeout_t)INT_MAX + rand();
     return min + (rand64 % (max - min));
 }
 
@@ -199,12 +211,12 @@ static timeout_t random_to(timeout_t min, timeout_t max)
             } \
 } while (0)
 
-/*
- * Use dumb looping to locate the earliest timeout pending on the wheel so
- * our invariant assertions can check the result of our optimized code.
- * the earlist pending timeout should greater than curr time after
- * get_exired_timer() called.
- */
+ /*
+  * Use dumb looping to locate the earliest timeout pending on the wheel so
+  * our invariant assertions can check the result of our optimized code.
+  * the earlist pending timeout should greater than curr time after
+  * get_exired_timer() called.
+  */
 static wtimer_t* min_timeout(wtimers_t* T)
 {
     struct wtimer_t *min = NULL;
@@ -232,28 +244,31 @@ bool timeouts_check(wtimers_t *T, FILE *fp)
     wtimer_t* to = min_timeout(T);
     if (to != NULL)
     {
-        check(to->abs_expires > T->curtime, "missed timeout (expires:%" TIMEOUT_PRIu " <= curtime:%" TIMEOUT_PRIu ")\n",
-                to->abs_expires, T->curtime);
+        check(to->abs_expires > T->curtime,
+            "missed timeout (expires:%" TIMEOUT_PRIu " <= curtime:%" TIMEOUT_PRIu ")\n",
+            to->abs_expires, T->curtime);
 
         timeout = T->get_interval();
         check(timeout <= to->abs_expires - T->curtime,
-                "wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
-                timeout, (to->abs_expires - T->curtime), to->abs_expires, T->curtime);
+            "wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
+            timeout, (to->abs_expires - T->curtime), to->abs_expires, T->curtime);
 
         timeout = T->timout();
         check(timeout <= to->abs_expires - T->curtime,
-                "wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
-                timeout, (to->abs_expires - T->curtime), to->abs_expires, T->curtime);
+            "wrong soft timeout (soft:%" TIMEOUT_PRIu " > hard:%" TIMEOUT_PRIu ") (expires:%" TIMEOUT_PRIu "; curtime:%" TIMEOUT_PRIu ")\n",
+            timeout, (to->abs_expires - T->curtime), to->abs_expires, T->curtime);
     }
     else
     {
         timeout = T->timout();
         if (!T->expired.empty())
-        check(timeout == 0, "wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n", timeout,
+            check(timeout == 0,
+                "wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n", timeout,
                 TIMEOUT_C(0));
         else
-            check(timeout == ~TIMEOUT_C(0), "wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n",
-                    timeout, ~TIMEOUT_C(0));
+            check(timeout == ~TIMEOUT_C(0),
+                "wrong soft timeout (soft:%" TIMEOUT_PRIu " != hard:%" TIMEOUT_PRIu ")\n", timeout,
+                ~TIMEOUT_C(0));
     }
     return 1;
 }
@@ -274,7 +289,7 @@ static int check_randomized(const struct rand_cfg *cfg)
     memset(deleted, 0, sizeof(uint8_t) * cfg->n_timeouts);
     memset(found, 0, sizeof(uint8_t) * cfg->n_timeouts);
 
-//check open
+    //check open
     wtimers_t tos;
     tos.open(TIMEOUT_mHZ);
     EXPECT_EQ(tos.get_hz(), TIMEOUT_mHZ);
@@ -377,8 +392,7 @@ static int check_randomized(const struct rand_cfg *cfg)
         int another;
 
         if (rel) tos.step(step);
-        else
-            tos.update(now);
+        else tos.update(now);
 
         for (i = 0; i < cfg->try_removing; ++i)
         {
@@ -438,7 +452,7 @@ static int check_randomized(const struct rand_cfg *cfg)
         tos.update(THE_END_OF_TIME);
         if (cfg->finalize > 1)
         {
-            EXPECT_EQ(tos.get_expired_timer(), (wtimer_t* )0);
+            EXPECT_EQ(tos.get_expired_timer(), (wtimer_t*)0);
             EXPECT_EQ(false, tos.has_expiring_timer());
             EXPECT_EQ(false, tos.has_expired_timer());
         }
@@ -450,7 +464,7 @@ static int check_randomized(const struct rand_cfg *cfg)
     EXPECT_EQ(false, tos.has_expired_timer());
 
     printf("\n---------------clearup---------------\n");
-    done: if (t) delete[] t;
+done: if (t) delete[] t;
     if (timeouts) delete[] timeouts;
     if (fired) delete[] fired;
     if (found) delete[] found;
@@ -487,28 +501,27 @@ TEST(GECO_ENGINE_ULTILS, TEST_WHEEL_TIMER)
 
     struct rand_cfg cfg1 =
     {
-    /*min_timeout*/1,
-    /*max_timeout*/381,
-    /*start_at*/100,
-    /*end_at*/1000,
-    /*n_timeouts*/1,
-    /*max_step*/10,
-    /*relative*/0,
-    /*try_removing*/0,
-    /*finalize*/2 };
-//DO_N(1, check_randomized(&cfg1));
+        /*min_timeout*/1,
+        /*max_timeout*/381,
+        /*start_at*/100,
+        /*end_at*/1000,
+        /*n_timeouts*/1,
+        /*max_step*/10,
+        /*relative*/0,
+        /*try_removing*/0,
+        /*finalize*/2 };
+    //DO_N(1, check_randomized(&cfg1));
 }
 
 TEST(GECO_ENGINE_ULTILS, TEST_ROTL)
 {
-// assume that currtime has 1 scale, eclapse has 4 scales on wheel 1.
-//
+    // assume that currtime has 1 scale, eclapse has 4 scales on wheel 1.
+    //
     wheel_t timeout_slotidx = (UINT64_C(1) << 4) - 1;
     int currtime_scales = 1;
     wheel_t pending = geco::ultils::rotl(timeout_slotidx, currtime_scales);
     char buf[1024];
-    geco::ultils::Bitify(buf, sizeof(wheel_t) * 8, (unsigned char*) &pending);
+    geco::ultils::Bitify(buf, sizeof(wheel_t) * 8, (unsigned char*)&pending);
     printf("%s\n", buf);
 }
-
 

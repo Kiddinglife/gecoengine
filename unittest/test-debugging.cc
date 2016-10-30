@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "gtest/gtest.h"
-#include "common/plateform.h"
+#include "plateform.h"
 #include "common/ultils/ultils.h"
 #include "common/debugging/debug.h"
 

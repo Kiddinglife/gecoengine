@@ -5,148 +5,14 @@
  *      Author: jackiez
  */
 
+// must put this before gecowatcher.h
+// because gecowatchert.h includes plateform.h that includes <windows.h>
 #include "gecowatchert.h"
 
 #if ENABLE_WATCHERS
 
-DECLARE_DEBUG_COMPONENT2("COMM", LOG_MSG_VERBOSE);
+DECLARE_DEBUG_COMPONENT2("COMM", LOG_MSG_INFO);
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - 
-// 　　　　　　　　　　　　　　Section: watcher_path_request_v1 impls
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - 
-bool watcher_path_request_v1::set_watcher_value()
-{
-    if (!geco_watcher_base_t::get_root_watcher().set_from_string(NULL, request_path_.c_str(), setopt_string_.c_str()))
-    {
-        ERROR_MSG("watcher_path_request_v1::set_watcher_value(): set_from_string() failed!\n");
-        this->notify(0);
-        return false;
-    }
-    this->get_watcher_value();
-    return true;
-}
-void watcher_path_request_v1::get_watcher_value()
-{
-    static std::string desc;
-    static std::string result;
-    WatcherMode mode;
-    desc.clear();
-    result.clear();
-
-    if (!geco_watcher_base_t::get_root_watcher().get_as_string(NULL, request_path_.c_str(), result, desc, mode))
-    {
-        ERROR_MSG("get_watcher_value():get_as_string return FALSE!\n");
-        this->notify(0);
-        return;
-    }
-
-    if (mode == WT_DIRECTORY)
-    {
-        replies_count_ = 0;
-        if (!geco_watcher_base_t::get_root_watcher().visit_children(NULL, request_path_.c_str(), *this))
-        {
-            replies_count_ = 0;
-        }
-        // At this point we've collected results from directory's children
-        // watchers. containedReplies_ also contains the amount of children
-        // under this directory.
-        this->notify(replies_count_);
-    }
-    else if (mode != WT_INVALID)
-    {
-        // Add the result onto the final result stream
-        write_watcher_value_to_stream(result_, result, WT_READ_ONLY, request_path_, desc);
-        // Tell our parent we have collected all our data
-        this->notify();
-    }
-}
-
-bool watcher_path_request_v1::on_visit_dirwt_child(WatcherMode mode, const std::string & label,
-    const std::string & desc, const std::string & valueStr)
-{
-    static std::string path;
-    path.clear();
-
-    path += valueStr;
-    // add up dir name and make it path
-    request_path_.size() > 0 ? path += request_path_ + "/" + label : path = label;
-    if (use_desc_)
-    {
-        path += desc;
-    }
-    path += "\n";
-    // Add the result onto the final result stream
-    result_.Write(path);
-    this->replies_count_++;
-    printf("%s", path.c_str());
-    return true;
-}
-bool watcher_path_request_v1::add_watcher_path(const void *base, const char *path, std::string & label,
-    geco_watcher_base_t &watcher)
-{
-    static std::string valstr;
-    static std::string desc;
-    valstr.clear();
-    valstr.clear();
-    WatcherMode mode;
-    watcher.get_as_string(base, path, valstr, desc, mode);
-    this->on_visit_dirwt_child(mode, label, desc, valstr);
-    return watcher.visit_children(base, NULL, *this);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
-// 　　　　　　　　　　　　Section: watcher_path_request_v2 impls
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
-void watcher_path_request_v2::get_watcher_value()
-{
-    if (!geco_watcher_base_t::get_root_watcher().get_as_stream(NULL, request_path_.c_str(), *this))
-    {
-        result_.WriteMini((uchar)WVT_UNKNOWN);
-        result_.WriteMini((uchar)WT_READ_ONLY);
-        result_.WriteMini(false);
-        // And notify the parent of our failure.
-        this->notify();
-    }
-}
-bool watcher_path_request_v2::set_watcher_value()
-{
-    bool status = geco_watcher_base_t::get_root_watcher().set_from_stream(NULL, request_path_.c_str(), *this);
-    if (!status)
-    {
-        result_.WriteMini((uchar)WVT_UNKNOWN);
-        result_.WriteMini((uchar)WT_READ_ONLY);
-        result_.WriteMini(status);
-        // We're pretty much done setting watcher value (failed)
-        // Ready to fill in the packet now
-        this->notify();
-    }
-    return true;
-}
-bool watcher_path_request_v2::add_watcher_path(const void *base, const char *path, std::string & label,
-    geco_watcher_base_t &watcher)
-{
-    std::string desc;
-    origin_request_path_.size() > 0 ? request_path_ = origin_request_path_ + "/" + label : request_path_ = label;
-
-    // Push the directory entry onto the result stream
-    // We are using a reference to the correct watcher now, so no need
-    // to pass in the path to search for.
-    bool status = watcher.get_as_stream(base, NULL, *this);
-
-    if (!status)
-    {
-        ERROR_MSG("watcher_path_request_v2::add_watcher_path::!status error\n");
-        // If the get operation failed, we still need to notify the parent
-        // so it can continue with its response.
-        result_.WriteMini((uchar)WVT_UNKNOWN);
-        result_.WriteMini((uchar)WT_READ_ONLY);
-        result_.WriteMini(status);
-        return false;
-    }
-    // Always need to return true from the asyn version 2 protocol
-    // otherwise the stream won't be completed.
-    return true;
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　                       geco_watcher_t impls
@@ -168,10 +34,11 @@ void destroy_root_watcher()
         root_watcher_gptr = NULL;
     }
 }
-void geco_watcher_base_t::partition_path(const std::string path, std::string & name, std::string & dir)
+void geco_watcher_base_t::partition_path(const std::string path, std::string & name,
+        std::string & dir)
 {
     int pos = path.find_last_of(WATCHER_PATH_SEPARATOR);
-    if (0 <= pos && pos < (int)path.size())
+    if (0 <= pos && pos < (int) path.size())
     {
         dir = path.substr(0, pos + 1);
         name = path.substr(pos + 1, path.length() - pos - 1);
@@ -186,12 +53,14 @@ void geco_watcher_base_t::partition_path(const std::string path, std::string & n
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　　 Section: geco_watcher_director_t
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
-bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t& pChild, void * withBase)
+bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t& pChild,
+        void * withBase)
 {
     bool was_added = false;
     if (this->is_empty_path(path))
     {
-        ERROR_MSG("geco_watcher_director_t::add_watcher() tried to add unnamed child (no trailing slashes please)\n");
+        ERROR_MSG(
+        "geco_watcher_director_t::add_watcher() tried to add unnamed child (no trailing slashes please)\n");
     }
     else if (strchr(path, '/') == NULL)  // appending value
     {
@@ -206,7 +75,7 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             container_.insert(iter, newdir);
             was_added = true;
-            VERBOSE_MSG("append watcher %s, container size %d!\n\n", newdir.label.c_str(), (int)container_.size());
+            //VERBOSE_MSG("append watcher %s, container size %d!\n\n", newdir.label.c_str(), (int)container_.size());
         }
         else  //existed value
         {
@@ -228,13 +97,13 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
             auto iter = container_.begin();
             while (iter != container_.end() && (iter->label < newdir.label)) ++iter;
             pFound = &(*(container_.insert(iter, newdir)));
-            VERBOSE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), (int)container_.size());
+            //VERBOSE_MSG(" create new dir (%s),container size %d\n", newdir.label.c_str(), (int)container_.size());
         }
         // recusice call add_watcher, this will create new watcher dir if needed
         // finally result is a new path is built and the watcher itself is added
         if (pFound != NULL)
         {
-            was_added = pFound->watcher->add_watcher(geco_watcher_director_t::get_path_tail(path), pChild, withBase);
+            was_added = pFound->watcher->add_watcher(get_path_tail(path), pChild, withBase);
         }
     }
     return was_added;
@@ -242,14 +111,15 @@ bool geco_watcher_director_t::add_watcher(const char * path, geco_watcher_base_t
 bool geco_watcher_director_t::remove_watcher(const char * path)
 {
     if (path == NULL) return false;
-    char* pseparator = strchr((char*)path, WATCHER_PATH_SEPARATOR);
+    char* pseparator = strchr((char*) path, WATCHER_PATH_SEPARATOR);
     uint cmp_len = (pseparator == NULL) ? strlen(path) : (pseparator - path);
     if (cmp_len > 0)
     {
         auto iter = container_.begin();
         while (iter != container_.end())
         {
-            if (cmp_len == (*iter).label.length() && strncmp(path, (*iter).label.c_str(), cmp_len) == 0)
+            if (cmp_len == (*iter).label.length()
+                    && strncmp(path, (*iter).label.c_str(), cmp_len) == 0)
             {
                 if (pseparator == NULL)
                 {
@@ -259,7 +129,7 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
                 }
                 else
                 {
-                    return iter->watcher->remove_watcher(geco_watcher_director_t::get_path_tail(path));
+                    return iter->watcher->remove_watcher(get_path_tail(path));
                 }
             }
             ++iter;
@@ -267,67 +137,70 @@ bool geco_watcher_director_t::remove_watcher(const char * path)
     }
     return false;
 }
-bool geco_watcher_director_t::set_from_string(void * base, const char * path, const char * valueStr)
+int geco_watcher_director_t::set_from_string(void * base, const char * path, const char * valueStr)
 {
     watcher_directory_t* pChild = this->find_child(path);
     if (pChild != NULL)
     {
-        void * addedBase = (void*)(((uintptr)base) + ((uintptr)pChild->base));
-        return pChild->watcher->set_from_string(addedBase, geco_watcher_director_t::get_path_tail(path), valueStr);
+        void * addedBase = (void*) (((uintptr) base) + ((uintptr) pChild->base));
+        return pChild->watcher->set_from_string(addedBase, get_path_tail(path), valueStr);
     }
     else
     {
         return false;
     }
 }
-bool geco_watcher_director_t::set_from_stream(void * base, const char * path, watcher_path_request_v2& pathRequest)
+int geco_watcher_director_t::set_from_stream(void * base, const char * path,
+        watcher_value_query_t& pathRequest)
 {
     watcher_directory_t* pChild = this->find_child(path);
     if (pChild != NULL)
     {
-        void * addedBase = (void*)(((uintptr)base) + ((uintptr)pChild->base));
-        return pChild->watcher->set_from_stream(addedBase, geco_watcher_director_t::get_path_tail(path), pathRequest);
+        void * addedBase = (void*) (((uintptr) base) + ((uintptr) pChild->base));
+        return pChild->watcher->set_from_stream(addedBase, get_path_tail(path), pathRequest);
     }
     else
     {
-        return false;
+        return 0;
     }
 }
-bool geco_watcher_director_t::get_as_string(const void * base, const char * path, std::string & result,
-    std::string & desc, WatcherMode & mode)
+int geco_watcher_director_t::get_as_string(const void * base, const char * path,
+        std::string & result, std::string & desc, WatcherMode & mode)
 {
     if (geco_watcher_director_t::is_empty_path(path))
     {
         result = "<DIR>";
         mode = WatcherMode::WT_DIRECTORY;
         desc = this->comment_;
-        return true;
+        return 1;
     }
     else
     {
         watcher_directory_t* pChild = this->find_child(path);
         if (pChild != NULL)
         {
-            void * addedBase = (void*)(((uintptr)base) + ((uintptr)pChild->base));
-            return pChild->watcher->get_as_string(addedBase, geco_watcher_director_t::get_path_tail(path), result, desc,
-                mode);
+            void * addedBase = (void*) (((uintptr) base) + ((uintptr) pChild->base));
+            return pChild->watcher->get_as_string(addedBase, get_path_tail(path), result, desc,
+                    mode);
         }
         else
         {
-            return false;
+            return 0;
         }
     }
 }
-bool geco_watcher_director_t::get_as_stream(const void * base, const char * path, watcher_path_request_v2 & pathRequest)
+int geco_watcher_director_t::get_as_stream(const void * base, const char * path,
+        watcher_value_query_t & pathRequest)
 {
     if (geco_watcher_director_t::is_empty_path(path))
     {
-        pathRequest.get_result_stream().WriteMini((uchar)WT_DIRECTORY);
+        pathRequest.get_result_stream().WriteMini((uchar) WT_DIRECTORY);
         uint size = container_.size();
         pathRequest.get_result_stream().WriteMini(size);
         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
         pathRequest.get_result_stream().Write(comment_);
-        DEBUG_MSG("write dir watcher [%d,%d,%s,%s]\n", (int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(), comment_);
+        VERBOSE_MSG(
+        "write dir watcher [%d,%d,%s,%s]\n", (int)WT_DIRECTORY, (int)size, pathRequest.get_request_path().c_str(), comment_);
 
         std::string old(pathRequest.origin_request_path_);
         pathRequest.origin_request_path_ = pathRequest.request_path_;
@@ -335,14 +208,11 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
         pathRequest.origin_request_path_ = old;
         pathRequest.request_path_ = pathRequest.origin_request_path_;
         pathRequest.notify();
-
-        //pathRequest.set_result_stream(comment_, WT_DIRECTORY, this, base);
         return true;
     }
     else if (geco_watcher_director_t::is_doc_path(path))
     {
-        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY,
-            pathRequest.request_path_, comment_);
+        write_watcher_value_to_stream(pathRequest.get_result_stream(), comment_, WT_READ_ONLY);
         std::string old(pathRequest.origin_request_path_);
         pathRequest.origin_request_path_ = pathRequest.request_path_;
         this->visit_children(base, NULL, pathRequest);
@@ -356,8 +226,8 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
         watcher_directory_t* pChild = this->find_child(path);
         if (pChild != NULL)
         {
-            void * addedBase = (void*)(((uintptr)base) + ((uintptr)pChild->base));
-            return pChild->watcher->get_as_stream(addedBase, geco_watcher_director_t::get_path_tail(path), pathRequest);
+            void * addedBase = (void*) (((uintptr) base) + ((uintptr) pChild->base));
+            return pChild->watcher->get_as_stream(addedBase, get_path_tail(path), pathRequest);
         }
         else
         {
@@ -366,7 +236,8 @@ bool geco_watcher_director_t::get_as_stream(const void * base, const char * path
     }
     return false;
 }
-bool geco_watcher_director_t::visit_children(const void * base, const char *path, watcher_path_request& pathRequest)
+bool geco_watcher_director_t::visit_children(const void * base, const char *path,
+        watcher_value_query_t& pathRequest)
 {
     bool handled = false;
 
@@ -376,7 +247,8 @@ bool geco_watcher_director_t::visit_children(const void * base, const char *path
         Container::iterator iter = container_.begin();
         while (iter != container_.end())
         {
-            const void * addedBase = (const void*)(((const uintptr)base) + ((const uintptr)(*iter).base));
+            const void * addedBase = (const void*) (((const uintptr) base)
+                    + ((const uintptr) (*iter).base));
             ret = pathRequest.add_watcher_path(addedBase, NULL, iter->label, *iter->watcher);
             if (!ret) break;
             iter++;
@@ -388,9 +260,9 @@ bool geco_watcher_director_t::visit_children(const void * base, const char *path
         watcher_directory_t* pChild = this->find_child(path);
         if (pChild != NULL)
         {
-            const void * addedBase = (const void*)(((const uintptr)base) + ((const uintptr)pChild->base));
-            handled = pChild->watcher->visit_children(addedBase, geco_watcher_director_t::get_path_tail(path),
-                pathRequest);
+            const void * addedBase = (const void*) (((const uintptr) base)
+                    + ((const uintptr) pChild->base));
+            handled = pChild->watcher->visit_children(addedBase, get_path_tail(path), pathRequest);
         }
     }
     return handled;
@@ -405,7 +277,8 @@ bool init_value_watcher(int& value, const char * path)
     if (path != NULL)
     {
         geco_watcher_base_t* ptr = new value_watcher_t<int>(value, WT_READ_WRITE, path);
-        ret = geco_watcher_base_t::get_root_watcher().add_watcher(path, *ptr, NULL);
+        ret = geco_watcher_base_t::get_root_watcher().add_watcher(path, *ptr,
+        NULL);
     }
     else
     {
@@ -414,4 +287,5 @@ bool init_value_watcher(int& value, const char * path)
     return ret;
 }
 #endif
+
 

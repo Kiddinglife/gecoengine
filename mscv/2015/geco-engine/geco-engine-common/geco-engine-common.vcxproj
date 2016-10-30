@@ -204,8 +204,7 @@
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="asm64.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    <CustomBuild Include="asms.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ml64 /c %(fileName).asm</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(fileName).obj</Outputs>

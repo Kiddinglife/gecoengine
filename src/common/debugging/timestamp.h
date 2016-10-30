@@ -22,7 +22,7 @@
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
-#include "../plateform.h"
+#include "../../plateform.h"
 #include "debug.h"
 
 namespace geco
@@ -41,17 +41,14 @@ namespace geco
 #ifndef _XBOX360
 # define GECO_USE_RDTSC
 #endif // _XBOX360
-
-        /**
-         * This function returns the processor's (real-time) clock cycle counter.
-         */
 #if defined(__unix__) || defined(__linux__)
+        /**　This function returns the processor's (real-time) clock cycle counter.
+         *　Read Time-Stamp Counterloads current value of processor's timestamp counter into EDX:EAX
+         */
         inline uint64 gettimestamp()
         {
             uint32 rethi, retlo;
             __asm__ __volatile__(
-                    // Read Time-Stamp Counter
-                    // loads current value of processor's timestamp counter into EDX:EAX
                     "rdtsc":
                     "=d" (rethi),
                     "=a" (retlo)
@@ -63,10 +60,14 @@ namespace geco
 #pragma warning (push)
 #pragma warning (disable: 4035)
 #ifdef _AMD64_
+//  uint mStartTime[2];
+// startHighResolutionTimer(mStartTime);
+// double passed_time = endHighResolutionTimer(mStartTime);
         /* remember myself that i should use geco:debugging namespace in timestamp.cpp,
          * othwerwise will cause c3018 error */
         extern "C" uint64 _stdcall asm_time();
-#define gettimestamp() asm_time()
+#define gettimestamp asm_time
+#define startHighResolutionTimer asm_startHighResolutionTimer
 #else
         inline uint64 gettimestamp()
         {
@@ -112,20 +113,15 @@ namespace geco
         double stamps_per_sec_double();
         double stamps2sec(uint64 stamps);
 
-// ---------------------------------------------------------------------
-// Section: TimeStamp
-// ---------------------------------------------------------------------
-
-        /**
-         *	This class stores a value in stamps but has access functions in seconds.
-         */
+        /** This class stores a value in stamps but has access functions in seconds.*/
         struct time_stamp_t
         {
-                time_stamp_t(uint64 stamps = 0)
-                        : stamp_(stamps)
+                uint64 stamp_;
+
+                time_stamp_t(uint64 stamps = 0) :
+                        stamp_(stamps)
                 {
                 }
-
                 operator uint64 &()
                 {
                     return stamp_;
@@ -135,49 +131,34 @@ namespace geco
                     return stamp_;
                 }
 
-                /**
-                 *	This method returns this timestamp in seconds.
-                 */
-                double inSeconds() const
+                /*This method returns this timestamp in seconds.*/
+                double inSecs() const
                 {
-                    return toSeconds(stamp_);
+                    return toSecs(stamp_);
                 }
-                /**
-                 *	This method sets this timestamp from seconds.
-                 */
-                void setInSeconds(double seconds)
+                /*This method sets this timestamp from seconds.*/
+                void setInSecs(double seconds)
                 {
-                    stamp_ = fromSeconds(seconds);
+                    stamp_ = fromSecs(seconds);
                 }
-
-                /**
-                 *	This method returns the number of stamps from this TimeStamp to now.
-                 */
+                /*This method returns the number of stamps from this TimeStamp to now.*/
                 time_stamp_t ageInStamps() const
                 {
                     return gettimestamp() - stamp_;
                 }
-                /**
-                 *	This method returns the number of seconds from this TimeStamp to now.
-                 */
-                double ageInSeconds() const
+                /*This method returns the number of seconds from this TimeStamp to now.*/
+                double agesInSec() const
                 {
-                    return toSeconds(this->ageInStamps());
+                    return toSecs(this->ageInStamps());
                 }
-
-                /**
-                 *	This static method converts a timestamp value into seconds.
-                 */
-                static double toSeconds(uint64 stamps)
+                /*This static method converts a timestamp value into seconds.*/
+                static double toSecs(uint64 stamps)
                 {
                     return double(stamps) / stamps_per_sec_double();
                 }
-                /**
-                 *	This static method converts seconds into timestamps.
-                 */
-                static time_stamp_t fromSeconds(double seconds);
+                /*This static method converts seconds into timestamps.*/
+                static time_stamp_t fromSecs(double seconds);
 
-                uint64 stamp_;
         };
     }
 }

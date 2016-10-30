@@ -58,7 +58,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/common/debugging/asms.asm|src/network" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/common/debugging/asms.asm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -69,8 +69,11 @@
 				<externalSettings>
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/geco-game-engine-static-lib-project"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/engine"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/geco-game-engine-static-lib-project/Release"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/engine/Release"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="geco-game-engine-static-lib-project" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="engine" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>

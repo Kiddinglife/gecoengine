@@ -28,7 +28,7 @@
 #ifndef SRC_COMMON_ULTILS_SINGLETON_BASE_H_
 #define SRC_COMMON_ULTILS_SINGLETON_BASE_H_
 
-#include "debug.h"
+#include "../debugging/debug.h"
 
 /**
  *	This class is used to implement singletons. Generally singletons should be
