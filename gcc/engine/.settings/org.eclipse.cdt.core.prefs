@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
 environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/RootPath/delimiter=\:
-environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/RootPath/operation=append
-environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/RootPath/value=/home/jackiez/20160219/geco-game-engine
+environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/RootPath/operation=replace
+environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/RootPath/value=/home/jackiez/20160219/gecoengine
 environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/append=true
 environment/project/cdt.managedbuild.config.gnu.lib.debug.556339875/appendContributed=true
 environment/project/cdt.managedbuild.config.gnu.lib.release.1393268081/RootPath/delimiter=\:

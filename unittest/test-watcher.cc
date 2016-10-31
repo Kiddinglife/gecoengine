@@ -83,34 +83,46 @@ TEST(GECO_DEBUGGING_WATCHER, transformation_between_watchervalue_and_request_str
     geco_bit_stream_t ret;
     uchar type;
     uchar mode;
-    for (int i = 0; i < 10000; i++)
+
+
+    for (int i = 0; i < 3; i++)
     {
         int int_in = 12;
         write_watcher_value_to_stream(ret, int_in, WT_READ_WRITE);
+
         uint64 uint64_in = 234726728;
         write_watcher_value_to_stream(ret, uint64_in, WT_READ_WRITE);
+
         float float_in = 12.001f;
         write_watcher_value_to_stream(ret, float_in, WT_READ_ONLY);
+
         double double_in = 12.00000001;
         write_watcher_value_to_stream(ret, double_in, WT_READ_ONLY);
+
         char str_in[] = "hello worldhello world2hello world2hello world2";
         write_watcher_value_to_stream(ret, str_in, WT_READ_ONLY);
+
         std::string string_in = "hello world2hello world2hello world2hello world2hello world2";
         write_watcher_value_to_stream(ret, string_in, WT_READ_ONLY);
 
         uint bytes;
-        int int_out;
-        read_watcher_value_from_stream(ret, int_out, type, mode);
-        EXPECT_EQ(int_in, int_out);
+
+        int int_out=0;
+        read_watcher_value_from_stream(ret,int_out,type, mode);
+
         uint64 uint64_out;
         read_watcher_value_from_stream(ret, uint64_out, type, mode);
+
         float float_out;
         read_watcher_value_from_stream(ret, float_out, type, mode);
+
         double double_out;
         read_watcher_value_from_stream(ret, double_out, type, mode);
+
         char str_out[1024];
         read_watcher_value_from_stream(ret, str_out, type, mode);
         EXPECT_STREQ(str_in, str_out);
+
         std::string string_out;
         read_watcher_value_from_stream(ret, string_out, type, mode);
         EXPECT_STREQ(string_in.c_str(), string_out.c_str());

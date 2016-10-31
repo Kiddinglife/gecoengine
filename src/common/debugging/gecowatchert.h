@@ -321,8 +321,9 @@ inline std::string& watcher_value_to_string(bool value)
 }/* protocol v1 ends */
 
 // GET OPT PROTOCOL
-#define read_watcher_value_from_stream(result,valtype,mode,value) \
+#define read_watcher_value_from_stream(result,value,valtype,mode) \
 result.ReadMini(valtype);result.ReadMini(mode);result.Read(value)
+
 
 // SET OPT PROTOCOL
 //CANNOT BE REPLCAED BY A SINGLE MACRO AS WE RELIES ON OVERLOAD TO SERILIZE WVT
@@ -331,56 +332,56 @@ inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int8
 {
     result.WriteMini((uchar) WVT_INT8);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value, false);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint8 value,
         const WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_UINT8);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int16 value,
         const WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_INT16);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value, false);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint16 value,
         const WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_UINT16);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int64 value,
         const WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_INT64);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value, false);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint64 value,
         const WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_UINT64);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int value,
         WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_INT32);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value, false);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint value,
         WatcherMode mode)
 {
     result.WriteMini((uchar) WVT_UINT32);
     result.WriteMini((uchar) mode);
-    result.WriteMini(value);
+    result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const float value,
         WatcherMode mode)
