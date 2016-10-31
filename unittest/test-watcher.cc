@@ -186,13 +186,13 @@ static void req2_cb(watcher_value_query_t & pathRequest, int32 retcode)
             {
             case WatcherValueType::WVT_INT32:
                 int int32v;
-                is.ReadMini(int32v);
-                INFO_MSG("req2_cb [int32 %d,mode %d,val " PRId32 "]\n", valtype, mode, int32v);
+                is.Read(int32v);
+                INFO_MSG("req2_cb [int32 %d,mode %d,val %"PRId32"]\n", valtype, mode, int32v);
                 break;
             case WatcherValueType::WVT_UINT32:
                 uint uint32v;
-                is.ReadMini(uint32v);
-                INFO_MSG("req2_cb [uint32 %d,mode %d,val " PRIu32 "]\n", valtype, mode, uint32v);
+                is.Read(uint32v);
+                INFO_MSG("req2_cb [uint32 %d,mode %d,val %"PRIu32"]\n", valtype, mode, uint32v);
                 break;
             case WatcherValueType::WVT_STRING:
                 std::string strval;
@@ -286,12 +286,12 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v2)
     int num = 0;
     geco_watcher_base_t::get_root_watcher().walk_all_files(tmp, paths, num, false);
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    // true means this is a request for dir watcher
-    watcher_value_query_t dirreq("logger/cppThresholds", req2_cb, true);
-    dirreq.get_watcher_value();
+//    // true means this is a request for dir watcher
+//    watcher_value_query_t dirreq("logger/cppThresholds", req2_cb, true);
+//    dirreq.get_watcher_value();//cb is called every time we retrive sonthing from dir
     //false means this request is for a value watcher
     watcher_value_query_t valuereq(path1, req2_cb, false);
     valuereq.get_watcher_value();
-    valuereq.set_watcher_value(); 
+    //valuereq.set_watcher_value();
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 }

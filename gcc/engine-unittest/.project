@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>engine-unittest</name>
+	<name>gecoengine_unittests</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -26,25 +26,58 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>bw2</name>
-			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/bw2</locationURI>
-		</link>
-		<link>
-			<name>source</name>
-			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/Seriousness/server/source</locationURI>
-		</link>
-		<link>
 			<name>unittest</name>
 			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest</locationURI>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>unittest/readme.md</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/readme.md</locationURI>
+		</link>
+		<link>
+			<name>unittest/test-auth.cc</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-auth.cc</locationURI>
+		</link>
+		<link>
+			<name>unittest/test-debugging.cc</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-debugging.cc</locationURI>
+		</link>
+		<link>
+			<name>unittest/test-geco-bit-stream.cc</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-geco-bit-stream.cc</locationURI>
+		</link>
+		<link>
+			<name>unittest/test-main.cc</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-main.cc</locationURI>
+		</link>
+		<link>
+			<name>unittest/test-timer.cc</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-timer.cc</locationURI>
+		</link>
+		<link>
+			<name>unittest/test-watcher.cc</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-watcher.cc</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>
 			<value>$%7BPARENT-2-PROJECT_LOC%7D/2016209/geco-game-engine</value>
+		</variable>
+		<variable>
+			<name>copy_PARENT1</name>
+			<value>$%7BPARENT-2-PROJECT_LOC%7D/20160219</value>
+		</variable>
+		<variable>
+			<name>copy_PARENT12</name>
+			<value>$%7Bcopy_PARENT1%7D/gecoengine</value>
 		</variable>
 	</variableList>
 </projectDescription>
