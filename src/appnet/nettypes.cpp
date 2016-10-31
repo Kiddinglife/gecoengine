@@ -594,7 +594,7 @@ void watcher_value_query_t::get_watcher_value()
 
 	if( !ret )
 	{
-		result_.WriteMini(ret);
+		result_.Write(ret);
 		// And notify the parent of our failure.
 		this->notify(-1);
 	}

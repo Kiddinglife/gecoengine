@@ -5,13 +5,12 @@
  *      Author: jackiez
  */
 
-// must put this before gecowatcher.h
-// because gecowatchert.h includes plateform.h that includes <windows.h>
+//  gecowatchert.h includes plateform.h that includes <windows.h>
 #include "gecowatchert.h"
 
 #if ENABLE_WATCHERS
 
-DECLARE_DEBUG_COMPONENT2("COMM", LOG_MSG_INFO);
+DECLARE_DEBUG_COMPONENT2("COMM", LOG_MSG_CRITICAL);
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
@@ -194,9 +193,9 @@ int geco_watcher_director_t::get_as_stream(const void * base, const char * path,
 {
     if (geco_watcher_director_t::is_empty_path(path))
     {
-        pathRequest.get_result_stream().WriteMini((uchar) WT_DIRECTORY);
+        pathRequest.get_result_stream().Write((ushort) WT_DIRECTORY);
         uint size = container_.size();
-        pathRequest.get_result_stream().WriteMini(size);
+        pathRequest.get_result_stream().Write(size);
         pathRequest.get_result_stream().Write(pathRequest.get_request_path());
         pathRequest.get_result_stream().Write(comment_);
         VERBOSE_MSG(

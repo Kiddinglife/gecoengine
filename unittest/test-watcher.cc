@@ -50,7 +50,7 @@ TEST(GECO_DEBUGGING_WATCHER, transformation_between_watchervalue_and_stringval_r
 {
     std::string valstr;
 
-    for (int i = 0; i < 100000; i++)
+    for (int i = 0; i < 10000; i++)
     {
         int int_ret;
         valstr = watcher_value_to_string((int)12);
@@ -81,11 +81,11 @@ TEST(GECO_DEBUGGING_WATCHER, transformation_between_watchervalue_and_stringval_r
 TEST(GECO_DEBUGGING_WATCHER, transformation_between_watchervalue_and_request_stream__result_should_be_same)
 {
     geco_bit_stream_t ret;
-    uchar type;
-    uchar mode;
+    ushort type;
+    ushort mode;
 
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 10000; i++)
     {
         int int_in = 12;
         write_watcher_value_to_stream(ret, int_in, WT_READ_WRITE);
@@ -164,35 +164,35 @@ static void req2_cb(watcher_value_query_t & pathRequest, int32 retcode)
     }
 
     geco_bit_stream_t& is = pathRequest.get_result_stream();
-    uchar valtype;
-    uchar mode;
+    ushort valtype;
+    ushort mode;
     while (is.get_payloads() > 0)
     {
-        is.ReadMini(valtype);
+        is.Read(valtype);
         if (valtype == WT_DIRECTORY)
         {
             uint child_size;
             std::string mypath;
             std::string comment;
-            is.ReadMini(child_size);
+            is.Read(child_size);
             is.Read(mypath);
             is.Read(comment);
             INFO_MSG("req2_cb [WT_DIRECTORY %d, child size %d, path %s,comment %s]\n", WT_DIRECTORY, child_size, mypath.c_str(), comment.c_str());
         }
         else  // watcher
         {
-            is.ReadMini(mode);
+            is.Read(mode);
             switch (valtype)
             {
             case WatcherValueType::WVT_INT32:
                 int int32v;
                 is.Read(int32v);
-                INFO_MSG("req2_cb [int32 %d,mode %d,val %"PRId32"]\n", valtype, mode, int32v);
+                INFO_MSG("req2_cb [int32 %d,mode %d,val %d]\n", valtype, mode, int32v);
                 break;
             case WatcherValueType::WVT_UINT32:
                 uint uint32v;
                 is.Read(uint32v);
-                INFO_MSG("req2_cb [uint32 %d,mode %d,val %"PRIu32"]\n", valtype, mode, uint32v);
+                INFO_MSG("req2_cb [uint32 %d,mode %d,val %d]\n", valtype, mode, uint32v);
                 break;
             case WatcherValueType::WVT_STRING:
                 std::string strval;
@@ -286,9 +286,9 @@ TEST(GECO_DEBUGGING_WATCHER, test_watcher_path_request_v2)
     int num = 0;
     geco_watcher_base_t::get_root_watcher().walk_all_files(tmp, paths, num, false);
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-//    // true means this is a request for dir watcher
-//    watcher_value_query_t dirreq("logger/cppThresholds", req2_cb, true);
-//    dirreq.get_watcher_value();//cb is called every time we retrive sonthing from dir
+    // true means this is a request for dir watcher
+    watcher_value_query_t dirreq("logger/cppThresholds", req2_cb, true);
+    dirreq.get_watcher_value();//cb is called every time we retrive sonthing from dir
     //false means this request is for a value watcher
     watcher_value_query_t valuereq(path1, req2_cb, false);
     valuereq.get_watcher_value();

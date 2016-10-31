@@ -53,7 +53,7 @@ class WatcherPacketHandler;
  2. Add operator << and >> :
  geco_bit_stream_t& operator << (geco_bit_stream_t &os, const ExampleClass &d)
  {
- os.WriteMini(d.a);
+ os.Write(d.a);
  return os;
  }
  geco_bit_stream_t& operator >> (geco_bit_stream_t &is,  ExampleClass &d)
@@ -64,8 +64,8 @@ class WatcherPacketHandler;
  3. Add encoding for your type, you do not need write encoding function as they are all the same:
  inline void write_watcher_value_to_stream(geco_bit_stream_t & result,ExampleClass& value, mode)
  {
- result.WriteMini((uchar)type);
- result.WriteMini((uchar)mode);
+ result.Write((ushort)type);
+ result.Write((ushort)mode);
  result << value;
  }
  4. complie again and use it !
@@ -83,15 +83,15 @@ class watcher_visitor_t;
  * sent and received via the watcher protocol.
  *  @ingroup WatcherModule
  */
-enum WatcherValueType
+enum WatcherValueType : ushort
 {
-    WVT_INT8,
-    WVT_UINT8,
-    WVT_INT16,
-    WVT_UINT16,
-    WVT_INT32,
-    WVT_UINT32,
-    WVT_INT64,
+	WVT_INT8,
+	WVT_UINT8,
+	WVT_INT16,
+	WVT_UINT16,
+	WVT_INT32,
+	WVT_UINT32,
+	WVT_INT64,
     WVT_UINT64,
     WVT_FLOAT,
     WVT_DOUBLE,
@@ -117,7 +117,7 @@ enum
  *  This enumeration is used to specify the type of the watcher.
  *  @ingroup WatcherModule
  */
-enum WatcherMode
+enum WatcherMode : ushort
 {
     WT_INVALID,         ///< Indicates an error.
     WT_READ_ONLY,    ///< Indicates the watched value cannot be changed.
@@ -322,86 +322,85 @@ inline std::string& watcher_value_to_string(bool value)
 
 // GET OPT PROTOCOL
 #define read_watcher_value_from_stream(result,value,valtype,mode) \
-result.ReadMini(valtype);result.ReadMini(mode);result.Read(value)
-
+result.Read(valtype);result.Read(mode);result.Read(value)
 
 // SET OPT PROTOCOL
 //CANNOT BE REPLCAED BY A SINGLE MACRO AS WE RELIES ON OVERLOAD TO SERILIZE WVT
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int8 value,
         const WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_INT8);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_INT8);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint8 value,
         const WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_UINT8);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_UINT8);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int16 value,
         const WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_INT16);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_INT16);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint16 value,
         const WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_UINT16);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_UINT16);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int64 value,
         const WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_INT64);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_INT64);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint64 value,
         const WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_UINT64);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_UINT64);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const int value,
         WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_INT32);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_INT32);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const uint value,
         WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_UINT32);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_UINT32);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const float value,
         WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_FLOAT);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_FLOAT);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const double value,
         WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_DOUBLE);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_DOUBLE);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, const std::string& value,
         WatcherMode mode)
 {
-    result.WriteMini((uchar) WVT_STRING);
-    result.WriteMini((uchar) mode);
+    result.Write((ushort) WVT_STRING);
+    result.Write((ushort) mode);
     result.Write(value);
 }
 inline void write_watcher_value_to_stream(geco_bit_stream_t & result, char* value, WatcherMode mode)
@@ -785,8 +784,8 @@ class value_watcher_t: public geco_watcher_base_t
                 return SetOperationIsNotAllowed;
             }
 
-            uchar valtype;
-            uchar mode;
+            ushort valtype;
+            ushort mode;
             TYPE & useValue = *(TYPE*)(((uintptr)&rValue_) + ((uintptr)base));
             read_watcher_value_from_stream(pathRequest.get_value_stream(), useValue, valtype, mode);
 
@@ -824,7 +823,7 @@ class value_watcher_t: public geco_watcher_base_t
             {
                 const TYPE & useValue = *(const TYPE*)(((const uintptr)&rValue_) + ((const uintptr)base));
                 write_watcher_value_to_stream(pathRequest.get_result_stream(), useValue, access_);
-                DEBUG_MSG("write value watcher  [%d,%s,%s]\n", access_, pathRequest.get_request_path().c_str(),
+				VERBOSE_MSG("write value watcher  [%d,%s,%s]\n", access_, pathRequest.get_request_path().c_str(),
                 watcher_value_to_string(useValue).c_str());
                 pathRequest.notify();
                 return true;
@@ -918,8 +917,8 @@ class func_watcher_t: public geco_watcher_base_t
                 return SetOperationIsNotAllowed;
             }
 
-            uchar valtype;
-            uchar mode;
+            ushort valtype;
+            ushort mode;
             RETURN_TYPE useValue;
             read_watcher_value_from_stream(pathRequest.get_value_stream(), useValue, valtype, mode);
 
@@ -1070,8 +1069,8 @@ class method_watcher_t: public geco_watcher_base_t
                 return SetOperationIsNotAllowed;
             }
 
-            uchar valtype;
-            uchar mode;
+            ushort valtype;
+            ushort mode;
             RETURN_TYPE useValue;
             read_watcher_value_from_stream(pathRequest.get_value_stream(), useValue, valtype, mode);
 
