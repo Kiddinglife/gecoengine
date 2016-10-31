@@ -738,7 +738,7 @@ extern unsigned int sockaddr2hashcode(const sockaddrunion* sa);
  of the SCTP instance to which it belongs. With the name of the SCTP-
  instance its datastruct can be read from the list of SCTP-instances.
  */
-struct applicaton_layer_cbs_t
+struct ulp_cbs_t
 {
         /* @{ */
         /**

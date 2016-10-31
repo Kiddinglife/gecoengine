@@ -31,14 +31,12 @@
 /* common includes */
 #include <limits>
 #include <math.h>
-
 /* 360 includes */
 
 /* PS3 includes */
 #if defined( PLAYSTATION3 )
 // _BIG_ENDIAN is a built in define
 #include <stdlib.h>
-#include <stdint.h>
 #include <sys/sys_time.h>
 #include <sys/timer.h>
 #include <sys/time_util.h>
@@ -109,6 +107,9 @@ typedef UINT_PTR uintptr;
 #define PRIu32 "%lu"
 #define PRId32 "%ld"
 #else //unix or linux
+#include <unistd.h>
+#include <stdint.h>
+#include <fcntl.h>
 /// This type is an integer with a size of 8 bits.
 typedef int8_t int8;
 /// This type is an unsigned integer with a size of 8 bits.
