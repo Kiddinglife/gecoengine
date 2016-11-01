@@ -1,0 +1,239 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager
+END
+FvMySQLThread.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLThread.h
+END
+FvDBEntityRecoverer.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBEntityRecoverer.h
+END
+FvDBInterface.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBInterface.cpp
+END
+FvWorkerThread.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvWorkerThread.h
+END
+FvMySQLNotPrepared.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLNotPrepared.cpp
+END
+FvDatabase.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDatabase.h
+END
+FvDBConfig.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBConfig.cpp
+END
+FvMySQLWrapper.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLWrapper.h
+END
+FvDBCustom.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBCustom.cpp
+END
+FvMySQLTable.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLTable.h
+END
+FvIDatabase.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvIDatabase.h
+END
+FvDBEntityDefs.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBEntityDefs.cpp
+END
+FvMySQLTypeMapping.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLTypeMapping.h
+END
+FvMySQLNamedLock.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLNamedLock.h
+END
+FvDBStatus.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBStatus.cpp
+END
+FvMySQLDatabase.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLDatabase.cpp
+END
+FvXMLDatabase.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvXMLDatabase.h
+END
+FvDBInterfaceUtils.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBInterfaceUtils.h
+END
+FvMySQLThread.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLThread.cpp
+END
+FvMySQLPrepared.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLPrepared.h
+END
+FvSignalSet.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvSignalSet.h
+END
+FvDBEntityRecoverer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBEntityRecoverer.cpp
+END
+FvWorkerThread.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvWorkerThread.cpp
+END
+FvDatabase.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDatabase.cpp
+END
+FvMySQLWrapper.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLWrapper.cpp
+END
+FvDBInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBInterface.h
+END
+FvMySQLTable.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLTable.cpp
+END
+FvMySQLNotPrepared.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLNotPrepared.h
+END
+FvDBConfig.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBConfig.h
+END
+FvMySQLTypeMapping.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLTypeMapping.cpp
+END
+FvMySQLNamedLock.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLNamedLock.cpp
+END
+FvDBCustom.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBCustom.h
+END
+FvXMLDatabase.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvXMLDatabase.cpp
+END
+FvDBInterfaceUtils.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBInterfaceUtils.cpp
+END
+FvMySQLPrepared.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLPrepared.cpp
+END
+Main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/Main.cpp
+END
+FvDBEntityDefs.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBEntityDefs.h
+END
+FvDBStatus.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvDBStatus.h
+END
+FvMySQLDatabase.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvDBManager/FvMySQLDatabase.h
+END

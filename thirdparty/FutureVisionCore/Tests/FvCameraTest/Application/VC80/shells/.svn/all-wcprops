@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells
+END
+roomex_0.collision
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/roomex_0.collision
+END
+roomex_1.collision
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/roomex_1.collision
+END
+Box01.mesh
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/Box01.mesh
+END
+Box02.mesh
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/Box02.mesh
+END
+roomex_0.material
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/roomex_0.material
+END
+roomex_1.material
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/roomex_1.material
+END
+roomex_0.node
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/roomex_0.node
+END
+roomex_1.node
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/shells/roomex_1.node
+END

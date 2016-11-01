@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvCliSvrCommon
+END
+FvBaseAppExtInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvBaseAppExtInterface.h
+END
+FvClientInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvClientInterface.h
+END
+FvLogicDllManager.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvLogicDllManager.cpp
+END
+FvFileLog.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvFileLog.h
+END
+FvLogicDllManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvLogicDllManager.h
+END
+FvLoginInterface.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvLoginInterface.cpp
+END
+FvSpaceDataTypes.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvSpaceDataTypes.cpp
+END
+FvCommonClientInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvCommonClientInterface.h
+END
+FvCliSvrCommonDefines.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvCliSvrCommonDefines.h
+END
+FvLoginInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvLoginInterface.h
+END
+FvSpaceDataTypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvSpaceDataTypes.h
+END
+FvFileLog.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvCliSvrCommon/FvFileLog.cpp
+END

@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80
+END
+Default.material
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/Default.material
+END
+cg.dll
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/cg.dll
+END
+OgreCore.zip
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/OgreCore.zip
+END
+resources.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/resources.cfg
+END
+ogre.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/ogre.cfg
+END

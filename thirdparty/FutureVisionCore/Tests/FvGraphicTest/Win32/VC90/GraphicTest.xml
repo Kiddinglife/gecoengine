@@ -1,0 +1,10 @@
+<root>
+<AnimShell  Path="Character/Human/Human.xml"/>
+<AvatarRes  Path="Character/Human/Male/PC_M_Base01.avr"/>
+<ConfigFile Path="./FVC/config.xml"/>
+<DataPath   Path="E:/Work/SaintsPro/trunk/Binaries/Data"/>
+<CursorFile Path="Locale/LocaleCN/Interface/MouseCursors.xml"/>
+<Spd        Value="25.0"/>
+<MouseSpd   Value="10.0"/>
+<Time       Value="10"/>
+</root>

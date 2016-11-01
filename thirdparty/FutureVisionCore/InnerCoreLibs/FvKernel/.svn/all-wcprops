@@ -1,0 +1,341 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvKernel
+END
+FvWatcher.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvWatcher.h
+END
+FvTimeQueue.inl
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvTimeQueue.inl
+END
+FvBGTaskManager.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBGTaskManager.cpp
+END
+FvSingleton.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvSingleton.h
+END
+FvStringMap.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvStringMap.h
+END
+FvGlobalMacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvGlobalMacros.h
+END
+FvDDS.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDDS.cpp
+END
+FvStringFilter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvStringFilter.cpp
+END
+FvRefList.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/4/trunk/InnerCoreLibs/FvKernel/FvRefList.h
+END
+FvVectorProvider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvVectorProvider.cpp
+END
+FvProcessorAffinity.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvProcessorAffinity.h
+END
+FvCommand.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvCommand.h
+END
+FvVectorNoDestructor.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvVectorNoDestructor.h
+END
+FvWatcherPathRequest.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvWatcherPathRequest.cpp
+END
+FvMemoryStream.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvMemoryStream.cpp
+END
+FvIntrusiveObject.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvIntrusiveObject.h
+END
+FvMemoryStream.inl
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvMemoryStream.inl
+END
+FvDebug.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDebug.cpp
+END
+FvSmartPointer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvSmartPointer.cpp
+END
+FvUniqueID.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvUniqueID.h
+END
+FvBase64.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBase64.h
+END
+FvMD5.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvMD5.h
+END
+FvInitSingleton.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvInitSingleton.h
+END
+FvDoubleLink.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDoubleLink.h
+END
+FvWatcher.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvWatcher.cpp
+END
+FvWatcher.inl
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvWatcher.inl
+END
+FvConcurrency.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvConcurrency.h
+END
+FvMask.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvMask.h
+END
+FvDebugFileter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDebugFileter.cpp
+END
+FvProcessorAfinity.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvProcessorAfinity.cpp
+END
+FvTimeStamp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvTimeStamp.cpp
+END
+FvBaseTypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBaseTypes.h
+END
+FvBinaryStream.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBinaryStream.h
+END
+FvProfile.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvProfile.h
+END
+FvRefList.inl
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvRefList.inl
+END
+FvTimeQueue.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvTimeQueue.h
+END
+FvTimestamp.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvTimestamp.h
+END
+FvBGTaskManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBGTaskManager.h
+END
+FvCommand.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvCommand.cpp
+END
+FvDDS.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDDS.h
+END
+FvStringFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvStringFilter.h
+END
+FvUniqueID.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvUniqueID.cpp
+END
+FvBase64.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBase64.cpp
+END
+FvMD5.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvMD5.cpp
+END
+FvKernel.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvKernel.h
+END
+FvDoubleLink.inl
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDoubleLink.inl
+END
+FvWatcherPathRequest.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvWatcherPathRequest.h
+END
+FvMemoryStream.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvMemoryStream.h
+END
+FvConcurrency.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvConcurrency.cpp
+END
+FvDebug.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDebug.h
+END
+FvSmartPointer.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvSmartPointer.h
+END
+FvProvider.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvProvider.h
+END
+FvBinaryStream.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBinaryStream.cpp
+END
+FvBinaryStream.inl
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvBinaryStream.inl
+END
+FvProfile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvProfile.cpp
+END
+FvDebugFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvKernel/FvDebugFilter.h
+END

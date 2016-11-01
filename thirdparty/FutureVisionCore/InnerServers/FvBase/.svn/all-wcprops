@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase
+END
+FvBaseEntityManager.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseEntityManager.cpp
+END
+FvBaseEntityManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseEntityManager.h
+END
+FvBaseEntity.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseEntity.cpp
+END
+FvBaseAppIntInterface.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseAppIntInterface.cpp
+END
+FvBaseEntity.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseEntity.h
+END
+FvBaseAppIntInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseAppIntInterface.h
+END
+FvBaseDefines.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseDefines.h
+END
+FvGlobalBases.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvGlobalBases.cpp
+END
+FvProxy.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvProxy.cpp
+END
+FvGlobalBases.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvGlobalBases.h
+END
+FvProxy.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvProxy.h
+END
+FvBaseMailbox.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseMailbox.cpp
+END
+FvBaseMailbox.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseMailbox.h
+END
+FvBaseRPCCallBack.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseRPCCallBack.cpp
+END
+FvBaseRPCCallBack.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBase/FvBaseRPCCallBack.h
+END

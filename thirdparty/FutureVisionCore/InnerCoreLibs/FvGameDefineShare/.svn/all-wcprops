@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/9/trunk/InnerCoreLibs/FvGameDefineShare
+END
+FvAreaStruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvGameDefineShare/FvAreaStruct.h
+END
+FvSpellStruct.inl
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/9/trunk/InnerCoreLibs/FvGameDefineShare/FvSpellStruct.inl
+END
+FvGameUnitDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvGameDefineShare/FvGameUnitDefine.h
+END
+FvSpellStruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/9/trunk/InnerCoreLibs/FvGameDefineShare/FvSpellStruct.h
+END
+FvGameDefineShareCPP.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/InnerFutureVision/!svn/ver/9/trunk/InnerCoreLibs/FvGameDefineShare/FvGameDefineShareCPP.cpp
+END
+FvGameUnitInfo.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvGameDefineShare/FvGameUnitInfo.h
+END
+FvMiscData.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvGameDefineShare/FvMiscData.h
+END
+FvSpellDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvGameDefineShare/FvSpellDefine.h
+END

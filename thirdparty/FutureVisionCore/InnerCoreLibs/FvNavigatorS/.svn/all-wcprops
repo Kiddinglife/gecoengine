@@ -1,0 +1,155 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvNavigatorS
+END
+FvWaypointView.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointView.cpp
+END
+FvZoneNavPolySet.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvZoneNavPolySet.h
+END
+FvWaypointZone.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointZone.cpp
+END
+FvZoneView.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvZoneView.cpp
+END
+FvWaypoint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypoint.cpp
+END
+FvNavigatorDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvNavigatorDefine.h
+END
+FvAStar.inl
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvAStar.inl
+END
+FvWaypointView.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointView.h
+END
+FvWaypointState.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointState.cpp
+END
+FvWaypointZone.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointZone.h
+END
+FvZoneView.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvZoneView.h
+END
+FvWaypoint.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypoint.h
+END
+FvAStar.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvAStar.h
+END
+FvWaypointState.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointState.h
+END
+FvAdjacentZoneSet.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvAdjacentZoneSet.cpp
+END
+FvZoneWaypointSet.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvZoneWaypointSet.cpp
+END
+FvWaypointSet.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointSet.cpp
+END
+FvAdjacentZoneSet.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvAdjacentZoneSet.h
+END
+FvWaypointSetState.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointSetState.cpp
+END
+FvZoneWaypointSet.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvZoneWaypointSet.h
+END
+FvNavigator.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvNavigator.cpp
+END
+FvWaypointSet.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointSet.h
+END
+FvWaypointSetState.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvWaypointSetState.h
+END
+FvNavigator.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvNavigator.h
+END
+FvZoneNavPolySet.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNavigatorS/FvZoneNavPolySet.cpp
+END

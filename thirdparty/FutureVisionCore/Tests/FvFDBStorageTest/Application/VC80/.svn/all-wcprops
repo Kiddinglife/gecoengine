@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvFDBStorageTest/Application/VC80
+END
+PlayerInfo.slk
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvFDBStorageTest/Application/VC80/PlayerInfo.slk
+END
+PlayerInfo.fdb
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvFDBStorageTest/Application/VC80/PlayerInfo.fdb
+END
+Convert.bat
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvFDBStorageTest/Application/VC80/Convert.bat
+END
+Unconvert.bat
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvFDBStorageTest/Application/VC80/Unconvert.bat
+END

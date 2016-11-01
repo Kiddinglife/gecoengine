@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC90/DebugDll
+END
+DebugLauncherMachine.bat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC90/DebugDll/DebugLauncherMachine.bat
+END
+FvMachined.conf
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC90/DebugDll/FvMachined.conf
+END
+DebugLauncherBaseApp.bat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC90/DebugDll/DebugLauncherBaseApp.bat
+END
+DebugLauncher.bat
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC90/DebugDll/DebugLauncher.bat
+END
+DebugLauncherCellApp.bat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC90/DebugDll/DebugLauncherCellApp.bat
+END

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvLogicServerTest
+END
+FvMain.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvLogicServerTest/FvMain.cpp
+END
+FvTestSpell.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvLogicServerTest/FvTestSpell.h
+END
+FvTestSpell.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvLogicServerTest/FvTestSpell.cpp
+END

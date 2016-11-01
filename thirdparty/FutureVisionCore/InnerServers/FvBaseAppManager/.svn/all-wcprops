@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager
+END
+FvBaseAppManager.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvBaseAppManager.cpp
+END
+FvBaseAppManagerInterface.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvBaseAppManagerInterface.cpp
+END
+Main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/Main.cpp
+END
+FvBaseApp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvBaseApp.cpp
+END
+FvBaseAppManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvBaseAppManager.h
+END
+FvBaseAppManagerInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvBaseAppManagerInterface.h
+END
+FvWatcherForwardingBaseApp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvWatcherForwardingBaseApp.cpp
+END
+FvBaseApp.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvBaseApp.h
+END
+FvWatcherForwardingBaseApp.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvBaseAppManager/FvWatcherForwardingBaseApp.h
+END

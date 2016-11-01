@@ -1,0 +1,42 @@
+vertex_program FvTerrainVertexShader hlsl
+{
+	source FvTerrainVertexShader.vsh
+	entry_point Main
+	target vs_3_0
+
+	default_params
+	{
+		param_indexed_auto 0 world_matrix
+		param_indexed_auto 4 viewproj_matrix
+		param_indexed_auto 8 camera_position
+		
+		param_indexed_auto 9 custom 1
+		//xScale yScale lodStart lodEnd
+		//param_indexed 9		float4 100 100 9999.0 10000.0
+		//NormalMap size BlendMap size
+		param_indexed 10	float4 128 128 512 512
+		param_indexed 11 float4 0.03 0 0 0
+		param_indexed 12 float4 0 0.03 0 0
+		param_indexed 13 float4 0.03 0 0 0
+		param_indexed 14 float4 0 0.03 0 0
+		param_indexed 15 float4 0.03 0 0 0
+		param_indexed 16 float4 0 0.03 0 0
+		param_indexed 17 float4 0.03 0 0 0
+		param_indexed 18 float4 0 0.03 0 0
+		
+		
+	}
+}
+
+fragment_program FvTerrainPixelShader hlsl
+{
+	source FvTerrainPixelShader.psh
+	entry_point Main
+	target ps_3_0
+	
+	default_params
+	{
+		//LayerMask
+		param_indexed 0 float4 0.3 0.3 0.3 0.3
+	}	
+}

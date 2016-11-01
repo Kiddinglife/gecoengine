@@ -1,0 +1,407 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvNetwork
+END
+FvNetForwardingStringHandler.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetForwardingStringHandler.h
+END
+FvNetInterfaceMinder.inl
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceMinder.inl
+END
+FvNetFileStream.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetFileStream.h
+END
+FvNetBSDSNPrintf.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetBSDSNPrintf.h
+END
+FvNetRemoteStepper.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetRemoteStepper.h
+END
+FvNetIrregularChannels.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetIrregularChannels.cpp
+END
+FvNetTypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetTypes.h
+END
+FvNetBundle.inl
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetBundle.inl
+END
+FvNetWatcherGlue.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetWatcherGlue.cpp
+END
+FvNetCondemnedChannels.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetCondemnedChannels.h
+END
+FvNetChannel.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetChannel.h
+END
+FvNetMsgTypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMsgTypes.h
+END
+FvNetMonitoredChannels.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMonitoredChannels.h
+END
+FvNetKeepAliveChannels.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetKeepAliveChannels.cpp
+END
+FvNetPublicKeyCipher.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPublicKeyCipher.cpp
+END
+FvNetFormatStringHandler.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetFormatStringHandler.h
+END
+FvNetNub.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetNub.cpp
+END
+FvNetBSDSNPrintf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetBSDSNPrintf.cpp
+END
+FvNetRemoteStepper.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetRemoteStepper.cpp
+END
+FvNetTypes.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetTypes.cpp
+END
+FvNetCondemnedChannels.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetCondemnedChannels.cpp
+END
+FvNetChannel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetChannel.cpp
+END
+FvNetMonitoredChannels.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMonitoredChannels.cpp
+END
+FvNetInterfaceElement.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceElement.h
+END
+FvNetEndpoint.inl
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetEndpoint.inl
+END
+FvNetWatcherPacketHandler.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetWatcherPacketHandler.cpp
+END
+FvNetKeepAliveChannels.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetKeepAliveChannels.h
+END
+FvNetPortMap.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPortMap.h
+END
+FvNetMachineGuard.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMachineGuard.cpp
+END
+FvNetMask.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMask.cpp
+END
+FvNetInterfaceMinder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceMinder.cpp
+END
+FvNetInterfaceLayer.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceLayer.h
+END
+FvNetLoggerMessageForwarder.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetLoggerMessageForwarder.h
+END
+FvNetEncryptionFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetEncryptionFilter.h
+END
+FvNetWatcherNub.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetWatcherNub.h
+END
+FvNetPacket.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPacket.cpp
+END
+FvNetInterfaceLayerMacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceLayerMacros.h
+END
+FvNetBundle.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetBundle.cpp
+END
+FvNetInterfaceElement.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceElement.cpp
+END
+FvNetPacketFilter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPacketFilter.cpp
+END
+FvNetNub.inl
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetNub.inl
+END
+FvNetEndpoint.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetEndpoint.h
+END
+FvNetForwardingStringHandler.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetForwardingStringHandler.cpp
+END
+FvNetWatcherPacketHandler.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetWatcherPacketHandler.h
+END
+FvNetFileStream.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetFileStream.cpp
+END
+FvNetMachineGuard.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMachineGuard.h
+END
+FvNetMessageFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMessageFilter.h
+END
+FvNetMisc.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMisc.h
+END
+FvNetMask.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetMask.h
+END
+FvNetLoggerMessageForwarder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetLoggerMessageForwarder.cpp
+END
+FvNetEncryptionFilter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetEncryptionFilter.cpp
+END
+FvNetWatcherNub.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetWatcherNub.cpp
+END
+FvNetTypes.inl
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetTypes.inl
+END
+FvNetInterfaceMinder.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceMinder.h
+END
+FvNetBlockingReplyHandler.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetBlockingReplyHandler.h
+END
+FvNetChannel.inl
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetChannel.inl
+END
+FvNetInterfaceMinderMacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaceMinderMacros.h
+END
+FvNetPacket.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPacket.h
+END
+FvNetIrregularChannels.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetIrregularChannels.h
+END
+FvNetBundle.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetBundle.h
+END
+FvNetWatcherGlue.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetWatcherGlue.h
+END
+FvNetEndpoint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetEndpoint.cpp
+END
+FvNetPacketFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPacketFilter.h
+END
+FvNetPublicKeyCipher.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetPublicKeyCipher.h
+END
+FvNetwork.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetwork.h
+END
+FvNetInterfaces.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetInterfaces.h
+END
+FvNetNub.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvNetwork/FvNetNub.h
+END

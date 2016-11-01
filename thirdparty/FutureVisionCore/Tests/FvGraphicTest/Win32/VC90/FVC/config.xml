@@ -1,0 +1,6 @@
+<Config>
+    <Vsync>false</Vsync>
+    <Fullscreen>false</Fullscreen>
+    <Resolution>1024x768</Resolution>
+    <TextureFilteringMode>5</TextureFilteringMode>
+</Config>

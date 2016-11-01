@@ -1,0 +1,245 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/InnerFutureVision/!svn/ver/7/trunk/InnerCoreLibs/FvMath
+END
+FvDirection3.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvDirection3.cpp
+END
+FvPlane.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvPlane.h
+END
+FvWorldPolygon.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvWorldPolygon.h
+END
+FvEMA.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvEMA.h
+END
+FvMatrix.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvMatrix.h
+END
+FvBoundingBox.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvBoundingBox.cpp
+END
+FvQuadTree.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvQuadTree.h
+END
+FvLinearAnimation.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvLinearAnimation.h
+END
+FvWorldTriangle.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvWorldTriangle.h
+END
+FvSMA.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvSMA.h
+END
+FvQuaternion.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvQuaternion.cpp
+END
+FvAngle.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvAngle.cpp
+END
+FvIntegrate.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvIntegrate.h
+END
+FvBSP.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvBSP.h
+END
+FvMath.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvMath.cpp
+END
+FvHullTree.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvHullTree.h
+END
+FvVector2.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvVector2.h
+END
+FvVector3.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvVector3.h
+END
+FvVector4.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvVector4.h
+END
+FvPortal2D.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvPortal2D.h
+END
+FvPerlinNoise.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvPerlinNoise.h
+END
+FvLine.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvLine.h
+END
+FvPlane.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvPlane.cpp
+END
+FvWorldPolygon.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvWorldPolygon.cpp
+END
+FvMatrix.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvMatrix.cpp
+END
+FvDirection3.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvDirection3.h
+END
+FvQuadTree.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvQuadTree.cpp
+END
+FvWorldTriangle.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvWorldTriangle.cpp
+END
+FvBoundingBox.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvBoundingBox.h
+END
+FvHullTree.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvHullTree.cpp
+END
+FvVector2.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvVector2.cpp
+END
+FvBSP.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvBSP.cpp
+END
+FvVector3.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvVector3.cpp
+END
+FvVector4.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvVector4.cpp
+END
+FvPortal2D.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvPortal2D.cpp
+END
+FvPerlinNoise.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvPerlinNoise.cpp
+END
+FvLine.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvLine.cpp
+END
+FvQuaternion.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvQuaternion.h
+END
+FvAngle.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvMath/FvAngle.h
+END
+FvMath.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/InnerFutureVision/!svn/ver/7/trunk/InnerCoreLibs/FvMath/FvMath.h
+END

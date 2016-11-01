@@ -1,0 +1,53 @@
+sampler NormalSampler		: register(s0);
+sampler BlendSampler		: register(s1);
+sampler Base0Sampler		: register(s2);
+sampler Base1Sampler		: register(s3);
+sampler Base2Sampler		: register(s4);
+sampler Base3Sampler		: register(s5);
+
+float4 layermask : register(c0);
+
+struct INPUT
+{
+	float4 PosProjected		: POSITION;
+	float4 NormalBlendUV	: TEXCOORD0;
+	float4 Layer01UV			: TEXCOORD1;
+	float4 Layer23UV			: TEXCOORD2;
+};
+
+struct OUTPUT
+{
+	float4 FinalColor : COLOR0;
+};
+
+OUTPUT Main(INPUT In)
+{
+	OUTPUT Out = (OUTPUT) 0;
+	
+	float3 normal;
+  normal.xy = tex2D(NormalSampler, In.NormalBlendUV.xy).ga * 2 - float2(1,1);
+  normal.z  = sqrt( 1 - normal.x*normal.x - normal.y*normal.y ); 
+  
+  float4 blend = tex2D(BlendSampler, In.NormalBlendUV.zw) * layermask;
+  
+  float indes = dot(normalize(float3(1,1,1)), normal);
+	
+	float3 base0 = tex2D(Base0Sampler, In.Layer01UV.xy).xyz * blend.a;
+	base0 += tex2D(Base1Sampler, In.Layer01UV.zw).xyz * blend.r;
+	base0 += tex2D(Base2Sampler, In.Layer23UV.xy).xyz * blend.g;
+	base0 += tex2D(Base3Sampler, In.Layer23UV.zw).xyz * blend.b;
+	
+	
+	float3 ambient = lerp(float3(0.1, 0.1, 0.1), float3(1, 1, 1),
+		saturate(normal.z * 0.5f + 0.5f));
+	
+	Out.FinalColor = float4(base0.xyz * (ambient + float3(0.8, 0.7, 0.3) * saturate(indes)),1);
+	
+	
+	
+	//Out.FinalColor = float4(normal,1);
+	
+	//Out.FinalColor = float4(tex2D(BlendSampler, In.NormalBlendUV.zw).xyz,1)
+	
+	return Out;
+}

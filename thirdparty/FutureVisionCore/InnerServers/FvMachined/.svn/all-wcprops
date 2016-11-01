@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined
+END
+FvWindowsMachineGuard.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvWindowsMachineGuard.cpp
+END
+FvCommonMachineGuard.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvCommonMachineGuard.h
+END
+FvCluster.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvCluster.h
+END
+FvLinuxMachineGuard.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvLinuxMachineGuard.cpp
+END
+FvWindowsMachineGuard.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvWindowsMachineGuard.h
+END
+FvListeners.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvListeners.cpp
+END
+FvMachined.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvMachined.cpp
+END
+Main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/Main.cpp
+END
+FvLinuxMachineGuard.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvLinuxMachineGuard.h
+END
+FvUserMap.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvUserMap.cpp
+END
+FvListeners.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvListeners.h
+END
+FvMachined.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvMachined.h
+END
+FvCluster.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvCluster.cpp
+END
+FvUserMap.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvMachined/FvUserMap.h
+END

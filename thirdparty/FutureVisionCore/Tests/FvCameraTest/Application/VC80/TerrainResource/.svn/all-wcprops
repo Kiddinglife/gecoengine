@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource
+END
+terrain.material
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource/terrain.material
+END
+FvTerrainPixelShader.psh
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource/FvTerrainPixelShader.psh
+END
+FvTerrainVertexShader.vsh
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource/FvTerrainVertexShader.vsh
+END
+TESTMAP.bmp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource/TESTMAP.bmp
+END
+terrain.program
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource/terrain.program
+END
+Blend.tga
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvCameraTest/Application/VC80/TerrainResource/Blend.tga
+END

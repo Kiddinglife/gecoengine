@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvEntityDefTest/Application/VC80/scripts/entity_defs
+END
+EntityBase.def
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvEntityDefTest/Application/VC80/scripts/entity_defs/EntityBase.def
+END
+alias_带注释.xml
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvEntityDefTest/Application/VC80/scripts/entity_defs/alias_%E5%B8%A6%E6%B3%A8%E9%87%8A.xml
+END
+alias.xml
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvEntityDefTest/Application/VC80/scripts/entity_defs/alias.xml
+END
+EntityA.def
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvEntityDefTest/Application/VC80/scripts/entity_defs/EntityA.def
+END

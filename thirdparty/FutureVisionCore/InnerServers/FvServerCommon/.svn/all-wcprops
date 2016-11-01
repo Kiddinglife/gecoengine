@@ -1,0 +1,185 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon
+END
+FvReviverSubject.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvReviverSubject.cpp
+END
+FvCellRect.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvCellRect.h
+END
+FvService.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvService.h
+END
+FvWriteDB.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvWriteDB.h
+END
+FvReviverSubject.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvReviverSubject.h
+END
+FvIdGenerator.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvIdGenerator.h
+END
+FvBackupHash.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvBackupHash.cpp
+END
+FvServerUtil.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServerUtil.h
+END
+FvEntityRefCnt.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvEntityRefCnt.cpp
+END
+FvBackupHash.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvBackupHash.h
+END
+FvServerResource.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServerResource.cpp
+END
+FvAnonymousChannelClient.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvAnonymousChannelClient.cpp
+END
+FvEntityRefCnt.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvEntityRefCnt.h
+END
+FvDocWatcher.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvDocWatcher.cpp
+END
+FvServerResource.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServerResource.h
+END
+FvServerCommon.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServerCommon.h
+END
+FvAnonymousChannelClient.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvAnonymousChannelClient.h
+END
+FvDocWatcher.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvDocWatcher.h
+END
+FvTimeKeeper.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvTimeKeeper.cpp
+END
+FvIdClient.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvIdClient.cpp
+END
+FvServiceBase.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServiceBase.cpp
+END
+FvServerConfig.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServerConfig.cpp
+END
+FvCellRect.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvCellRect.cpp
+END
+FvTimeKeeper.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvTimeKeeper.h
+END
+FvReviverCommon.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvReviverCommon.h
+END
+FvIdClient.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvIdClient.h
+END
+FvService.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvService.cpp
+END
+FvServiceBase.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServiceBase.h
+END
+FvStreamHelper.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvStreamHelper.h
+END
+FvServerConfig.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvServerCommon/FvServerConfig.h
+END

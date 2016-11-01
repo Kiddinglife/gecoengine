@@ -1,0 +1,18 @@
+<root>
+    <terrain>
+        <resource>00000000o.ftd</resource>
+    </terrain>
+    <model>
+        <resource>model/Teapot.node</resource>
+        <transform>
+            <row0>-0.000000 0.000000 -0.100000</row0>
+            <row1>0.000000 0.100000 0.000000</row1>
+            <row2>0.100000 0.000000 -0.000000</row2>
+            <row3>50 50 3</row3>
+        </transform>
+        <editorOnly>
+            <castsShadow>true</castsShadow>
+        </editorOnly>
+        <reflectionVisible>false</reflectionVisible>
+    </model>
+</root>

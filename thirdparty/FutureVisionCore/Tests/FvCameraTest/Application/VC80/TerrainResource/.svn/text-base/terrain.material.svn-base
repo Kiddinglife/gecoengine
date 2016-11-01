@@ -1,0 +1,64 @@
+material FvTerrainTemplateMaterial
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref FvTerrainVertexShader
+			{
+			}
+			shadow_receiver_vertex_program_ref FvTerrainVertexShader
+			{
+			}
+
+			fragment_program_ref FvTerrainPixelShader
+			{
+			}
+			shadow_receiver_fragment_program_ref FvTerrainPixelShader
+			{
+			}
+			
+			texture_unit NormalMap
+			{
+				texture dnormals.dds
+				filtering linear linear linear
+				tex_address_mode clamp
+			}
+			
+			texture_unit BlendMap
+			{
+				texture Blend.tga
+				filtering linear linear linear
+				tex_address_mode clamp
+			}
+			
+			texture_unit Base0Map
+			{
+				texture dterr_dirt-grass.jpg
+				filtering linear linear linear
+				tex_address_mode wrap
+			}
+			
+			texture_unit Base1Map
+			{
+				texture dterr_rock-dirt.jpg
+				filtering linear linear linear
+				tex_address_mode wrap
+			}
+			
+			texture_unit Base2Map
+			{
+				texture dterr_rock6.jpg
+				filtering linear linear linear
+				tex_address_mode wrap
+			}
+			
+			texture_unit Base3Map
+			{
+				texture daid_builder.tga
+				filtering linear linear linear
+				tex_address_mode wrap
+			}
+		}
+	}
+}

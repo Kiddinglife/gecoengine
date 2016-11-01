@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC80/DebugDll
+END
+CopyDllForRedistVC90.bat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC80/DebugDll/CopyDllForRedistVC90.bat
+END
+CopyDllForDebugVC90.bat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC80/DebugDll/CopyDllForDebugVC90.bat
+END
+DebugLauncher.bat
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/Application/VC80/DebugDll/DebugLauncher.bat
+END

@@ -1,0 +1,76 @@
+10
+
+dir
+10
+http://192.168.1.251:4445/svn/InnerFutureVision/trunk/InnerCoreLibs
+http://192.168.1.251:4445/svn/InnerFutureVision
+
+
+
+2011-06-17T09:21:07.436201Z
+9
+Nicholas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+169ff1c7-8da7-f143-80b1-8417b12211a7
+
+FvModelS
+dir
+
+FvLogicServer
+dir
+
+FvXMLSection
+dir
+
+FvTerrainS
+dir
+
+FvNetwork
+dir
+
+FvMath
+dir
+
+FvEntityDef
+dir
+
+FvPower
+dir
+
+FvLogicClient
+dir
+
+FvZoneS
+dir
+
+FvLogicCommon
+dir
+
+FvGameDefineShare
+dir
+
+FvCliSvrCommon
+dir
+
+FvNavigatorS
+dir
+
+FvFDBStorage
+dir
+
+FvKernel
+dir
+

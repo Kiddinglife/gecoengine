@@ -1,0 +1,473 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvEntityDef
+END
+FvDataObj.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataObj.cpp
+END
+FvEntityData.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityData.cpp
+END
+FvUserDataObjectLinkDataType.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectLinkDataType.cpp
+END
+FvObj.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvObj.cpp
+END
+FvEntityDescriptionMap.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDescriptionMap.cpp
+END
+FvMailBoxExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMailBoxExportMacro.cpp
+END
+FvDataScanf.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataScanf.h
+END
+FvBaseEntityExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvBaseEntityExportMacro.cpp
+END
+FvEntityDefConstants.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDefConstants.h
+END
+FvNumFixArrayExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvNumFixArrayExportMacro.h
+END
+FvBaseUserDataObjectDescription.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvBaseUserDataObjectDescription.cpp
+END
+FvEntityDefDefines.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDefDefines.h
+END
+FvIndexVector.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvIndexVector.h
+END
+FvDataTypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataTypes.h
+END
+FvRobotEntityExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvRobotEntityExportMacro.cpp
+END
+FvUserDataObjectType.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectType.h
+END
+FvDataObj.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataObj.h
+END
+FvSysDataType.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvSysDataType.cpp
+END
+FvEntityData.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityData.h
+END
+FvDataDescription.inl
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataDescription.inl
+END
+FvEntityExport.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityExport.cpp
+END
+FvObj.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvObj.h
+END
+FvEntityDescription.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDescription.cpp
+END
+FvUDOExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUDOExportMacro.h
+END
+FvEntityDescriptionMap.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDescriptionMap.h
+END
+FvMethodDescription.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMethodDescription.cpp
+END
+FvDataOwner.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataOwner.cpp
+END
+FvEntityDefUtility.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDefUtility.h
+END
+FvDataPrint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataPrint.cpp
+END
+FvNumFixArrayExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvNumFixArrayExportMacro.cpp
+END
+FvObjAssisstant.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvObjAssisstant.h
+END
+FvCellEntityExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvCellEntityExportMacro.cpp
+END
+FvUserDataObjectType.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectType.cpp
+END
+FvBaseUserDataObjectDescription.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvBaseUserDataObjectDescription.h
+END
+FvClientEntityExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvClientEntityExportMacro.h
+END
+FvUserDataObject.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObject.h
+END
+FvUserDataObjectDescriptionMap.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectDescriptionMap.h
+END
+FvStructObjExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvStructObjExportMacro.h
+END
+FvUserDataObjectDescription.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectDescription.h
+END
+FvRobotEntityExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvRobotEntityExportMacro.h
+END
+FvUDOExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUDOExportMacro.cpp
+END
+FvCommonExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvCommonExportMacro.cpp
+END
+FvMacroCmdExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMacroCmdExportMacro.h
+END
+FvEntityDefUtility.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDefUtility.cpp
+END
+FvSysDataType.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvSysDataType.h
+END
+FvMemberDescription.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMemberDescription.h
+END
+FvDataDescription.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataDescription.h
+END
+FvEntityExport.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityExport.h
+END
+FvEntityDescription.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDescription.h
+END
+FvGlobalEntityExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvGlobalEntityExportMacro.h
+END
+FvAllDataExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvAllDataExportMacro.cpp
+END
+FvObjAssisstant.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvObjAssisstant.cpp
+END
+FvMethodDescription.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMethodDescription.h
+END
+FvDataOwner.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataOwner.h
+END
+FvPropertyOwnerBase.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvPropertyOwnerBase.cpp
+END
+FvDataPrint.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataPrint.h
+END
+FvBaseUserDataObjectDescription.inl
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvBaseUserDataObjectDescription.inl
+END
+FvClientEntityExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvClientEntityExportMacro.cpp
+END
+FvUserDataObject.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObject.cpp
+END
+FvUserDataObjectDescriptionMap.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectDescriptionMap.cpp
+END
+FvStructObjExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvStructObjExportMacro.cpp
+END
+FvUserDataObjectDescription.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectDescription.cpp
+END
+FvCellEntityExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvCellEntityExportMacro.h
+END
+FvMacroCmdExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMacroCmdExportMacro.cpp
+END
+FvMemberDescription.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMemberDescription.cpp
+END
+FvDataDescription.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataDescription.cpp
+END
+FvUserDataObjectLinkDataType.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvUserDataObjectLinkDataType.h
+END
+FvEntityDescription.inl
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvEntityDescription.inl
+END
+FvGlobalEntityExportMacro.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvGlobalEntityExportMacro.cpp
+END
+FvCommonExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvCommonExportMacro.h
+END
+FvMethodDescription.inl
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMethodDescription.inl
+END
+FvMailBoxExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvMailBoxExportMacro.h
+END
+FvDataScanf.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataScanf.cpp
+END
+FvIndexVector.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvIndexVector.cpp
+END
+FvAllDataExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvAllDataExportMacro.h
+END
+FvDataTypes.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvDataTypes.cpp
+END
+FvPropertyOwnerBase.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvPropertyOwnerBase.h
+END
+FvBaseEntityExportMacro.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvEntityDef/FvBaseEntityExportMacro.h
+END

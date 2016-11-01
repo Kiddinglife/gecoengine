@@ -1,0 +1,82 @@
+10
+
+dir
+10
+http://192.168.1.251:4445/svn/InnerFutureVision/trunk/InnerServers
+http://192.168.1.251:4445/svn/InnerFutureVision
+
+
+
+2011-05-10T06:00:10.859375Z
+2
+Uman
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+169ff1c7-8da7-f143-80b1-8417b12211a7
+
+FvRobot
+dir
+
+FvRobotApp
+dir
+
+FvGlobal
+dir
+
+FvGlobalApp
+dir
+
+FvBaseAppManager
+dir
+
+Application
+dir
+
+FvMachined
+dir
+
+FvCellAppWindow
+dir
+
+FvLoginApp
+dir
+
+FvBase
+dir
+
+FvCellAppManager
+dir
+
+FvBaseApp
+dir
+
+FvRobotWindow
+dir
+
+FvCell
+dir
+
+FvServerCommon
+dir
+
+FvDBManager
+dir
+
+FvCellApp
+dir
+
+FvReviver
+dir
+

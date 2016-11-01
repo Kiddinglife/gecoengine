@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp
+END
+FvLoginIntInterface.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/FvLoginIntInterface.cpp
+END
+FvStatusCheckWatcher.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/FvStatusCheckWatcher.h
+END
+Main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/Main.cpp
+END
+FvLoginApp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/FvLoginApp.cpp
+END
+FvLoginIntInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/FvLoginIntInterface.h
+END
+FvLoginApp.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/FvLoginApp.h
+END
+FvStatusCheckWatcher.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerServers/FvLoginApp/FvStatusCheckWatcher.cpp
+END

@@ -1,0 +1,67 @@
+<Teapot.node>
+    <node>
+        <identifier>Scene Root</identifier>
+        <transform>
+            <row0>1.000000 0.000000 0.000000</row0>
+            <row1>0.000000 1.000000 0.000000</row1>
+            <row2>0.000000 0.000000 1.000000</row2>
+            <row3>0.000000 0.000000 0.000000</row3>
+        </transform>
+        <node>
+            <identifier>Teapot01</identifier>
+            <transform>
+                <row0>1.000000 0.000000 0.000000</row0>
+                <row1>0.000000 1.000000 0.000000</row1>
+                <row2>0.000000 0.000000 1.000000</row2>
+                <row3>0.000000 0.000000 0.000000</row3>
+            </transform>
+        </node>
+    </node>
+    <renderSet>
+        <treatAsWorldSpaceObject>false</treatAsWorldSpaceObject>
+        <node>Scene Root</node>
+        <geometry>
+            <vertices>vertices</vertices>
+            <primitive>indices</primitive>
+            <primitiveGroup>0
+                <material>
+                    <identifier>01 - Default</identifier>
+                    <fx>shaders/std_effects/lightonly.fx</fx>
+                    <property>diffuseMap
+                        <Texture>model/10points.png</Texture>
+                    </property>
+                </material>
+            </primitiveGroup>
+        </geometry>
+    </renderSet>
+    <boundingBox>
+        <min>-4.500000 -3.000000 0.000000</min>
+        <max>5.142188 3.000000 4.725000</max>
+    </boundingBox>
+    <nodes>
+        <node>
+            <position>0.000000 0.000000 0.000000</position>
+            <scale>1.000000 1.000000 1.000000</scale>
+            <rotation>0.000000 0.000000 0.000000 1.000000</rotation>
+            <entity>
+                <subentities>
+                    <subentity>
+                        <index>0</index>
+                        <materialName>01-Default</materialName>
+                    </subentity>
+                </subentities>
+                <identifier>Teapot01</identifier>
+                <mesh>model/Teapot01.mesh</mesh>
+                <castShadows>true</castShadows>
+                <receiveShadows>true</receiveShadows>
+            </entity>
+            <identifier>Teapot01</identifier>
+        </node>
+    </nodes>
+    <bspMaterials>
+        <id>01 - Default</id>
+    </bspMaterials>
+    <bspCollision>
+        <bsp>model/teapot.collision</bsp>
+    </bspCollision>
+</Teapot.node>

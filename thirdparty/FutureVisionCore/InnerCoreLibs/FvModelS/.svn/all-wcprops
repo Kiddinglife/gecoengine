@@ -1,0 +1,275 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvModelS
+END
+FvModelDefines.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModelDefines.h
+END
+FvTree.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvTree.h
+END
+FvModel.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModel.h
+END
+FvAnimationShell.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationShell.cpp
+END
+FvOcclusionQueryRenderable.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvOcclusionQueryRenderable.cpp
+END
+FvAnimatedCharacterResource.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimatedCharacterResource.h
+END
+FvGameObjectModelSerializer.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvGameObjectModelSerializer.h
+END
+FvGameObjectModel.inl
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvGameObjectModel.inl
+END
+FvGameObjectModel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvGameObjectModel.cpp
+END
+FvModelSerializerImpl.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModelSerializerImpl.h
+END
+FvAvatar.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAvatar.h
+END
+FvAnimatedEntity.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimatedEntity.h
+END
+FvAnimationShellResource.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationShellResource.h
+END
+FvAvatarResource.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAvatarResource.cpp
+END
+FvAnimationModelSerializer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationModelSerializer.cpp
+END
+FvBSPProxy.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvBSPProxy.h
+END
+FvTreeSerializer.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvTreeSerializer.h
+END
+FvBillboard.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvBillboard.h
+END
+FvModelSerializer.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModelSerializer.h
+END
+FvTree.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvTree.cpp
+END
+FvModel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModel.cpp
+END
+FvModel.inl
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModel.inl
+END
+FvAnimatedCharacter.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimatedCharacter.h
+END
+FvAnimationModel.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationModel.h
+END
+FvInstanceEntity.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvInstanceEntity.h
+END
+FvAnimatedCharacterResource.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimatedCharacterResource.cpp
+END
+FvGameObjectModelSerializer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvGameObjectModelSerializer.cpp
+END
+FvAnimationShell.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationShell.h
+END
+FvModelSerializerImpl.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModelSerializerImpl.cpp
+END
+FvOcclusionQueryRenderable.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvOcclusionQueryRenderable.h
+END
+FvAvatar.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAvatar.cpp
+END
+FvAnimatedEntity.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimatedEntity.cpp
+END
+FvAnimationShellResource.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationShellResource.cpp
+END
+FvGameObjectModel.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvGameObjectModel.h
+END
+FvBSPProxy.inl
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvBSPProxy.inl
+END
+FvBSPProxy.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvBSPProxy.cpp
+END
+FvTreeSerializer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvTreeSerializer.cpp
+END
+FvBillboard.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvBillboard.cpp
+END
+FvModelSerializer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvModelSerializer.cpp
+END
+FvAvatarResource.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAvatarResource.h
+END
+FvAnimatedCharacter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimatedCharacter.cpp
+END
+FvAnimationModelSerializer.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationModelSerializer.h
+END
+FvAnimationModel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationModel.cpp
+END
+FvAnimationModel.inl
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvAnimationModel.inl
+END
+FvInstanceEntity.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvModelS/FvInstanceEntity.cpp
+END

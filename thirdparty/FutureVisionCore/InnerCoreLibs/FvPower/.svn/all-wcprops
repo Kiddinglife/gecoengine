@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/InnerFutureVision/!svn/ver/5/trunk/InnerCoreLibs/FvPower
+END
+FvPrintf.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvPrintf.c
+END
+FvMathPower.c
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvMathPower.c
+END
+FvConfigWin32Common.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfigWin32Common.h
+END
+FvPrintf.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvPrintf.h
+END
+FvConfig.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfig.h
+END
+FvVectorMartixQuaternionPower.c
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvVectorMartixQuaternionPower.c
+END
+FvMathPower.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvMathPower.h
+END
+FvConfigWin32MSVC7.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfigWin32MSVC7.h
+END
+FvProcess.c
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvProcess.c
+END
+FvConfigWin32MSVC8.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfigWin32MSVC8.h
+END
+FvConfigWin32MSVC9.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfigWin32MSVC9.h
+END
+FvVectorMartixQuaternionPower.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvVectorMartixQuaternionPower.h
+END
+FvSysLog.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvSysLog.c
+END
+FvProcess.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvProcess.h
+END
+FvSysLog.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvSysLog.h
+END
+FvExport.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvExport.h
+END
+FvConfigWin32MSVC.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfigWin32MSVC.h
+END
+FvConfigWin32.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvConfigWin32.h
+END
+FvPowerDefines.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/InnerFutureVision/!svn/ver/2/trunk/InnerCoreLibs/FvPower/FvPowerDefines.h
+END

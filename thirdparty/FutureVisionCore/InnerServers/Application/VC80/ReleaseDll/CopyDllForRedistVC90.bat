@@ -1,0 +1,50 @@
+@del /F /Q ".\Fv*.dll"
+@del /F /Q ".\Fv*.exe"
+@del /F /Q ".\Fv*.conf"
+@del /F /Q ".\Gx*.dll"
+@del /F /Q ".\OgreMain.dll"
+@del /F /Q ".\libmysql.dll"
+@del /F /Q ".\libeay32.dll"
+
+@pause
+
+@copy /Y "%FV_PATH%\Externals\Redist\Win32\libmysql.dll" ".\"
+@copy /Y "%FV_PATH%\Externals\Redist\Win32\VC90\libeay32.dll" ".\"
+
+@copy /Y "%FV_PATH%\Externals\Redist\Win32\ReleaseDll\OgreMain.dll" ".\"
+
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvBase.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvCell.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvEntityDefS.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvFDBStorage.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvGameDefineShare.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvKernel.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvLogicServer.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvLogicCommon.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvMath.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvModelS.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvNavigatorS.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvNetworkS.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvPower.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvTerrainS.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvXMLSection.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvZoneS.dll" ".\"
+@copy /Y "%FV_PATH%\SDK\Win32\Dll\ReleaseDll\FvCliSvrCommon.dll" ".\"
+
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvMachined.conf" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvBaseApp.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvBaseAppManager.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvCellApp.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvCellAppManager.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvCellAppWindow.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvDBManager.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvGlobalApp.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvLoginApp.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvMachined.exe" ".\"
+@copy /Y "%FV_PATH%\Servers\Application\VC90\ReleaseDll\FvServerCommon.dll" ".\"
+
+@copy /Y "%GX_PATH%\SDK\Win32\Dll\ReleaseDll\GxBase.dll" ".\"
+@copy /Y "%GX_PATH%\SDK\Win32\Dll\ReleaseDll\GxCell.dll" ".\"
+@copy /Y "%GX_PATH%\SDK\Win32\Dll\ReleaseDll\GxCommon.dll" ".\"
+
+@pause

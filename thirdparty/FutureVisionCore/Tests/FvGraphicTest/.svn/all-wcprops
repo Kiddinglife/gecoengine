@@ -1,0 +1,221 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest
+END
+GxVisualAvatar.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualAvatar.cpp
+END
+GxScriptSysDataType.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxScriptSysDataType.h
+END
+KeyboardState.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/KeyboardState.h
+END
+FvZoneTest.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/FvZoneTest.cpp
+END
+GxData.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxData.cpp
+END
+PlayerDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/PlayerDefine.h
+END
+VisualStruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/VisualStruct.h
+END
+GxVisualBuilder.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualBuilder.h
+END
+GxVisualAvatarAssisstant.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualAvatarAssisstant.cpp
+END
+FvController.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/FvController.cpp
+END
+ScriptEntityDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/ScriptEntityDefine.h
+END
+GxScriptDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxScriptDefine.h
+END
+VisualDefine.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/VisualDefine.h
+END
+GxMouseHandler.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxMouseHandler.h
+END
+GameUnitEntity_Move.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GameUnitEntity_Move.cpp
+END
+ScriptGameData.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/ScriptGameData.h
+END
+TestFun.h
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/TestFun.h
+END
+PlayerEntity.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/PlayerEntity.h
+END
+GxScriptSysDataType.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxScriptSysDataType.cpp
+END
+AvatarAssisstant.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/AvatarAssisstant.h
+END
+KeyboardState.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/KeyboardState.cpp
+END
+GxVisualAvatar.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualAvatar.h
+END
+GxVisualBuilder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualBuilder.cpp
+END
+GxVisualStruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualStruct.h
+END
+FvZoneTest.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/FvZoneTest.h
+END
+GxData.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxData.h
+END
+control.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/control.cpp
+END
+说明.docx
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/%E8%AF%B4%E6%98%8E.docx
+END
+GxVisualAvatarAssisstant.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxVisualAvatarAssisstant.h
+END
+GxScriptMailBox.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxScriptMailBox.h
+END
+FvController.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/FvController.h
+END
+Main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/Main.cpp
+END
+GxMouseHandler.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/GxMouseHandler.cpp
+END
+ScriptGameData.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/ScriptGameData.cpp
+END
+PlayerEntity.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/PlayerEntity.cpp
+END
+AvatarAssisstant.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvGraphicTest/AvatarAssisstant.cpp
+END

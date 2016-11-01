@@ -1,0 +1,98 @@
+<RoomEx_0.node>
+    <node>
+        <identifier>Scene Root</identifier>
+        <transform>
+            <row0>1.000000 0.000000 0.000000</row0>
+            <row1>0.000000 1.000000 0.000000</row1>
+            <row2>0.000000 0.000000 1.000000</row2>
+            <row3>0.000000 0.000000 0.000000</row3>
+        </transform>
+    </node>
+    <renderSet>
+        <treatAsWorldSpaceObject>false</treatAsWorldSpaceObject>
+        <node>Scene Root</node>
+        <geometry>
+            <vertices>vertices</vertices>
+            <primitive>indices</primitive>
+            <primitiveGroup>0
+                <material>
+                    <identifier>01 - Default</identifier>
+                    <fx>shaders/std_effects/lightonly.fx</fx>
+                    <property>diffuseMap
+                        <Texture>model/10points.png</Texture>
+                    </property>
+                </material>
+            </primitiveGroup>
+        </geometry>
+    </renderSet>
+    <boundingBox>
+        <min>-8.000000 -8.000000 0.000000</min>
+        <max>8.000000 8.000000 8.500000</max>
+    </boundingBox>
+    <boundary>
+        <normal>1.000000 0.000000 0.000000</normal>
+        <distance>-8.000000</distance>
+        <portal>
+            <zone>invasive</zone>
+            <uAxis>0.000000 0.000000 1.000000</uAxis>
+            <point>2.666666 -2.666667 0.000000</point>
+            <point>5.333332 -2.666667 0.000000</point>
+            <point>5.333332 2.666666 0.000000</point>
+            <point>2.666666 2.666666 0.000000</point>
+        </portal>
+    </boundary>
+    <boundary>
+        <normal>-1.000000 -0.000000 -0.000000</normal>
+        <distance>-8.000000</distance>
+    </boundary>
+    <boundary>
+        <normal>0.000000 0.000000 1.000000</normal>
+        <distance>0.000000</distance>
+    </boundary>
+    <boundary>
+        <normal>-0.000000 -0.000000 -1.000000</normal>
+        <distance>-8.499999</distance>
+        <portal>
+            <uAxis>0.000000 1.000000 0.000000</uAxis>
+            <point>-2.666667 -2.666667 0.000000</point>
+            <point>2.666666 -2.666667 0.000000</point>
+            <point>2.666666 2.666666 0.000000</point>
+            <point>-2.666667 2.666666 0.000000</point>
+        </portal>
+    </boundary>
+    <boundary>
+        <normal>0.000000 1.000000 0.000000</normal>
+        <distance>-8.000000</distance>
+    </boundary>
+    <boundary>
+        <normal>-0.000000 -1.000000 -0.000000</normal>
+        <distance>-8.000000</distance>
+    </boundary>
+    <customHull>false</customHull>
+    <nodes>
+        <node>
+            <position>0.000000 0.000000 0.000000</position>
+            <scale>1.000000 1.000000 1.000000</scale>
+            <rotation>0.000000 0.000000 0.000000 1.000000</rotation>
+            <entity>
+                <subentities>
+                    <subentity>
+                        <index>0</index>
+                        <materialName>01-Default</materialName>
+                    </subentity>
+                </subentities>
+                <identifier>Box01</identifier>
+                <mesh>shells/Box01.mesh</mesh>
+                <castShadows>true</castShadows>
+                <receiveShadows>true</receiveShadows>
+            </entity>
+            <identifier>Box01</identifier>
+        </node>
+    </nodes>
+    <bspMaterials>
+        <id>01 - Default</id>
+    </bspMaterials>
+    <bspCollision>
+        <bsp>shells/roomex_0.collision</bsp>
+    </bspCollision>
+</RoomEx_0.node>

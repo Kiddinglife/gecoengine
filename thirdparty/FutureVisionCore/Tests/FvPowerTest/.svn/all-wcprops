@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvPowerTest
+END
+FvMathAlgorithmsTest.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvPowerTest/FvMathAlgorithmsTest.cpp
+END
+FvMathAlgorithmsTest.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvPowerTest/FvMathAlgorithmsTest.h
+END
+FvPowerTest.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/FutureVision/!svn/ver/2/trunk/Tests/FvPowerTest/FvPowerTest.cpp
+END
