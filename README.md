@@ -1,4 +1,10 @@
-# geco-game-engine
-game engine framework for any kind of game like MMORPG, MOBA, ARPG and so on
-sudo ./engine-unittest --gtest_filter=GECO_DEBUGGING_WATCHER.test_add_remove_value_func_method_watchers
+![gecoengine logo](https://media.licdn.com/media/AAEAAQAAAAAAAALQAAAAJDI3NjViNjAxLTA5NDItNGJkMi05ZThlLThmM2VlODkyMmQwZA.png)
+
+# Aimed for Online Games  
+
+**gecoengine** is a complete solution for different kinds of online games like MMORPG, MOBA, ARPG.  
+waiting...  
+
+## Core Features    
+waiting...
 

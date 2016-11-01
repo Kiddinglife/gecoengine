@@ -31,11 +31,6 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>src/README.md</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/README.md</locationURI>
-		</link>
-		<link>
 			<name>src/appnet</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
