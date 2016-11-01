@@ -1,30 +1,10 @@
-# geco-engine
-game engine framework for any kind of game like MMORPG, MOBA, ARPG and so on
+![gecoengine logo](https://media.licdn.com/media/AAEAAQAAAAAAAALQAAAAJDI3NjViNjAxLTA5NDItNGJkMi05ZThlLThmM2VlODkyMmQwZA.png)
 
-Chapter 1 The Role of Game Designer
+# Aimed for Online Games  
 
-This chapter will answer the questions below:
-    1.what does it take to be a game designer?
-    2.what what kinds of talents and skills do you need?
-    3.what will be ecpected of you during the process?
-    4.what is the best method for design games? 
+**gecoengine** is a complete solution for different kinds of online games like MMORPG, MOBA, ARPG.  
+waiting...  
 
-1.Playcentric:
-    Use interative design method of "playcentric" to judge 
-    the success of game play based on player ecperiences.
-    
-2.Advocate of player:
-    Game designer must look at the game  world through the players' eyes
-    solid gameplay hooks players other than graphics, storylines and so on.
-    
-3.Playtester: 
-    3.0 Inviting players "over play" and listening to what they say as they
-        experience your game is the best way to understand how your game working.
-    3.1 By watching other people play the game, you learn a grat deal.
-    3.2 Pay attentions to what objects they are focused on, where they 
-        click or move the cursor when they get stuck or frustrated or bored, 
-        and write down everything they tell you.Gaug reactons, interpret silent moments, 
-        study their feedbacks,and match them with your game elements.
-        
-4.
+## Core Features    
+waiting...
 
