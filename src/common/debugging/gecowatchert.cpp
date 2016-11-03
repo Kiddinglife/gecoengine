@@ -12,6 +12,63 @@
 
 DECLARE_DEBUG_COMPONENT2("COMM", LOG_MSG_CRITICAL);
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
+// 　　　　　　　　　　　　Section: watcher_value_query_t impls
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
+void watcher_value_query_t::get_watcher_value()
+{
+	int ret;
+	if (is_dir_watcher_) ret = geco_watcher_base_t::get_root_watcher().visit_children(0,
+		request_path_.c_str(), *this);
+	else ret = geco_watcher_base_t::get_root_watcher().get_as_stream(NULL, request_path_.c_str(),
+		*this);
+
+	if (!ret)
+	{
+		result_.Write(ret);
+		// And notify the parent of our failure.
+		this->notify(-1);
+	}
+}
+void watcher_value_query_t::set_watcher_value()
+{
+	if (is_dir_watcher_) return;
+	if (!geco_watcher_base_t::get_root_watcher().set_from_stream(NULL, request_path_.c_str(), *this))
+	{
+		//result_.WriteMini((uchar)WVT_UNKNOWN);
+		//result_.WriteMini((uchar)WT_READ_ONLY);
+		result_.WriteMini(false);
+		// We're pretty much done setting watcher value (failed)
+		// Ready to fill in the packet now 0 means operation failed
+		this->notify(-1);
+	}
+}
+bool watcher_value_query_t::add_watcher_path(const void *base, const char *path,
+	std::string & label, geco_watcher_base_t &watcher)
+{
+	std::string desc;
+	origin_request_path_.size() > 0 ?
+		request_path_ = origin_request_path_ + "/" + label : request_path_ = label;
+
+	// Push the directory entry onto the result stream
+	// We are using a reference to the correct watcher now, so no need
+	// to pass in the path to search for.
+	bool status = watcher.get_as_stream(base, NULL, *this);
+
+	if (!status)
+	{
+		ERROR_MSG("watcher_path_request_v2::add_watcher_path::!status error\n");
+		// If the get operation failed, we still need to notify the parent
+		// so it can continue with its response.
+		result_.WriteMini((uchar)WVT_UNKNOWN);
+		result_.WriteMini((uchar)WT_READ_ONLY);
+		result_.WriteMini(status);
+		return false;
+	}
+	// Always need to return true from the asyn version 2 protocol
+	// otherwise the stream won't be completed.
+	return true;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - -
 // 　　　　　　　　　　　                       geco_watcher_t impls

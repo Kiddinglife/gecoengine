@@ -3,6 +3,7 @@
 *.lo
 *.o
 *.obj
+*.iobj
 *.tlog
 # Precompiled Headers
 *.gch
@@ -14,10 +15,11 @@
 *.ilk
 # Compiled Dynamic libraries
 *.dylib
-
+*.lib
+*.ipdb
 # Fortran module files
 *.mod
-
+*.exe
 # Compiled Static libraries
 *.lai
 *.la
@@ -36,5 +38,5 @@
 *.mk
 *~
 *.opendb
-*.VC.opendb
+*.VC.db
 *.idb

@@ -17,13 +17,15 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
 		testing::InitGoogleMock(&argc, argv);
 
         //::testing::GTEST_FLAG(filter) = "GECO_ULTILS.encode64_when_given_string_and_then_decode64_back_to_string_result_should_be_same";
-		::testing::GTEST_FLAG(filter) = "GECO_ULTILS.test_geco_cmdline_t";
+		//::testing::GTEST_FLAG(filter) = "GECO_ULTILS.test_geco_cmdline_t";
 
-		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";
+		::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*"; 
 		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_haffman_compression";
 		//::testing::GTEST_FLAG(filter) ="GecoMemoryStreamTestCase.test_geco_string_compressor";
 		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_float_compression";
 		// ::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_run_length";
+		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_all_reads_and_writes";
+		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_all_reads_and_writes_un_compressed";
 
         //::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_TIMESTAMP.test_gettimestamp_func";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.test_msg_macros";
