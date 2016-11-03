@@ -182,22 +182,40 @@ namespace geco
         //	Section: default_critical_msg_handler_t
         //-------------------------------------------------------
 #if defined(_WIN32) && !defined(_XBOX)
+        static BOOL CALLBACK EnumWindowsProc( HWND hWnd, LPARAM lParam )
+        {
+            char acClassName[1024];
+            GetClassName( hWnd, acClassName, sizeof( acClassName ) );
+            if( strcmp( acClassName, "tooltips_class32" ) &&
+                strcmp( acClassName, "#32770" ) )
+            {
+                DWORD iProcessID;
+                GetWindowThreadProcessId( hWnd, &iProcessID );
+                if( iProcessID == GetCurrentProcessId() )
+                {
+                    *(HWND*)lParam = hWnd;
+                    return FALSE;
+                }
+            }
+            return TRUE;
+        }
+
+        static HWND GetDefaultParent()
+        {
+            HWND hWnd = NULL;
+            EnumWindows( EnumWindowsProc, (LPARAM)&hWnd );
+            return hWnd;
+        }
         class win32_critical_msg_handler_t : public default_critical_msg_handler_t
         {
-            virtual Result ask(const char* msg)
+            virtual Result Ask( const char *pcMsg )
             {
-#ifdef BUILT_BY_GECO
-                CriticalMsgBox mb(msg, true);
-#else
-                // TODO CriticalMsgBox mb(msg, false);
-#endif
-                //if (mb.doModal())
-                //    return ENTERDEBUGGER;
+                if( ::MessageBox( GetDefaultParent(), pcMsg, "Critical Error", MB_YESNO ) == IDYES )
+                    return ENTERDEBUGGER;
 
                 return EXITDIRECTLY;
             }
-            virtual void recordInfo(bool willExit)
-            {}
+            virtual void recordInfo(bool willExit){}
         };
         // win32 has default handler inilized
         static win32_critical_msg_handler_t win32_critical_msg_handler;

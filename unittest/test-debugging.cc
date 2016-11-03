@@ -43,7 +43,8 @@ TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_cause_real_assertion_when_has_dev_ass
 
 TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_not_run_when_has_dev_assert_is_true_and_assert_value_false)
 {
-	// when has_dev_assert_ = true (default), GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
+	// when has_dev_assert_ = true (default), 
+	// GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
 	bool runblockcodes = false;
 	log_msg_filter_t::get_instance().has_dev_assert_ = true;
 	GECO_ASSERT_DEV_IFNOT(false)
@@ -55,7 +56,8 @@ TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_not_run_
 }
 TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_not_run_when_has_dev_assert_is_true_and_assert_value_true)
 {
-	// when has_dev_assert_ = true (default), GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
+	// when has_dev_assert_ = true (default), 
+	// GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
 	bool runblockcodes = false;
 	log_msg_filter_t::get_instance().has_dev_assert_ = true;
 	GECO_ASSERT_DEV_IFNOT(true)
@@ -67,7 +69,8 @@ TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_not_run_
 }
 TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_run_when_has_dev_assert_is_false_and_assert_value_false)
 {
-	// when has_dev_assert_ = true (default), GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
+	// when has_dev_assert_ = false (default), 
+	// GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
 	bool runblockcodes = false;
 	log_msg_filter_t::get_instance().has_dev_assert_ = false;
 	GECO_ASSERT_DEV_IFNOT(false)
@@ -79,7 +82,8 @@ TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_run_when
 }
 TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_if_not_does_block_codes_will_not_run_when_has_dev_assert_is_false_and_assert_value_true)
 {
-	// when has_dev_assert_ = true (default), GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
+	// when has_dev_assert_ = true (default), 
+	// GECO_ASSERT_DEV_IFNOT will cause a REAL assert like GECO_ASSERT_DEV
 	bool runblockcodes = false;
 	log_msg_filter_t::get_instance().has_dev_assert_ = false;
 	GECO_ASSERT_DEV_IFNOT(true)
