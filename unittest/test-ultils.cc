@@ -25,6 +25,8 @@ TEST(GECO_ULTILS, test_geco_cmdline_t)
 	char acT[128];
 	kCommand.String("strr",acT,128);
 	ASSERT_STREQ(acT, "hello");
+
+
 }
 
 
