@@ -18,6 +18,51 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\common\debugging\debug.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\gecowatchert.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\stack_tracker_t.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\timestamp.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\geco-bit-stream.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-engine-feature.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-export.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-plateform.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\affinity.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-cmdline.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-config.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-malloc.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-engine-auth.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-malloc.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-thread.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\singleton_base.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\ultils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\src\common\debugging\asms.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ml64 /c %(filename).asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\common\debugging\debug.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\gecowatchert.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\timestamp.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\geco-bit-stream.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\affinity.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\geco-cmdline.cc" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\geco-engine-auth.cc" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\ultils.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9DB6451B-55F3-4A06-9C23-22C43B515E3D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -168,50 +213,6 @@
       <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\common\debugging\debug.h" />
-    <ClInclude Include="..\..\..\..\src\common\debugging\gecowatchert.h" />
-    <ClInclude Include="..\..\..\..\src\common\debugging\stack_tracker_t.h" />
-    <ClInclude Include="..\..\..\..\src\common\debugging\timestamp.h" />
-    <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
-    <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
-    <ClInclude Include="..\..\..\..\src\common\ds\geco-bit-stream.h" />
-    <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
-    <ClInclude Include="..\..\..\..\src\common\geco-engine-config.h" />
-    <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
-    <ClInclude Include="..\..\..\..\src\common\plateform.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\affinity.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\geco-cmdline.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\geco-engine-auth.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\geco-thread.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\ultils.h" />
-    <ClInclude Include="..\..\..\..\src\common\ultils\geco-malloc.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\common\debugging\debug.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\debugging\gecowatchert.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\debugging\timestamp.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ds\geco-bit-stream.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\affinity.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\geco-cmdline.cc" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\geco-engine-auth.cc" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\ultils.cpp" />
-    <ClCompile Include="..\..\..\..\src\common\ultils\geco-malloc.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="asms.asm">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ml64 /c %(fileName).asm</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(fileName).obj</Outputs>
-    </CustomBuild>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

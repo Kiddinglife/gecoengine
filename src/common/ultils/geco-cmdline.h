@@ -2,7 +2,7 @@
 #define _SRC_GECO_CMDLINE
 
 //see GECO_ULTILS.test_geco_cmdline_t to leran how to use it
-#include "../geco-plateform.h"
+#include "../geco-export.h"
 
 class GECO_EXPORT geco_cmdline_t
 {

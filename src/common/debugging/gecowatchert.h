@@ -35,8 +35,8 @@
 #include <sstream>
 #include <memory>
 
-#include "../../plateform.h"
-#include "../../geco-engine-config.h"
+#include "../geco-engine-feature.h"
+#include "../geco-plateform.h"
 #include "../ds/geco-bit-stream.h"
 #include "debug.h"
 using namespace std::placeholders;

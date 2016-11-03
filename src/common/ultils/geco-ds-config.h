@@ -1,403 +1,403 @@
 /*
- *
- * Copyright (c) 1994
- * Hewlett-Packard Company SGI_STL
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for SGI_STL purpose is hereby granted without fee,
- * provided that the above copyright notice appear in all copies and
- * that both that copyright notice and this permission notice appear
- * in supporting documentation.  Hewlett-Packard Comp SGI_STL makes no
- * representations about the suitability of this software for SGI_STL
- * purpose.  It is provided "as is" without express or implied warranty.
- *
- * Copyright (c) 1997
- * Silicon Graphics
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for SGI_STL purpose is hereby granted without fee,
- * provided that the above copyright notice appear in all copies and
- * that both that copyright notice and this permission notice appear
- * in supporting documentation.  Silicon Graphics makes no
- * representations about the suitability of this software for SGI_STL
- * purpose.  It is provided "as is" without express or implied warranty.
- *
- * Copyright (c) 2016
- * Geco Gaming Company
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for GECO purpose is hereby granted without fee,
- * provided that the above copyright notice appear in all copies and
- * that both that copyright notice and this permission notice appear
- * in supporting documentation.  GECO makes no representations about
- * the suitability of this software for GECO purpose.
- * It is provided "as is" without express or implied warranty.
- *
- */
+*
+* Copyright (c) 1994
+* Hewlett-Packard Company SGI_STL
+*
+* Permission to use, copy, modify, distribute and sell this software
+* and its documentation for SGI_STL purpose is hereby granted without fee,
+* provided that the above copyright notice appear in all copies and
+* that both that copyright notice and this permission notice appear
+* in supporting documentation.  Hewlett-Packard Comp SGI_STL makes no
+* representations about the suitability of this software for SGI_STL
+* purpose.  It is provided "as is" without express or implied warranty.
+*
+* Copyright (c) 1997
+* Silicon Graphics
+*
+* Permission to use, copy, modify, distribute and sell this software
+* and its documentation for SGI_STL purpose is hereby granted without fee,
+* provided that the above copyright notice appear in all copies and
+* that both that copyright notice and this permission notice appear
+* in supporting documentation.  Silicon Graphics makes no
+* representations about the suitability of this software for SGI_STL
+* purpose.  It is provided "as is" without express or implied warranty.
+*
+* Copyright (c) 2016
+* Geco Gaming Company
+*
+* Permission to use, copy, modify, distribute and sell this software
+* and its documentation for GECO purpose is hereby granted without fee,
+* provided that the above copyright notice appear in all copies and
+* that both that copyright notice and this permission notice appear
+* in supporting documentation.  GECO makes no representations about
+* the suitability of this software for GECO purpose.
+* It is provided "as is" without express or implied warranty.
+*
+*/
 
 # ifndef __INCLUDE_GECO_CONFIG_H
 # define __INCLUDE_GECO_CONFIG_H
 
 /*******************************************************
- * stl 模板的说明及congfig文件解析
- * stl的六大组建：
- * 容器:vector, list
- * 算法 : algorithm头文件中
- * 仿函数 : 和普通函数使用方式一样，在算法中用的较多
- * 迭代器 : 采用前闭后开区间
- * 配接器 : stack
- * 配置器：allocator
- * ****************************************************/
+* stl 模板的说明及congfig文件解析
+* stl的六大组建：
+* 容器:vector, list
+* 算法 : algorithm头文件中
+* 仿函数 : 和普通函数使用方式一样，在算法中用的较多
+* 迭代器 : 采用前闭后开区间
+* 配接器 : stack
+* 配置器：allocator
+* ****************************************************/
 
 /************************************************************************
- * 用户可以设置的宏定义
- * GECO_USE_SGI_ALLOCATORS
- *  让STL使用老的allocator
- * GECO_NO_NAMESPACES
- *  不要将库加入std命名空间中
- * GECO_NO_RELOPS_NAMESPACE
- *  不要将关系操作符(> , <= . >= , != )加入到std::rel_ops命名空间
- *  GECO_ASSERTIONS
- *  允许运行时检查
- * PTHREADS
- *  使用Posix线程
- *  GECO_WIN32THREADS
- *  使用ｗｉｎｓ线程
- * UITHREADS
- *  使用SCO / Solaris / UI线程
- * NOTHREADS
- *  不支持多线程
- * GECO_USE_NEW_IOSTREAMS
- *  使用新的输入输出流
- * GECO_NO_CONCEPT_CHECKS
- *  不支持错误检查
- ************************************************ /
-
- /**
- //! @def GECO_TEMPLATE_NULL
- //! @brief some conpilers require template <>
- */
+* 用户可以设置的宏定义
+* GECO_USE_SGI_ALLOCATORS
+*  让STL使用老的allocator
+* GECO_NO_NAMESPACES
+*  不要将库加入std命名空间中
+* GECO_NO_RELOPS_NAMESPACE
+*  不要将关系操作符(> , <= . >= , != )加入到std::rel_ops命名空间
+*  GECO_ASSERTIONS
+*  允许运行时检查
+* PTHREADS
+*  使用Posix线程
+*  GECO_WIN32THREADS
+*  使用ｗｉｎｓ线程
+* UITHREADS
+*  使用SCO / Solaris / UI线程
+* NOTHREADS
+*  不支持多线程
+* GECO_USE_NEW_IOSTREAMS
+*  使用新的输入输出流
+* GECO_NO_CONCEPT_CHECKS
+*  不支持错误检查
+************************************************ /
 
 /**
- //! @def GECO_NO_BOOL
- //! @brief defined if the compiler doesn't have bool as a builtin type.
- //! @def GECO_HAS_WCHAR_T
- //! @brief defined if the compier has wchar_t as a builtin type.
- //! GECO_NO_DRAND48
- //! @brief defined if the compiler doesn't have the drand48 function.
- //! drand() uses srand() to generate seed and then it generates a ranom number bwtween [0,1]
- //! @See http://!blog.csdn.net/jimmyblind/article/details/5550042
- //! for details about drand48() function
- */
+//! @def GECO_TEMPLATE_NULL
+//! @brief some conpilers require template <>
+*/
 
 /**
- @def GECO_STATIC_TEMPLATE_MEMBER_BUG
- @brief defined if the compiler can't handle static members of template classes.
- 测试模板类中是否能够进行静态成员的定义。
- @example
- template <class T>
- class testClass1{
- public:
- static int _data;
- };
- //进行泛化，定义int类型模板类的静态变量。
- template<>
- int testClass1<int>::_data = 10;
- //进行泛化，定义char类型模板类的静态变量。
- template<>
- int testClass1<char>::_data = 11;
- */
+//! @def GECO_NO_BOOL
+//! @brief defined if the compiler doesn't have bool as a builtin type.
+//! @def GECO_HAS_WCHAR_T
+//! @brief defined if the compier has wchar_t as a builtin type.
+//! GECO_NO_DRAND48
+//! @brief defined if the compiler doesn't have the drand48 function.
+//! drand() uses srand() to generate seed and then it generates a ranom number bwtween [0,1]
+//! @See http://!blog.csdn.net/jimmyblind/article/details/5550042
+//! for details about drand48() function
+*/
 
 /**
- //! @def GECO_STATIC_CONST_INIT_BUG:
- //! @brief defined if the compiler can't handle a constant-initializer in the declaration
- //! of a static const data member
- */
+@def GECO_STATIC_TEMPLATE_MEMBER_BUG
+@brief defined if the compiler can't handle static members of template classes.
+测试模板类中是否能够进行静态成员的定义。
+@example
+template <class T>
+class testClass1{
+public:
+static int _data;
+};
+//进行泛化，定义int类型模板类的静态变量。
+template<>
+int testClass1<int>::_data = 10;
+//进行泛化，定义char类型模板类的静态变量。
+template<>
+int testClass1<char>::_data = 11;
+*/
 
 /**
- * @def GECO_CLASS_PARTIAL_SPECIALIZATION
- * @brief defined if the compiler supports partial specialization of template classes.
- * 是否支持类模板的偏特化
- * 除了一般设计之外，特别针对某些template参数做特殊化处理，
- * 也就是说，当有多个模板类符合时，只调用完全匹配的模板。
- * @note pay aatention on the "<>" after the class name
- * @example
- * template <class T, class Allocator> class vector { // … // };
- * template <class Allocator> class vector<bool, Allocator> { //…//};
- *
- * template <class T, class O>
- * class testClass2
- * {public:testClass2() {cout << "T,O" << endl;}};
- *
- * template <class T>
- * class testClass2<T*, T*>
- * {public:testClass2(){cout << "T*,T*" << endl;}};
- *
- * template <class T>
- * class testClass2<const T, T>
- * {public:testClass2(){cout << "cont T, T" << endl;}};
- */
+//! @def GECO_STATIC_CONST_INIT_BUG:
+//! @brief defined if the compiler can't handle a constant-initializer in the declaration
+//! of a static const data member
+*/
 
 /**
- //! @def GECO_PARTIAL_SPECIALIZATION_SYNTAX
- //! @brief defined if the compiler supports partial specialization syntax for full
- //! specialization of class templates.
- //! (Even if it doesn't actually support partial specialization itself.)
- //! fixme this may be same to GECO_CLASS_PARTIAL_SPECIALIZATION commented on 02-May-2016by jakez
- //! @def GECO_FUNCTION_TMPL_PARTIAL_ORDER
- //! \brief defined if the compiler supports partial ordering of function templates.
- //! (a.k.a partial specialization of function templates.)
- //! @example
- //! template <class T> void f(T);
- //! template <class T*> void f(T);
- //! template <const class T*> void f(T);
- //! f(t);   // Calls first function.
- //! f(pointer);  // Calls second more specialized function.
- //! f(const_pointer); // Calls last even more specialized function.
- */
+* @def GECO_CLASS_PARTIAL_SPECIALIZATION
+* @brief defined if the compiler supports partial specialization of template classes.
+* 是否支持类模板的偏特化
+* 除了一般设计之外，特别针对某些template参数做特殊化处理，
+* 也就是说，当有多个模板类符合时，只调用完全匹配的模板。
+* @note pay aatention on the "<>" after the class name
+* @example
+* template <class T, class Allocator> class vector { // … // };
+* template <class Allocator> class vector<bool, Allocator> { //…//};
+*
+* template <class T, class O>
+* class testClass2
+* {public:testClass2() {cout << "T,O" << endl;}};
+*
+* template <class T>
+* class testClass2<T*, T*>
+* {public:testClass2(){cout << "T*,T*" << endl;}};
+*
+* template <class T>
+* class testClass2<const T, T>
+* {public:testClass2(){cout << "cont T, T" << endl;}};
+*/
 
 /**
- *@def GECO_MEMBER_TEMPLATES
- *@def @brief defined if the compiler supports template member functions of classes.
- *@def 测试模板函数中是否允许再有模板成员
-
- template <class T, class Alloc = alloc>
- class vector{
- template <class I>
- void insert(iterator, I, I){cout << "insert.\n";}
- };
- */
-
-/**
- //! @def GECO_MEMBER_TEMPLATE_CLASSES
- //! @brief defined if the compiler supports nested classes that are member
- //! templates of other classes.
- */
-
-/**
- //! @def  GECO_TEMPLATE_FRIENDS
- //! @brief  defined if the compiler supports templatized friend declarations.
- */
+//! @def GECO_PARTIAL_SPECIALIZATION_SYNTAX
+//! @brief defined if the compiler supports partial specialization syntax for full
+//! specialization of class templates.
+//! (Even if it doesn't actually support partial specialization itself.)
+//! fixme this may be same to GECO_CLASS_PARTIAL_SPECIALIZATION commented on 02-May-2016by jakez
+//! @def GECO_FUNCTION_TMPL_PARTIAL_ORDER
+//! \brief defined if the compiler supports partial ordering of function templates.
+//! (a.k.a partial specialization of function templates.)
+//! @example
+//! template <class T> void f(T);
+//! template <class T*> void f(T);
+//! template <const class T*> void f(T);
+//! f(t);   // Calls first function.
+//! f(pointer);  // Calls second more specialized function.
+//! f(const_pointer); // Calls last even more specialized function.
+*/
 
 /**
- //! @def GECO_EXPLICIT_FUNCTION_TMPL_ARGS
- //! @brief defined if the compiler supports calling a function template by providing its
- //! template arguments explicitly.
- //! @code
- //! template <class Type, class Sequence>
- //! bool operator==(const stack<Type, Sequence>& x);
- //!
- //! template < class Type, class Sequence = deque<Type>>
- //! class stack {
- //! //!this is correct
- //! friend bool operator== <Type> (const stack<Type>&, const stack<Type>&);
- //! //!this is alos correct
- //! friend bool opeartor==<Type> (const statck<Type>&, const stack<Type>&);
- //! //!this is alos correct
- //! friend bool opeartor==<> (const statck&, const stack&);
- //! }
- //! @endcode
- */
+*@def GECO_MEMBER_TEMPLATES
+*@def @brief defined if the compiler supports template member functions of classes.
+*@def 测试模板函数中是否允许再有模板成员
+
+template <class T, class Alloc = alloc>
+class vector{
+template <class I>
+void insert(iterator, I, I){cout << "insert.\n";}
+};
+*/
 
 /**
- //! @def  GECO_LIMITED_DEFAULT_TEMPLATES
- //! @brief defined if the compiler is unable to handle default template
- // !parameters that depend on previous template parameters.
- //! 测试模板参数可否根据前一个模板参数而设定默认值
-
- template<class T, class Alloc = alloc, size_t BufSiz = 0 >
- class deque{
- public:
- deque() {cout << "deque.\n";}
- };
-
- template <class T,
- class Sequence = deque<T> >  // use previous T as default parameter
- class stack{
- public:
- stack(){cout << "stack.\n";}
- private:
- Sequence d;
- };
- */
+//! @def GECO_MEMBER_TEMPLATE_CLASSES
+//! @brief defined if the compiler supports nested classes that are member
+//! templates of other classes.
+*/
 
 /**
- //! @def  GECO_NON_TYPE_TMPL_PARAM_BUG
- //! @brief defined if the compiler has trouble with
- //! function template argument deduction for non-type template parameters.
- //! \code
- //! template <class Type, size_t BufSize>
- //! struct deque_iterator { typedef deque_iterator<Type, BufSize> iterator;};
- //! \endcode
- */
+//! @def  GECO_TEMPLATE_FRIENDS
+//! @brief  defined if the compiler supports templatized friend declarations.
+*/
 
 /**
- //! @def  SGI_GECO_NO_ARROW_OPERATOR
- //! @brief defined if the compiler is unable to support the -> operator for iterators.
- */
+//! @def GECO_EXPLICIT_FUNCTION_TMPL_ARGS
+//! @brief defined if the compiler supports calling a function template by providing its
+//! template arguments explicitly.
+//! @code
+//! template <class Type, class Sequence>
+//! bool operator==(const stack<Type, Sequence>& x);
+//!
+//! template < class Type, class Sequence = deque<Type>>
+//! class stack {
+//! //!this is correct
+//! friend bool operator== <Type> (const stack<Type>&, const stack<Type>&);
+//! //!this is alos correct
+//! friend bool opeartor==<Type> (const statck<Type>&, const stack<Type>&);
+//! //!this is alos correct
+//! friend bool opeartor==<> (const statck&, const stack&);
+//! }
+//! @endcode
+*/
 
 /**
- //! @def  GECO_DEFAULT_CONSTRUCTOR_BUG
- //! @brief defined if Type() does not work properly when Type is a builtin type.
- */
+//! @def  GECO_LIMITED_DEFAULT_TEMPLATES
+//! @brief defined if the compiler is unable to handle default template
+// !parameters that depend on previous template parameters.
+//! 测试模板参数可否根据前一个模板参数而设定默认值
+
+template<class T, class Alloc = alloc, size_t BufSiz = 0 >
+class deque{
+public:
+deque() {cout << "deque.\n";}
+};
+
+template <class T,
+class Sequence = deque<T> >  // use previous T as default parameter
+class stack{
+public:
+stack(){cout << "stack.\n";}
+private:
+Sequence d;
+};
+*/
 
 /**
- //! @def  GECO_USE_EXCEPTIONS
- //! @brief defined if the compiler (in the current compilation mode) supports exceptions.
- */
+//! @def  GECO_NON_TYPE_TMPL_PARAM_BUG
+//! @brief defined if the compiler has trouble with
+//! function template argument deduction for non-type template parameters.
+//! \code
+//! template <class Type, size_t BufSize>
+//! struct deque_iterator { typedef deque_iterator<Type, BufSize> iterator;};
+//! \endcode
+*/
 
 /**
- //! @def  GECO_USE_NAMESPACES
- //! @brief defined if the compiler has the necessary support for namespaces.
- */
+//! @def  SGI_GECO_NO_ARROW_OPERATOR
+//! @brief defined if the compiler is unable to support the -> operator for iterators.
+*/
 
 /**
- //! @def  GECO_NO_EXCEPTION_HEADER
- //! @brief defined if the compiler does not have
- //! a standard-conforming header <exception>.
- */
+//! @def  GECO_DEFAULT_CONSTRUCTOR_BUG
+//! @brief defined if Type() does not work properly when Type is a builtin type.
+*/
 
 /**
- //! @def  GECO_NO_BAD_ALLOC
- //! @brief defined if the compiler does not have a <new> header,
- //! or if <new> does not contain a bad_alloc class.
- //! If a bad_alloc class exists, it is assumed to be in namespace geco.
- */
+//! @def  GECO_USE_EXCEPTIONS
+//! @brief defined if the compiler (in the current compilation mode) supports exceptions.
+*/
 
 /**
- //! @def  GECO_HAS_LONG_LONG
- //! @brief if the compiler has long long and unsigned long long
- //! types (They're not in the C++ standard, but they are expected to be
- //! included in the forthcoming C9X standard).
- */
+//! @def  GECO_USE_NAMESPACES
+//! @brief defined if the compiler has the necessary support for namespaces.
+*/
 
 /**
- //! @def GECO_THREADS
- //! @brief defined if thread safety is needed.
- */
+//! @def  GECO_NO_EXCEPTION_HEADER
+//! @brief defined if the compiler does not have
+//! a standard-conforming header <exception>.
+*/
 
 /**
- //! @def  GECO_VOLATILE
- //! @brief defined to be "volatile" if threads are being used, and the empty string otherwise.
- */
+//! @def  GECO_NO_BAD_ALLOC
+//! @brief defined if the compiler does not have a <new> header,
+//! or if <new> does not contain a bad_alloc class.
+//! If a bad_alloc class exists, it is assumed to be in namespace geco.
+*/
 
 /**
- //! @def  GECO_NO_USING_CLAUSE_IN_CLASS
- //! @brief The compiler does not handle "using" clauses inside of class definitions.
- */
+//! @def  GECO_HAS_LONG_LONG
+//! @brief if the compiler has long long and unsigned long long
+//! types (They're not in the C++ standard, but they are expected to be
+//! included in the forthcoming C9X standard).
+*/
 
 /**
- //!  @def  GECO_NO_FRIEND_TEMPLATE_CLASS
- //! @brief The compiler does not handle friend declaractions
- //! where the friend is a template class.
- */
+//! @def GECO_THREADS
+//! @brief defined if thread safety is needed.
+*/
 
 /**
- //! @def  GECO_NO_FUNCTION_PTR_IN_CLASS_TEMPLATE
- //! @brief The compiler does not support the use of a function pointer type
- //! as the argument for a template.
- */
+//! @def  GECO_VOLATILE
+//! @brief defined to be "volatile" if threads are being used, and the empty string otherwise.
+*/
 
 /**
- //! @def GECO_MEMBER_TEMPLATE_KEYWORD
- //! @brief standard C++ requires the template keyword in a few new places (14.2.4),
- //! this flag is set for compilers that support (and require) this usage.
- */
+//! @def  GECO_NO_USING_CLAUSE_IN_CLASS
+//! @brief The compiler does not handle "using" clauses inside of class definitions.
+*/
 
 /**
- //! @def  GECO_USE_SGI_ALLOCATORS
- //! @brief User-settable macros that control compilation.
- //! if defined, then the GECO will use older SGI-style allocators,
- //! instead of standard-conforming allocators,
- //! even if the compiler supports all of the language features needed
- //! for standard-conforming allocators.
- */
+//!  @def  GECO_NO_FRIEND_TEMPLATE_CLASS
+//! @brief The compiler does not handle friend declaractions
+//! where the friend is a template class.
+*/
 
 /**
- //! @def GECO_NO_NAMESPACES
- //! @brief if defined, don't put the library in namespace
- //! geco, even if the compiler supports namespaces.
- */
+//! @def  GECO_NO_FUNCTION_PTR_IN_CLASS_TEMPLATE
+//! @brief The compiler does not support the use of a function pointer type
+//! as the argument for a template.
+*/
 
 /**
- //! @def  GECO_NO_RELOPS_NAMESPACE
- //! @brief if defined, don't put the relational operator templates (>, <=. >=, !=)
- //! in namespace geco::rel_ops, even if the compiler supports namespaces
- //! and partial ordering of function templates.
- */
+//! @def GECO_MEMBER_TEMPLATE_KEYWORD
+//! @brief standard C++ requires the template keyword in a few new places (14.2.4),
+//! this flag is set for compilers that support (and require) this usage.
+*/
 
 /**
- //! @def  GECO_ASSERTIONS
- //! @brief if defined, then enable runtime checking through the GECO_assert macro.
- */
+//! @def  GECO_USE_SGI_ALLOCATORS
+//! @brief User-settable macros that control compilation.
+//! if defined, then the GECO will use older SGI-style allocators,
+//! instead of standard-conforming allocators,
+//! even if the compiler supports all of the language features needed
+//! for standard-conforming allocators.
+*/
 
 /**
- //! @def  GECO_SGI_THREADS
- //! @brief defined if this is being compiled for an SGI IRIX
- //! system in multithreaded mode, using native SGI threads instead of  pthreads,
- //! this is used only for SGI  specific system.
- //! fixme maybe not need,can be deleted.
- //! @def  GECO_WIN32THREADS
- //! @brief defined if this is being compiled on a WIN32 compiler in multithreaded mode.
- //! @def GECO_PTHREADS
- //! @brief defined if we should use portable pthreads synchronization.
- //! @def GECO_UITHREADS
- //! @brief defined if we should use UI / solaris / UnixWare threads synchronization.
- //! UIthreads are similar to pthreads, but are based
- //! on an earlier version of the Posix threads standard.
- //! @def  _PTHREADS
- //! @brief if defined, use Posix threads for multithreading support.
- //! @def  _UITHREADS
- //! @brief if defined, use SCO/Solaris/UI threads for multithreading support
- //!  @def  _NOTHREADS
- //! @brief if defined, don't use GECO_GECO multithreading support.
- */
+//! @def GECO_NO_NAMESPACES
+//! @brief if defined, don't put the library in namespace
+//! geco, even if the compiler supports namespaces.
+*/
 
 /**
- //!  @def  GECO_USE_CONCEPT_CHECKS
- //!  enables some extra compile-time error
- //!  checking to make sure that user-defined template arguments satisfy
- //!  all of the appropriate requirements.  This may result in more
- //!  comprehensible error messages.  It incurs no runtime overhead.  This
- //!  feature requires member templates and partial specialization.
- //! @def GECO_NO_CONCEPT_CHECKS
- //! @brief if defined, disables the error checking that
- //! we get from GECO_USE_CONCEPT_CHECKS.
- */
+//! @def  GECO_NO_RELOPS_NAMESPACE
+//! @brief if defined, don't put the relational operator templates (>, <=. >=, !=)
+//! in namespace geco::rel_ops, even if the compiler supports namespaces
+//! and partial ordering of function templates.
+*/
 
 /**
- //! @def  GECO_USE_NEW_IOSTREAMS
- //! if defined, then the GECO will use new, standard-conforming iostreams
- //! (e.g. the <iosfwd> header).  If not defined, the GECO will use old cfront-style
- //! iostreams (e.g. the <iostream.h> header).
- */
+//! @def  GECO_ASSERTIONS
+//! @brief if defined, then enable runtime checking through the GECO_assert macro.
+*/
 
 /**
- //! @def GECO_NO_BOOL
- //! @brief bool, true, and false, if defined.
- //! typename, as a null macro if it's not already a keyword.
- //! explicit, as a null macro if it's not already a keyword.
- */
+//! @def  GECO_SGI_THREADS
+//! @brief defined if this is being compiled for an SGI IRIX
+//! system in multithreaded mode, using native SGI threads instead of  pthreads,
+//! this is used only for SGI  specific system.
+//! fixme maybe not need,can be deleted.
+//! @def  GECO_WIN32THREADS
+//! @brief defined if this is being compiled on a WIN32 compiler in multithreaded mode.
+//! @def GECO_PTHREADS
+//! @brief defined if we should use portable pthreads synchronization.
+//! @def GECO_UITHREADS
+//! @brief defined if we should use UI / solaris / UnixWare threads synchronization.
+//! UIthreads are similar to pthreads, but are based
+//! on an earlier version of the Posix threads standard.
+//! @def  _PTHREADS
+//! @brief if defined, use Posix threads for multithreading support.
+//! @def  _UITHREADS
+//! @brief if defined, use SCO/Solaris/UI threads for multithreading support
+//!  @def  _NOTHREADS
+//! @brief if defined, don't use GECO_GECO multithreading support.
+*/
 
 /**
- //! @def GECO
- //! @brief namespace-related macros
- //! @def GECO_BEGIN_NAMESPACE
- //! @brief namespace-related macros
- */
+//!  @def  GECO_USE_CONCEPT_CHECKS
+//!  enables some extra compile-time error
+//!  checking to make sure that user-defined template arguments satisfy
+//!  all of the appropriate requirements.  This may result in more
+//!  comprehensible error messages.  It incurs no runtime overhead.  This
+//!  feature requires member templates and partial specialization.
+//! @def GECO_NO_CONCEPT_CHECKS
+//! @brief if defined, disables the error checking that
+//! we get from GECO_USE_CONCEPT_CHECKS.
+*/
 
 /**
- //! @def GECO_TRY
- //! @brief exception-related macros
- //! @def GECO_UNWIND
- //! @brief exception-related macros
- */
+//! @def  GECO_USE_NEW_IOSTREAMS
+//! if defined, then the GECO will use new, standard-conforming iostreams
+//! (e.g. the <iosfwd> header).  If not defined, the GECO will use old cfront-style
+//! iostreams (e.g. the <iostream.h> header).
+*/
 
 /**
- //! @def GECO_assert
- //! @brief either as a test or as a null macro, depending on
- //! whether or not GECO_ASSERTIONS is defined.
- */
+//! @def GECO_NO_BOOL
+//! @brief bool, true, and false, if defined.
+//! typename, as a null macro if it's not already a keyword.
+//! explicit, as a null macro if it's not already a keyword.
+*/
+
+/**
+//! @def GECO
+//! @brief namespace-related macros
+//! @def GECO_BEGIN_NAMESPACE
+//! @brief namespace-related macros
+*/
+
+/**
+//! @def GECO_TRY
+//! @brief exception-related macros
+//! @def GECO_UNWIND
+//! @brief exception-related macros
+*/
+
+/**
+//! @def GECO_assert
+//! @brief either as a test or as a null macro, depending on
+//! whether or not GECO_ASSERTIONS is defined.
+*/
 
 #define GECO_REQUIRES(a,b)
 #define GECO_CONVERTIBLE(a,b)
@@ -483,32 +483,32 @@
 # endif //! sgi complier
 
 /*
- * Jochen Schlick '1999  - added new #defines (GECO)_UITHREADS (for
- *                         providing SCO / Solaris / UI thread support)
- *                       - added the necessary defines for the SCO UDK 7
- *                         compiler (and its template friend behavior)
- *                       - all UDK7 specific GECO changes are based on the
- *                         macro USLC being defined
- *
- SCO Unix是在国内比较有名气的操作系统，因为他是当时能运行在Intel的平台之一，
- 并且较早进入中国市场. 它的历史可以追溯到MicroSoft开发的Xienx，
- Xienx是运行在Intel平台上的一种基于Unix V 6的系统，
- 后来Xienx开发部门独立出来成立了SCO公司，
- 并基于AT&Type System VR3.2开发了SCO Unix，
- 其最新的版本为增强了图形接口的SCO OpenServer 5.0.4。
- 此时AT&Type已经将它们负责Unix的部门USL(Unix系统实验室)，
- 卖给了Novell公司，它们的Unix被更名为UnixWare ，
- 但是Novell正逢经营问题，不得不将UnixWare再次卖给SCO。
- SCO之所以能占有市场，并不是其产品特别出色，
- 而是因为在小型机特别昂贵的年代，对一些追求稳定的行业来说，
- 使用SCO能在x86上运行，可以节约大量成本。
- 因此早期的银行、金融行业的终端大多是使用SCO的。
- 而最近SCO的名声越来越坏，只因被更加优秀且同样能运行于x86的Linux抢走大量份额，
- 大家知道知道吃不饱的狗是会乱咬人的。不过可惜最后授权没强行推销出去几份，
- 反而得了个$CO之名。
- 而Novell在购买UnixWare之后的一个重要举动是将Unix商标赠送给一个非盈利的Unix组织X/Open，
- 结束了USL与BSD以及其他厂商的纷争。
- */
+* Jochen Schlick '1999  - added new #defines (GECO)_UITHREADS (for
+*                         providing SCO / Solaris / UI thread support)
+*                       - added the necessary defines for the SCO UDK 7
+*                         compiler (and its template friend behavior)
+*                       - all UDK7 specific GECO changes are based on the
+*                         macro USLC being defined
+*
+SCO Unix是在国内比较有名气的操作系统，因为他是当时能运行在Intel的平台之一，
+并且较早进入中国市场. 它的历史可以追溯到MicroSoft开发的Xienx，
+Xienx是运行在Intel平台上的一种基于Unix V 6的系统，
+后来Xienx开发部门独立出来成立了SCO公司，
+并基于AT&Type System VR3.2开发了SCO Unix，
+其最新的版本为增强了图形接口的SCO OpenServer 5.0.4。
+此时AT&Type已经将它们负责Unix的部门USL(Unix系统实验室)，
+卖给了Novell公司，它们的Unix被更名为UnixWare ，
+但是Novell正逢经营问题，不得不将UnixWare再次卖给SCO。
+SCO之所以能占有市场，并不是其产品特别出色，
+而是因为在小型机特别昂贵的年代，对一些追求稳定的行业来说，
+使用SCO能在x86上运行，可以节约大量成本。
+因此早期的银行、金融行业的终端大多是使用SCO的。
+而最近SCO的名声越来越坏，只因被更加优秀且同样能运行于x86的Linux抢走大量份额，
+大家知道知道吃不饱的狗是会乱咬人的。不过可惜最后授权没强行推销出去几份，
+反而得了个$CO之名。
+而Novell在购买UnixWare之后的一个重要举动是将Unix商标赠送给一个非盈利的Unix组织X/Open，
+结束了USL与BSD以及其他厂商的纷争。
+*/
 //! SCO UDK 7 compiler (UnixWare 7x, OSR 5, UnixWare 2x)
 # if defined(USLC)
 #     define GECO_HAS_WCHAR_T
@@ -582,16 +582,16 @@
 #   endif
 
 /**
- * Use g++ -pthread, it is equivalent to g++ -pthread -D_REENTRANT.
- * Using g++ -D_REENTRANT would be different, it may not set all the linker flags.
- *
- * Use -pthread, not -lpthread.
- * The -pthread option sets all flags necessary for threading,
- * no matter what platform you're on.Using -lpthread would only link in libpthread,
- * which may not be enough for some platforms.
- * (e.g., OpenBSD used to not have libpthread---it used libc_r instead.)
- * see http://stackoverflow.com/questions/875789/gcc-do-i-need-d-reentrant-with-pthreads fro details
- */
+* Use g++ -pthread, it is equivalent to g++ -pthread -D_REENTRANT.
+* Using g++ -D_REENTRANT would be different, it may not set all the linker flags.
+*
+* Use -pthread, not -lpthread.
+* The -pthread option sets all flags necessary for threading,
+* no matter what platform you're on.Using -lpthread would only link in libpthread,
+* which may not be enough for some platforms.
+* (e.g., OpenBSD used to not have libpthread---it used libc_r instead.)
+* see http://stackoverflow.com/questions/875789/gcc-do-i-need-d-reentrant-with-pthreads fro details
+*/
 #   if defined(_REENTRANT) || defined(D_REENTRANT)
 #     define GECO_PTHREADS
 #   endif

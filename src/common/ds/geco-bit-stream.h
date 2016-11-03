@@ -41,16 +41,8 @@
 #include <map>
 #include <vector>
 
-  //#include "geco-export.h"
-  //#include "geco-namesapces.h"
-  //#include "geco-malloc-interface.h"
-  //#include "geco-sock-includes.h"
-  //#include "geco-net-config.h"
-  //#include "geco-basic-type.h"
-  //#include "geco-net-type.h"
-  //#include "GecoString.h"
-#include "../../plateform.h"
-#include "../../geco-engine-config.h"
+#include "../geco-plateform.h"
+#include "../geco-engine-feature.h"
 #include "../ultils/geco-malloc.h"
 
 // MSWin uses _copysign, others use copysign...

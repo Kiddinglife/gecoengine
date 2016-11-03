@@ -13,8 +13,6 @@
 #include <functional>
 
 #include "gtest/gtest.h"
-#include "protocolstack/net_common.h"
-#include "appnet/nettypes.h"
 #include "common/ultils/ultils.h"
 #include "common/debugging/debug.h"
 #include "common/debugging/gecowatchert.h"

@@ -15,7 +15,7 @@
 #include "gtest/gtest.h"
 #include "common/debugging/debug.h"
 #include "common/ds/geco-bit-stream.h"
-#include "plateform.h"
+#include "common/geco-plateform.h"
 
 using namespace geco::debugging;
 using namespace geco::ultils;

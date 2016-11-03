@@ -22,7 +22,7 @@
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
-#include "../../plateform.h"
+#include "../geco-plateform.h"
 #include "debug.h"
 
 namespace geco

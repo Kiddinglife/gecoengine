@@ -460,6 +460,7 @@ GECO_MASK_DEL(flag,GECO_MASK(location));							\
 else																\
 GECO_MASK_ADD(flag,GECO_MASK(location));
 
+//how to complie asemble http://blog.csdn.net/robin__chou/article/details/50275061
 /// This macro is used to enter the debugger.
 #if defined( _XBOX360 )
 #define ENTER_DEBUGGER() DebugBreak()
@@ -468,7 +469,6 @@ extern "C" void _stdcall asm_int3();
 #ifdef _AMD64_
 #define ENTER_DEBUGGER() asm_int3()
 #else
-ENTER_DEBUGGER();
 #define ENTER_DEBUGGER() __asm { int 3 }
 #endif
 #elif defined( PLAYSTATION3 )

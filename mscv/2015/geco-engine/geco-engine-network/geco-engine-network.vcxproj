@@ -146,23 +146,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\appnet\demon-process.cc" />
-    <ClCompile Include="..\..\..\..\src\appnet\nettypes.cpp" />
-    <ClCompile Include="..\..\..\..\src\protocolstack\auth.cc" />
-    <ClCompile Include="..\..\..\..\src\protocolstack\gecotimer.cc" />
-    <ClCompile Include="..\..\..\..\src\protocolstack\net_common.cc" />
-    <ClCompile Include="..\..\..\..\src\protocolstack\transport_layer.cc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\appnet\demon-process.h" />
-    <ClInclude Include="..\..\..\..\src\appnet\nettypes.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\auth.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\gecotimer.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\messages.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\netconfig.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\network_handlers.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\net_common.h" />
-    <ClInclude Include="..\..\..\..\src\protocolstack\transport_layer.h" />
+    <ClInclude Include="..\..\..\..\src\network\network_handlers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

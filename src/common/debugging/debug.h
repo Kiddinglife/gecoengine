@@ -28,11 +28,11 @@
 #include <functional>
 #include <algorithm>
 
-#include "../../plateform.h"
-#include "../../geco-engine-config.h"
+#include "../geco-engine-feature.h"
+#include "../geco-plateform.h"
+#include "../ultils/geco-malloc.h"
 #include "../ds/array.h"
 #include "../ultils/ultils.h"
-#include "../ultils/geco-malloc.h"
 
 /**
  *	@file geco-engine-debug.h
@@ -210,6 +210,7 @@ struct log_msg_filter_t  //oldname - DebugFilter
 	typedef geco::ds::array_t<info_msg_cb_t*> info_msg_cbs_t;
 	typedef geco::ds::array_t<notice_msg_cb_t*> notice_msg_cbs_t;
 	typedef geco::ds::array_t<trace_msg_cb_t*> trace_msg_cbs_t;
+
 	critical_msg_cbs_t critical_msg_cbs_;
 	error_msg_cbs_t error_msg_cbs_;
 	warnning_msg_cbs_t warnning_msg_cbs_;

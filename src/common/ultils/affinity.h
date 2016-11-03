@@ -21,7 +21,7 @@
 // created on 03-July-2016 by Jackie Zhang
 #ifndef _SRC_GECO_ENGINE_AFFINITY
 #define _SRC_GECO_ENGINE_AFFINITY
-#include "../../plateform.h"
+#include "../geco-plateform.h"
 
 namespace geco
 {
