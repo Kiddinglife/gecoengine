@@ -9,7 +9,7 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
 #else
 	GTEST_API_ int main(int argc, char** argv) {
 #endif  // GTEST_OS_WINDOWS_MOBILE
-		std::cout << "Running main() from gmock_main.cc\n";
+		std::cout << "Running main() from gmock_main.cc, argc=" << argc << std::endl;
 
 		// Since Google Mock depends on Google Test, InitGoogleMock() is
 		// also responsible for initializing Google Test.  Therefore there's
@@ -17,6 +17,7 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
 		testing::InitGoogleMock(&argc, argv);
 
         //::testing::GTEST_FLAG(filter) = "GECO_ULTILS.encode64_when_given_string_and_then_decode64_back_to_string_result_should_be_same";
+		::testing::GTEST_FLAG(filter) = "GECO_ULTILS.test_geco_cmdline_t";
 
 		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";
 		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_haffman_compression";
@@ -35,7 +36,8 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.transformation_between_watchervalue_and_stringval_result_should_be_same";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.transformation_between_watchervalue_and_request_stream__result_should_be_same";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.add_remove_value_func_method_watchers";
-		::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.test_watcher_path_request_v2";
+		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.test_watcher_path_request_v2";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_WATCHER.test_sequence_watcher";
+
 		return RUN_ALL_TESTS();
 	}

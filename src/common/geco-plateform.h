@@ -23,9 +23,9 @@
 #define _SRC_GECO_ENGINE_PLATEFORM
 
 #ifdef CODE_INLINE
-#define INLINE    inline
+#define CODE_INLINE    inline
 #else
-#define INLINE
+#define CODE_INLINE
 #endif
 
 /* common includes */
@@ -113,7 +113,9 @@ typedef UINT_PTR uintptr;
 #define PRIX64 "llX"
 #define PRIu32 "lu"
 #define PRId32 "ld"
+#define GECO_FAST_CALL __fastcall
 #else //unix or linux
+#define GECO_FAST_CALL
 /// This type is an integer with a size of 8 bits.
 typedef int8_t int8;
 /// This type is an unsigned integer with a size of 8 bits.
@@ -422,6 +424,42 @@ template <class T> inline const T & max(const T & a, const T & b)
 /* big endian macros go here */
 #endif
 
+#define GECO_SAFE_DELETE(p) if(p) {delete (p); (p) = NULL;}
+#define GECO_SAFE_DELETE_ARRAY(p) if(p) {delete [] (p); (p) = NULL;}
+
+#ifndef GECO_DECLARE_COPY_CONSTRUCTOR
+#define GECO_DECLARE_COPY_CONSTRUCTOR(classname)  classname(const classname & );
+#endif
+#ifndef GECO_DECLARE_COPY
+#define GECO_DECLARE_COPY(classname)  void operator=( const classname& );
+#endif
+#ifndef GECO_DECLARE_COMPARE
+#define GECO_DECLARE_COMPARE(classname)  bool operator==( const classname& );
+#endif
+#ifndef GECO_NOT_COPY
+#define GECO_NOT_COPY(classname) \
+	GECO_DECLARE_COPY(classname);\
+	GECO_DECLARE_COPY_CONSTRUCTOR(classname);
+#endif
+#ifndef GECO_NOT_COPY_COMPARE
+#define GECO_NOT_COPY_COMPARE(classname) \
+	GECO_DECLARE_COPY(classname);\
+	GECO_DECLARE_COMPARE(classname);\
+	GECO_DECLARE_COPY_CONSTRUCTOR(classname);
+#endif
+
+#define GECO_MASK(location) (0x01 << (location))
+#define GECO_MASK_HAS_ANY(flag,mask) (((flag) & (mask)) != 0)
+#define GECO_MASK_HAS_ALL(flag,mask) (((flag) & (mask)) == (mask))
+#define GECO_MASK_ADD(flag,mask) ((flag) |= (mask))
+#define GECO_MASK_DEL(flag,mask) ((flag) &= (~(mask)))
+#define GECO_MASK_REMOVE(flag,mask) ((flag) & (~(mask)))
+#define GECO_MASK_CHANGE(location,flag)									\
+if(GECO_MASK_HAS_ANY(flag,GECO_MASK(location)))							\
+GECO_MASK_DEL(flag,GECO_MASK(location));							\
+else																\
+GECO_MASK_ADD(flag,GECO_MASK(location));
+
 /// This macro is used to enter the debugger.
 #if defined( _XBOX360 )
 #define ENTER_DEBUGGER() DebugBreak()
@@ -438,6 +476,7 @@ ENTER_DEBUGGER();
 #else
 #define ENTER_DEBUGGER() asm( "int $3" )
 #endif
+
 
 /**
  *	This function returns user id.

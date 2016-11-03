@@ -28,42 +28,7 @@
 		<link>
 			<name>unittest</name>
 			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>unittest/readme.md</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/readme.md</locationURI>
-		</link>
-		<link>
-			<name>unittest/test-auth.cc</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-auth.cc</locationURI>
-		</link>
-		<link>
-			<name>unittest/test-debugging.cc</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-debugging.cc</locationURI>
-		</link>
-		<link>
-			<name>unittest/test-geco-bit-stream.cc</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-geco-bit-stream.cc</locationURI>
-		</link>
-		<link>
-			<name>unittest/test-main.cc</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-main.cc</locationURI>
-		</link>
-		<link>
-			<name>unittest/test-timer.cc</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-timer.cc</locationURI>
-		</link>
-		<link>
-			<name>unittest/test-watcher.cc</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/unittest/test-watcher.cc</locationURI>
+			<location>/home/jackiez/20160219/gecoengine/unittest</location>
 		</link>
 	</linkedResources>
 	<variableList>

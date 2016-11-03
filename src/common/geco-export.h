@@ -23,8 +23,7 @@
 #ifndef __INCLUDE_GECO_EXPORT_H
 #define __INCLUDE_GECO_EXPORT_H
 
-#if defined(_WIN32) && !(defined(__GNUC__)  || defined(__GCCXML__)) \
-      && !defined(STATIC_LIB_BUILD) && defined(DYNAMIC_LIB_BUILD)
+#if defined(_WIN32) && !(defined(__GNUC__)  || defined(__GCCXML__)) && !defined(STATIC_LIB_BUILD) && defined(DYNAMIC_LIB_BUILD)
 #define GECO_EXPORT __declspec(dllexport)
 #else
 #define GECO_EXPORT
