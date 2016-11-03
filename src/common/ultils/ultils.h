@@ -136,7 +136,7 @@ inline std::wstring geco_utf8tow(const std::string & s)
  * using theactive code page on this system. Returns true if it succeeded, otherwise
  *	false if there was a decoding error.
  */
-bool win_geco_acp2w(const char * src, std::wstring& output);
+extern bool win_geco_acp2w(const char * src, std::wstring& output);
 inline bool win_geco_acp2w(const std::string & s, std::wstring& output)
 {
 	return win_geco_acp2w(s.c_str(), output);

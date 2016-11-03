@@ -144,8 +144,8 @@ public:
 	virtual ~default_critical_msg_handler_t()
 	{
 	}
-	virtual Result ask(const char* msg) = 0;
-	virtual void recordInfo(bool willExit) = 0;
+	virtual Result ask(const char* msg) { return ENTERDEBUGGER; };
+	virtual void recordInfo(bool willExit) {};
 };
 
 /**

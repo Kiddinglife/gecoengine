@@ -184,6 +184,7 @@
     <ClInclude Include="..\..\..\..\src\common\geco-engine-export.h" />
     <ClInclude Include="..\..\..\..\src\common\plateform.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\affinity.h" />
+    <ClInclude Include="..\..\..\..\src\common\ultils\geco-cmdline.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-engine-auth.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-thread.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\geco-bit-stream.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\affinity.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ultils\geco-cmdline.cc" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-engine-auth.cc" />
     <ClCompile Include="..\..\..\..\src\common\ultils\ultils.cpp" />

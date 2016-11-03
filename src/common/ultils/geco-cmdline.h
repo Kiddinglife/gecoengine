@@ -4,10 +4,12 @@
 //see GECO_ULTILS.test_geco_cmdline_t to leran how to use it
 #include "../geco-plateform.h"
 
-class geco_cmdline_t
+class GECO_EXPORT geco_cmdline_t
 {
 public:
-	geco_cmdline_t(int iArgc, char** ppcArgv);geco_cmdline_t(const char* pcCmdline);~geco_cmdline_t();
+	geco_cmdline_t(int iArgc, char** ppcArgv);
+	geco_cmdline_t(const char* pcCmdline);
+	~geco_cmdline_t();
 	int ExcessArguments();
 
 	geco_cmdline_t& Min(float fValue);
