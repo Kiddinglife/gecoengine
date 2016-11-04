@@ -546,11 +546,9 @@ __FILE__ "(%d)%s%s\n", (int )__LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAM
   //--------------------------------------------------------------------
   /// This macro prints a debug message with CRITICAL priority.
   /// CRITICAL_MSG is always enabled no matter what the build target is.
-#define CRITICAL_MSG \
-geco::debugging::log_msg_helper(::const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
-/// This macro prints a development time only message CRITICAL priority.
-#define DEV_CRITICAL_MSG　\
-geco::debugging::log_msg_helper(::const_cpnt_priority,LOG_MSG_CRITICAL ).dev_critical_msg
+#define CRITICAL_MSG geco::debugging::log_msg_helper(::const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
+  /// This macro prints a development time only message CRITICAL priority.
+#define DEV_CRITICAL_MSG geco::debugging::log_msg_helper(::const_cpnt_priority,LOG_MSG_CRITICAL ).dev_critical_msg
 
 #if ENABLE_MSG_LOGGING
 #define MSG_BACK_TRACE(PRIORITY)\
