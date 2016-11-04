@@ -13,7 +13,11 @@ namespace geco
         std::string stack_tracker_t::getStackItem(uint idx)
         {
             assert(idx < stack_tracker_t::stack_pos_);
-            return stack_[stack_tracker_t::stack_pos_ - 1 - idx].name;
+            std::string str;
+            str=stack_[stack_tracker_t::stack_pos_ - 1 - idx].name;
+            str+=stack_[stack_tracker_t::stack_pos_ - 1 - idx].line;
+            str+=stack_[stack_tracker_t::stack_pos_ - 1 - idx].file;
+            return str;
         }
         std::string stack_tracker_t::report()
         {
@@ -28,7 +32,17 @@ namespace geco
             }
             return res;
         }
-#endif
 
+        scoped_stack_tracker_t::scoped_stack_tracker_t(const char* name, const char* file,uint line)
+        {
+            stack_tracker_t::push(name, file, line);
+        }
+
+        scoped_stack_tracker_t::~scoped_stack_tracker_t()
+        {
+            stack_tracker_t::pop();
+        }
+
+#endif
     }
 }

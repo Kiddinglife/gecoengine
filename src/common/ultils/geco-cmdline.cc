@@ -1,6 +1,6 @@
 #include "geco-cmdline.h"
 
-#include <string>
+#include <string.h>
 #include <malloc.h>
 
 char geco_cmdline_t::ms_acOptionNotFound[] = "option not found";

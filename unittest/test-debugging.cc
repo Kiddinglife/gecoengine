@@ -9,6 +9,7 @@
 #include "common/geco-plateform.h"
 #include "common/ultils/ultils.h"
 #include "common/debugging/debug.h"
+#include "common/debugging/stack_tracker_t.h"
 
 using namespace geco::debugging;
 using namespace geco::ultils;
@@ -26,6 +27,52 @@ TEST(GECO_DEBUGGING_MSGLOG, test_msg_macros)
 	NOTICE_MSG("NOTICE_MSG %s\n", "hello world");
 	ERROR_MSG("ERROR_MSG %s\n", "hello world");
 }
+
+static bool critical_cb_is_called = false;
+static bool criticalcallback(int component_priority, int msg_priority,
+		const char * format, va_list args_list)
+{
+	// !!! never call debugging macro in debugging cb will loop DEBUG_MSG("DEBUG_MSG %d\n", 12);
+	printf("criticalcallback msg_priority=%d!\n", msg_priority);
+	critical_cb_is_called = true;
+	//return true, no default printout operation, which is print to stdout at this moment
+	//return true, default printout operation, which is print to stdout at this moment
+	return false;
+}
+TEST(GECO_DEBUGGING_MSGLOG, test_critical_msg)
+{
+	{
+		scoped_stack_tracker_t t("dummy call", "test-debugging file", 123);
+	}
+
+	critical_msg_cb_t dcb = std::bind(criticalcallback, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3,
+			std::placeholders::_4);
+	log_msg_filter_t::get_instance().add_critical_cb(&dcb);
+	CRITICAL_MSG("THIS IS CRITICAL_MSG\n");
+}
+
+static bool debug_cb_is_called = false;
+static bool debugcallback(int component_priority, int msg_priority,
+		const char * format, va_list args_list)
+{
+	// !!! never call debugging macro in debugging cb will loop DEBUG_MSG("DEBUG_MSG %d\n", 12);
+	printf("debugcallback msg_priority=%d!\n", msg_priority);
+	debug_cb_is_called = true;
+	//return true, no default printout operation, which is print to stdout at this moment
+	//return true, default printout operation, which is print to stdout at this moment
+	return false;
+}
+TEST(GECO_DEBUGGING_MSGLOG, test_msg_cb)
+{
+	debug_msg_cb_t dcb = std::bind(debugcallback, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3,
+			std::placeholders::_4);
+	log_msg_filter_t::get_instance().add_debug_cb(&dcb);
+	VERBOSE_MSG("VERBOSE_MSG\n");
+	ASSERT_EQ(debug_cb_is_called, true);
+}
+
 TEST(GECO_DEBUGGING_MSGLOG, geco_asset_dev_cause_real_assertion_when_has_dev_assert_is_false)
 {
 	// Runtime disable fatal assertions

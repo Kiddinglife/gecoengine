@@ -90,11 +90,31 @@
  *	@param MF_ASSERT
  *	 is a macro that should be used instead of assert or ASSERT.
  */
+/**
+ *	This enumeration is used to indicate the priority of a message. The higher
+ *	the enumeration's value, the higher the priority.
+ */
 
 namespace geco
 {
 namespace debugging
 {
+
+enum LogMsgPriority
+{
+	LOG_MSG_VERBOSE,
+	LOG_MSG_DEBUG,
+	LOG_MSG_INFO,
+	LOG_MSG_NOTICE,
+	LOG_MSG_WARNING,
+	LOG_MSG_ERROR,
+	LOG_MSG_CRITICAL,
+	LOG_MSG_HACK,
+	LOG_MSG_SCRIPT,
+	LOG_MSG_ASSET,
+	NUM_LOG_MSG
+};
+const char * get_logmsg_prefix_str(LogMsgPriority p);
 
 //-------------------------------------------------------
 //  Section: globals
@@ -107,12 +127,9 @@ extern std::string g_syslog_name;
 //-------------------------------------------------------
 
 /*Definition for the critical message common callback functor*/
-struct critical_msg_cb_tag
-{
-};
 typedef std::function<
 		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, critical_msg_cb_tag*)> critical_msg_cb_t;
+				va_list args_list)> critical_msg_cb_t;
 
 /**
  *  @brief this is  the critical message specified callback class.
@@ -144,56 +161,25 @@ public:
 	virtual ~default_critical_msg_handler_t()
 	{
 	}
-	virtual Result ask(const char* msg) { return ENTERDEBUGGER; };
-	virtual void recordInfo(bool willExit) {};
+	virtual Result ask(const char* msg)
+	{
+		return ENTERDEBUGGER;
+	}
+	;
+	virtual void recordInfo(bool willExit)
+	{
+	}
+	;
 };
 
 /**
  *	Definition for the common message common callback functor. If the
- *  function returns true, the default behaviour for
+ *  function returns true, the default behaviour(print to stdout) for
  *  displaying messages is ignored.
  **/
-struct debug_msg_cb_tag
-{
-};
 typedef std::function<
 		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, debug_msg_cb_tag*)> debug_msg_cb_t;
-
-struct error_msg_cb_tag
-{
-};
-typedef std::function<
-		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, error_msg_cb_tag*)> error_msg_cb_t;
-
-struct warnning_msg_cb_tag
-{
-};
-typedef std::function<
-		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, warnning_msg_cb_tag*)> warnning_msg_cb_t;
-
-struct info_msg_cb_tag
-{
-};
-typedef std::function<
-		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, info_msg_cb_tag*)> info_msg_cb_t;
-
-struct notice_msg_cb_tag
-{
-};
-typedef std::function<
-		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, notice_msg_cb_tag*)> notice_msg_cb_t;
-
-struct trace_msg_cb_tag
-{
-};
-typedef std::function<
-		bool(int component_priority, int msg_priority, const char * format,
-				va_list args_list, trace_msg_cb_tag*)> trace_msg_cb_t;
+				va_list args_list)> debug_msg_cb_t;
 
 /** This class is used to help filter log messages.*/
 struct log_msg_filter_t  //oldname - DebugFilter
@@ -204,20 +190,10 @@ struct log_msg_filter_t  //oldname - DebugFilter
 	static bool shouldWriteToConsole;
 
 	typedef geco::ds::array_t<critical_msg_cb_t*> critical_msg_cbs_t;
-	typedef geco::ds::array_t<error_msg_cb_t*> error_msg_cbs_t;
-	typedef geco::ds::array_t<warnning_msg_cb_t*> warnning_msg_cbs_t;
 	typedef geco::ds::array_t<debug_msg_cb_t*> debug_msg_cbs_t;
-	typedef geco::ds::array_t<info_msg_cb_t*> info_msg_cbs_t;
-	typedef geco::ds::array_t<notice_msg_cb_t*> notice_msg_cbs_t;
-	typedef geco::ds::array_t<trace_msg_cb_t*> trace_msg_cbs_t;
 
 	critical_msg_cbs_t critical_msg_cbs_;
-	error_msg_cbs_t error_msg_cbs_;
-	warnning_msg_cbs_t warnning_msg_cbs_;
 	debug_msg_cbs_t debug_msg_cbs_;
-	info_msg_cbs_t info_msg_cbs_;
-	notice_msg_cbs_t notice_msg_cbs_;
-	trace_msg_cbs_t trace_msg_cbs_;
 
 	// Only messages with a message priority greater than or equal
 	// to this limit will be displayed.
@@ -231,13 +207,8 @@ struct log_msg_filter_t  //oldname - DebugFilter
 	{
 		filter_threshold_ = 0;
 		has_dev_assert_ = true;
-		critical_msg_cbs_.reserve(64);
-		error_msg_cbs_.reserve(64);
-		warnning_msg_cbs_.reserve(64);
-		debug_msg_cbs_.reserve(64);
-		info_msg_cbs_.reserve(64);
-		notice_msg_cbs_.reserve(64);
-		trace_msg_cbs_.reserve(64);
+		critical_msg_cbs_.reserve(8);
+		debug_msg_cbs_.reserve(8);
 	}
 
 	/** This method returns the singleton instance of this class.*/
@@ -277,46 +248,10 @@ struct log_msg_filter_t  //oldname - DebugFilter
 	 * @brief This method sets a callback associated with a critical message,
 	 * log_msg_filter_t now owns the object pointed to by pCallback.
 	 * @return index of the position where this cb is stored*/
-	unsigned int add(critical_msg_cb_t * pCallback)
+	unsigned int add_critical_cb(critical_msg_cb_t * pCallback)
 	{
 		critical_msg_cbs_.push_back(pCallback);
 		return (critical_msg_cbs_.size() - 1);
-	}
-	/**
-	 *	@brief This method sets a callback associated with a error message,
-	 *  log_msg_filter_t now owns the object pointed to by pCallback.
-	 * @return index of the position where this cb is stored*/
-	unsigned int add(error_msg_cb_t * pCallback)
-	{
-		error_msg_cbs_.push_back(pCallback);
-		return (error_msg_cbs_.size() - 1);
-	}
-	/**
-	 *	@brief This method sets a callback associated with a warnning message,
-	 *   log_msg_filter_t now owns the object pointed to by pCallback.
-	 * @return index of the position where this cb is stored*/
-	unsigned int add(warnning_msg_cb_t * pCallback)
-	{
-		warnning_msg_cbs_.push_back(pCallback);
-		return (warnning_msg_cbs_.size() - 1);
-	}
-	/**
-	 *	@brief This method sets a callback associated with a info message,
-	 *  log_msg_filter_t now owns the object pointed to by pCallback.
-	 * @return index of the position where this cb is stored*/
-	unsigned int add(info_msg_cb_t * pCallback)
-	{
-		info_msg_cbs_.push_back(pCallback);
-		return (info_msg_cbs_.size() - 1);
-	}
-	/**
-	 *  @brief This method sets a callback associated with a info message,
-	 *  log_msg_filter_t now owns the object pointed to by pCallback.
-	 * @return index of the position where this cb is stored*/
-	unsigned int add(notice_msg_cb_t * pCallback)
-	{
-		notice_msg_cbs_.push_back(pCallback);
-		return (notice_msg_cbs_.size() - 1);
 	}
 	/**
 	 * @brief sets a callback associated with a debug message.
@@ -324,7 +259,7 @@ struct log_msg_filter_t  //oldname - DebugFilter
 	 * behaviour for displaying messages is not done.
 	 * DebugFilter now owns the object pointed to by pCallback.
 	 * @return index of the position where this cb is stored*/
-	unsigned int add(debug_msg_cb_t* pCallback)
+	unsigned int add_debug_cb(debug_msg_cb_t* pCallback)
 	{
 		debug_msg_cbs_.push_back(pCallback);
 		return (debug_msg_cbs_.size() - 1);
@@ -333,61 +268,15 @@ struct log_msg_filter_t  //oldname - DebugFilter
 	 *  @brief This method sets a callback associated with a info message,
 	 *  log_msg_filter_t now owns the object pointed to by pCallback.
 	 * @return index of the position where this cb is stored*/
-	unsigned int add(trace_msg_cb_t * pCallback)
-	{
-		trace_msg_cbs_.push_back(pCallback);
-		return (trace_msg_cbs_.size() - 1);
-	}
-	void remove(unsigned int idx, critical_msg_cb_tag*)
+	void remove_critical_cb(unsigned int idx)
 	{
 		critical_msg_cbs_.remove_fast(idx);
 	}
-	void remove(unsigned int idx, error_msg_cb_tag*)
-	{
-		error_msg_cbs_.remove_fast(idx);
-	}
-	void remove(unsigned int idx, warnning_msg_cb_tag*)
-	{
-		warnning_msg_cbs_.remove_fast(idx);
-	}
-	void remove(unsigned int idx, debug_msg_cb_tag*)
+	void remove_debug_cb(unsigned int idx)
 	{
 		debug_msg_cbs_.remove_fast(idx);
 	}
-	void remove(unsigned int idx, info_msg_cb_tag*)
-	{
-		info_msg_cbs_.remove_fast(idx);
-	}
-	void remove(unsigned int idx, trace_msg_cb_tag*)
-	{
-		trace_msg_cbs_.remove_fast(idx);
-	}
-	void remove(unsigned int idx, notice_msg_cb_tag*)
-	{
-		notice_msg_cbs_.remove_fast(idx);
-	}
 };
-
-/**
- *	This enumeration is used to indicate the priority of a message. The higher
- *	the enumeration's value, the higher the priority.
- */
-enum LogMsgPriority
-{
-	LOG_MSG_VERBOSE,
-	LOG_MSG_DEBUG,
-	LOG_MSG_INFO,
-	LOG_MSG_NOTICE,
-	LOG_MSG_WARNING,
-	LOG_MSG_ERROR,
-	LOG_MSG_CRITICAL,
-	LOG_MSG_HACK,
-	LOG_MSG_SCRIPT,
-	LOG_MSG_ASSET,
-	NUM_LOG_MSG
-};
-
-const char * get_logmsg_prefix_str(LogMsgPriority p);
 
 //-------------------------------------------------------
 //	Section: log_msg_helper
@@ -610,7 +499,7 @@ __FILE__ "(%d)%s%s\n",(int)__LINE__, *GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME
 #define GECO_ASSERT_DEV_IFNOT( exp )\
 if ((!( exp )) && (log_msg_helper().dev_critical_msg("GECO_ASSERT_DEV_IFNOT FAILED: " #exp "\n" \
 __FILE__ "(%d)%s%s\n", (int )__LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAME ),true))
-        // leave trailing block after message
+  // leave trailing block after message
 
 /** this is a placeholder until a better solution can be implemented. */
 #define GECO_EXIT(msg) \
@@ -652,15 +541,16 @@ __FILE__ "(%d)%s%s\n", (int )__LINE__,*GECO_FUNCNAME ? " in " : "", GECO_FUNCNAM
 #define GECO_VERIFY_DEV GECO_ASSERT_DEV
 #endif
 
-        //------------------------------------------------------------------
-		//                	Section: 	*_MSG macros.
-		//--------------------------------------------------------------------
-		/// This macro prints a debug message with CRITICAL priority.
-		/// CRITICAL_MSG is always enabled no matter what the build target is.
+  //------------------------------------------------------------------
+  //                	Section: 	*_MSG macros.
+  //--------------------------------------------------------------------
+  /// This macro prints a debug message with CRITICAL priority.
+  /// CRITICAL_MSG is always enabled no matter what the build target is.
 #define CRITICAL_MSG \
-geco::debugging::log_msg_helper(const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
+geco::debugging::log_msg_helper(::const_cpnt_priority,LOG_MSG_CRITICAL ).critical_msg
 /// This macro prints a development time only message CRITICAL priority.
-#define DEV_CRITICAL_MSG	CRITICAL_MSG
+#define DEV_CRITICAL_MSG　\
+geco::debugging::log_msg_helper(::const_cpnt_priority,LOG_MSG_CRITICAL ).dev_critical_msg
 
 #if ENABLE_MSG_LOGGING
 #define MSG_BACK_TRACE(PRIORITY)\
@@ -732,7 +622,7 @@ const int const_cpnt_priority = 0;
  * priority should be displayed in.
  *	@param priority	The initial component priority of the messages in the file.
  */
-    //impled in watcher.cpp
+		//impled in watcher.cpp
 extern bool init_value_watcher(int& value, const char * path);
 #define DECLARE_DEBUG_COMPONENT2(module, priority)\
 static int const_cpnt_priority = priority;\
