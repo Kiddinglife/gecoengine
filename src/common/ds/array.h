@@ -26,7 +26,7 @@ namespace geco
          *  I don't bother with operator= to improve performance.
          */
         template<class ElementType, unsigned int QUEUE_INIT_SIZE = 32>
-        class GECO_EXPORT array_t
+        class GECOAPI array_t
         {
             private:
                 /// An array of user values

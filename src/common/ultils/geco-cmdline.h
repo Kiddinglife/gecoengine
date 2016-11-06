@@ -4,7 +4,7 @@
 //see GECO_ULTILS.test_geco_cmdline_t to leran how to use it
 #include "../geco-export.h"
 
-class GECO_EXPORT geco_cmdline_t
+class GECOAPI geco_cmdline_t
 {
 public:
 	geco_cmdline_t(int iArgc, char** ppcArgv);
