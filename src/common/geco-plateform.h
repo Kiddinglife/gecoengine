@@ -22,6 +22,15 @@
 #ifndef _SRC_GECO_ENGINE_PLATEFORM
 #define _SRC_GECO_ENGINE_PLATEFORM
 
+//#include <new>
+//void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
+//{
+//	return 
+//}
+//void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
+//{
+//}
+
 #ifdef CODE_INLINE
 #define CODE_INLINE    inline
 #else

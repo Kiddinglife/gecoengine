@@ -1,5 +1,36 @@
-#include "../common/geco-plateform.h"
+/*
+* Copyright (c) 2016
+* Geco Gaming Company
+*
+* Permission to use, copy, modify, distribute and sell this software
+* and its documentation for GECO purpose is hereby granted without fee,
+* provided that the above copyright notice appear in all copies and
+* that both that copyright notice and this permission notice appear
+* in supporting documentation. Geco Gaming makes no
+* representations about the suitability of this software for GECO
+* purpose.  It is provided "as is" without express or implied warranty.
+*
+*/
+
+/**
+* Created on 22 April 2016 by Jake Zhang
+* Reviewed on 07 May 2016 by Jakze Zhang
+*/
+
+#ifndef __INCLUDE_MSG_H
+#define __INCLUDE_MSG_H
+
 #include <stdint.h>
+#include "../common/geco-plateform.h"
+#include "../protocol/geco-net-common.h"
+
+#define PORT_LOGIN				20013
+#define PORT_MACHINED_OLD		20014
+#define PORT_MACHINED			20018
+#define PORT_BROADCAST_DISCOVERY	20019
+#define PORT_WATCHER				20017
+#define PORT_PYTHON_PROXY		40000
+#define PORT_PYTHON_CELL			50000
 
 const uint CHANNEL_ID_NULL = UINT32_MAX;
 const ushort REPLY_ID_NONE = UINT16_MAX;
@@ -63,3 +94,36 @@ struct msg_fixed_t // 4 BYTES
 	//{}
 	//const char *MsgName() const;
 };
+
+struct FvEntityMailBoxRef
+{
+	entity_id_t m_iID;
+	FvNetAddress m_kAddr;
+
+	enum Component
+	{
+		CELL = 0,
+		BASE = 1,
+		GLOBAL = 2,
+	};
+
+	Component GetComponent() const { return (Component)(m_kAddr.m_uiSalt >> 13); }
+	void SetComponent(Component c) { m_kAddr.m_uiSalt = GetType() | (FvUInt16(c) << 13); }
+
+	FvEntityTypeID GetType() const { return m_kAddr.m_uiSalt & 0x1FFF; }
+	void SetType(FvEntityTypeID t) { m_kAddr.m_uiSalt = (m_kAddr.m_uiSalt & 0xE000) | t; }
+
+	void Init() { m_iID = 0; m_kAddr.m_uiIP = 0; m_kAddr.m_uiPort = 0; m_kAddr.m_uiSalt = 0; }
+	void Init(FvEntityID i, const FvNetAddress & a,
+		Component c, FvEntityTypeID t)
+	{
+		m_iID = i; m_kAddr = a; m_kAddr.m_uiSalt = (FvUInt16(c) << 13) | t;
+	}
+
+	FvEntityMailBoxRef()
+	{
+		SetType(FV_INVALID_ENTITY_TYPE_ID);
+	}
+};
+#endif
+

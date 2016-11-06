@@ -146,8 +146,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\network\deamon.h" />
     <ClInclude Include="..\..\..\..\src\network\msg.h" />
+    <ClInclude Include="..\..\..\..\src\network\msg_handler_element_t.h" />
+    <ClInclude Include="..\..\..\..\src\network\net-types.h" />
     <ClInclude Include="..\..\..\..\src\network\network_handlers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\network\deamon.cc" />
+    <ClCompile Include="..\..\..\..\src\network\msg_handler_element_t.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,6 +10,7 @@
 #include "common/ultils/ultils.h"
 #include "common/debugging/debug.h"
 #include "common/debugging/stack_tracker_t.h"
+#include "common/ds/eastl/EASTL/fixed_vector.h"
 
 using namespace geco::debugging;
 using namespace geco::ultils;
