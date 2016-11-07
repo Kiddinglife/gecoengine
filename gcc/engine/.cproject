@@ -7,8 +7,10 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/geco-game-engine-static-lib-project"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/engine"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gecoengine"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/geco-game-engine-static-lib-project/Debug"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/engine/Debug"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gecoengine/Debug"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="geco-game-engine-static-lib-project" srcPrefixMapping="" srcRootPath=""/>
 						<entry flags="RESOLVED" kind="libraryFile" name="gecoengine_d" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
@@ -37,9 +39,15 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.467911207" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.188004148" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="${RootPath}/src/common/ds/eastl/"/>
+									<listOptionValue builtIn="false" value="${EA_TEST}/　EABase/include/"/>
+									<listOptionValue builtIn="false" value="${EA_TEST}/　EAAsert/include/"/>
+									<listOptionValue builtIn="false" value="${EA_TEST}/　EAStdC/include/"/>
+									<listOptionValue builtIn="false" value="${EA_TEST}/EATest/include/"/>
+									<listOptionValue builtIn="false" value="${EA_TEST}/　EAThread/include/"/>
+									<listOptionValue builtIn="false" value="${EA_TEST}/EAMain/include/"/>
 									<listOptionValue builtIn="false" value="${RootPath}/thirdparty/cat/include/"/>
 									<listOptionValue builtIn="false" value="${RootPath}/thirdparty/"/>
-									<listOptionValue builtIn="false" value="${RootPath}/src/net-engine"/>
 									<listOptionValue builtIn="false" value="${RootPath}/thirdparty/openssl-1.0.1t/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1646543699" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -57,8 +65,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.lib.debug.556339875.303909277" name="/" resourcePath="src/common/ds/eastl/doc">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.lib.debug.2051210908" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.lib.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.1507154239" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug.943677616"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.1729432578" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.609385653"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.1407881349" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.779629807"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1800720229" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.15771122"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1355529127" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.942523152"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.1358552446" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug.56036922"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/common/debugging/asms.asm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/common/ds/eastl/doc|src/common/ds/eastl/benchmark|src/common/ds/eastl/test|src/common/debugging/asms.asm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
