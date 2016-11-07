@@ -25,6 +25,114 @@
     <ClInclude Include="..\..\..\..\src\common\debugging\timestamp.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\config\eacompiler.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\config\eacompilertraits.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\config\eaplatform.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\eabase.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\eahave.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\earesult.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\eastdarg.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\nullptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EABase\version.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\algorithm.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\allocator.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\allocator_malloc.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\array.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bitset.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bitvector.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\adaptors.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\call_traits.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\compressed_pair.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\fixed_string_abstract.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\intrusive_sdlist.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\intrusive_slist.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\list_map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\ring_buffer.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\sort_extra.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\sparse_matrix.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\bonus\string_abstract.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\chrono.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\core_allocator.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\core_allocator_adapter.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\deque.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_allocator.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_hash_map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_hash_set.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_list.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_set.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_slist.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_string.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_substring.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\fixed_vector.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\functional.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\hash_map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\hash_set.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\heap.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\initializer_list.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\allocator_traits.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\allocator_traits_fwd_decls.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\config.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\copy_help.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\enable_shared.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\fill_help.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\fixed_pool.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\function.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\functional_base.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\generic_iterator.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\hashtable.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\integer_sequence.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\intrusive_hashtable.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\mem_fn.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\move_help.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\pair_fwd_decls.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\red_black_tree.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\smart_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\thread_support.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\tuple_fwd_decls.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\type_compound.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\type_fundamental.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\type_pod.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\type_properties.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\internal\type_transformations.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\intrusive_hash_map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\intrusive_hash_set.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\intrusive_list.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\intrusive_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\iterator.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\linked_array.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\linked_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\list.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\memory.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\numeric.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\numeric_limits.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\optional.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\priority_queue.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\queue.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\random.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\ratio.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\safe_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\scoped_array.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\scoped_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\set.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\shared_array.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\shared_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\slist.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\sort.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\stack.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\string.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\tuple.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\type_traits.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\unique_ptr.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\utility.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\vector.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\vector_map.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\vector_multimap.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\vector_multiset.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\vector_set.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\version.h" />
+    <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\weak_ptr.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\geco-bit-stream.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-engine-feature.h" />
@@ -57,6 +165,16 @@
     <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cpp" />
     <ClCompile Include="..\..\..\..\src\common\debugging\timestamp.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\allocator_eastl.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\assert.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\fixed_pool.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\hashtable.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\intrusive_list.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\numeric_limits.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\red_black_tree.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\SampleNewAndDelete.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\string.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\thread_support.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\geco-bit-stream.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\affinity.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-cmdline.cc" />
@@ -156,8 +274,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>STATIC_LIB_BUILD;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,9 +318,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STATIC_LIB_BUILD;SERVER_BUILD;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../../../../src;../../../../thirdparty;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl/include/;../../../../thirdparty/log4cxx/src/main/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

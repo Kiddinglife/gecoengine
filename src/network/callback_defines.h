@@ -18,31 +18,11 @@
 
 /**
  *  This method is called by event dispatcher to deliver a message.
- *  @param source   The address at which the message originated.
+ *  @param channel_id    at which channel the message originated.
  *  @param data     This contains the message type, size, and flags. and  actual message data.
  */
-class Address;
 class geco_bit_stream_t;
-typedef std::function<void(const Address & source, geco_bit_stream_t& data)> msg_handler_t;
-//class InputMessageHandler
-//{
-//    public:
-//        virtual ~InputMessageHandler()
-//        {
-//        }
-//        ;
-//
-//        /**
-//         *  This method is called by Mercury to deliver a message.
-//         *
-//         *  @param source   The address at which the message originated.
-//         *  @param header   This contains the message type, size, and flags.
-//         *  @param data     The actual message data.
-//         */
-//        virtual void handleMessage(const Address & source,
-//                UnpackedMessageHeader & header,
-//                BinaryIStream & data) = 0;
-//};
+typedef std::function<void(const int channel_id, geco_bit_stream_t& data)> msg_handler_cb;
 
 /**
  *  This class defines an interface for receiving socket events.
@@ -85,7 +65,7 @@ typedef std::function<int(int fd)> network_data_arrived_handler_t;
  *  @ingroup mercury
  */
 class NubException;
-typedef std::function<void(const Address & source, geco_bit_stream_t& data, void* args)>
+typedef std::function<void(int source, geco_bit_stream_t& data, void* args)>
 reply_msg_handler_t;
 typedef std::function<void(const NubException & exception, void * arg)>
 reply_exception_handler_t;
