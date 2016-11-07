@@ -44,9 +44,9 @@ namespace geco
 #endif
 
 #ifdef _WIN32//! win32
-#define	NET_LOCALHOSTNAME "localhost"
+#define	LOCALHOSTNAME "localhost"
 #else
-#define NET_LOCALHOSTNAME "lo"
+#define LOCALHOSTNAME "lo"
 #endif
 
 #define PORT_LOGIN				20013
@@ -57,11 +57,11 @@ namespace geco
 #define PORT_PYTHON_PROXY		40000
 #define PORT_PYTHON_CELL			50000
 
-		const int NET_UDP_OVERHEAD = 28;
-		const int NET_BITS_PER_BYTE = 8;
-		const uint NET_LOCALHOST = 0x0100007F;
-		const uint NET_BROADCAST = 0xFFFFFFFF;
-		static const int NET_WN_PACKET_SIZE = 0x10000;
+		const int UDP_OVERHEAD = 28;
+		const int BITS_PER_BYTE = 8;
+		const uint LOCALHOST = 0x0100007F;
+		const uint BROADCAST = 0xFFFFFFFF;
+		static const int WN_PACKET_SIZE = 0x10000;
 		typedef uint TimeStamp;
 		typedef int entity_id;
 		const uchar ENTITY_DEF_INIT_FLG = 0;
@@ -94,9 +94,9 @@ namespace geco
 		typedef uint SeqNum;
 		typedef uchar msg_id;
 		typedef void * TimerID;
-		const TimerID NET_TIMER_ID_NONE = 0;
+		const TimerID TIMER_ID_NONE = 0;
 		typedef int ChannelID;
-		const ChannelID NET_CHANNEL_ID_NULL = 0;
+		const ChannelID CHANNEL_ID_NULL = 0;
 		typedef SeqNum ChannelVersion;
 		typedef uint GridID;
 		typedef uint EventNumber;
@@ -323,47 +323,81 @@ namespace geco
 			d.m_iID = ntohl(entitid);
 			return is;
 		}
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		const char NET_FIXED_LENGTH_MESSAGE = 0;
-		const char NET_VARIABLE_LENGTH_MESSAGE = 1;
-		const char NET_INVALID_MESSAGE = 2;
-		struct GECOAPI msg_handler //NetInterfaceElement
+
+
+		/**
+		* 	@internal
+		* 	This constant indicates a fixed length message.
+		* 	It is used as the lengthStyle in an InterfaceElement.
+		* 	For this type of message, lengthParam is the number
+		* 	of bytes in the message. This is constant for all
+		* 	messages of this type.
+		*/
+		const char FIXED_LENGTH_MESSAGE = 0;
+
+		/**
+		* 	@internal
+		* 	This constant indicates a variable length message.
+		* 	It is used as the lengthStyle in an InterfaceElement.
+		* 	For this type of message, lengthParam is the number
+		* 	of bytes used to store the message size. This is
+		* 	constant for all messages of this type.
+		*/
+		const char VARIABLE_LENGTH_MESSAGE = 1;
+
+		/**
+		* 	@internal
+		* 	This constant indicates the InterfaceElement has not been initialised.
+		*/
+		const char INVALID_MESSAGE = 2;
+
+		/**
+		* 	@internal
+		*	This structure describes a single message within an
+		*	interface. It describes how to encode and decode the
+		*	header of the message, including whether the message
+		*	is fixed length or variable.  For fixed length messages, it
+		*	defines the length of the message. For variable length
+		*	messages, it defines the number of bytes needed to
+		*	express the length.
+		*/
+		struct GECOAPI msg_handler_t
 		{
-			static const msg_handler REPLY;
+			static const msg_handler_t REPLY;
 
-			msg_id m_uiID;
-			uchar m_uiLengthStyle;
-			int m_iLengthParam;
-			const char *m_pcName;
-			msg_handler_cb m_pkHandler;
+			msg_id id_; ///< Unique message ID
+			uchar lengthStyle_;	///< Fixed or variable length
+			int lengthParam_;///< This depends on lengthStyle
+			const char *name_;///< The name of the interface method
+			msg_handler_cb pHandler_; /// msg handler
 
-			msg_handler(const char * name = "", msg_id id = 0,
-				uchar lengthStyle = NET_INVALID_MESSAGE, int lengthParam = 0,
+			msg_handler_t(const char * name = "", msg_id id = 0,
+				uchar lengthStyle = INVALID_MESSAGE, int lengthParam = 0,
 				msg_handler_cb pHandler = NULL) :
-				m_uiID(id),
-				m_uiLengthStyle(lengthStyle),
-				m_iLengthParam(lengthParam),
-				m_pcName(name),
-				m_pkHandler(pHandler)
+				id_(id),
+				lengthStyle_(lengthStyle),
+				lengthParam_(lengthParam),
+				name_(name),
+				pHandler_(pHandler)
 			{}
 
 			void Set(const char * name, msg_id id, uchar lengthStyle,
 				int lengthParam)
 			{
-				m_uiID = id;
-				m_uiLengthStyle = lengthStyle;
-				m_iLengthParam = lengthParam;
-				m_pcName = name;
+				id_ = id;
+				lengthStyle_ = lengthStyle;
+				lengthParam_ = lengthParam;
+				name_ = name;
 			}
 			int read_hdr_len() const
 			{
-				return m_uiLengthStyle == NET_FIXED_LENGTH_MESSAGE ?
-					sizeof(msg_id) : m_iLengthParam + sizeof(msg_id);
+				return lengthStyle_ == FIXED_LENGTH_MESSAGE ?
+					sizeof(msg_id) : lengthParam_ + sizeof(msg_id);
 			}
 			bool is_valid_len(uint length) const
 			{
-				return (m_uiLengthStyle != NET_VARIABLE_LENGTH_MESSAGE) ||
-					(length > 0 && length < (1 << (8 * m_iLengthParam)) - 1);
+				return (lengthStyle_ != VARIABLE_LENGTH_MESSAGE) ||
+					(length > 0 && length < (1 << (8 * lengthParam_)) - 1);
 			}
 			//int SpecialExpandLength(void * header, FvNetPacket * pPacket) const;
 			//int SpecialCompressLength(void * header, int length,
@@ -372,7 +406,7 @@ namespace geco
 			const char* c_str() const
 			{
 				static char buf[128];
-				snprintf(buf, sizeof(buf), "%d/%s", m_pcName, m_uiID);
+				snprintf(buf, sizeof(buf), "%d/%s", name_, id_);
 				return buf;
 			}
 		};
