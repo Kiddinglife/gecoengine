@@ -21,6 +21,8 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
 		//::testing::GTEST_FLAG(filter) = "GECO_ULTILS.encode64_when_given_string_and_then_decode64_back_to_string_result_should_be_same";
 		//::testing::GTEST_FLAG(filter) = "GECO_ULTILS.test_geco_cmdline_t";
 
+		::testing::GTEST_FLAG(filter) = "RMI.*";
+
 		//last run and pass on 14:18 PM 4 Oct 2016
 		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";
 		//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_haffman_compression";
@@ -32,7 +34,7 @@ GTEST_API_ int _tmain(int argc, TCHAR** argv)
 
 		//last run and pass on 14:18 PM 4 Oct 2016
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_TIMESTAMP.test_gettimestamp_func";
-		::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.test_msg_macros";
+		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.test_msg_macros";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.test_msg_cb";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.test_critical_msg";
 		//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_MSGLOG.geco_asset_dev_if_not_does_block_codes_will_not_run_when_has_dev_assert_is_true";
