@@ -86,7 +86,7 @@
 #include <EASTL/algorithm.h>
 
 #if defined(EA_PRAGMA_ONCE_SUPPORTED)
-	#pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
 #endif
 
 
@@ -105,20 +105,20 @@ namespace eastl
 		intrusive_list_node* mpNext;
 		intrusive_list_node* mpPrev;
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			intrusive_list_node()       // Implemented inline because GCC can't deal with member functions
-			{                           // of may-alias classes being defined outside the declaration.
-				mpNext = mpPrev = NULL;
-			}
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		intrusive_list_node()       // Implemented inline because GCC can't deal with member functions
+		{                           // of may-alias classes being defined outside the declaration.
+			mpNext = mpPrev = NULL;
+		}
 
-			~intrusive_list_node()
-			{
-				#if EASTL_ASSERT_ENABLED
-					if(mpNext || mpPrev)
-						EASTL_FAIL_MSG("~intrusive_list_node(): List is non-empty.");
-				#endif
-			}
-		#endif
+		~intrusive_list_node()
+		{
+#if EASTL_ASSERT_ENABLED
+			if (mpNext || mpPrev)
+				EASTL_FAIL_MSG("~intrusive_list_node(): List is non-empty.");
+#endif
+		}
+#endif
 	} EASTL_MAY_ALIAS;  // It's not clear if this really should be needed. An old GCC compatible compiler is generating some crashing optimized code when strict aliasing is enabled, but analysis of it seems to blame the compiler. However, this topic can be tricky.
 
 
@@ -173,7 +173,7 @@ namespace eastl
 
 	public:
 		intrusive_list_base();
-	   ~intrusive_list_base();
+		~intrusive_list_base();
 
 		bool            empty() const EA_NOEXCEPT;
 		eastl_size_t    size() const EA_NOEXCEPT;  ///< Returns the number of elements in the list; O(n).
@@ -246,7 +246,7 @@ namespace eastl
 		reverse_iterator        rend() EA_NOEXCEPT;                  ///< Returns a reverse_iterator pointing at the start of the list (end of the reverse sequence).
 		const_reverse_iterator  rend() const EA_NOEXCEPT;            ///< Returns a const_reverse_iterator pointing at the start of the list (end of the reverse sequence).
 		const_reverse_iterator  crend() const EA_NOEXCEPT;           ///< Returns a const_reverse_iterator pointing at the start of the list (end of the reverse sequence).
-		
+
 		reference               front();                 ///< Returns a reference to the first element. The list must be non-empty.
 		const_reference         front() const;           ///< Returns a const reference to the first element. The list must be non-empty.
 		reference               back();                  ///< Returns a reference to the last element. The list must be non-empty.
@@ -270,21 +270,21 @@ namespace eastl
 		static void remove(value_type& value);                    ///< Erases an element from a list; O(1). Note that this is static so you don't need to know which list the element, although it must be in some list.
 
 		void               splice(const_iterator pos, value_type& x);
-				///< Moves the given element into this list before the element pointed to by pos; O(1).
-				///< Required: x must be in some list or have first/next pointers that point it itself.
+		///< Moves the given element into this list before the element pointed to by pos; O(1).
+		///< Required: x must be in some list or have first/next pointers that point it itself.
 
 		void               splice(const_iterator pos, intrusive_list& x);
-				///< Moves the contents of a list into this list before the element pointed to by pos; O(1).
-				///< Required: &x != this (same as std::list).
+		///< Moves the contents of a list into this list before the element pointed to by pos; O(1).
+		///< Required: &x != this (same as std::list).
 
 		void               splice(const_iterator pos, intrusive_list& x, const_iterator i);
-				///< Moves the given element pointed to i within the list x into the current list before
-				///< the element pointed to by pos; O(1).
+		///< Moves the given element pointed to i within the list x into the current list before
+		///< the element pointed to by pos; O(1).
 
 		void               splice(const_iterator pos, intrusive_list& x, const_iterator first, const_iterator last);
-				///< Moves the range of elements [first, last) from list x into the current list before
-				///< the element pointed to by pos; O(1).
-				///< Required: pos must not be in [first, last). (same as std::list).
+		///< Moves the range of elements [first, last) from list x into the current list before
+		///< the element pointed to by pos; O(1).
+		///< Required: pos must not be in [first, last). (same as std::list).
 
 	public:
 		// Sorting functionality
@@ -347,9 +347,9 @@ namespace eastl
 	template <typename T, typename Pointer, typename Reference>
 	inline intrusive_list_iterator<T, Pointer, Reference>::intrusive_list_iterator()
 	{
-		#if EASTL_DEBUG
-			mpNode = NULL;
-		#endif
+#if EASTL_DEBUG
+		mpNode = NULL;
+#endif
 	}
 
 
@@ -371,7 +371,7 @@ namespace eastl
 
 	template <typename T, typename Pointer, typename Reference>
 	inline typename intrusive_list_iterator<T, Pointer, Reference>::reference
-	intrusive_list_iterator<T, Pointer, Reference>::operator*() const
+		intrusive_list_iterator<T, Pointer, Reference>::operator*() const
 	{
 		return *mpNode;
 	}
@@ -379,7 +379,7 @@ namespace eastl
 
 	template <typename T, typename Pointer, typename Reference>
 	inline typename intrusive_list_iterator<T, Pointer, Reference>::pointer
-	intrusive_list_iterator<T, Pointer, Reference>::operator->() const
+		intrusive_list_iterator<T, Pointer, Reference>::operator->() const
 	{
 		return mpNode;
 	}
@@ -387,7 +387,7 @@ namespace eastl
 
 	template <typename T, typename Pointer, typename Reference>
 	inline typename intrusive_list_iterator<T, Pointer, Reference>::this_type&
-	intrusive_list_iterator<T, Pointer, Reference>::operator++()
+		intrusive_list_iterator<T, Pointer, Reference>::operator++()
 	{
 		mpNode = static_cast<node_type*>(mpNode->mpNext);
 		return *this;
@@ -396,7 +396,7 @@ namespace eastl
 
 	template <typename T, typename Pointer, typename Reference>
 	inline typename intrusive_list_iterator<T, Pointer, Reference>::this_type
-	intrusive_list_iterator<T, Pointer, Reference>::operator++(int)
+		intrusive_list_iterator<T, Pointer, Reference>::operator++(int)
 	{
 		intrusive_list_iterator it(*this);
 		mpNode = static_cast<node_type*>(mpNode->mpNext);
@@ -406,7 +406,7 @@ namespace eastl
 
 	template <typename T, typename Pointer, typename Reference>
 	inline typename intrusive_list_iterator<T, Pointer, Reference>::this_type&
-	intrusive_list_iterator<T, Pointer, Reference>::operator--()
+		intrusive_list_iterator<T, Pointer, Reference>::operator--()
 	{
 		mpNode = static_cast<node_type*>(mpNode->mpPrev);
 		return *this;
@@ -415,7 +415,7 @@ namespace eastl
 
 	template <typename T, typename Pointer, typename Reference>
 	inline typename intrusive_list_iterator<T, Pointer, Reference>::this_type
-	intrusive_list_iterator<T, Pointer, Reference>::operator--(int)
+		intrusive_list_iterator<T, Pointer, Reference>::operator--(int)
 	{
 		intrusive_list_iterator it(*this);
 		mpNode = static_cast<node_type*>(mpNode->mpPrev);
@@ -427,16 +427,16 @@ namespace eastl
 	// Thus we provide additional template paremeters here to support this. The defect report does not
 	// require us to support comparisons between reverse_iterators and const_reverse_iterators.
 	template <typename T, typename PointerA, typename ReferenceA, typename PointerB, typename ReferenceB>
-	inline bool operator==(const intrusive_list_iterator<T, PointerA, ReferenceA>& a, 
-							const intrusive_list_iterator<T, PointerB, ReferenceB>& b)
+	inline bool operator==(const intrusive_list_iterator<T, PointerA, ReferenceA>& a,
+		const intrusive_list_iterator<T, PointerB, ReferenceB>& b)
 	{
 		return a.mpNode == b.mpNode;
 	}
 
 
 	template <typename T, typename PointerA, typename ReferenceA, typename PointerB, typename ReferenceB>
-	inline bool operator!=(const intrusive_list_iterator<T, PointerA, ReferenceA>& a, 
-							const intrusive_list_iterator<T, PointerB, ReferenceB>& b)
+	inline bool operator!=(const intrusive_list_iterator<T, PointerA, ReferenceA>& a,
+		const intrusive_list_iterator<T, PointerB, ReferenceB>& b)
 	{
 		return a.mpNode != b.mpNode;
 	}
@@ -445,8 +445,8 @@ namespace eastl
 	// We provide a version of operator!= for the case where the iterators are of the 
 	// same type. This helps prevent ambiguity errors in the presence of rel_ops.
 	template <typename T, typename Pointer, typename Reference>
-	inline bool operator!=(const intrusive_list_iterator<T, Pointer, Reference>& a, 
-						   const intrusive_list_iterator<T, Pointer, Reference>& b)
+	inline bool operator!=(const intrusive_list_iterator<T, Pointer, Reference>& a,
+		const intrusive_list_iterator<T, Pointer, Reference>& b)
 	{
 		return a.mpNode != b.mpNode;
 	}
@@ -458,17 +458,17 @@ namespace eastl
 	// intrusive_list_base
 	///////////////////////////////////////////////////////////////////////
 
-	inline intrusive_list_base::intrusive_list_base() 
+	inline intrusive_list_base::intrusive_list_base()
 	{
 		mAnchor.mpNext = mAnchor.mpPrev = &mAnchor;
 	}
 
 	inline intrusive_list_base::~intrusive_list_base()
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			clear();
-			mAnchor.mpNext = mAnchor.mpPrev = NULL;
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		clear();
+		mAnchor.mpNext = mAnchor.mpPrev = NULL;
+#endif
 	}
 
 
@@ -486,7 +486,7 @@ namespace eastl
 		do {
 			++n;
 			p = p->mpNext;
-		} while(p != &mAnchor);
+		} while (p != &mAnchor);
 
 		return n;
 	}
@@ -494,18 +494,18 @@ namespace eastl
 
 	inline void intrusive_list_base::clear() EA_NOEXCEPT
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			// Need to clear out all the next/prev pointers in the elements;
-			// this makes this operation O(n) instead of O(1).
-			intrusive_list_node* pNode = mAnchor.mpNext;
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		// Need to clear out all the next/prev pointers in the elements;
+		// this makes this operation O(n) instead of O(1).
+		intrusive_list_node* pNode = mAnchor.mpNext;
 
-			while(pNode != &mAnchor)
-			{
-				intrusive_list_node* const pNextNode = pNode->mpNext;
-				pNode->mpNext = pNode->mpPrev = NULL;
-				pNode = pNextNode;
-			}
-		#endif
+		while (pNode != &mAnchor)
+		{
+			intrusive_list_node* const pNextNode = pNode->mpNext;
+			pNode->mpNext = pNode->mpPrev = NULL;
+			pNode = pNextNode;
+		}
+#endif
 
 		mAnchor.mpNext = mAnchor.mpPrev = &mAnchor;
 	}
@@ -513,41 +513,41 @@ namespace eastl
 
 	inline void intrusive_list_base::pop_front()
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			intrusive_list_node* const pNode = mAnchor.mpNext;
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		intrusive_list_node* const pNode = mAnchor.mpNext;
+#endif
 
 		mAnchor.mpNext->mpNext->mpPrev = &mAnchor;
 		mAnchor.mpNext = mAnchor.mpNext->mpNext;
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			if(pNode != &mAnchor)
-				pNode->mpNext = pNode->mpPrev = NULL;
-			#if EASTL_ASSERT_ENABLED
-			else
-				EASTL_FAIL_MSG("intrusive_list::pop_front(): empty list.");
-			#endif
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		if (pNode != &mAnchor)
+			pNode->mpNext = pNode->mpPrev = NULL;
+#if EASTL_ASSERT_ENABLED
+		else
+			EASTL_FAIL_MSG("intrusive_list::pop_front(): empty list.");
+#endif
+#endif
 	}
 
 
 	inline void intrusive_list_base::pop_back()
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			intrusive_list_node* const pNode = mAnchor.mpPrev;
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		intrusive_list_node* const pNode = mAnchor.mpPrev;
+#endif
 
 		mAnchor.mpPrev->mpPrev->mpNext = &mAnchor;
 		mAnchor.mpPrev = mAnchor.mpPrev->mpPrev;
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			if(pNode != &mAnchor)
-				pNode->mpNext = pNode->mpPrev = NULL;
-			#if EASTL_ASSERT_ENABLED
-			else
-				EASTL_FAIL_MSG("intrusive_list::pop_back(): empty list.");
-			#endif
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		if (pNode != &mAnchor)
+			pNode->mpNext = pNode->mpPrev = NULL;
+#if EASTL_ASSERT_ENABLED
+		else
+			EASTL_FAIL_MSG("intrusive_list::pop_back(): empty list.");
+#endif
+#endif
 	}
 
 
@@ -565,7 +565,7 @@ namespace eastl
 
 	template <typename T>
 	inline intrusive_list<T>::intrusive_list(const this_type& /*x*/)
-	  : intrusive_list_base()
+		: intrusive_list_base()
 	{
 		// We intentionally ignore argument x.
 		// To consider: Shouldn't this function simply not exist? Is there a useful purpose for having this function?
@@ -575,7 +575,7 @@ namespace eastl
 
 	template <typename T>
 	inline typename intrusive_list<T>::this_type& intrusive_list<T>::operator=(const this_type& /*x*/)
-	{ 
+	{
 		// We intentionally ignore argument x.
 		// See notes above in the copy constructor about questioning the existence of this function.
 		return *this;
@@ -669,10 +669,10 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::reference intrusive_list<T>::front()
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(mAnchor.mpNext == &mAnchor)
-				EASTL_FAIL_MSG("intrusive_list::front(): empty list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (mAnchor.mpNext == &mAnchor)
+			EASTL_FAIL_MSG("intrusive_list::front(): empty list.");
+#endif
 
 		return *static_cast<T*>(mAnchor.mpNext);
 	}
@@ -681,10 +681,10 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::const_reference intrusive_list<T>::front() const
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(mAnchor.mpNext == &mAnchor)
-				EASTL_FAIL_MSG("intrusive_list::front(): empty list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (mAnchor.mpNext == &mAnchor)
+			EASTL_FAIL_MSG("intrusive_list::front(): empty list.");
+#endif
 
 		return *static_cast<const T*>(mAnchor.mpNext);
 	}
@@ -693,10 +693,10 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::reference intrusive_list<T>::back()
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(mAnchor.mpNext == &mAnchor)
-				EASTL_FAIL_MSG("intrusive_list::back(): empty list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (mAnchor.mpNext == &mAnchor)
+			EASTL_FAIL_MSG("intrusive_list::back(): empty list.");
+#endif
 
 		return *static_cast<T*>(mAnchor.mpPrev);
 	}
@@ -705,10 +705,10 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::const_reference intrusive_list<T>::back() const
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(mAnchor.mpNext == &mAnchor)
-				EASTL_FAIL_MSG("intrusive_list::back(): empty list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (mAnchor.mpNext == &mAnchor)
+			EASTL_FAIL_MSG("intrusive_list::back(): empty list.");
+#endif
 
 		return *static_cast<const T*>(mAnchor.mpPrev);
 	}
@@ -717,10 +717,10 @@ namespace eastl
 	template <typename T>
 	inline void intrusive_list<T>::push_front(value_type& x)
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(x.mpNext || x.mpPrev)
-				EASTL_FAIL_MSG("intrusive_list::push_front(): element already on a list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (x.mpNext || x.mpPrev)
+			EASTL_FAIL_MSG("intrusive_list::push_front(): element already on a list.");
+#endif
 
 		x.mpNext = mAnchor.mpNext;
 		x.mpPrev = &mAnchor;
@@ -732,10 +732,10 @@ namespace eastl
 	template <typename T>
 	inline void intrusive_list<T>::push_back(value_type& x)
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(x.mpNext || x.mpPrev)
-				EASTL_FAIL_MSG("intrusive_list::push_back(): element already on a list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (x.mpNext || x.mpPrev)
+			EASTL_FAIL_MSG("intrusive_list::push_back(): element already on a list.");
+#endif
 
 		x.mpPrev = mAnchor.mpPrev;
 		x.mpNext = &mAnchor;
@@ -747,9 +747,9 @@ namespace eastl
 	template <typename T>
 	inline bool intrusive_list<T>::contains(const value_type& x) const
 	{
-		for(const intrusive_list_node* p = mAnchor.mpNext; p != &mAnchor; p = p->mpNext)
+		for (const intrusive_list_node* p = mAnchor.mpNext; p != &mAnchor; p = p->mpNext)
 		{
-			if(p == &x)
+			if (p == &x)
 				return true;
 		}
 
@@ -760,9 +760,9 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::iterator intrusive_list<T>::locate(value_type& x)
 	{
-		for(intrusive_list_node* p = (T*)mAnchor.mpNext; p != &mAnchor; p = p->mpNext)
+		for (intrusive_list_node* p = (T*)mAnchor.mpNext; p != &mAnchor; p = p->mpNext)
 		{
-			if(p == &x)
+			if (p == &x)
 				return iterator(static_cast<T*>(p));
 		}
 
@@ -773,9 +773,9 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::const_iterator intrusive_list<T>::locate(const value_type& x) const
 	{
-		for(const intrusive_list_node* p = mAnchor.mpNext; p != &mAnchor; p = p->mpNext)
+		for (const intrusive_list_node* p = mAnchor.mpNext; p != &mAnchor; p = p->mpNext)
 		{
-			if(p == &x)
+			if (p == &x)
 				return const_iterator(static_cast<const T*>(p));
 		}
 
@@ -786,16 +786,16 @@ namespace eastl
 	template <typename T>
 	inline typename intrusive_list<T>::iterator intrusive_list<T>::insert(const_iterator pos, value_type& x)
 	{
-		#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
-			if(x.mpNext || x.mpPrev)
-				EASTL_FAIL_MSG("intrusive_list::insert(): element already on a list.");
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST && EASTL_ASSERT_ENABLED
+		if (x.mpNext || x.mpPrev)
+			EASTL_FAIL_MSG("intrusive_list::insert(): element already on a list.");
+#endif
 
 		node_type& next = *const_cast<node_type*>(pos.mpNode);
 		node_type& prev = *static_cast<node_type*>(next.mpPrev);
 		prev.mpNext = next.mpPrev = &x;
-		x.mpPrev    = &prev;
-		x.mpNext    = &next;
+		x.mpPrev = &prev;
+		x.mpNext = &next;
 
 		return iterator(&x);
 	}
@@ -803,17 +803,17 @@ namespace eastl
 
 	template <typename T>
 	inline typename intrusive_list<T>::iterator
-	intrusive_list<T>::erase(const_iterator pos)
+		intrusive_list<T>::erase(const_iterator pos)
 	{
 		node_type& prev = *static_cast<node_type*>(pos.mpNode->mpPrev);
 		node_type& next = *static_cast<node_type*>(pos.mpNode->mpNext);
 		prev.mpNext = &next;
 		next.mpPrev = &prev;
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			iterator ii(const_cast<node_type*>(pos.mpNode));
-			ii.mpNode->mpPrev = ii.mpNode->mpNext = NULL;
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		iterator ii(const_cast<node_type*>(pos.mpNode));
+		ii.mpNode->mpPrev = ii.mpNode->mpNext = NULL;
+#endif
 
 		return iterator(&next);
 	}
@@ -821,25 +821,25 @@ namespace eastl
 
 	template <typename T>
 	inline typename intrusive_list<T>::iterator
-	intrusive_list<T>::erase(const_iterator first, const_iterator last)
+		intrusive_list<T>::erase(const_iterator first, const_iterator last)
 	{
 		node_type& prev = *static_cast<node_type*>(first.mpNode->mpPrev);
 		node_type& next = *const_cast<node_type*>(last.mpNode);
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			// need to clear out all the next/prev pointers in the elements;
-			// this makes this operation O(n) instead of O(1), sadly, although
-			// it's technically amortized O(1) since you could count yourself
-			// as paying this cost with each insert.
-			intrusive_list_node* pCur = const_cast<node_type*>(first.mpNode);
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		// need to clear out all the next/prev pointers in the elements;
+		// this makes this operation O(n) instead of O(1), sadly, although
+		// it's technically amortized O(1) since you could count yourself
+		// as paying this cost with each insert.
+		intrusive_list_node* pCur = const_cast<node_type*>(first.mpNode);
 
-			while(pCur != &next)
-			{
-				intrusive_list_node* const pCurNext = pCur->mpNext;
-				pCur->mpPrev = pCur->mpNext = NULL;
-				pCur = pCurNext;
-			}
-		#endif
+		while (pCur != &next)
+		{
+			intrusive_list_node* const pCurNext = pCur->mpNext;
+			pCur->mpPrev = pCur->mpNext = NULL;
+			pCur = pCurNext;
+		}
+#endif
 
 		prev.mpNext = &next;
 		next.mpPrev = &prev;
@@ -850,7 +850,7 @@ namespace eastl
 
 	template <typename T>
 	inline typename intrusive_list<T>::reverse_iterator
-	intrusive_list<T>::erase(const_reverse_iterator position)
+		intrusive_list<T>::erase(const_reverse_iterator position)
 	{
 		return reverse_iterator(erase((++position).base()));
 	}
@@ -858,7 +858,7 @@ namespace eastl
 
 	template <typename T>
 	inline typename intrusive_list<T>::reverse_iterator
-	intrusive_list<T>::erase(const_reverse_iterator first, const_reverse_iterator last)
+		intrusive_list<T>::erase(const_reverse_iterator first, const_reverse_iterator last)
 	{
 		// Version which erases in order from first to last.
 		// difference_type i(first.base() - last.base());
@@ -876,24 +876,24 @@ namespace eastl
 	{
 		// swap anchors
 		intrusive_list_node temp(mAnchor);
-		mAnchor   = x.mAnchor;
+		mAnchor = x.mAnchor;
 		x.mAnchor = temp;
 
 		// Fixup node pointers into the anchor, since the addresses of 
 		// the anchors must stay the same with each list.
-		if(mAnchor.mpNext == &x.mAnchor)
+		if (mAnchor.mpNext == &x.mAnchor)
 			mAnchor.mpNext = mAnchor.mpPrev = &mAnchor;
 		else
 			mAnchor.mpNext->mpPrev = mAnchor.mpPrev->mpNext = &mAnchor;
 
-		if(x.mAnchor.mpNext == &mAnchor)
+		if (x.mAnchor.mpNext == &mAnchor)
 			x.mAnchor.mpNext = x.mAnchor.mpPrev = &x.mAnchor;
 		else
 			x.mAnchor.mpNext->mpPrev = x.mAnchor.mpPrev->mpNext = &x.mAnchor;
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			temp.mpPrev = temp.mpNext = NULL;
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		temp.mpPrev = temp.mpNext = NULL;
+#endif
 	}
 
 
@@ -903,7 +903,7 @@ namespace eastl
 		// Note that splice(pos, x, pos) and splice(pos+1, x, pos)
 		// are valid and need to be handled correctly.
 
-		if(pos.mpNode != &value)
+		if (pos.mpNode != &value)
 		{
 			// Unlink item from old list.
 			intrusive_list_node& oldNext = *value.mpNext;
@@ -927,18 +927,18 @@ namespace eastl
 	void intrusive_list<T>::splice(const_iterator pos, intrusive_list& x)
 	{
 		// Note: &x == this is prohibited, so self-insertion is not a problem.
-		if(x.mAnchor.mpNext != &x.mAnchor) // If the list 'x' isn't empty...
+		if (x.mAnchor.mpNext != &x.mAnchor) // If the list 'x' isn't empty...
 		{
-			node_type& next       = *const_cast<node_type*>(pos.mpNode);
-			node_type& prev       = *static_cast<node_type*>(next.mpPrev);
+			node_type& next = *const_cast<node_type*>(pos.mpNode);
+			node_type& prev = *static_cast<node_type*>(next.mpPrev);
 			node_type& insertPrev = *static_cast<node_type*>(x.mAnchor.mpNext);
 			node_type& insertNext = *static_cast<node_type*>(x.mAnchor.mpPrev);
 
-			prev.mpNext       = &insertPrev;
+			prev.mpNext = &insertPrev;
 			insertPrev.mpPrev = &prev;
 			insertNext.mpNext = &next;
-			next.mpPrev       = &insertNext;
-			x.mAnchor.mpPrev  = x.mAnchor.mpNext = &x.mAnchor;
+			next.mpPrev = &insertNext;
+			x.mAnchor.mpPrev = x.mAnchor.mpNext = &x.mAnchor;
 		}
 	}
 
@@ -957,7 +957,7 @@ namespace eastl
 
 		iterator ii(const_cast<node_type*>(i.mpNode)); // Make a temporary non-const version.
 
-		if(pos != ii)
+		if (pos != ii)
 		{
 			// Unlink item from old list.
 			intrusive_list_node& oldNext = *ii.mpNode->mpNext;
@@ -981,7 +981,7 @@ namespace eastl
 	void intrusive_list<T>::splice(const_iterator pos, intrusive_list& /*x*/, const_iterator first, const_iterator last)
 	{
 		// Note: &x == this is prohibited, so self-insertion is not a problem.
-		if(first != last)
+		if (first != last)
 		{
 			node_type& insertPrev = *const_cast<node_type*>(first.mpNode);
 			node_type& insertNext = *static_cast<node_type*>(last.mpNode->mpPrev);
@@ -994,10 +994,10 @@ namespace eastl
 			node_type& next = *const_cast<node_type*>(pos.mpNode);
 			node_type& prev = *static_cast<node_type*>(next.mpPrev);
 
-			prev.mpNext       = &insertPrev;
+			prev.mpNext = &insertPrev;
 			insertPrev.mpPrev = &prev;
 			insertNext.mpNext = &next;
-			next.mpPrev       = &insertNext;
+			next.mpPrev = &insertNext;
 		}
 	}
 
@@ -1010,25 +1010,25 @@ namespace eastl
 		prev.mpNext = &next;
 		next.mpPrev = &prev;
 
-		#if EASTL_VALIDATE_INTRUSIVE_LIST
-			value.mpPrev = value.mpNext = NULL;
-		#endif
+#if EASTL_VALIDATE_INTRUSIVE_LIST
+		value.mpPrev = value.mpNext = NULL;
+#endif
 	}
 
 
 	template <typename T>
 	void intrusive_list<T>::merge(this_type& x)
 	{
-		if(this != &x)
+		if (this != &x)
 		{
 			iterator       first(begin());
 			iterator       firstX(x.begin());
 			const iterator last(end());
 			const iterator lastX(x.end());
 
-			while((first != last) && (firstX != lastX))
+			while ((first != last) && (firstX != lastX))
 			{
-				if(*firstX < *first)
+				if (*firstX < *first)
 				{
 					iterator next(firstX);
 
@@ -1039,7 +1039,7 @@ namespace eastl
 					++first;
 			}
 
-			if(firstX != lastX)
+			if (firstX != lastX)
 				splice(last, x, firstX, lastX);
 		}
 	}
@@ -1049,16 +1049,16 @@ namespace eastl
 	template <typename Compare>
 	void intrusive_list<T>::merge(this_type& x, Compare compare)
 	{
-		if(this != &x)
+		if (this != &x)
 		{
 			iterator       first(begin());
 			iterator       firstX(x.begin());
 			const iterator last(end());
 			const iterator lastX(x.end());
 
-			while((first != last) && (firstX != lastX))
+			while ((first != last) && (firstX != lastX))
 			{
-				if(compare(*firstX, *first))
+				if (compare(*firstX, *first))
 				{
 					iterator next(firstX);
 
@@ -1069,7 +1069,7 @@ namespace eastl
 					++first;
 			}
 
-			if(firstX != lastX)
+			if (firstX != lastX)
 				splice(last, x, firstX, lastX);
 		}
 	}
@@ -1081,13 +1081,13 @@ namespace eastl
 		iterator       first(begin());
 		const iterator last(end());
 
-		if(first != last)
+		if (first != last)
 		{
 			iterator next(first);
 
-			while(++next != last)
+			while (++next != last)
 			{
-				if(*first == *next)
+				if (*first == *next)
 					erase(next);
 				else
 					first = next;
@@ -1104,13 +1104,13 @@ namespace eastl
 		iterator       first(begin());
 		const iterator last(end());
 
-		if(first != last)
+		if (first != last)
 		{
 			iterator next(first);
 
-			while(++next != last)
+			while (++next != last)
 			{
-				if(predicate(*first, *next))
+				if (predicate(*first, *next))
 					erase(next);
 				else
 					first = next;
@@ -1132,8 +1132,8 @@ namespace eastl
 		// if((i != end()) && (++i != end())) // If the size is >= 2 (without calling the more expensive size() function)...
 
 		// Faster, more inlinable version of the 'if' statement:
-		if((static_cast<node_type*>(mAnchor.mpNext) != &mAnchor) &&
-		   (static_cast<node_type*>(mAnchor.mpNext) != static_cast<node_type*>(mAnchor.mpPrev)))
+		if ((static_cast<node_type*>(mAnchor.mpNext) != &mAnchor) &&
+			(static_cast<node_type*>(mAnchor.mpNext) != static_cast<node_type*>(mAnchor.mpPrev)))
 		{
 			// Split the array into 2 roughly equal halves.
 			this_type leftList;     // This should cause no memory allocation.
@@ -1143,15 +1143,15 @@ namespace eastl
 			// this is to iterate from the base node both forwards and backwards with two 
 			// iterators and stop when they meet each other. Recall that our size() function 
 			// is not O(1) but is instead O(n), at least when EASTL_LIST_SIZE_CACHE is disabled.
-			#if EASTL_LIST_SIZE_CACHE
-				iterator mid(begin());
-				eastl::advance(mid, size() / 2);
-			#else
-				iterator mid(begin()), tail(end());
+#if EASTL_LIST_SIZE_CACHE
+			iterator mid(begin());
+			eastl::advance(mid, size() / 2);
+#else
+			iterator mid(begin()), tail(end());
 
-				while((mid != tail) && (++mid != tail))
-					--tail;
-			#endif
+			while ((mid != tail) && (++mid != tail))
+				--tail;
+#endif
 
 			// Move the left half of this into leftList and the right half into rightList.
 			leftList.splice(leftList.begin(), *this, begin(), mid);
@@ -1181,8 +1181,8 @@ namespace eastl
 		// if((i != end()) && (++i != end())) // If the size is >= 2 (without calling the more expensive size() function)...
 
 		// Faster, more inlinable version of the 'if' statement:
-		if((static_cast<node_type*>(mAnchor.mpNext) != &mAnchor) &&
-		   (static_cast<node_type*>(mAnchor.mpNext) != static_cast<node_type*>(mAnchor.mpPrev)))
+		if ((static_cast<node_type*>(mAnchor.mpNext) != &mAnchor) &&
+			(static_cast<node_type*>(mAnchor.mpNext) != static_cast<node_type*>(mAnchor.mpPrev)))
 		{
 			// Split the array into 2 roughly equal halves.
 			this_type leftList;     // This should cause no memory allocation.
@@ -1192,15 +1192,15 @@ namespace eastl
 			// this is to iterate from the base node both forwards and backwards with two 
 			// iterators and stop when they meet each other. Recall that our size() function 
 			// is not O(1) but is instead O(n), at least when EASTL_LIST_SIZE_CACHE is disabled.
-			#if EASTL_LIST_SIZE_CACHE
-				iterator mid(begin());
-				eastl::advance(mid, size() / 2);
-			#else
-				iterator mid(begin()), tail(end());
+#if EASTL_LIST_SIZE_CACHE
+			iterator mid(begin());
+			eastl::advance(mid, size() / 2);
+#else
+			iterator mid(begin()), tail(end());
 
-				while((mid != tail) && (++mid != tail))
-					--tail;
-			#endif
+			while ((mid != tail) && (++mid != tail))
+				--tail;
+#endif
 
 			// Move the left half of this into leftList and the right half into rightList.
 			leftList.splice(leftList.begin(), *this, begin(), mid);
@@ -1222,14 +1222,14 @@ namespace eastl
 	{
 		// To do: Come up with a more efficient mechanism of doing this.
 
-		for(const_iterator temp = begin(), tempEnd = end(); temp != tempEnd; ++temp)
+		for (const_iterator temp = begin(), tempEnd = end(); temp != tempEnd; ++temp)
 		{
-			if(temp == i)
+			if (temp == i)
 				return (isf_valid | isf_current | isf_can_dereference);
 		}
 
-		if(i == end())
-			return (isf_valid | isf_current); 
+		if (i == end())
+			return (isf_valid | isf_current);
 
 		return isf_none;
 	}
@@ -1244,12 +1244,12 @@ namespace eastl
 	bool operator==(const intrusive_list<T>& a, const intrusive_list<T>& b)
 	{
 		// If we store an mSize member for intrusive_list, we want to take advantage of it here.
-		typename intrusive_list<T>::const_iterator ia   = a.begin();
-		typename intrusive_list<T>::const_iterator ib   = b.begin();
+		typename intrusive_list<T>::const_iterator ia = a.begin();
+		typename intrusive_list<T>::const_iterator ib = b.begin();
 		typename intrusive_list<T>::const_iterator enda = a.end();
 		typename intrusive_list<T>::const_iterator endb = b.end();
 
-		while((ia != enda) && (ib != endb) && (*ia == *ib))
+		while ((ia != enda) && (ib != endb) && (*ia == *ib))
 		{
 			++ia;
 			++ib;

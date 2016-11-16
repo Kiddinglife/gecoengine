@@ -12,16 +12,16 @@
  *
  */
 
-/**
- * Created on 22 April 2016 by Jake Zhang
- * Reviewed on 07 May 2016 by Jakze Zhang
- */
+ /**
+  * Created on 22 April 2016 by Jake Zhang
+  * Reviewed on 07 May 2016 by Jakze Zhang
+  */
 
 #ifndef __INCLUDE_MSG_DEFINES_H
 #define __INCLUDE_MSG_DEFINES_H
 
-// this header includes <windows.h> that has vialations with wsock2.h. Therefor
-// must be placed in the first place otherwise complie errors related to  wsock2.h
+  // this header includes <windows.h> that has vialations with wsock2.h. Therefor
+  // must be placed in the first place otherwise complie errors related to  wsock2.h
 #include "../protocol/geco-net-common.h" 
 #include "../protocol/geco-net-msg.h"
 #include "../common/geco-plateform.h"
@@ -61,24 +61,24 @@ static const int WN_PACKET_SIZE = 0x10000;
 typedef uint TimeStamp;
 typedef int entity_id;
 const uchar ENTITY_DEF_INIT_FLG = 0;
-const entity_id NULL_ENTITY = ((entity_id) 0);
+const entity_id NULL_ENTITY = ((entity_id)0);
 //! Server (0, 0x20000000)
-const entity_id MIN_SERVER_ENTITY = ((entity_id) 0);
-const entity_id MAX_SERVER_ENTITY = ((entity_id) 0x20000000);
+const entity_id MIN_SERVER_ENTITY = ((entity_id)0);
+const entity_id MAX_SERVER_ENTITY = ((entity_id)0x20000000);
 //! Client (0x1FFFFFFF, 0x40000000)
-const entity_id MIN_CLIENT_ENTITY = ((entity_id) 0x1FFFFFFF);
-const entity_id MAX_CLIENT_ENTITY = ((entity_id) 0x40000000);
+const entity_id MIN_CLIENT_ENTITY = ((entity_id)0x1FFFFFFF);
+const entity_id MAX_CLIENT_ENTITY = ((entity_id)0x40000000);
 //! Global (0x3FFFFFFF, 0x7FFFFFFF)
-const entity_id MIN_GLOBAL_ENTITY = ((entity_id) 0x3FFFFFFF);
-const entity_id MAX_GLOBAL_ENTITY = ((entity_id) 0x7FFFFFFF);
+const entity_id MIN_GLOBAL_ENTITY = ((entity_id)0x3FFFFFFF);
+const entity_id MAX_GLOBAL_ENTITY = ((entity_id)0x7FFFFFFF);
 typedef int SpaceID;
-const SpaceID NULL_SPACE = ((SpaceID) 0);
+const SpaceID NULL_SPACE = ((SpaceID)0);
 //! Server (0, 0x40000000)
-const SpaceID MIN_SERVER_SPACE = ((SpaceID) 0);
-const SpaceID MAX_SERVER_SPACE = ((SpaceID) 0x40000000);
+const SpaceID MIN_SERVER_SPACE = ((SpaceID)0);
+const SpaceID MAX_SERVER_SPACE = ((SpaceID)0x40000000);
 //! Global (0x3FFFFFFF, 0x7FFFFFFF)
-const SpaceID MIN_GLOBAL_SPACE = ((SpaceID) 0x3FFFFFFF);
-const SpaceID MAX_GLOBAL_SPACE = ((SpaceID) 0x7FFFFFFF);
+const SpaceID MIN_GLOBAL_SPACE = ((SpaceID)0x3FFFFFFF);
+const SpaceID MAX_GLOBAL_SPACE = ((SpaceID)0x7FFFFFFF);
 typedef int CellAppID;
 typedef int BaseAppID;
 typedef uint SessionKey;
@@ -141,126 +141,126 @@ inline const char * NetReasonToString(GECONetReason reason)
 
 struct msg_fixed_t // 4 BYTES
 {
-		uchar m_uiIdentifier;
-		uchar m_cFlags;
-		ushort len;
-		uint m_iReplyID;
-		//GECONetNub *m_pkNub;
-		//GECONetChannel *m_pkChannel;
-		//msg_fixed_t() :
-		//	m_uiIdentifier(0), m_cFlags(0),
-		//	m_iReplyID(UINT32_MAX), m_iLength(0), m_pkNub(NULL), m_pkChannel(NULL)
-		//{}
-		//const char *MsgName() const;
+	uchar m_uiIdentifier;
+	uchar m_cFlags;
+	ushort len;
+	uint m_iReplyID;
+	//GECONetNub *m_pkNub;
+	//GECONetChannel *m_pkChannel;
+	//msg_fixed_t() :
+	//	m_uiIdentifier(0), m_cFlags(0),
+	//	m_iReplyID(UINT32_MAX), m_iLength(0), m_pkNub(NULL), m_pkChannel(NULL)
+	//{}
+	//const char *MsgName() const;
 };
 struct my_addr
 {
-		sockaddrunion su;
-		ushort m_uiSalt;
+	sockaddrunion su;
+	ushort m_uiSalt;
 };
 typedef my_addr space_entry_id;
 struct entity_mb
 {
-		entity_id m_iID;
-		my_addr m_kAddr;
+	entity_id m_iID;
+	my_addr m_kAddr;
 
-		enum Component
-		{
-			CELL = 0, BASE = 1, GLOBAL = 2,
-		};
+	enum Component
+	{
+		CELL = 0, BASE = 1, GLOBAL = 2,
+	};
 
-		Component GetComponent() const
-		{
-			return (Component) (m_kAddr.m_uiSalt >> 13);
-		}
-		void SetComponent(Component c)
-		{
-			m_kAddr.m_uiSalt = GetType() | (ushort(c) << 13);
-		}
+	Component GetComponent() const
+	{
+		return (Component)(m_kAddr.m_uiSalt >> 13);
+	}
+	void SetComponent(Component c)
+	{
+		m_kAddr.m_uiSalt = GetType() | (ushort(c) << 13);
+	}
 
-		entity_type GetType() const
-		{
-			return m_kAddr.m_uiSalt & 0x1FFF;
-		}
-		void SetType(entity_type t)
-		{
-			m_kAddr.m_uiSalt = (m_kAddr.m_uiSalt & 0xE000) | t;
-		}
+	entity_type GetType() const
+	{
+		return m_kAddr.m_uiSalt & 0x1FFF;
+	}
+	void SetType(entity_type t)
+	{
+		m_kAddr.m_uiSalt = (m_kAddr.m_uiSalt & 0xE000) | t;
+	}
 
-		void Init()
-		{
-			m_iID = 0;
-			memset(&m_kAddr, 0, sizeof(my_addr));
-		}
+	void Init()
+	{
+		m_iID = 0;
+		memset(&m_kAddr, 0, sizeof(my_addr));
+	}
 
-		void Init(entity_id i, const my_addr& a, Component c, entity_type t)
-		{
-			m_iID = i;
-			m_kAddr = a;
-			m_kAddr.m_uiSalt = (ushort(c) << 13) | t;
-		}
+	void Init(entity_id i, const my_addr& a, Component c, entity_type t)
+	{
+		m_iID = i;
+		m_kAddr = a;
+		m_kAddr.m_uiSalt = (ushort(c) << 13) | t;
+	}
 
-		entity_mb()
-		{
-			SetType(INVALID_ENTITY_TYPE_ID);
-			Init();
-		}
+	entity_mb()
+	{
+		SetType(INVALID_ENTITY_TYPE_ID);
+		Init();
+	}
 };
 struct interface_listener_msg
 {
-		sockaddrunion su; //always network endian
-		ushort uiUserID;
-		char kName[MAX_IPADDR_STR_LEN];
+	sockaddrunion su; //always network endian
+	ushort uiUserID;
+	char kName[MAX_IPADDR_STR_LEN];
 
-		interface_listener_msg(sockaddrunion& su_, ushort uiUserID_,
-				char* kName) :
-				su(su_), uiUserID(uiUserID_)
-		{
-			strncpy(kName, kName, MAX_IPADDR_STR_LEN);
-		}
-		interface_listener_msg()
-		{
-			kName[0] = 0;
-			uiUserID = 1;
-			memset(&su, 0, sizeof(sockaddrunion));
-		}
+	interface_listener_msg(sockaddrunion& su_, ushort uiUserID_,
+		char* kName) :
+		su(su_), uiUserID(uiUserID_)
+	{
+		strncpy(kName, kName, MAX_IPADDR_STR_LEN);
+	}
+	interface_listener_msg()
+	{
+		kName[0] = 0;
+		uiUserID = 1;
+		memset(&su, 0, sizeof(sockaddrunion));
+	}
 };
 struct bits_opt_t //FvCapabilities
 {
-		static const unsigned int ms_uiMaxCap =
-				std::numeric_limits<uint>::digits - 1;
-		uint m_uiCaps;
-		bits_opt_t() :
-				m_uiCaps(0)
-		{
-		}
+	static const unsigned int ms_uiMaxCap =
+		std::numeric_limits<uint>::digits - 1;
+	uint m_uiCaps;
+	bits_opt_t() :
+		m_uiCaps(0)
+	{
+	}
 
-		void Add(unsigned int cap)
-		{
-			m_uiCaps |= 1 << cap;
-		}
+	void Add(unsigned int cap)
+	{
+		m_uiCaps |= 1 << cap;
+	}
 
-		bool Has(unsigned int cap) const
-		{
-			return !!(m_uiCaps & (1 << cap));
-		}
+	bool Has(unsigned int cap) const
+	{
+		return !!(m_uiCaps & (1 << cap));
+	}
 
-		bool Empty() const
-		{
-			return m_uiCaps == 0;
-		}
+	bool Empty() const
+	{
+		return m_uiCaps == 0;
+	}
 
-		bool Match(const bits_opt_t& on, const bits_opt_t& off) const
-		{
-			return (on.m_uiCaps & m_uiCaps) == on.m_uiCaps
-					&& (off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
-		}
+	bool Match(const bits_opt_t& on, const bits_opt_t& off) const
+	{
+		return (on.m_uiCaps & m_uiCaps) == on.m_uiCaps
+			&& (off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
+	}
 
-		bool MatchAny(const bits_opt_t& on, const bits_opt_t& off) const
-		{
-			return !!(on.m_uiCaps & m_uiCaps)
-					&& (off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
-		}
+	bool MatchAny(const bits_opt_t& on, const bits_opt_t& off) const
+	{
+		return !!(on.m_uiCaps & m_uiCaps)
+			&& (off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
+	}
 };
 
 inline bool operator==(const my_addr & a, const my_addr & b)
@@ -274,32 +274,32 @@ inline bool operator!=(const my_addr & a, const my_addr & b)
 inline geco_bit_stream_t& operator <<(geco_bit_stream_t &os, const my_addr &d)
 {
 	ushort salt = htons(d.m_uiSalt);
-	os.WriteRaw((uchar*) &d.su, sizeof(sockaddrunion));
+	os.WriteRaw((uchar*)&d.su, sizeof(sockaddrunion));
 	os.Write(salt);
 	return os;
 }
-inline geco_bit_stream_t& operator >>(geco_bit_stream_t &is, my_addr &d)
+inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is, my_addr &d)
 {
 	ushort salt;
-	is.ReadRaw((uchar*) &d.su, sizeof(sockaddrunion));
+	is.ReadRaw((uchar*)&d.su, sizeof(sockaddrunion));
 	is.Read(salt);
 	d.m_uiSalt = ntohs(salt);
 	return is;
 }
 inline geco_bit_stream_t& operator <<(geco_bit_stream_t &os,
-		const interface_listener_msg &d)
+	const interface_listener_msg &d)
 {
 	ushort ns = htons(d.uiUserID);
-	os.WriteRaw((uchar*) &d.su, sizeof(sockaddrunion));
+	os.WriteRaw((uchar*)&d.su, sizeof(sockaddrunion));
 	os.Write(ns);
 	os.Write(d.kName);
 	return os;
 }
-inline geco_bit_stream_t& operator >>(geco_bit_stream_t &is,
-		interface_listener_msg &d)
+inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is,
+	interface_listener_msg &d)
 {
 	ushort ns;
-	is.ReadRaw((uchar*) &d.su, sizeof(sockaddrunion));
+	is.ReadRaw((uchar*)&d.su, sizeof(sockaddrunion));
 	is.Read(ns);
 	is.Read(d.kName);
 	d.uiUserID = ntohs(ns);
@@ -312,11 +312,11 @@ inline geco_bit_stream_t& operator <<(geco_bit_stream_t &os, const entity_mb &d)
 	os.Write(entitid);
 	return os;
 }
-inline geco_bit_stream_t& operator >>(geco_bit_stream_t &is, entity_mb &d)
+inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is, entity_mb &d)
 {
 	is >> d.m_kAddr;
 	int entitid;
-	is.ReadRaw((uchar*) &d.m_kAddr.su, sizeof(sockaddrunion));
+	is.ReadRaw((uchar*)&d.m_kAddr.su, sizeof(sockaddrunion));
 	is.Read(entitid);
 	d.m_iID = ntohl(entitid);
 	return is;
@@ -362,81 +362,81 @@ const char INVALID_MESSAGE = 2;
  */
 struct GECOAPI msg_handler_t
 {
-		static const msg_handler_t REPLY;
-		uint hdr_len_;
-		uint nominal_body_size_;
-		msg_id id_; ///< Unique message ID
-		uchar lengthStyle_;	///< Fixed or variable length
-		uint lengthParam_;	///< This depends on lengthStyle
-		const char *name_;	///< The name of the interface method
-		msg_handler_cb pHandler_; /// msg handler
+	static const msg_handler_t REPLY;
+	uint hdr_len_;
+	uint nominal_body_size_;
+	msg_id id_; ///< Unique message ID
+	uchar lengthStyle_;	///< Fixed or variable length
+	uint lengthParam_;	///< This depends on lengthStyle
+	const char *name_;	///< The name of the interface method
+	msg_handler_cb pHandler_; /// msg handler
 
-		msg_handler_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
-				INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
-				NULL) :
-				id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
-						name), pHandler_(pHandler)
+	msg_handler_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
+		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
+		NULL) :
+		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
+			name), pHandler_(pHandler)
+	{
+		if (lengthStyle_ == FIXED_LENGTH_MESSAGE)
 		{
-			if (lengthStyle_ == FIXED_LENGTH_MESSAGE)
-			{
-				hdr_len_ = sizeof(msg_id);
-				nominal_body_size_ = lengthParam_;
-			}
-			else if (lengthStyle_ == VARIABLE_LENGTH_MESSAGE)
-			{
-				hdr_len_ = lengthParam_ + sizeof(msg_id);
-				nominal_body_size_ = 0;
-			}
-			else
-			{
-				hdr_len_ = 0;
-				nominal_body_size_ = 0;
-			}
-
+			hdr_len_ = sizeof(msg_id);
+			nominal_body_size_ = lengthParam_;
+		}
+		else if (lengthStyle_ == VARIABLE_LENGTH_MESSAGE)
+		{
+			hdr_len_ = lengthParam_ + sizeof(msg_id);
+			nominal_body_size_ = 0;
+		}
+		else
+		{
+			hdr_len_ = 0;
+			nominal_body_size_ = 0;
 		}
 
-		void Set(const char * name, msg_id id, uchar lengthStyle,
-				int lengthParam)
-		{
-			id_ = id;
-			lengthStyle_ = lengthStyle;
-			lengthParam_ = lengthParam;
-			name_ = name;
-		}
-		/**
-		 *  This method returns the number of bytes occupied by a header
-		 *  for this type of message.
-		 *
-		 *  @return Number of bytes needed for this header.
-		 */
-		uint read_hdr_len() const
-		{
-			return hdr_len_;
-		}
-		/**
-		 *  This method returns the number of bytes nominally occupied by the body
-		 *  of this type of message.
-		 *
-		 *  @return Number of bytes.
-		 */
-		uint nominalBodySize() const
-		{
-			// never guesses for variable-length messages
-			return (lengthStyle_ == FIXED_LENGTH_MESSAGE) ? lengthParam_ : 0;
-		}
-		bool is_valid_len(uint length) const
-		{
-			return (lengthStyle_ != VARIABLE_LENGTH_MESSAGE)
-					|| (length > 0
-							&& length < (uint) ((1 << (8 * lengthParam_)) - 1));
-		}
+	}
 
-		const char* c_str() const
-		{
-			static char buf[128];
-			snprintf(buf, sizeof(buf), "%s/%u", name_, id_);
-			return buf;
-		}
+	void Set(const char * name, msg_id id, uchar lengthStyle,
+		int lengthParam)
+	{
+		id_ = id;
+		lengthStyle_ = lengthStyle;
+		lengthParam_ = lengthParam;
+		name_ = name;
+	}
+	/**
+	 *  This method returns the number of bytes occupied by a header
+	 *  for this type of message.
+	 *
+	 *  @return Number of bytes needed for this header.
+	 */
+	uint read_hdr_len() const
+	{
+		return hdr_len_;
+	}
+	/**
+	 *  This method returns the number of bytes nominally occupied by the body
+	 *  of this type of message.
+	 *
+	 *  @return Number of bytes.
+	 */
+	uint nominalBodySize() const
+	{
+		// never guesses for variable-length messages
+		return (lengthStyle_ == FIXED_LENGTH_MESSAGE) ? lengthParam_ : 0;
+	}
+	bool is_valid_len(uint length) const
+	{
+		return (lengthStyle_ != VARIABLE_LENGTH_MESSAGE)
+			|| (length > 0
+				&& length < (uint)((1 << (8 * lengthParam_)) - 1));
+	}
+
+	const char* c_str() const
+	{
+		static char buf[128];
+		snprintf(buf, sizeof(buf), "%s/%u", name_, id_);
+		return buf;
+	}
 };
 /////////////////////////////////////// msg_handler_t ends ////////////////////////////////////
 
@@ -451,7 +451,41 @@ struct FvNetDataField
 	char *m_pcBeg;
 	ushort m_uiLength;
 };
-
 /////////////////////////////////////// packet ends ////////////////////////////////////
 
+
+/////////////////////////////////////// nub module ////////////////////////////////////
+/**
+*	This class is used to collect statistics about packet_receiver_t .
+*/
+#include "../math/stat_rate_of_change.h"
+struct packet_receiver_stats_t
+{
+	typedef intrusive_stat_rate_of_change_t< unsigned int > stat;
+	stat::container_type* pStats_;
+
+	stat numBytesReceived_;
+	stat numPacketsReceived_;
+	stat numDuplicatePacketsReceived_;
+	stat numPacketsReceivedOffChannel_;
+	stat numBundlesReceived_;
+	stat numMessagesReceived_;
+	stat numOverheadBytesReceived_;
+	stat numCorruptedPacketsReceived_;
+	stat numCorruptedBundlesReceived_;
+
+	uint64	lastGatherTime_;
+	int		lastTxQueueSize_;
+	int		lastRxQueueSize_;
+	int		maxTxQueueSize_;
+	int		maxRxQueueSize_;
+
+#if ENABLE_WATCHERS
+	static WatcherPtr pWatcher();
+	//ProfileVal	mercuryTimer_;
+	//ProfileVal	systemTimer_;
+#endif // ENABLE_WATCHERS
+
+};
+/////////////////////////////////////// nub module ////////////////////////////////////
 #endif

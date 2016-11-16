@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit-tests", "unit-tests\un
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "protocol", "protocol\protocol.vcxproj", "{A1B4B6A8-5038-4A8E-80D4-55731987760F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geco-engine-math", "geco-engine-mah\geco-engine-mah.vcxproj", "{210353A6-A8E8-48E7-92F6-7EF2522274BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -68,6 +70,18 @@ Global
 		{A1B4B6A8-5038-4A8E-80D4-55731987760F}.Release|Win32.Build.0 = Release|Win32
 		{A1B4B6A8-5038-4A8E-80D4-55731987760F}.Release|x64.ActiveCfg = Release|x64
 		{A1B4B6A8-5038-4A8E-80D4-55731987760F}.Release|x64.Build.0 = Release|x64
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Debug|Win32.Build.0 = Debug|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Debug|x64.ActiveCfg = Debug|x64
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Debug|x64.Build.0 = Debug|x64
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Release|Win32.ActiveCfg = Release|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Release|Win32.Build.0 = Release|Win32
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Release|x64.ActiveCfg = Release|x64
+		{210353A6-A8E8-48E7-92F6-7EF2522274BA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
