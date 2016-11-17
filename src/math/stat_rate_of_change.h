@@ -124,7 +124,6 @@ public:
 	double getRateOfChange3() const { return this->getRateOfChange(3); }
 	double getRateOfChange4() const { return this->getRateOfChange(4); }
 
-private:
 	/**
 	*	This method changes this stat by the specified amount.
 	*/
@@ -157,8 +156,7 @@ struct intrusive_stat_rate_of_change_t :
 		public eastl::intrusive_list_node,
 		public stat_rate_of_change_t< TYPE >
 {
-	typedef eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>> container_type;
-	intrusive_stat_rate_of_change_t(container_type*& pContainer) {}
+	typedef  eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>> container_type;
 };
 
 #endif // STAT_WITH_RATES_OF_CHANGE_HPP

@@ -26,6 +26,7 @@
 #include "../protocol/geco-net-msg.h"
 #include "../common/geco-plateform.h"
 #include "../common/debugging/gecowatchert.h"
+#include "../common/ds/eastl/EASTL/vector.h"
 #include "callback_defines.h"
 #include <stdint.h>
 
@@ -455,44 +456,27 @@ struct FvNetDataField
 
 
 /////////////////////////////////////// stats module  ////////////////////////////////////
+#include "../common/ds/eastl/EASTL/utility.h"
 #include "../math/stat_rate_of_change.h"
-
-typedef intrusive_stat_rate_of_change_t< unsigned int > uint_stat;
-typedef eastl::pair< std::string, float > stat_entry_t;
-typedef eastl::vector< stat_entry_t > stat_entries_t;
-
-/**
- *	This method initialises a single stat instance.
- */
-void initRatesOfChangeForStat( const uint_stat & stat );
-
-/**
- *	This method initialises a collection of stat instances.
- */
-void initRatesOfChangeForStats( const uint_stat::container_type & stats );
-
-/**
- *	This method adds a Watcher that inspects the total value of a stat.
- */
-void addTotalWatcher(geco_watcher_base_t* pWatcher, const char * name, uint_stat & stat );
 
 /**
  *	This class is used to collect statistics about the connection.
  */
-struct connection_stats_t
+struct network_stats_t
 {
-	uint connection_id_;
-	uint_stat::container_type* pStats_;
+	typedef intrusive_stat_rate_of_change_t< uint> stat;
+	eastl::intrusive_list<stat>  pStats_;
+	geco_watcher_director_t pwatchers_;
 
-	uint_stat numBytesReceived_;
-	uint_stat numPacketsReceived_;
-	uint_stat numDuplicatePacketsReceived_;
-	uint_stat numPacketsReceivedOffChannel_;
-	uint_stat numBundlesReceived_;
-	uint_stat numMessagesReceived_;
-	uint_stat numOverheadBytesReceived_;
-	uint_stat numCorruptedPacketsReceived_;
-	uint_stat numCorruptedBundlesReceived_;
+	stat numBytesReceived_;
+	stat numPacketsReceived_;
+	stat numDuplicatePacketsReceived_;
+	stat numPacketsReceivedOffChannel_;
+	stat numBundlesReceived_;
+	stat numMessagesReceived_;
+	stat numOverheadBytesReceived_;
+	stat numCorruptedPacketsReceived_;
+	stat numCorruptedBundlesReceived_;
 
 	uint64	lastGatherTime_;
 	int		lastTxQueueSize_;
@@ -500,11 +484,10 @@ struct connection_stats_t
 	int		maxTxQueueSize_;
 	int		maxRxQueueSize_;
 
-	//static WatcherPtr pWatcher();
 	//ProfileVal	mercuryTimer_;
 	//ProfileVal	systemTimer_;
 
-	connection_stats_t(uint connid);
+	network_stats_t();
 
 	/**
 	 *	This method updates the statics associated with this connection
@@ -517,7 +500,7 @@ struct connection_stats_t
 	 *	This method updates the moving averages of the collected stats.
 	 *	elapsedTime in seconds
 	 */
-	void updateStatAverages( double elapsedTime );
+	void updateStatAverages(double elapsedTime);
 
 
 	/**
@@ -539,7 +522,7 @@ struct connection_stats_t
 	 */
 	double MessagesPerSecond() const
 	{
-		return numMessagesReceived_.getRateOfChange(0);
+		return numMessagesReceived_.getRateOfChange();
 	}
 };
 /////////////////////////////////////// stats module ////////////////////////////////////

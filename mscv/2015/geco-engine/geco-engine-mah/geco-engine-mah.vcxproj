@@ -101,7 +101,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).lib</OutputFile>
-      <AdditionalLibraryDirectories>../../../../src;../../../../thirdparty;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl/include/;../../../../thirdparty/log4cxx/src/main/include;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../../thirdparty;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl/include/;../../../../thirdparty/log4cxx/src/main/include;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>../../../../src/common/ds/eastl;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
