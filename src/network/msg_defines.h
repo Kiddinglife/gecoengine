@@ -454,57 +454,27 @@ struct FvNetDataField
 /////////////////////////////////////// packet ends ////////////////////////////////////
 
 
-/////////////////////////////////////// nub module ////////////////////////////////////
+/////////////////////////////////////// stats module  ////////////////////////////////////
 #include "../math/stat_rate_of_change.h"
 
+typedef intrusive_stat_rate_of_change_t< unsigned int > uint_stat;
 typedef eastl::pair< std::string, float > stat_entry_t;
 typedef eastl::vector< stat_entry_t > stat_entries_t;
-extern stat_entries_t entries_;
 
 /**
  *	This method initialises a single stat instance.
  */
-template <class TYPE>
-void initRatesOfChangeForStat( TYPE & stat )
-{
-	stat_entries_t::const_iterator iter = entries_.begin();
-	stat_entries_t::const_iterator end = entries_.end();
-	while (iter != end)
-	{
-		stat.monitorRateOfChange( iter->second );
-		++iter;
-	}
-}
+void initRatesOfChangeForStat( const uint_stat & stat );
 
 /**
  *	This method initialises a collection of stat instances.
  */
-template <class TYPE>
-void initRatesOfChangeForStats( const TYPE & stats )
-{
-	typename TYPE::const_iterator iter = stats.begin();
-	typename TYPE::const_iterator end = stats.end();
-	while (iter != end)
-	{
-		initRatesOfChangeForStat(*iter);
-		++iter;
-	}
-}
+void initRatesOfChangeForStats( const uint_stat::container_type & stats );
 
 /**
  *	This method adds a Watcher that inspects the total value of a stat.
  */
-template <class TYPE>
-void addTotalWatcher(geco_watcher_base_t* pWatcher, const char * name, TYPE & stat )
-{
-	char buf[ 256 ];
-	snprintf( buf, sizeof( buf ), "totals/%s", name );
-//	pWatcher->add_watcher( buf, new method_watcher_t<, OBJECT_TYPE>(rObject, getMethod,
-//            setMethod, path));
-}
-
-
-
+void addTotalWatcher(geco_watcher_base_t* pWatcher, const char * name, uint_stat & stat );
 
 /**
  *	This class is used to collect statistics about the connection.
@@ -512,19 +482,17 @@ void addTotalWatcher(geco_watcher_base_t* pWatcher, const char * name, TYPE & st
 struct connection_stats_t
 {
 	uint connection_id_;
+	uint_stat::container_type* pStats_;
 
-	typedef intrusive_stat_rate_of_change_t< unsigned int > stat;
-	stat::container_type* pStats_;
-
-	stat numBytesReceived_;
-	stat numPacketsReceived_;
-	stat numDuplicatePacketsReceived_;
-	stat numPacketsReceivedOffChannel_;
-	stat numBundlesReceived_;
-	stat numMessagesReceived_;
-	stat numOverheadBytesReceived_;
-	stat numCorruptedPacketsReceived_;
-	stat numCorruptedBundlesReceived_;
+	uint_stat numBytesReceived_;
+	uint_stat numPacketsReceived_;
+	uint_stat numDuplicatePacketsReceived_;
+	uint_stat numPacketsReceivedOffChannel_;
+	uint_stat numBundlesReceived_;
+	uint_stat numMessagesReceived_;
+	uint_stat numOverheadBytesReceived_;
+	uint_stat numCorruptedPacketsReceived_;
+	uint_stat numCorruptedBundlesReceived_;
 
 	uint64	lastGatherTime_;
 	int		lastTxQueueSize_;
@@ -574,5 +542,5 @@ struct connection_stats_t
 		return numMessagesReceived_.getRateOfChange(0);
 	}
 };
-/////////////////////////////////////// nub module ////////////////////////////////////
+/////////////////////////////////////// stats module ////////////////////////////////////
 #endif

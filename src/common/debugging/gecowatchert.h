@@ -1396,9 +1396,8 @@ geco_watcher_base_t* add_watcher(const char * path, OBJECT_TYPE & rObject,
 	static_cast<TYPE& (*)()>(rFUNC),			\
 	static_cast< void (*)(TYPE&)   >(wFUNC)
 
-#define CAST_METHOD_R( TYPE, CLASS, METHOD )					\
-	static_cast< TYPE& (CLASS::*)()>( NULL ),					\
-	static_cast< void (CLASS::*)(TYPE&)   >( &CLASS::METHOD )
+#define CAST_METHOD_R( TYPE, CLASS, rMETHOD)							\
+	static_cast< TYPE& (CLASS::*)() const>(&CLASS::rMETHOD)
 
 #define CAST_FUNC_R( TYPE, rFUNC )							\
 	static_cast<TYPE& (*)()>(rFUNC),			\
