@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <functional>
 #include <hash_map>
+#include <unordered_map>
 
 #include "gtest/gtest.h"
 #include "common/debugging/debug.h"
@@ -77,7 +78,7 @@ struct arg_type_key_comparaor
 #ifdef _WIN32
 std::unordered_map<arg_type_key, void*> channel_map_;
 #else
-std::tr1::unordered_map<arg_type_key, decoder_t, arg_type_key_hash_functor,
+std::unordered_map<arg_type_key, decoder_t, arg_type_key_hash_functor,
 		arg_type_key_comparaor> parsemap;
 #endif
 #define INT_TYPE 1

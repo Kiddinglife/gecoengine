@@ -30,18 +30,18 @@
 #include "timestamp.h"
 #include "debug.h"
 
-// 由此可得到系统profile时间
+// 锟缴此可得碉拷系统profile时锟斤拷
 extern uint64 runningTime();
 struct Profiles;
 struct Profile
 {
 	std::string            strName_;
 	Profiles*              pProfiles_;
-	int		   inProgress_;  	// 记录第几次处理, 如递归等
+	int		   inProgress_;  	// 锟斤拷录锟节硷拷锟轿达拷锟斤拷, 锟斤拷莨锟斤拷
 	bool                    initWatcher_;
 
 	static time_stamp_t warningPeriod_;
-	time_stamp_t		   sumTime_;                       	// count_次的总时间
+	time_stamp_t		   sumTime_;                       	// count_锟轿碉拷锟斤拷时锟斤拷
 	time_stamp_t          sumInternalTime_; 	 /// Total time counted
 	time_stamp_t          lastTime_;                   /// time after start
 	time_stamp_t          lastInternalTime_; 	/// the last internal time
@@ -55,68 +55,68 @@ struct Profile
 
 	void start(void);
 	void stop(unsigned int qty = 0);
-	bool Profile::initializeWatcher(void)
+	bool initializeWatcher(void)
 	{
-		VERBOSE_MSG("Profile::initializeWatcher()\n");
+		//VERBOSE_MSG("initializeWatcher()\n");
 		return true;
 	}
-	void Profile::stop1(const char * filename, int lineNum, unsigned int qty = 0)
+	void stop1(const char * filename, int lineNum, unsigned int qty = 0)
 	{
 		this->stop(qty);
 		if (isTooLong())
 		{
-			WARNING_MSG("{%s}:{%d}: Profile {%s} took {:.2f} seconds\n", filename, lineNum, strName_.c_str(), stamps2sec(lastTime_));
+			//WARNING_MSG("{%s}:{%d}: Profile {%s} took {%.2f} seconds\n", filename, lineNum, strName_.c_str(), stamps2sec(lastTime_));
 		}
 	}
-	bool Profile::running() const
+	bool running() const
 	{
 		return inProgress_ > 0;
 	}
-	const char * Profile::c_str() const
+	const char * c_str() const
 	{
 		return strName_.c_str();
 	}
-	bool Profile::isTooLong() const
+	bool isTooLong() const
 	{
 		return !this->running() && (lastTime_ > warningPeriod_);
 	}
-	const time_stamp_t& Profile::sumTime() const
+	const time_stamp_t& sumTime() const
 	{
 		return sumTime_;
 	}
-	const time_stamp_t& Profile::lastIntTime() const
+	const time_stamp_t& lastIntTime() const
 	{
 		return lastInternalTime_;
 	}
-	const time_stamp_t& Profile::sumIntTime() const
+	const time_stamp_t& sumIntTime() const
 	{
 		return sumInternalTime_;
 	}
-	const time_stamp_t Profile::lastTime() const
+	const time_stamp_t lastTime() const
 	{
 		return this->running() ? time_stamp_t(0) : lastTime_;
 	}
-	double Profile::lastTimeInSeconds() const
+	double lastTimeInSeconds() const
 	{
 		return stamps2sec(lastTime_);
 	}
-	double Profile::sumTimeInSeconds() const
+	double sumTimeInSeconds() const
 	{
 		return stamps2sec(sumTime_);
 	}
-	double Profile::lastIntTimeInSeconds() const
+	double lastIntTimeInSeconds() const
 	{
 		return stamps2sec(lastInternalTime_);
 	}
-	double Profile::sumIntTimeInSeconds() const
+	double sumIntTimeInSeconds() const
 	{
 		return stamps2sec(sumInternalTime_);
 	}
-	const char* Profile::name() const
+	const char* name() const
 	{
 		return this->strName_.c_str();
 	}
-	unsigned int Profile::count() const
+	unsigned int count() const
 	{
 		return stopCounts_;
 	}

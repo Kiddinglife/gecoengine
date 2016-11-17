@@ -455,12 +455,64 @@ struct FvNetDataField
 
 
 /////////////////////////////////////// nub module ////////////////////////////////////
-/**
-*	This class is used to collect statistics about packet_receiver_t .
-*/
 #include "../math/stat_rate_of_change.h"
-struct packet_receiver_stats_t
+
+typedef eastl::pair< std::string, float > stat_entry_t;
+typedef eastl::vector< stat_entry_t > stat_entries_t;
+extern stat_entries_t entries_;
+
+/**
+ *	This method initialises a single stat instance.
+ */
+template <class TYPE>
+void initRatesOfChangeForStat( TYPE & stat )
 {
+	stat_entries_t::const_iterator iter = entries_.begin();
+	stat_entries_t::const_iterator end = entries_.end();
+	while (iter != end)
+	{
+		stat.monitorRateOfChange( iter->second );
+		++iter;
+	}
+}
+
+/**
+ *	This method initialises a collection of stat instances.
+ */
+template <class TYPE>
+void initRatesOfChangeForStats( const TYPE & stats )
+{
+	typename TYPE::const_iterator iter = stats.begin();
+	typename TYPE::const_iterator end = stats.end();
+	while (iter != end)
+	{
+		initRatesOfChangeForStat(*iter);
+		++iter;
+	}
+}
+
+/**
+ *	This method adds a Watcher that inspects the total value of a stat.
+ */
+template <class TYPE>
+void addTotalWatcher(geco_watcher_base_t* pWatcher, const char * name, TYPE & stat )
+{
+	char buf[ 256 ];
+	snprintf( buf, sizeof( buf ), "totals/%s", name );
+//	pWatcher->add_watcher( buf, new method_watcher_t<, OBJECT_TYPE>(rObject, getMethod,
+//            setMethod, path));
+}
+
+
+
+
+/**
+ *	This class is used to collect statistics about the connection.
+ */
+struct connection_stats_t
+{
+	uint connection_id_;
+
 	typedef intrusive_stat_rate_of_change_t< unsigned int > stat;
 	stat::container_type* pStats_;
 
@@ -480,12 +532,47 @@ struct packet_receiver_stats_t
 	int		maxTxQueueSize_;
 	int		maxRxQueueSize_;
 
-#if ENABLE_WATCHERS
-	static WatcherPtr pWatcher();
+	//static WatcherPtr pWatcher();
 	//ProfileVal	mercuryTimer_;
 	//ProfileVal	systemTimer_;
-#endif // ENABLE_WATCHERS
 
+	connection_stats_t(uint connid);
+
+	/**
+	 *	This method updates the statics associated with this connection
+	 *	@TODO register a repeated timer with interval one sec for this function
+	 *	instead of test time slap
+	 */
+	void update_stats();
+
+	/**
+	 *	This method updates the moving averages of the collected stats.
+	 *	elapsedTime in seconds
+	 */
+	void updateStatAverages( double elapsedTime );
+
+
+	/**
+	 *	This method returns the current bits per second received.
+	 */
+	double BitsPerSecond() const
+	{
+		return numBytesReceived_.getRateOfChange(0) * 8;
+	}
+	/**
+	 *	This method returns the current packets per second received.
+	 */
+	double PacketsPerSecond() const
+	{
+		return numPacketsReceived_.getRateOfChange(0);
+	}
+	/**
+	 *	This method returns the current messages per second received.
+	 */
+	double MessagesPerSecond() const
+	{
+		return numMessagesReceived_.getRateOfChange(0);
+	}
 };
 /////////////////////////////////////// nub module ////////////////////////////////////
 #endif

@@ -27,7 +27,7 @@
 #include "../common/debugging/timestamp.h"
 #include "../common/debugging/debug.h"
 #include "../common/ds/eastl/EASTL/vector.h"
-#include "../common/ds/eastl/EASTL/bonus/intrusive_slist.h"
+#include "../common/ds/eastl/EASTL/intrusive_list.h"
 
 /**
  *	This class is used to keep a statistic. The rate of change of this statistic is monitored.
@@ -91,7 +91,7 @@ public:
 	/**
 	*	This method returns the value of this stat.
 	*/
-	total() const
+	TYPE total() const
 	{
 		return val_;
 	}
@@ -100,7 +100,7 @@ public:
 	/**
 	*	This method returns the value of this stat at the last tick call.
 	*/
-	setTotal(TYPE total)
+	void setTotal(TYPE total)
 	{
 		val_ = total;
 	}
@@ -109,7 +109,7 @@ public:
 	*	This method returns a rate of change of this statistic. The rates of change
 	*	can vary based on their weightings.
 	*/
-	getRateOfChange(int index) const
+	double getRateOfChange(int index=0) const
 	{
 		return averages_[index].average();
 	}
@@ -128,7 +128,7 @@ private:
 	/**
 	*	This method changes this stat by the specified amount.
 	*/
-	add(TYPE value)
+	void add(TYPE value)
 	{
 		val_ += value;
 	}
@@ -136,7 +136,7 @@ private:
 	/**
 	*	This method reduces this stat by the specified amount.
 	*/
-	subtract(TYPE value)
+	void subtract(TYPE value)
 	{
 		val_ -= value;
 	}
@@ -144,7 +144,7 @@ private:
 	TYPE val_;
 	TYPE prev_val_;
 
-	typedef eastl::vector< ema_t_t > Averages;
+	typedef eastl::vector< ema_t > Averages;
 	Averages averages_;
 };
 
@@ -153,10 +153,12 @@ private:
  *	This class adds IntrusiveObject functionality to stat_rate_of_change_t.
  */
 template < class TYPE >
-struct intrusive_stat_rate_of_change_t : public stat_rate_of_change_t< TYPE >, public eastl::intrusive_list_node
+struct intrusive_stat_rate_of_change_t :
+		public eastl::intrusive_list_node,
+		public stat_rate_of_change_t< TYPE >
 {
-	typedef typename intrusive_slist<intrusive_stat_rate_of_change_t<TYPE>> container_type;
-	intrusive_stat_rate_of_change_t(Container *& pContainer) {}
+	typedef eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>> container_type;
+	intrusive_stat_rate_of_change_t(container_type*& pContainer) {}
 };
 
 #endif // STAT_WITH_RATES_OF_CHANGE_HPP
