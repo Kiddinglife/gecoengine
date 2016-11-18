@@ -91,7 +91,7 @@ public:
 	/**
 	*	This method returns the value of this stat.
 	*/
-	TYPE total() const
+	TYPE& total()
 	{
 		return val_;
 	}
@@ -100,7 +100,7 @@ public:
 	/**
 	*	This method returns the value of this stat at the last tick call.
 	*/
-	void setTotal(TYPE total)
+	void setTotal(TYPE& total)
 	{
 		val_ = total;
 	}
@@ -118,11 +118,11 @@ public:
 	template <int INDEX>
 	double getRateOfChangeT() const { return this->getRateOfChange(INDEX); }
 
-	double getRateOfChange0() const { return this->getRateOfChange(0); }
-	double getRateOfChange1() const { return this->getRateOfChange(1); }
-	double getRateOfChange2() const { return this->getRateOfChange(2); }
-	double getRateOfChange3() const { return this->getRateOfChange(3); }
-	double getRateOfChange4() const { return this->getRateOfChange(4); }
+	double& getRateOfChange0() { static double val; val = this->getRateOfChange(0); return val;}
+	double& getRateOfChange1() { static double val; val = this->getRateOfChange(1); return val;}
+	double& getRateOfChange2() { static double val; val = this->getRateOfChange(2); return val;}
+	double& getRateOfChange3() { static double val; val = this->getRateOfChange(3); return val;}
+	double& getRateOfChange4() { static double val; val = this->getRateOfChange(4); return val;}
 
 	/**
 	*	This method changes this stat by the specified amount.
@@ -156,7 +156,7 @@ struct intrusive_stat_rate_of_change_t :
 		public eastl::intrusive_list_node,
 		public stat_rate_of_change_t< TYPE >
 {
-	typedef  eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>> container_type;
+	typedef typename eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>> container_type;
 };
 
 #endif // STAT_WITH_RATES_OF_CHANGE_HPP

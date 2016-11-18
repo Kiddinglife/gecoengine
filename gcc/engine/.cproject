@@ -65,16 +65,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.lib.debug.556339875.303909277" name="/" resourcePath="src/common/ds/eastl/doc">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.lib.debug.2051210908" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.lib.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.1507154239" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug.943677616"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.1729432578" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.609385653"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.1407881349" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.779629807"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1800720229" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.15771122"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1355529127" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.942523152"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.1358552446" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug.56036922"/>
-						</toolChain>
-					</folderInfo>
 					<sourceEntries>
 						<entry excluding="src/common/ds/eastl/doc|src/common/ds/eastl/benchmark|src/common/ds/eastl/test|src/common/debugging/asms.asm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>

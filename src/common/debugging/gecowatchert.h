@@ -850,7 +850,7 @@ template<class RETURN_TYPE>
 class func_watcher_t : public geco_watcher_base_t
 {
 private:
-	RETURN_TYPE&(*getFunction_)();
+	RETURN_TYPE& (*getFunction_)();
 	void(*setFunction_)(RETURN_TYPE&);
 
 public:
@@ -992,7 +992,7 @@ template<class RETURN_TYPE, class OBJECT_TYPE>
 class method_watcher_t : public geco_watcher_base_t
 {
 private:
-	typedef RETURN_TYPE& (OBJECT_TYPE::*GetMethodType)() const;
+	typedef RETURN_TYPE& (OBJECT_TYPE::*GetMethodType)();
 	typedef void (OBJECT_TYPE::*SetMethodType)(RETURN_TYPE&);
 
 	OBJECT_TYPE * pObject_;
@@ -1351,9 +1351,8 @@ geco_watcher_base_t* add_watcher(const char * path, TYPE& rValue,
  *	@ingroup WatcherModule
  */
 template<class RETURN_TYPE>
-geco_watcher_base_t* add_watcher(const char * path, RETURN_TYPE(*getFunction)(),
-	void(*setFunction)(RETURN_TYPE) = NULL, const char * comment =
-	NULL, geco_watcher_base_t* dir = NULL)
+geco_watcher_base_t* add_watcher(const char * path, RETURN_TYPE& (*getFunction)(),
+	void(*setFunction)(RETURN_TYPE&) = NULL, const char * comment = NULL, geco_watcher_base_t* dir = NULL)
 {
 	geco_watcher_base_t* ptr = new func_watcher_t<RETURN_TYPE>(getFunction, setFunction, path);
 	if (dir == NULL) dir = &geco_watcher_base_t::get_root_watcher();
@@ -1370,8 +1369,8 @@ geco_watcher_base_t* add_watcher(const char * path, RETURN_TYPE(*getFunction)(),
 
 template<class RETURN_TYPE, class OBJECT_TYPE>
 geco_watcher_base_t* add_watcher(const char * path, OBJECT_TYPE& rObject,
-	RETURN_TYPE (OBJECT_TYPE::*getMethod)(),
-	void (OBJECT_TYPE::*setMethod)(RETURN_TYPE) = NULL, const char * comment = NULL, geco_watcher_base_t* dir= NULL)
+	RETURN_TYPE& (OBJECT_TYPE::*getMethod)(),
+	void (OBJECT_TYPE::*setMethod)(RETURN_TYPE&) = NULL, const char * comment = NULL, geco_watcher_base_t* dir= NULL)
 {
 	geco_watcher_base_t* ptr = new method_watcher_t<RETURN_TYPE, OBJECT_TYPE>(rObject, getMethod,setMethod, path);
 	if (dir == NULL) dir = &geco_watcher_base_t::get_root_watcher();
@@ -1387,16 +1386,16 @@ geco_watcher_base_t* add_watcher(const char * path, OBJECT_TYPE& rObject,
 }
 
 #define CAST_METHOD_RW( TYPE, CLASS, rMETHOD,wMETHOD )	\
-static_cast< TYPE (CLASS::*)()>(&CLASS::rMETHOD),static_cast< void (CLASS::*)(TYPE)   >(&CLASS::wMETHOD)
+static_cast<TYPE& (CLASS::*)()>(&CLASS::rMETHOD),static_cast<void (CLASS::*)(TYPE&)>(&CLASS::wMETHOD)
 
 #define CAST_FUNC_RW( TYPE, rFUNC,wFUNC )							\
-static_cast<TYPE (*)()>(rFUNC),static_cast< void (*)(TYPE)   >(wFUNC)
+static_cast<TYPE& (*)()>(rFUNC),static_cast< void (*)(TYPE&)   >(wFUNC)
 
 #define CAST_METHOD_R( TYPE, CLASS, rMETHOD) \
-static_cast< TYPE (CLASS::*)() const>(&CLASS::rMETHOD),static_cast< void (CLASS::*)(TYPE)   >(NULL)
+static_cast< TYPE& (CLASS::*)()>(&CLASS::rMETHOD),static_cast< void (CLASS::*)(TYPE&)   >(NULL)
 
 #define CAST_FUNC_R( TYPE, rFUNC ) \
-static_cast<TYPE (*)()>(rFUNC),	static_cast< void (*)(TYPE)   >(NULL)
+static_cast<TYPE& (*)()>(rFUNC),static_cast< void (*)(TYPE&)   >(NULL)
 
 #define GECO_WATCH add_watcher
 #endif

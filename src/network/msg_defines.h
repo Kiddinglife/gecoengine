@@ -20,15 +20,16 @@
 #ifndef __INCLUDE_MSG_DEFINES_H
 #define __INCLUDE_MSG_DEFINES_H
 
-  // this header includes <windows.h> that has vialations with wsock2.h. Therefor
-  // must be placed in the first place otherwise complie errors related to  wsock2.h
+// this header includes <windows.h> that has vialations with wsock2.h. Therefor
+// must be placed in the first place otherwise complie errors related to  wsock2.h
+
 #include "../protocol/geco-net-common.h" 
 #include "../protocol/geco-net-msg.h"
 #include "../common/geco-plateform.h"
-#include "../common/debugging/gecowatchert.h"
-#include "../common/ds/eastl/EASTL/vector.h"
+#include "../common/geco-export.h"
+#include "../common/debugging/debug.h"
 #include "callback_defines.h"
-#include <stdint.h>
+#include "../common/ds/geco-bit-stream.h"
 
 #ifndef _WIN32
 #ifndef _LP64
@@ -455,75 +456,4 @@ struct FvNetDataField
 /////////////////////////////////////// packet ends ////////////////////////////////////
 
 
-/////////////////////////////////////// stats module  ////////////////////////////////////
-#include "../common/ds/eastl/EASTL/utility.h"
-#include "../math/stat_rate_of_change.h"
-
-/**
- *	This class is used to collect statistics about the connection.
- */
-struct network_stats_t
-{
-	typedef intrusive_stat_rate_of_change_t< uint> stat;
-	eastl::intrusive_list<stat>  pStats_;
-	geco_watcher_director_t pwatchers_;
-
-	stat numBytesReceived_;
-	stat numPacketsReceived_;
-	stat numDuplicatePacketsReceived_;
-	stat numPacketsReceivedOffChannel_;
-	stat numBundlesReceived_;
-	stat numMessagesReceived_;
-	stat numOverheadBytesReceived_;
-	stat numCorruptedPacketsReceived_;
-	stat numCorruptedBundlesReceived_;
-
-	uint64	lastGatherTime_;
-	int		lastTxQueueSize_;
-	int		lastRxQueueSize_;
-	int		maxTxQueueSize_;
-	int		maxRxQueueSize_;
-
-	//ProfileVal	mercuryTimer_;
-	//ProfileVal	systemTimer_;
-
-	network_stats_t();
-
-	/**
-	 *	This method updates the statics associated with this connection
-	 *	@TODO register a repeated timer with interval one sec for this function
-	 *	instead of test time slap
-	 */
-	void update_stats();
-
-	/**
-	 *	This method updates the moving averages of the collected stats.
-	 *	elapsedTime in seconds
-	 */
-	void updateStatAverages(double elapsedTime);
-
-
-	/**
-	 *	This method returns the current bits per second received.
-	 */
-	double BitsPerSecond() const
-	{
-		return numBytesReceived_.getRateOfChange(0) * 8;
-	}
-	/**
-	 *	This method returns the current packets per second received.
-	 */
-	double PacketsPerSecond() const
-	{
-		return numPacketsReceived_.getRateOfChange(0);
-	}
-	/**
-	 *	This method returns the current messages per second received.
-	 */
-	double MessagesPerSecond() const
-	{
-		return numMessagesReceived_.getRateOfChange();
-	}
-};
-/////////////////////////////////////// stats module ////////////////////////////////////
 #endif
