@@ -149,10 +149,12 @@
     <ClInclude Include="..\..\..\..\src\network\deamon.h" />
     <ClInclude Include="..\..\..\..\src\network\msg_defines.h" />
     <ClInclude Include="..\..\..\..\src\network\callback_defines.h" />
+    <ClInclude Include="..\..\..\..\src\network\networkstats.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\network\deamon.cc" />
     <ClCompile Include="..\..\..\..\src\network\msg_defines.cc" />
+    <ClCompile Include="..\..\..\..\src\network\networkstats.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
