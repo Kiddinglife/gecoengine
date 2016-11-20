@@ -153,7 +153,9 @@ private:
 	*/
 	void InitStatWatcher()
 	{
-		initRateOfChange("averages/last", 0.f);// real time no wights
+		// no wights, this is nit average stata but the stat itself that is accurate  
+		// e.g. numBytesReceivedPerSecond_ with 0 weights is actually the exact bytes received per second
+		initRateOfChange("averages/last", 0.f);
 		initRateOfChange("averages/short", 60.f);	// 1 minute at 95%
 		initRateOfChange("averages/medium", 600.0f);	// 10 minutes at 95%
 		initRateOfChange("averages/long", 3600.0f);	// 60 minutes at 95%
@@ -169,12 +171,12 @@ struct network_recv_stats_t
 	eastl::intrusive_list<stat>  pStats_;
 	geco_watcher_director_t pwatchers_;
 
-	stat numBytesReceived_;
-	stat numPacketsReceived_;
+	stat numBytesReceivedPerSecond_;
+	stat numPacketsReceivedPerSecond_;
 	stat numDuplicatePacketsReceived_;
 	stat numPacketsReceivedOffChannel_;
 	stat numBundlesReceived_;
-	stat numMessagesReceived_;
+	stat numMessagesReceivedPerSecond_;
 	stat numOverheadBytesReceived_;
 	stat numCorruptedPacketsReceived_;
 	stat numCorruptedBundlesReceived_;
@@ -203,27 +205,33 @@ struct network_recv_stats_t
 	 */
 	void updateStatAverages(double elapsedTime);
 
-
 	/**
 	 *	This method returns the current bits per second received.
 	 */
 	double BitsPerSecond() const
 	{
-		return numBytesReceived_.getRateOfChange(0) * 8;
+		return numBytesReceivedPerSecond_.getRateOfChange(0) * 8;
+	}
+	/**
+	*	This method returns the current bits per second received.
+	*/
+	double BytesPerSecond() const
+	{
+		return numBytesReceivedPerSecond_.getRateOfChange(0);
 	}
 	/**
 	 *	This method returns the current packets per second received.
 	 */
 	double PacketsPerSecond() const
 	{
-		return numPacketsReceived_.getRateOfChange(0);
+		return numPacketsReceivedPerSecond_.getRateOfChange(0);
 	}
 	/**
 	 *	This method returns the current messages per second received.
 	 */
 	double MessagesPerSecond() const
 	{
-		return numMessagesReceived_.getRateOfChange();
+		return numMessagesReceivedPerSecond_.getRateOfChange(0);
 	}
 };
 

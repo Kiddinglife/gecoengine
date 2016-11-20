@@ -20,8 +20,8 @@
 #ifndef __INCLUDE_MSG_DEFINES_H
 #define __INCLUDE_MSG_DEFINES_H
 
-// this header includes <windows.h> that has vialations with wsock2.h. Therefor
-// must be placed in the first place otherwise complie errors related to  wsock2.h
+  // this header includes <windows.h> that has vialations with wsock2.h. Therefor
+  // must be placed in the first place otherwise complie errors related to  wsock2.h
 
 #include "../protocol/geco-net-common.h" 
 #include "../protocol/geco-net-msg.h"
@@ -110,7 +110,7 @@ const int DEFAULT_ONCEOFF_RESEND_PERIOD = 200 * 1000; /* 200 ms */
 const int DEFAULT_ONCEOFF_MAX_RESENDS = 50;
 const int NO_REPLY = -1;
 
-enum GECONetReason
+enum geco_engine_reason
 {
 	SUCCESS = 0,
 	TIMER_EXPIRED = -1,
@@ -126,7 +126,7 @@ enum GECONetReason
 	CHANNEL_LOST = -11
 };
 
-inline const char * NetReasonToString(GECONetReason reason)
+inline const char * NetReasonToString(geco_engine_reason reason)
 {
 	const char * reasons[] =
 	{ "SUCCESS", "TIMER_EXPIRED", "NO_SUCH_PORT", "GENERAL_NETWORK",
@@ -141,26 +141,13 @@ inline const char * NetReasonToString(GECONetReason reason)
 	return "UNKNOWN";
 }
 
-struct msg_fixed_t // 4 BYTES
-{
-	uchar m_uiIdentifier;
-	uchar m_cFlags;
-	ushort len;
-	uint m_iReplyID;
-	//GECONetNub *m_pkNub;
-	//GECONetChannel *m_pkChannel;
-	//msg_fixed_t() :
-	//	m_uiIdentifier(0), m_cFlags(0),
-	//	m_iReplyID(UINT32_MAX), m_iLength(0), m_pkNub(NULL), m_pkChannel(NULL)
-	//{}
-	//const char *MsgName() const;
-};
 struct my_addr
 {
 	sockaddrunion su;
 	ushort m_uiSalt;
 };
 typedef my_addr space_entry_id;
+
 struct entity_mb
 {
 	entity_id m_iID;
@@ -208,6 +195,7 @@ struct entity_mb
 		Init();
 	}
 };
+
 struct interface_listener_msg
 {
 	sockaddrunion su; //always network endian
@@ -227,6 +215,7 @@ struct interface_listener_msg
 		memset(&su, 0, sizeof(sockaddrunion));
 	}
 };
+
 struct bits_opt_t //FvCapabilities
 {
 	static const unsigned int ms_uiMaxCap =
@@ -325,7 +314,7 @@ inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is, entity_mb &d)
 }
 
 
-/////////////////////////////////////// msg_handler_t starts ////////////////////////////////////
+/////////////////////////////////////// interface_element_t starts ////////////////////////////////////
 /**
  * 	@internal
  * 	This constant indicates a fixed length message.
@@ -362,9 +351,9 @@ const char INVALID_MESSAGE = 2;
  *	messages, it defines the number of bytes needed to
  *	express the length.
  */
-struct GECOAPI msg_handler_t
+struct GECOAPI interface_element_t
 {
-	static const msg_handler_t REPLY;
+	static const interface_element_t REPLY;
 	uint hdr_len_;
 	uint nominal_body_size_;
 	msg_id id_; ///< Unique message ID
@@ -373,7 +362,7 @@ struct GECOAPI msg_handler_t
 	const char *name_;	///< The name of the interface method
 	msg_handler_cb pHandler_; /// msg handler
 
-	msg_handler_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
+	interface_element_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
 		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
 		NULL) :
 		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
@@ -440,11 +429,12 @@ struct GECOAPI msg_handler_t
 		return buf;
 	}
 };
-/////////////////////////////////////// msg_handler_t ends ////////////////////////////////////
+/////////////////////////////////////// interface_element_t ends ////////////////////////////////////
 
 
 
 /////////////////////////////////////// packet starts ////////////////////////////////////
+#include "networkstats.h"
 // THIS IS DEFAULT 1500 -20 IPHDR - 8 UDPHDR - 12 GECOHDR,
 // SHOULD query pmtu from protocol stack and set this for each connection
 const uint DEFAULT_MAX_PACKET_SIZE = 1460;
@@ -453,7 +443,232 @@ struct FvNetDataField
 	char *m_pcBeg;
 	ushort m_uiLength;
 };
-/////////////////////////////////////// packet ends ////////////////////////////////////
 
+struct GECOAPI unpacked_msg_hdr_t// 4 BYTES
+{
+	static const int NO_REPLY = -1;
+	uchar m_uiIdentifier;
+	uchar m_cFlags;
+	ushort len;
+	uint replay_id;
+};
+
+/**
+*	This class manages sets of channels.
+*/
+class network_interface_t
+{
+};
+/**
+*	responsible for receiving game packets from protocol stack (sctp, udp, tcp and so on).
+*/
+class packet_recv_t
+{
+	uint curr_channel_id_;
+	sockaddrunion curr_saddr_;
+	network_interface_t* network_interface_;
+	unpacked_msg_hdr_t* curr_packet_;
+
+	network_recv_stats_t stats_;
+	geco_engine_reason process_packet();
+};
+
+struct geco_channel_t
+{
+
+};
+
+struct geco_nub_t
+{
+
+};
+
+
+#include <functional>
+typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_monitor_handler_t; //in and out
+typedef std::function<void(const sockaddrunion& source, unpacked_msg_hdr_t& header, uchar* data, void * arg)> reply_msg_handler_t;
+typedef std::function<void(const char* exception, void* arg)> reply_exception_handler_t;
+
+
+/**
+*	@internal
+*	This is the default request timeout in microseconds.
+*/
+const int DEFAULT_REQUEST_TIMEOUT = 5000000;
+
+struct reply_order_t
+{
+	reply_msg_handler_t response_msg_handler_;
+	reply_exception_handler_t response_exception_handler_;
+	void *arg;
+	int microseconds;
+	uint *pReplyID;
+};
+
+struct piggy_back_t
+{
+	uchar* m_spPacket;
+	ushort	m_iLen;
+};
+
+
+//skip
+class FvNetReliableOrder
+{
+public:
+	uchar	*m_uiSegBegin;
+	ushort m_uiSegLength;
+	ushort m_uiSegPartOfRequest;
+};
+typedef std::vector<FvNetReliableOrder> FvReliableVector;
+
+//skip
+enum FvNetReliableTypeEnum
+{
+	FV_NET_RELIABLE_NO = 0,
+	FV_NET_RELIABLE_DRIVER = 1,
+	FV_NET_RELIABLE_PASSENGER = 2,
+	FV_NET_RELIABLE_CRITICAL = 3
+};
+
+//skip
+struct FvNetReliableType
+{
+	FvNetReliableType(FvNetReliableTypeEnum e) : m_eReliableType(e) { }
+	FvNetReliableType(bool b) : m_eReliableType(b ? FV_NET_RELIABLE_DRIVER : FV_NET_RELIABLE_NO) { }
+
+	bool IsReliable() const { return m_eReliableType != FV_NET_RELIABLE_NO; }
+
+	bool IsDriver() const { return m_eReliableType & FV_NET_RELIABLE_DRIVER; }
+
+	bool operator== (const FvNetReliableTypeEnum e) { return e == m_eReliableType; }
+
+	FvNetReliableTypeEnum m_eReliableType;
+};
+
+//skip
+struct AckOrder
+{
+	uchar	*p;
+	uint	forseq;
+};
+
+typedef std::vector<AckOrder> AckOrders;
+AckOrders m_kAckOrders;
+
+/*-----------------------------------------------------------------------------
+ Section: Bundle
+
+ *	A bundle is a sequence of messages. You stream or otherwise
+ *	add your messages onto the bundle. When you want to send
+ *	a group of messages (possibly just one), you tell a nub
+ *	to send the bundle. Bundles can be sent multiple times
+ *	to different hosts, but beware that any requests inside
+ *	will also be made multiple times.
+
+ How requests and replies work (so I can get it straight):
+
+ When you make a request you put it on the bundle with a 'startRequest' message.
+ This means the bundle takes note of it and puts extra information (a reply id)
+ in the message's header.
+
+ When a request handler replies to a request, it puts it on the bundle with a
+ 'startReply' message, passing in the replyID from the broken-out header info
+ struct passed to it. This means the bundle adds the special message of type
+ 'REPLY_MESSAGE_IDENTIFIER', which is always handled by the system.
+ -----------------------------------------------------------------------------*/
+class GECOAPI geco_bundle_t : public geco_bit_stream_t
+{
+
+public:
+	// initialises an empty bundle for writing.
+	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL) :
+		m_spFirstPacket(NULL),
+		m_pkCurrentPacket(NULL),
+		m_bFinalised(false),
+		m_uiExtraSize(spareSize),
+		m_pkChannel(pChannel)
+	{
+		this->clear(true/*do_not_dispose*/);
+	}
+
+	geco_bundle_t(uchar* packetChain) :
+		m_spFirstPacket(packetChain),
+		m_pkCurrentPacket(packetChain),
+		m_bFinalised(true),
+		m_uiExtraSize(0),
+		m_pkChannel(NULL)
+	{
+		this->clear( /* firstTime: */ true);
+	}
+	virtual ~geco_bundle_t();
+
+	void clear(bool do_not_dispose = false);
+	/// This method cancels outstanding requests associated with this bundle.
+	void cancel_requests();
+	/// returns true if the bundle is empty of messages.
+	bool empty() const;
+	/// This method returns the accumulated size of the bundle (including all messages).
+	int size() const { return m_iNumMessagesTotalBytes_; }
+
+public:
+	typedef eastl::vector<reply_order_t> reply_orders_t;
+	reply_orders_t m_kReplyOrders;
+
+	typedef std::vector< piggy_back_t* > piggy_backs_t;
+	piggy_backs_t m_kPiggybacks;
+
+	//skip
+	FvReliableVector m_kReliableOrders; // This vector stores all the reliable messages for this bundle.
+	int	m_iReliableOrdersExtracted;
+	bool m_bIsCritical; 	// If true, this Bundle's packets will be considered to be 'critical' by the Channel.
+	AckOrders m_kAckOrders;
+
+	uchar* m_spFirstPacket;
+	uchar*	m_pkCurrentPacket;
+	bool m_bFinalised;
+	bool m_bReliableDriver;	//skip
+	uchar	m_uiExtraSize;
+
+private:
+	geco_channel_t* m_pkChannel;// This is the Channel that owns this Bundle, or NULL if not on a Channel.
+
+	// per message stuff
+	interface_element_t const *m_pkCurIE;
+	int	m_iMsgLen;
+	int	m_iMsgExtra;
+	uchar	*m_puiMsgBeg;
+	ushort m_uiMsgChunkOffset;
+	bool m_bMsgReliable;
+	bool m_bMsgRequest;
+
+	// statistics
+	int	m_iNumMessages;
+	int	m_iNumReliableMessages;
+	int m_iNumMessagesTotalBytes_;
+
+private:
+	void dispose();
+};
+
+/**
+*  This class is useful when you have a lot of data you want to send to a
+*  collection of other apps, but want to group the sends to each app together.
+*/
+class bundle_send_map_t
+{
+public:
+	bundle_send_map_t(geco_nub_t & nub) : m_kNub(nub) {}
+	geco_bundle_t & operator[](const sockaddrunion & addr);
+	void SendAll();
+
+private:
+	geco_nub_t &m_kNub;
+
+	typedef std::map< sockaddrunion, geco_channel_t* > Channels;
+	Channels m_kChannels;
+};
+
+/////////////////////////////////////// packet ends ////////////////////////////////////
 
 #endif

@@ -25,6 +25,8 @@
 
 /**
 *	This class represents an exponentially weighted moving average.
+*  (if no wights applied by number of samples, this is not stat's average but the stat itself that is accurate)
+*
 *  @details see http://www.forexabode.com/forex-school/technical-indicators/moving-averages/exponential-moving-average/
 *  Current periods’ exponential moving average =  (Previous period's EMA * (1 - Exponent))+(Previous period’s closing price * Exponent)
 *  Let’s assume the following to make an example:
@@ -54,15 +56,15 @@ struct ema_t
 	*	@param bias 	Determines the exponential bias.
 	*	@param initial 	The initial value of the average.
 	*/
-	explicit ema_t(float bias, float initial = 0.f) :
+	explicit ema_t(float bias=0.f, float initial = 0.f) :
 		bias_(bias),
 		average_(initial)
 	{}
 
 	/**
 	*	Sample a previous period's EMA into the average.
-	*
 	*	@param value 	Previous period's EMA
+	*  bias = 5%
 	*/
 	void sample(float value)
 	{
@@ -81,12 +83,14 @@ struct ema_t
 	*	For example, if numSamples is 60 and weighting is 0.95, using the resulting
 	*	bias in an EMA means that the latest 60 samples account for 95% of the
 	*	average and all other samples account for 5%.
+	*  if numSamples is 0, then bias is 0.f, we can have average_ = (1.f - bias_) * value + bias_ * average_ 
+	* = current value 
+	* 
 	*
 	*	@param numSamples The number of samples having the desired weighting.
 	*	@weighting The proportion of the average that these samples contribute.
 	*/
-	static float calculateBiasFromNumSamples(float numSamples,
-		float weighting = 0.95f)
+	static float calculateBiasFromNumSamples(float numSamples, float weighting = 0.95f)
 	{
 		return (numSamples != 0.f) ?
 			exp(log(1.f - weighting) / numSamples) :
@@ -96,10 +100,11 @@ struct ema_t
 
 /**
 *	This templated class is a helper class for accumulating values, and
-*	periodically sampling that value into an ema_t.
+*	periodically sampling that value into an ema
+*  used to calculate the ema average
 */
 template< typename TYPE >
-class Accumulatingema_t
+class cumulative_ema_t
 {
 public:
 	/**
@@ -109,7 +114,7 @@ public:
 	*	@param initialAverage	The initial value of the average.
 	*	@param initialValue 	The initial value of the accumulated value.
 	*/
-	Accumulatingema_t(float bias, float initialAverage = 0.f,
+	cumulative_ema_t(float bias, float initialAverage = 0.f,
 		TYPE initialValue = TYPE()) :
 		average_(bias, initialAverage),
 		accum_(initialValue)

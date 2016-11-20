@@ -25,13 +25,13 @@ network_recv_stats_t::network_recv_stats_t() :
 	//	systemTimer_(),
 {
 	uint_stat_watcher_factory_.initRatesOfChangeForStats(pStats_);
-	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bytesReceived", this->numBytesReceived_);
-	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bytesReceived", this->numBytesReceived_);
-	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "packetsReceived", this->numPacketsReceived_);
+	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bytesReceived", this->numBytesReceivedPerSecond_);
+	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bytesReceived", this->numBytesReceivedPerSecond_);
+	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "packetsReceived", this->numPacketsReceivedPerSecond_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "duplicatePacketsReceived", this->numDuplicatePacketsReceived_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "packetsReceivedOffChannel", this->numPacketsReceivedOffChannel_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bundlesReceived", this->numBundlesReceived_);
-	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "messagesReceived", this->numMessagesReceived_);
+	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "messagesReceived", this->numMessagesReceivedPerSecond_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "overheadBytesReceived", this->numOverheadBytesReceived_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "corruptedPacketsReceived", this->numCorruptedPacketsReceived_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "corruptedBundlesReceived", this->numCorruptedBundlesReceived_);
