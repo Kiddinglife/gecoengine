@@ -315,6 +315,11 @@ inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is, entity_mb &d)
 
 
 /////////////////////////////////////// interface_element_t starts ////////////////////////////////////
+const int RELIABLE_ORDER= 0;
+const int RELIABLE_UNORDER= 1;
+const int UNRELIABLE_ORDER= 2;
+const int UNRELIABLE_UNORDER= 3;
+
 /**
  * 	@internal
  * 	This constant indicates a fixed length message.
@@ -351,6 +356,7 @@ const char INVALID_MESSAGE = 2;
  *	messages, it defines the number of bytes needed to
  *	express the length.
  */
+class geco_bundle_t;
 struct GECOAPI interface_element_t
 {
 	static const interface_element_t REPLY;
@@ -362,11 +368,20 @@ struct GECOAPI interface_element_t
 	const char *name_;	///< The name of the interface method
 	msg_handler_cb pHandler_; /// msg handler
 
+	/*
+	value among:
+	const int RELIABLE_ORDER= 0;
+	const int RELIABLE_UNORDER= 1;
+	const int UNRELIABLE_ORDER= 2;
+	const int UNRELIABLE_UNORDER= 3;
+	*/
+	uint ro_;
+
 	interface_element_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
 		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
-		NULL) :
+		NULL, uint msg_rel_or = RELIABLE_ORDER) :
 		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
-			name), pHandler_(pHandler)
+			name), pHandler_(pHandler),ro_(msg_rel_or)
 	{
 		if (lengthStyle_ == FIXED_LENGTH_MESSAGE)
 		{
@@ -428,6 +443,19 @@ struct GECOAPI interface_element_t
 		snprintf(buf, sizeof(buf), "%s/%u", name_, id_);
 		return buf;
 	}
+
+	/**
+	 * 	compresses a length into the given header.
+	 *
+	 *	@param data		Pointer to the header
+	 *	@param length	Length to compress
+	 *
+	 *	@return 0 if successful.
+	 */
+	int compress_length(uchar* hdr, int length,geco_bundle_t& bundle, bool isRequest ) const
+	{
+		return 0;//TODO
+	}
 };
 /////////////////////////////////////// interface_element_t ends ////////////////////////////////////
 
@@ -473,9 +501,45 @@ class packet_recv_t
 	geco_engine_reason process_packet();
 };
 
-struct geco_channel_t
+class geco_channel_t
 {
+		/*
+		 *	decide the reliablity to use.
+		 *	There are two types of channels that we handle. The first is a
+		 *	channel between server and server. These channels are low latency,
+		 *	high bandwidth, and low loss. The second is a channel between client
+		 *	and server, which is high latency, low bandwidth, and high loss.
+		 *	Since bandwidth is scarce on client/server channels, only reliable
+		 *	data is resent on these channels. Unreliable data is stripped from
+		 *	dropped packets and discarded.
+		 */
+		enum:uint
+		{
+			WAN = 0,//server and server.
+			LAN = 1//client and server.
+		};
+		uint m_uiType;
 
+		//streams RELIABLE_ORDER= 0
+		//streams RELIABLE_UNORDER= 1
+		//streams UNRELIABLE_ORDER= 2
+		//streams UNRELIABLE_UNORDER= 3
+		typedef int stream_id_t;
+		typedef eastl::vector<stream_id_t> stream_ids_t;
+		const int m_ostreams_total_size;
+		const int m_ostreams_avg_size;
+		stream_ids_t m_sids[4];
+
+		geco_channel_t(int ostreams_total_size=8):
+			m_ostreams_total_size(ostreams_total_size)
+		{
+			if(m_ostreams_total_size <4 || m_ostreams_total_size&3>0) GECO_ASSERT(0);
+			m_ostreams_avg_size = m_ostreams_size/4;
+			m_sids[0].reserve(m_ostreams_avg_size);
+			m_sids[1].reserve(m_ostreams_avg_size);
+			m_sids[2].reserve(m_ostreams_avg_size);
+			m_sids[3].reserve(m_ostreams_avg_size);
+		}
 };
 
 struct geco_nub_t
@@ -579,56 +643,24 @@ AckOrders m_kAckOrders;
  -----------------------------------------------------------------------------*/
 class GECOAPI geco_bundle_t : public geco_bit_stream_t
 {
-
 public:
-	// initialises an empty bundle for writing.
-	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL) :
-		m_spFirstPacket(NULL),
-		m_pkCurrentPacket(NULL),
-		m_bFinalised(false),
-		m_uiExtraSize(spareSize),
-		m_pkChannel(pChannel)
-	{
-		this->clear(true/*do_not_dispose*/);
-	}
+		typedef eastl::vector<reply_order_t> reply_orders_t;
+		reply_orders_t m_kReplyOrders;
 
-	geco_bundle_t(uchar* packetChain) :
-		m_spFirstPacket(packetChain),
-		m_pkCurrentPacket(packetChain),
-		m_bFinalised(true),
-		m_uiExtraSize(0),
-		m_pkChannel(NULL)
-	{
-		this->clear( /* firstTime: */ true);
-	}
-	virtual ~geco_bundle_t();
+		typedef std::vector< piggy_back_t* > piggy_backs_t;
+		piggy_backs_t m_kPiggybacks;
 
-	void clear(bool do_not_dispose = false);
-	/// This method cancels outstanding requests associated with this bundle.
-	void cancel_requests();
-	/// returns true if the bundle is empty of messages.
-	bool empty() const;
-	/// This method returns the accumulated size of the bundle (including all messages).
-	int size() const { return m_iNumMessagesTotalBytes_; }
+		//skip
+		FvReliableVector m_kReliableOrders; // This vector stores all the reliable messages for this bundle.
+		int	m_iReliableOrdersExtracted;
+		bool m_bIsCritical; 	// If true, this Bundle's packets will be considered to be 'critical' by the Channel.
+		AckOrders m_kAckOrders;
 
-public:
-	typedef eastl::vector<reply_order_t> reply_orders_t;
-	reply_orders_t m_kReplyOrders;
-
-	typedef std::vector< piggy_back_t* > piggy_backs_t;
-	piggy_backs_t m_kPiggybacks;
-
-	//skip
-	FvReliableVector m_kReliableOrders; // This vector stores all the reliable messages for this bundle.
-	int	m_iReliableOrdersExtracted;
-	bool m_bIsCritical; 	// If true, this Bundle's packets will be considered to be 'critical' by the Channel.
-	AckOrders m_kAckOrders;
-
-	uchar* m_spFirstPacket;
-	uchar*	m_pkCurrentPacket;
-	bool m_bFinalised;
-	bool m_bReliableDriver;	//skip
-	uchar	m_uiExtraSize;
+		uchar* m_spFirstPacket;
+		uchar*	m_pkCurrentPacket;
+		bool m_bFinalised;
+		bool m_bReliableDriver;	//skip
+		uchar	m_uiExtraSize;
 
 private:
 	geco_channel_t* m_pkChannel;// This is the Channel that owns this Bundle, or NULL if not on a Channel.
@@ -643,12 +675,57 @@ private:
 	bool m_bMsgRequest;
 
 	// statistics
-	int	m_iNumMessages;
+	int	m_iNumMessages;//numMessages
 	int	m_iNumReliableMessages;
-	int m_iNumMessagesTotalBytes_;
+	int m_iNumMessagesTotalBytes;
+
+	uchar m_ucSendBuffer[MAX_MTU_SIZE-20-8];
+	int m_sb_free_space_;//free Bytes In m_ucSendBuffer
+	int m_curr_stream_id;
+
+public:
+	// initialises an empty bundle for writing.
+	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL);
+	geco_bundle_t(uchar* packetChain);
+	virtual ~geco_bundle_t();
+
+	/// flushes the messages from this bundle making it empty.
+	void clear(bool do_not_dispose = false);
+	/// cancels outstanding requests associated with this bundle.
+	void cancel_requests();
+	/// returns true if the bundle is empty of messages.
+	bool empty() const;
+	/// returns the accumulated size of the bundle (including all messages).
+	int size() const;
+	/// returns true if this Bundle is owned by an external channel.
+	bool is_external_channel() const;
+
+	/**
+	 * 	starts a new message on the bundle. The expected length
+	 *	should only be filled in if known (and only for variable-length messages)
+	 *	as a hint to whether to start this message on the current packet or to
+	 *	send the current bundle then bring in this message into current packet again
+	 *
+	 * 	@param ie			The type of message to start.
+	 * 	@param stream_id    -1 means use any stream id that
+	 */
+	void start_message_without_response( const interface_element_t& ie,int stream_id=-1);
+
+	/**
+	 * 	finalises a message. It is called from a number of places within Bundle when necessary.
+	 */
+	void end_message();
 
 private:
 	void dispose();
+	/**
+	 * 	This message begins a new message, with the given number of extra bytes in
+	 * 	the header. These extra bytes are normally used for request information.
+	 *
+	 * 	@param extra	Number of extra bytes to reserve.
+	 * 	@return	Pointer to the body of the message.
+	 */
+	char* new_message( int extra );
 };
 
 /**
