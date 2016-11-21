@@ -9,18 +9,18 @@
 #define SRC_NETWORK_HANDLERS_H_
 #include <functional>
 
-/**
- *   an interface for receiving Mercury messages.
- *  Classes that can handle general messages from Mercury needs to
- *  implement this.
- *  @ingroup network
- */
+ /**
+  *   an interface for receiving Mercury messages.
+  *  Classes that can handle general messages from Mercury needs to
+  *  implement this.
+  *  @ingroup network
+  */
 
-/**
- *  This method is called by event dispatcher to deliver a message.
- *  @param channel_id    at which channel the message originated.
- *  @param data     This contains the message type, size, and flags. and  actual message data.
- */
+  /**
+   *  This method is called by event dispatcher to deliver a message.
+   *  @param channel_id    at which channel the message originated.
+   *  @param data     This contains the message type, size, and flags. and  actual message data.
+   */
 class geco_bit_stream_t;
 typedef std::function<void(const int channel_id, geco_bit_stream_t& data)> msg_handler_cb;
 
@@ -64,14 +64,26 @@ typedef std::function<int(int fd)> network_data_arrived_handler_t;
  *
  *  @ingroup mercury
  */
-class NubException;
-typedef std::function<void(int source, geco_bit_stream_t& data, void* args)>
-reply_msg_handler_t;
-typedef std::function<void(const NubException & exception, void * arg)>
-reply_exception_handler_t;
-typedef std::function<void(const NubException & exception, void * arg)>
-reply_shutdown_handler_t;
+struct response_handler_t
+{
+	/*
+	 * 	called by Mercury to deliver a reply message.
+	 * 	@param source	The address at which the message originated.
+	 * 	@param header	This contains the message type, size, and flags.
+	 * 	@param data		The actual message data.
+	 * 	@param arg		This is user-defined data that was passed in with the request that generated this reply.
+	 */
+	std::function<void(sockaddrunion& source, unpacked_msg_hdr_t& msghdr, geco_bit_stream_t& data, void* args)> msg_parser_;
 
+	/**
+	* 	This method is called by Mercury when the request fails. The
+	* 	normal reason for this happening is a timeout.
+	* 	@param exception	The reason for failure.
+	* 	@param arg			The user-defined data associated with the request.
+	*/
+	std::function<void(const char* exception, void * arg)> exception_handler_;
+	std::function<void(const char* exception, void * arg)> shutdown_handler_;
+};
 //class ReplyMessageHandler
 //{
 //    public:

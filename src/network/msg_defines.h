@@ -452,7 +452,7 @@ struct GECOAPI interface_element_t
 	 *
 	 *	@return 0 if successful.
 	 */
-	int compress_length(uchar* hdr, int length,geco_bundle_t& bundle, bool isRequest ) const
+	int compress_length(uchar* hdr, int length,geco_bundle_t& bundle, int isRequest ) const
 	{
 		return 0;//TODO
 	}
@@ -502,6 +502,8 @@ class packet_recv_t
 };
 
 const int DEFAULT_BUNDLE_SEND_BUF_SIZE = 1500-20-8;
+const int DEFAULT_REPLY_MSG_TIMEOUT = 3000; // default request timeout in ms 5 senonds
+
 class geco_channel_t
 {
 	public:
@@ -533,14 +535,19 @@ class geco_channel_t
 		stream_ids_t m_sids[4];
 
 		geco_channel_t(int ostreams_total_size=8):
-			m_ostreams_total_size(ostreams_total_size)
+			m_ostreams_total_size(ostreams_total_size),
+			m_ostreams_avg_size(m_ostreams_total_size / 4)
 		{
 			if(m_ostreams_total_size <4 || m_ostreams_total_size&3>0) GECO_ASSERT(0);
-			m_ostreams_avg_size = m_ostreams_size/4;
 			m_sids[0].reserve(m_ostreams_avg_size);
 			m_sids[1].reserve(m_ostreams_avg_size);
 			m_sids[2].reserve(m_ostreams_avg_size);
 			m_sids[3].reserve(m_ostreams_avg_size);
+		}
+
+	    const char* c_str() const
+		{
+			return "c_str";
 		}
 };
 
@@ -549,6 +556,25 @@ struct geco_nub_t
 
 };
 
+struct geco_network_interface_t
+{
+	/**
+	* 	This method sends a bundle to the given address.
+	*
+	* 	Note: any pointers you have into the packet may become invalid after this
+	* 	call (and whenever a channel calls this too).
+	*
+	* 	@param address	The address to send to.
+	* 	@param bundle	The bundle to send
+	*	@param pChannel	The Channel that is sending the bundle.
+	*				(even if the bundle is not sent reliably, it is still passed
+	*				through the filter associated with the channel).
+	*/
+	void send(const sockaddrunion& address, geco_bundle_t& bundle, geco_channel_t * pChannel)
+	{
+
+	}
+};
 
 #include <functional>
 typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_monitor_handler_t; //in and out
@@ -560,7 +586,6 @@ typedef std::function<void(const char* exception, void* arg)> reply_exception_ha
 *	@internal
 *	This is the default request timeout in microseconds.
 */
-const int DEFAULT_REQUEST_TIMEOUT = 5000000;
 struct reply_order_t
 {
 	reply_msg_handler_t response_msg_handler_;
@@ -670,6 +695,9 @@ private:
 	interface_element_t const *m_pkCurIE;
 	int	m_iMsgLen;
 	int	m_iMsgExtra;
+	msg_id* m_pHeader;
+	uint m_uiHeaderLen;
+	uint m_uiHeaderLen1;
 	uchar	*m_puiMsgBeg;
 	ushort m_uiMsgChunkOffset;
 	bool m_bMsgReliable;
@@ -677,13 +705,16 @@ private:
 
 	// statistics
 	int	m_iNumMessages;//numMessages
-	int	m_iNumReliableMessages;
+	int	m_iNumReliableOrderedMessages;
+	int	m_iNumReliableUnOrderedMessages;
+	int	m_iNumUnReliableOrderedMessages;
+	int	m_iNumUnReliableUnOrderedMessages;
 	int m_iNumMessagesTotalBytes;
 
 	uchar m_ucSendBuffers[4][1500];
 	int m_sb_free_space_[4];//free Bytes In m_ucSendBuffer
-	int m_curr_stream_id;
 	int m_iPMTU;
+	int m_curr_stream_id;
 
 public:
 	// initialises an empty bundle for writing.
@@ -701,21 +732,47 @@ public:
 	int size() const;
 	/// returns true if this Bundle is owned by an external channel.
 	bool is_external_channel() const;
+	void send(const sockaddrunion& address, geco_network_interface_t& networkInterface,geco_channel_t* pChannel);
 
 	/**
-	 * 	starts a new message on the bundle. The expected length
+	 * 	write a request message without response on the bundle. The expected length
 	 *	should only be filled in if known (and only for variable-length messages)
 	 *	as a hint to whether to start this message on the current packet or to
 	 *	send the current bundle then bring in this message into current packet again
+	 * 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered, 
+	 * it is gueeted they are handled in sequence by receiver.
+	 * 
 	 *
 	 * 	@param ie			The type of message to start.
-	 * 	@param stream_id    -1 means use any stream id that
 	 */
-	void start_message_without_response( const interface_element_t& ie,int stream_id=-1);
+	void start_request_message( const interface_element_t& ie);
 
 	/**
-	 * 	finalises a message. It is called from a number of places within Bundle when necessary.
-	 */
+	* 	write a request message with response on the bundle, and call
+	* 	response_handler when the reply comes in or the
+	* 	timeout (in microseconds) expires, whichever comes first.
+	* 	A timeout of <= 0 means never time out (NOT recommended)
+	* 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered,
+	*  it is gueeted they are handled in sequence by receiver.
+	*
+	* 	@param ie			The type of request to start.
+	* 	@param handler		This handler receives the reply.
+	* 	@param arg			User argument that is sent to the handler.
+	* 	@param timeout		Time before a timeout exception is generated.
+	*/
+	void start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg=0, int timeout= DEFAULT_REPLY_MSG_TIMEOUT);
+
+	/**
+	* 	write a response to a request message. All reply id are should be the replyID
+	* 	from the message header of the request you're replying to.
+	* 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered,
+	*  it is gueeted they are handled in sequence by receiver.
+	* 
+	* 	@param id			The id of the message being replied to
+	*/
+	void start_response_message(const interface_element_t& ie);
+
+	/// finalises a message. It is called from a number of places within Bundle when necessary.
 	void end_message();
 
 private:
@@ -727,7 +784,7 @@ private:
 	 * 	@param extra	Number of extra bytes to reserve.
 	 * 	@return	Pointer to the body of the message.
 	 */
-	char* new_message( int extra );
+	uchar* new_message( int extra = 0);
 };
 
 /**
