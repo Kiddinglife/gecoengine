@@ -578,18 +578,15 @@ struct geco_network_interface_t
 
 #include <functional>
 typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_monitor_handler_t; //in and out
-typedef std::function<void(const sockaddrunion& source, unpacked_msg_hdr_t& header, uchar* data, void * arg)> reply_msg_handler_t;
-typedef std::function<void(const char* exception, void* arg)> reply_exception_handler_t;
-
 
 /**
 *	@internal
 *	This is the default request timeout in microseconds.
 */
-struct reply_order_t
+struct response_msg_handler_t
 {
-	reply_msg_handler_t response_msg_handler_;
-	reply_exception_handler_t response_exception_handler_;
+	std::function<void(const sockaddrunion& source, unpacked_msg_hdr_t& header, uchar* data, void * arg)> msg_handler_;
+	std::function<void(const char* exception, void* arg)> exception_handler_;
 	void *arg;
 	int microseconds;
 	uint *pReplyID;
@@ -670,7 +667,7 @@ AckOrders m_kAckOrders;
 class GECOAPI geco_bundle_t : public geco_bit_stream_t
 {
 public:
-		typedef eastl::vector<reply_order_t> reply_orders_t;
+		typedef eastl::vector<response_msg_handler_t> reply_orders_t;
 		reply_orders_t m_kReplyOrders;
 
 		typedef std::vector< piggy_back_t* > piggy_backs_t;
@@ -697,7 +694,7 @@ private:
 	int	m_iMsgExtra;
 	msg_id* m_pHeader;
 	uint m_uiHeaderLen;
-	uint m_uiHeaderLen1;
+	uint m_uiHeaderLenExtra;
 	uchar	*m_puiMsgBeg;
 	ushort m_uiMsgChunkOffset;
 	bool m_bMsgReliable;

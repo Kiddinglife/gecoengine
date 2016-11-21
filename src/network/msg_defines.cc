@@ -96,7 +96,7 @@ inline bool geco_bundle_t::is_external_channel() const { return m_pkChannel && m
 
 void geco_bundle_t::send(const sockaddrunion& address, geco_network_interface_t& networkInterface, geco_channel_t* pChannel)
 {
-	//TODO
+	//@TODO
 }
 
 void geco_bundle_t::cancel_requests()
@@ -104,7 +104,7 @@ void geco_bundle_t::cancel_requests()
 	reply_orders_t::iterator iter = m_kReplyOrders.begin();
 	while (iter != m_kReplyOrders.end())
 	{
-		iter->response_exception_handler_("requests are cancelled for eneral network reason !", iter->arg);
+		iter->exception_handler_("requests are cancelled for eneral network reason !", iter->arg);
 		++iter;
 	}
 	m_kReplyOrders.clear();
@@ -141,17 +141,17 @@ uchar* geco_bundle_t::new_message(int extra)
 		break;
 	}
 
-	m_uiHeaderLen1 = m_uiHeaderLen + extra;
-	if (m_uiHeaderLen1 <= m_sb_free_space_[m_pkCurIE->ro_])
+	m_uiHeaderLenExtra = m_uiHeaderLen + extra;
+	if (m_uiHeaderLenExtra <= m_sb_free_space_[m_pkCurIE->ro_])
 	{
 		m_pHeader = &m_ucSendBuffers[m_pkCurIE->ro_][m_iPMTU - m_sb_free_space_[m_pkCurIE->ro_]];
-		m_sb_free_space_[m_pkCurIE->ro_] -= m_uiHeaderLen1; 	// reset m_sb_free_space_
+		m_sb_free_space_[m_pkCurIE->ro_] -= m_uiHeaderLenExtra; 	// reset m_sb_free_space_
 	}
 	else
 	{
-		// @TODO force send this bundle ...
+		// @TODO force send this bundle to make space for this message
 		m_pHeader = &m_ucSendBuffers[m_pkCurIE->ro_][0];
-		m_sb_free_space_[m_pkCurIE->ro_] = (m_iPMTU- m_uiHeaderLen1); 		// reset m_sb_free_space_
+		m_sb_free_space_[m_pkCurIE->ro_] = (m_iPMTU- m_uiHeaderLenExtra); 		// reset m_sb_free_space_
 	}
 
 	m_puiMsgBeg = m_pHeader; 		// set the start of this msg
