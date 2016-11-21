@@ -501,8 +501,10 @@ class packet_recv_t
 	geco_engine_reason process_packet();
 };
 
+const int DEFAULT_BUNDLE_SEND_BUF_SIZE = 1500-20-8;
 class geco_channel_t
 {
+	public:
 		/*
 		 *	decide the reliablity to use.
 		 *	There are two types of channels that we handle. The first is a
@@ -559,7 +561,6 @@ typedef std::function<void(const char* exception, void* arg)> reply_exception_ha
 *	This is the default request timeout in microseconds.
 */
 const int DEFAULT_REQUEST_TIMEOUT = 5000000;
-
 struct reply_order_t
 {
 	reply_msg_handler_t response_msg_handler_;
@@ -679,14 +680,15 @@ private:
 	int	m_iNumReliableMessages;
 	int m_iNumMessagesTotalBytes;
 
-	uchar m_ucSendBuffer[MAX_MTU_SIZE-20-8];
-	int m_sb_free_space_;//free Bytes In m_ucSendBuffer
+	uchar m_ucSendBuffers[4][1500];
+	int m_sb_free_space_[4];//free Bytes In m_ucSendBuffer
 	int m_curr_stream_id;
+	int m_iPMTU;
 
 public:
 	// initialises an empty bundle for writing.
-	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL);
-	geco_bundle_t(uchar* packetChain);
+	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL,	int iPMTU=DEFAULT_BUNDLE_SEND_BUF_SIZE);
+	geco_bundle_t(uchar* packetChain,int iPMTU=DEFAULT_BUNDLE_SEND_BUF_SIZE);
 	virtual ~geco_bundle_t();
 
 	/// flushes the messages from this bundle making it empty.

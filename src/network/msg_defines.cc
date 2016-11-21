@@ -9,28 +9,28 @@ geco_engine_reason packet_recv_t::process_packet()
 	curr_packet_->m_uiIdentifier;
 }
 
-geco_bundle_t::geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL) :
+geco_bundle_t::geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel,int iPMTU) :
 	m_spFirstPacket(NULL),
 	m_pkCurrentPacket(NULL),
 	m_bFinalised(false),
 	m_uiExtraSize(spareSize),
 	m_pkChannel(pChannel),
-	m_sb_free_space_(sizeof(m_ucSendBuffer)),
-	m_curr_stream_id(-1)
+	m_curr_stream_id(-1),
+	m_iPMTU(iPMTU)
 {
 	this->clear(true/*do_not_dispose*/);
 }
 
-geco_bundle_t::geco_bundle_t(uchar* packetChain) :
+geco_bundle_t::geco_bundle_t(uchar* packetChain,int iPMTU) :
 	m_spFirstPacket(packetChain),
 	m_pkCurrentPacket(packetChain),
 	m_bFinalised(true),
 	m_uiExtraSize(0),
 	m_pkChannel(NULL),
-	m_sb_free_space_(sizeof(m_ucSendBuffer)),
-	m_curr_stream_id(-1)
+	m_curr_stream_id(-1),
+	m_iPMTU(iPMTU)
 {
-	this->clear( /* firstTime: */ true);
+	this->clear(true/*do_not_dispose*/);
 }
 
 void geco_bundle_t::dispose()
@@ -73,6 +73,11 @@ void geco_bundle_t::clear(bool do_not_dispose)
 		//m_spFirstPacket = new FvNetPacket();
 		//this->StartPacket(m_spFirstPacket.GetObject());
 	}
+
+	m_sb_free_space_[0] = DEFAULT_BUNDLE_SEND_BUF_SIZE;
+	m_sb_free_space_[1] = DEFAULT_BUNDLE_SEND_BUF_SIZE;
+	m_sb_free_space_[2] = DEFAULT_BUNDLE_SEND_BUF_SIZE;
+	m_sb_free_space_[3] = DEFAULT_BUNDLE_SEND_BUF_SIZE;
 }
 
 inline bool geco_bundle_t::empty() const{return (m_iNumMessages == 0);}
