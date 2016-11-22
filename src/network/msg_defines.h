@@ -363,6 +363,7 @@ struct GECOAPI interface_element_t
 	uint hdr_len_;
 	uint nominal_body_size_;
 	msg_id id_; ///< Unique message ID
+	uchar flag_;
 	uchar lengthStyle_;	///< Fixed or variable length
 	uint lengthParam_;	///< This depends on lengthStyle
 	const char *name_;	///< The name of the interface method
@@ -381,16 +382,16 @@ struct GECOAPI interface_element_t
 		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
 		NULL, uint msg_rel_or = RELIABLE_ORDER) :
 		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
-			name), pHandler_(pHandler),ro_(msg_rel_or)
+			name), pHandler_(pHandler),ro_(msg_rel_or), flag_(0)
 	{
 		if (lengthStyle_ == FIXED_LENGTH_MESSAGE)
 		{
-			hdr_len_ = sizeof(msg_id);
+			hdr_len_ = 2*sizeof(uchar)+sizeof(ushort);
 			nominal_body_size_ = lengthParam_;
 		}
 		else if (lengthStyle_ == VARIABLE_LENGTH_MESSAGE)
 		{
-			hdr_len_ = lengthParam_ + sizeof(msg_id);
+			hdr_len_ = lengthParam_ + sizeof(uchar);
 			nominal_body_size_ = 0;
 		}
 		else
@@ -533,6 +534,7 @@ class geco_channel_t
 		const int m_ostreams_total_size;
 		const int m_ostreams_avg_size;
 		stream_ids_t m_sids[4];
+		int curr_stream_idx[4];
 
 		geco_channel_t(int ostreams_total_size=8):
 			m_ostreams_total_size(ostreams_total_size),
@@ -543,6 +545,10 @@ class geco_channel_t
 			m_sids[1].reserve(m_ostreams_avg_size);
 			m_sids[2].reserve(m_ostreams_avg_size);
 			m_sids[3].reserve(m_ostreams_avg_size);
+			curr_stream_idx[0] = -1;
+			curr_stream_idx[1] = -1;
+			curr_stream_idx[2] = -1;
+			curr_stream_idx[3] = -1;
 		}
 
 	    const char* c_str() const
@@ -686,7 +692,7 @@ AckOrders m_kAckOrders;
  struct passed to it. This means the bundle adds the special message of type
  'REPLY_MESSAGE_IDENTIFIER', which is always handled by the system.
  -----------------------------------------------------------------------------*/
-class GECOAPI geco_bundle_t : public geco_bit_stream_t
+class GECOAPI geco_bundle_t
 {
 public:
 		// stores all the requests for this bundle.
@@ -717,7 +723,6 @@ private:
 	uint	m_iMsgExtra;
 	msg_id* m_pHeader;
 	uint m_uiHeaderLen;
-	uint m_uiHeaderLenExtra;
 	uchar	*m_puiMsgBeg;
 	ushort m_uiMsgChunkOffset;
 	bool m_bMsgReliable;
@@ -731,15 +736,12 @@ private:
 	uint	m_iNumUnReliableUnOrderedMessages;
 	uint m_iNumMessagesTotalBytes;
 
-	uchar m_ucSendBuffers[4][1500];
-	uint m_sb_free_space_[4];//free Bytes In m_ucSendBuffer
-	uint m_iPMTU;
-	uint m_curr_stream_id;
+	geco_bit_stream_t m_ucSendBuffers[4];  // 4 buffers for messages with different reliabilities (unrel&uno, unrel&o, rel&o, rel&uno)
 
 public:
 	// initialises an empty bundle for writing.
-	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL,	int iPMTU=DEFAULT_BUNDLE_SEND_BUF_SIZE);
-	geco_bundle_t(uchar* packetChain,int iPMTU=DEFAULT_BUNDLE_SEND_BUF_SIZE);
+	geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel = NULL);
+	geco_bundle_t(uchar* packetChain);
 	virtual ~geco_bundle_t();
 
 	/// flushes the messages from this bundle making it empty.
@@ -753,6 +755,8 @@ public:
 	/// returns true if this Bundle is owned by an external channel.
 	bool is_external_channel() const;
 	void send(const sockaddrunion& address, geco_network_interface_t& networkInterface,geco_channel_t* pChannel);
+	/// gets a start pointer to this many bytes 
+	uchar* reserve(int nBytes);
 
 	/**
 	 * 	write a request message without response on the bundle. The expected length

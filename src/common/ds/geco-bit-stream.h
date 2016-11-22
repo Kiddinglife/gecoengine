@@ -56,7 +56,7 @@
 /// Threshold at which to do a malloc / free rather than pushing data onto a fixed stack
 /// for the bitstream class. 512 is an arbitrary size, just picking something likely to be larger
 /// than  most packets
-#define GECO_STREAM_STACK_ALLOC_BYTES 512
+#define GECO_STREAM_STACK_ALLOC_BYTES 1472
 #define GECO_STREAM_STACK_ALLOC_BITS (BYTES_TO_BITS(GECO_STREAM_STACK_ALLOC_BYTES))
 
 // another imple of singleton using static methods instead of inhertance
@@ -430,7 +430,7 @@ public:
 			ReadBits((uchar*)&dest, BYTES_TO_BITS(sizeof(IntegralType)), true);
 #endif
 		}
-	}
+		}
 
 	/// @method Read
 	/// @access public
@@ -1983,6 +1983,6 @@ public:
 	void Bitify(bool hide_zero_low_bytes = false);
 	static void Hexlify(char* outstr, bit_size_t bitsPrint, uchar* src);
 	void Hexlify(void);
-};
+	};
 
 #endif /* SRC_COMMON_DS_GECO_BIT_STREAM_H_ */
