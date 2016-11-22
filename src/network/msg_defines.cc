@@ -3,13 +3,13 @@
 DECLARE_DEBUG_COMPONENT2("Network", 0);
 
 
-geco_engine_reason packet_recv_t::process_packet()
+inline geco_engine_reason packet_recv_t::process_packet()
 {
 	geco_engine_reason ret = geco_engine_reason::SUCCESS;
 	curr_packet_->m_uiIdentifier;
 }
 
-geco_bundle_t::geco_bundle_t(uchar spareSize = 0, geco_channel_t* pChannel, int iPMTU) :
+geco_bundle_t::geco_bundle_t(uchar spareSize, geco_channel_t* pChannel, int iPMTU) :
 	m_spFirstPacket(NULL),
 	m_pkCurrentPacket(NULL),
 	m_bFinalised(false),
@@ -39,7 +39,7 @@ geco_bundle_t::~geco_bundle_t()
 
 }
 
-void geco_bundle_t::dispose()
+inline void geco_bundle_t::dispose()
 {
 	m_spFirstPacket = NULL;
 	m_pkCurrentPacket = NULL;
@@ -53,7 +53,7 @@ void geco_bundle_t::dispose()
 	m_kAckOrders.clear();
 }
 
-void geco_bundle_t::clear(bool do_not_dispose)
+inline void geco_bundle_t::clear(bool do_not_dispose)
 {
 	if (!do_not_dispose)
 	{
@@ -90,7 +90,7 @@ void geco_bundle_t::clear(bool do_not_dispose)
 }
 
 inline bool geco_bundle_t::empty() const { return (m_iNumMessages == 0); }
-inline int geco_bundle_t::size() const { return m_iNumMessagesTotalBytes; }
+inline uint geco_bundle_t::size() const { return m_iNumMessagesTotalBytes; }
 inline bool geco_bundle_t::is_external_channel() const { return m_pkChannel && m_pkChannel->m_uiType == geco_channel_t::WAN; }
 
 
@@ -101,16 +101,17 @@ void geco_bundle_t::send(const sockaddrunion& address, geco_network_interface_t&
 
 void geco_bundle_t::cancel_requests()
 {
-	reply_orders_t::iterator iter = m_kReplyOrders.begin();
-	while (iter != m_kReplyOrders.end())
+	response_orders_t::iterator iter = m_kReplyOrders.begin();
+	response_orders_t::iterator end = m_kReplyOrders.end();
+	while (iter != end)
 	{
-		iter->exception_handler_("requests are cancelled for eneral network reason !", iter->arg);
+		iter->response_handler.exception_handler_("requests are cancelled for eneral network reason !", iter->arg);
 		++iter;
 	}
 	m_kReplyOrders.clear();
 }
 
-uchar* geco_bundle_t::new_message(int extra)
+uchar* geco_bundle_t::new_message(uint extra)
 {
 	// figure the length of the header
 	m_uiHeaderLen = m_pkCurIE->hdr_len_;
@@ -162,7 +163,7 @@ uchar* geco_bundle_t::new_message(int extra)
 	return (m_pHeader + m_uiHeaderLen);  //return a pointer to the extra data
 }
 
-void geco_bundle_t::start_request_message(const interface_element_t& ie)
+inline void geco_bundle_t::start_request_message(const interface_element_t& ie)
 {
 	if (m_pkChannel == NULL)
 	{
@@ -176,38 +177,58 @@ void geco_bundle_t::start_request_message(const interface_element_t& ie)
 	m_curr_stream_id &= m_pkChannel->m_ostreams_avg_size;
 }
 
-void geco_bundle_t::start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg, int timeout)
+inline void geco_bundle_t::start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg, uint timeout)
 {
 	if (m_pkChannel == NULL)
 	{
 		WARNING_MSG("geco_bundle_t::start_request_message(): no channel set !\n");
 		return;
 	}
+	if(ie.ro_ != RELIABLE_ORDER && ie.ro_ != RELIABLE_UNORDER)
+	{
+		WARNING_MSG("geco_bundle_t::start_request_message(): UNRELIABLE NOT ALLOWED FOR REQUEST MSG WITH RESPONSE EXPECTED!\n");
+		return;
+	}
 	if (timeout <= 0)
 	{
 		// Requests never timeout on channels.
 		WARNING_MSG("geco_bundle_t::start_request_message(channel: %s): no timeout set !\n", m_pkChannel->c_str());
+		return;
 	}
 	this->end_message();
 	m_pkCurIE = &ie;
 	m_bMsgRequest = true;
+
 	// Start a new message, and set bit for the reply flag 
+	this->new_message(/*extra=*/0);
+
+	// now make and add a response order
+	response_order_t& ro = m_kReplyOrders.push_back();
+	ro.response_handler = response_handler;
+	ro.timeout_ms = timeout;
+	ro.arg = arg;
 }
 
 
-void geco_bundle_t::start_response_message(const interface_element_t& ie)
+inline void geco_bundle_t::start_response_message(const interface_element_t& ie)
 {
 	if (m_pkChannel == NULL)
 	{
 		WARNING_MSG("geco_bundle_t::start_response_message(): no channel set !\n");
 		return;
 	}
+	if(ie.ro_ != RELIABLE_ORDER && ie.ro_ != RELIABLE_UNORDER)
+	{
+		WARNING_MSG("geco_bundle_t::start_response_message(): UNRELIABLE NOT ALLOWED FOR RESPONSE MSG!\n");
+		return;
+	}
 	this->end_message();
 	m_pkCurIE = &ie;
 	m_bMsgRequest = false;
+	this->new_message(/*extra=*/0);
 }
 
-void geco_bundle_t::end_message()
+inline void geco_bundle_t::end_message()
 {
 	// nothing to do if no message yet
 	if (m_puiMsgBeg == NULL) return;

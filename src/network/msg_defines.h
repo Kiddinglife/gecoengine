@@ -580,17 +580,39 @@ struct geco_network_interface_t
 typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_monitor_handler_t; //in and out
 
 /**
-*	@internal
-*	This is the default request timeout in microseconds.
-*/
-struct response_msg_handler_t
+ *  declares an interface for receiving response messages.
+ *  When a client issues a request with response, an interface of this type should
+ *  be provided to handle the reply.
+ */
+struct response_handler_t
 {
-	std::function<void(const sockaddrunion& source, unpacked_msg_hdr_t& header, uchar* data, void * arg)> msg_handler_;
-	std::function<void(const char* exception, void* arg)> exception_handler_;
-	void *arg;
-	int microseconds;
-	uint *pReplyID;
+	/*
+	 * 	called by Mercury to deliver a reply message.
+	 * 	@param source	The address at which the message originated.
+	 * 	@param header	This contains the message type, size, and flags.
+	 * 	@param data		The actual message data.
+	 * 	@param arg		This is user-defined data that was passed in with the request that generated this reply.
+	 */
+	std::function<void(sockaddrunion& source, unpacked_msg_hdr_t& msghdr, geco_bit_stream_t& is, void* args)> msg_parser_;
+
+	/**
+	* 	This method is called by Mercury when the request fails. The
+	* 	normal reason for this happening is a timeout.
+	* 	@param exception	The reason for failure.
+	* 	@param arg			The user-defined data associated with the request.
+	*/
+	std::function<void(const char* exception, void * arg)> exception_handler_;
+	std::function<void(const char* exception, void * arg)> shutdown_handler_;
 };
+
+///  represents a request that requires a reply.
+struct response_order_t
+{
+	response_handler_t response_handler;
+	void *arg;	//User argument passed to the handler.
+	uint timeout_ms;// Timeout in ms.
+};
+
 
 struct piggy_back_t
 {
@@ -667,8 +689,9 @@ AckOrders m_kAckOrders;
 class GECOAPI geco_bundle_t : public geco_bit_stream_t
 {
 public:
-		typedef eastl::vector<response_msg_handler_t> reply_orders_t;
-		reply_orders_t m_kReplyOrders;
+		// stores all the requests for this bundle.
+		typedef eastl::vector< response_order_t> response_orders_t;
+		response_orders_t m_kReplyOrders;
 
 		typedef std::vector< piggy_back_t* > piggy_backs_t;
 		piggy_backs_t m_kPiggybacks;
@@ -690,8 +713,8 @@ private:
 
 	// per message stuff
 	interface_element_t const *m_pkCurIE;
-	int	m_iMsgLen;
-	int	m_iMsgExtra;
+	uint	m_iMsgLen;
+	uint	m_iMsgExtra;
 	msg_id* m_pHeader;
 	uint m_uiHeaderLen;
 	uint m_uiHeaderLenExtra;
@@ -701,17 +724,17 @@ private:
 	bool m_bMsgRequest;
 
 	// statistics
-	int	m_iNumMessages;//numMessages
-	int	m_iNumReliableOrderedMessages;
-	int	m_iNumReliableUnOrderedMessages;
-	int	m_iNumUnReliableOrderedMessages;
-	int	m_iNumUnReliableUnOrderedMessages;
-	int m_iNumMessagesTotalBytes;
+	uint	m_iNumMessages;//numMessages
+	uint	m_iNumReliableOrderedMessages;
+	uint	m_iNumReliableUnOrderedMessages;
+	uint	m_iNumUnReliableOrderedMessages;
+	uint	m_iNumUnReliableUnOrderedMessages;
+	uint m_iNumMessagesTotalBytes;
 
 	uchar m_ucSendBuffers[4][1500];
-	int m_sb_free_space_[4];//free Bytes In m_ucSendBuffer
-	int m_iPMTU;
-	int m_curr_stream_id;
+	uint m_sb_free_space_[4];//free Bytes In m_ucSendBuffer
+	uint m_iPMTU;
+	uint m_curr_stream_id;
 
 public:
 	// initialises an empty bundle for writing.
@@ -726,7 +749,7 @@ public:
 	/// returns true if the bundle is empty of messages.
 	bool empty() const;
 	/// returns the accumulated size of the bundle (including all messages).
-	int size() const;
+	uint size() const;
 	/// returns true if this Bundle is owned by an external channel.
 	bool is_external_channel() const;
 	void send(const sockaddrunion& address, geco_network_interface_t& networkInterface,geco_channel_t* pChannel);
@@ -757,7 +780,7 @@ public:
 	* 	@param arg			User argument that is sent to the handler.
 	* 	@param timeout		Time before a timeout exception is generated.
 	*/
-	void start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg=0, int timeout= DEFAULT_REPLY_MSG_TIMEOUT);
+	void start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg=0, uint timeout= DEFAULT_REPLY_MSG_TIMEOUT);
 
 	/**
 	* 	write a response to a request message. All reply id are should be the replyID
@@ -781,7 +804,7 @@ private:
 	 * 	@param extra	Number of extra bytes to reserve.
 	 * 	@return	Pointer to the body of the message.
 	 */
-	uchar* new_message( int extra = 0);
+	uchar* new_message( uint extra = 0);
 };
 
 /**

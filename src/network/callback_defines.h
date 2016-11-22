@@ -54,36 +54,7 @@ typedef std::function<int(int fd)> network_data_arrived_handler_t;
 //        virtual int handleInputNotification(int fd) = 0;
 //};
 
-/**
- *  This class declares an interface for receiving reply messages.
- *  When a client issues a request, an interface of this type should
- *  be provided to handle the reply.
- *
- *  @see Bundle::startRequest
- *  @see Bundle::startReply
- *
- *  @ingroup mercury
- */
-struct response_handler_t
-{
-	/*
-	 * 	called by Mercury to deliver a reply message.
-	 * 	@param source	The address at which the message originated.
-	 * 	@param header	This contains the message type, size, and flags.
-	 * 	@param data		The actual message data.
-	 * 	@param arg		This is user-defined data that was passed in with the request that generated this reply.
-	 */
-	std::function<void(sockaddrunion& source, unpacked_msg_hdr_t& msghdr, geco_bit_stream_t& data, void* args)> msg_parser_;
 
-	/**
-	* 	This method is called by Mercury when the request fails. The
-	* 	normal reason for this happening is a timeout.
-	* 	@param exception	The reason for failure.
-	* 	@param arg			The user-defined data associated with the request.
-	*/
-	std::function<void(const char* exception, void * arg)> exception_handler_;
-	std::function<void(const char* exception, void * arg)> shutdown_handler_;
-};
 //class ReplyMessageHandler
 //{
 //    public:

@@ -39,3 +39,60 @@ This chapter will answer the questions below:
 5 Creativity: 
     what matters is not the spark of an idea but what you do with that idea once it emerges, 
     and this is where the playcentrc process accouts for.
+    
+    
+    
+    
+１ did war gaming need c++ developers to develop a branch-new back-end system from screech or  maintain and improve the existing back-end code base?
+
+
+Apply Actor Pattern
+a single process architecture can easily have bottleneck of bussiness logics when there are a huge of number of entities in AOI. 
+the feature of dynamic load balance does not work well when there are a huge number of player gathering together in a small area on the map
+due to the limited calculation ability of a single cpu core. One possible solution is to apply actor pattern with the powers of multi-cores 
+on the same server machine. In addition, application of actor pattern does not introduce any extra difficulties for dizaster recovery or 
+entity backup. Below is a very draft implementations:
+a single network thread used for reliable transfer, sending and receiving request or reply messages;
+multi script threads (assume 5, each of them keeps a script interpretor ptr) used as encoder and decoder of messages, calling emtity method and updating entity properties
+lock free spsc message queues(must have same number to scrip threads, which is 5 right here) 
+used for communications between network thread and scrip threads;
+struct java_message_info_t
+{
+    jobject obj;
+    jmethodID mtd;
+    jfieldID field;
+    jvalue* args;
+};
+struct python_message_info_t
+{
+    PyObject* obj;
+    PyObject* mtd;
+    PyObject* field;
+    PyObject* args;
+};
+...other scrip language are skipped over
+
+Apply memory serilizations with (de)compression
+big world uses zlib as real time (de)compression method for external channel, which is not the best choice.
+based on the formular:
+Time=1/Ratio+ActualBandwidth*(1/DecompressVelocity+1/CompressVelocity).
+LZF3.6 http://oldhome.schmorp.de/marc/liblzf.html is best option to achieve highest network throughput when bandwidth < 133 Mbps
+(the bandwidth most game clients have).In addition, bw lacks of a high granularity serilization method. 
+e.g. I can do this ushort player_health = 25; WriteCompress(player_health); which only uses 5 bits 
+
+Apply One Reply Bit in Msg Flag
+Use one bit in msg flag to tell a reply message instead of 4-byte-long REPLY_IDENTITY 
+so that we can reuse the same msg id with reply bit 1 or 0  to decode message correctly.
+
+Apply Robust High performance UDP-TUNNELED-SCTP (please refer to RFC 4960)
+UDP-TUNNELED-SCTP is the perfect network solution with different levels of reliabilities.
+It supports reliable-ordered, reliable-unordered, unreliable-ordered and unreliable-unordered transfer.
+However, BW only supports two of them, which are reliable-ordered and unreliable-unordered.
+BW's reliable transfer is so coupled with business logics, which makes it so hard to reuse.
+BW reliable transfer module has no congestion control(vital weakness!).
+
+Apply stronger encryption
+Secured connection based on key-exchange.
+key exchange methods (RAS & DH).
+encrption methods (DES_CBC, 3DES_CBC, ASE128,AES192).
+Hash methods (MD5, SHA-1).
