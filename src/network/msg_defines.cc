@@ -14,7 +14,8 @@ geco_bundle_t::geco_bundle_t(uchar spareSize, geco_channel_t* pChannel) :
 	m_pkCurrentPacket(NULL),
 	m_bFinalised(false),
 	m_uiExtraSize(spareSize),
-	m_pkChannel(pChannel)
+	m_pkChannel(pChannel),
+	m_CurrBuf(NULL)
 {
 	this->clear(true/*do_not_dispose*/);
 }
@@ -24,7 +25,8 @@ geco_bundle_t::geco_bundle_t(uchar* packetChain) :
 	m_pkCurrentPacket(packetChain),
 	m_bFinalised(true),
 	m_uiExtraSize(0),
-	m_pkChannel(NULL)
+	m_pkChannel(NULL),
+	m_CurrBuf(NULL)
 {
 	this->clear(true/*do_not_dispose*/);
 }
@@ -39,14 +41,7 @@ inline void geco_bundle_t::dispose()
 {
 	m_spFirstPacket = NULL;
 	m_pkCurrentPacket = NULL;
-
 	m_kReplyOrders.clear();
-	m_kReliableOrders.clear();
-
-	for (piggy_backs_t::iterator iter = m_kPiggybacks.begin();iter != m_kPiggybacks.end(); ++iter) delete *iter;
-	m_kPiggybacks.clear();
-
-	m_kAckOrders.clear();
 }
 
 inline void geco_bundle_t::clear(bool do_not_dispose)
@@ -58,8 +53,6 @@ inline void geco_bundle_t::clear(bool do_not_dispose)
 	}
 
 	m_bReliableDriver = false;
-	m_iReliableOrdersExtracted = 0;
-	m_bIsCritical = false;
 	m_pkCurIE = NULL;
 	m_iMsgLen = 0;
 	m_puiMsgBeg = NULL;
@@ -72,6 +65,11 @@ inline void geco_bundle_t::clear(bool do_not_dispose)
 	m_iNumUnReliableOrderedMessages = 0;
 	m_iNumUnReliableUnOrderedMessages = 0;
 	m_iNumMessagesTotalBytes = 0;
+
+	m_write_positions[0] = 0;
+	m_write_positions[1] = 0;
+	m_write_positions[2] = 0;
+	m_write_positions[3] = 0;
 
 	if (m_spFirstPacket == NULL)
 	{
@@ -102,23 +100,14 @@ void geco_bundle_t::cancel_requests()
 	m_kReplyOrders.clear();
 }
 
-inline uchar* geco_bundle_t::reserve(int extra)
+inline uchar* geco_bundle_t::reserve(uint extra)
 {
-	m_ucSendBuffers[m_pkCurIE->ro_].AppendBitsCouldRealloc(extra * 8);
-	return m_ucSendBuffers[m_pkCurIE->ro_].get_written_bytes()+ m_ucSendBuffers[m_pkCurIE->ro_].uchar_data();
+	m_CurrBuf->AppendBitsCouldRealloc(extra << 3);
+	return m_CurrBuf->get_written_bytes() + m_CurrBuf->uchar_data();
 }
 
-uchar* geco_bundle_t::new_message(uint extra)
+inline void geco_bundle_t::new_message()
 {
-	// figure the length of the header
-	m_uiHeaderLen = m_pkCurIE->hdr_len_;
-	if (m_uiHeaderLen < 0)
-	{
-		CRITICAL_MSG("geco_bundle_t::new_message(extra=%d)::"
-			"tried to add a message with an unknown length format %d\n",
-			extra, (int)m_pkCurIE->lengthStyle_);
-	}
-
 	++m_iNumMessages;
 	switch (m_pkCurIE->ro_)
 	{
@@ -139,28 +128,37 @@ uchar* geco_bundle_t::new_message(uint extra)
 		break;
 	}
 
-	m_pHeader = reserve(m_uiHeaderLen + extra);
-	m_puiMsgBeg = m_pHeader; 		// set the start of this msg
-	m_ucSendBuffers[m_pkCurIE->ro_].Write(m_pkCurIE->id_);
-	m_iMsgLen = 0; 	// set the length to zero as we do not know it is vari or fix msg
-	m_iMsgExtra = extra;
-	return (m_pHeader + m_uiHeaderLen);  //return a pointer to the extra data
+	m_CurrBuf = &m_ucSendBuffers[m_pkCurIE->ro_];
+	if (is_external_channel())
+	{
+		m_CurrBuf->WriteMini(m_pkCurIE->id_);
+		m_CurrBuf->WriteMini(m_pkCurIE->flag_);
+		m_MsgLenPtr = m_CurrBuf->uchar_data() + m_CurrBuf->get_written_bytes();
+		m_CurrBuf->write_two_aligned_bytes((const char*)&m_pkCurIE->lengthParam_);
+	}
+	else
+	{
+		m_CurrBuf->Write(m_pkCurIE->id_);
+		m_CurrBuf->Write(m_pkCurIE->flag_);
+		m_MsgLenPtr = m_CurrBuf->uchar_data() + m_CurrBuf->get_written_bytes();
+		m_CurrBuf->Write(m_pkCurIE->lengthParam_);
+	}
 }
 
-inline void geco_bundle_t::start_request_message(const interface_element_t& ie)
+geco_bit_stream_t* geco_bundle_t::start_request_message(interface_element_t& ie)
 {
 	if (m_pkChannel == NULL)
 	{
 		WARNING_MSG("geco_bundle_t::start_request_message(): no channel set !\n");
 		return;
 	}
-	this->end_message();
 	m_pkCurIE = &ie;
-	m_bMsgRequest = true;
-	this->new_message(ie.lengthParam_);
+	m_pkCurIE->flag_ |= MSG_REQUEST;
+	this->new_message();
+	return m_CurrBuf;
 }
 
-inline void geco_bundle_t::start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg, uint timeout)
+geco_bit_stream_t* geco_bundle_t::start_request_message(interface_element_t& ie, response_handler_t& response_handler, void * arg, uint timeout)
 {
 	if (m_pkChannel == NULL)
 	{
@@ -178,22 +176,19 @@ inline void geco_bundle_t::start_request_message(const interface_element_t& ie, 
 		WARNING_MSG("geco_bundle_t::start_request_message(channel: %s): no timeout set !\n", m_pkChannel->c_str());
 		return;
 	}
-	this->end_message();
 	m_pkCurIE = &ie;
-	m_bMsgRequest = true;
-
-	// Start a new message, and set bit for the reply flag 
-	this->new_message(/*extra=*/0);
-
+	m_pkCurIE->flag_ |= MSG_REQUEST;
+	this->new_message();
 	// now make and add a response order
 	response_order_t& ro = m_kReplyOrders.push_back();
 	ro.response_handler = response_handler;
 	ro.timeout_ms = timeout;
 	ro.arg = arg;
+	return m_CurrBuf;
 }
 
 
-inline void geco_bundle_t::start_response_message(const interface_element_t& ie)
+geco_bit_stream_t* geco_bundle_t::start_response_message(interface_element_t& ie)
 {
 	if (m_pkChannel == NULL)
 	{
@@ -205,19 +200,18 @@ inline void geco_bundle_t::start_response_message(const interface_element_t& ie)
 		WARNING_MSG("geco_bundle_t::start_response_message(): UNRELIABLE NOT ALLOWED FOR RESPONSE MSG!\n");
 		return;
 	}
-	this->end_message();
 	m_pkCurIE = &ie;
-	m_bMsgRequest = false;
-	this->new_message(/*extra=*/0);
+	m_pkCurIE->flag_ |= MSG_RESPONSE;
+	this->new_message();
+	return m_CurrBuf;
 }
 
-inline void geco_bundle_t::end_message()
+inline void geco_bundle_t::end_message(uint msg_payload_bytes) //  compression also need counts full size of that type
 {
 	// nothing to do if no message yet
-	if (m_puiMsgBeg == NULL) return;
-	// fill in msg hdr including msgid, msglen and msgflags
-	m_pkCurIE->compress_length(m_puiMsgBeg, m_iMsgLen, *this, m_bMsgRequest);
-	m_puiMsgBeg = NULL;
+	if (m_pkCurIE == NULL) return;
+	*(ushort*)m_MsgLenPtr = htons(msg_payload_bytes); //write msg len exclude msg id and msg flag
+	m_pkCurIE = NULL;
 }
 
 

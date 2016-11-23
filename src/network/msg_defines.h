@@ -315,10 +315,10 @@ inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is, entity_mb &d)
 
 
 /////////////////////////////////////// interface_element_t starts ////////////////////////////////////
-const int RELIABLE_ORDER= 0;
-const int RELIABLE_UNORDER= 1;
-const int UNRELIABLE_ORDER= 2;
-const int UNRELIABLE_UNORDER= 3;
+const int RELIABLE_ORDER = 0;
+const int RELIABLE_UNORDER = 1;
+const int UNRELIABLE_ORDER = 2;
+const int UNRELIABLE_UNORDER = 3;
 
 /**
  * 	@internal
@@ -346,6 +346,13 @@ const char VARIABLE_LENGTH_MESSAGE = 1;
  */
 const char INVALID_MESSAGE = 2;
 
+//00 last bit 0 = var 1=fix
+const uchar MSG_VAR = 0; 
+const uchar MSG_FIX = 1;
+//01 last second bit 0 = request 1 = response
+const uchar MSG_REQUEST = 0; 
+const uchar MSG_RESPONSE = 2; 
+
 /**
  * 	@internal
  *	This structure describes a single message within an
@@ -357,18 +364,18 @@ const char INVALID_MESSAGE = 2;
  *	express the length.
  */
 class geco_bundle_t;
+const uint MSG_HDR_SIZE = 4;
 struct GECOAPI interface_element_t
 {
 	static const interface_element_t REPLY;
-	uint hdr_len_;
 	uint nominal_body_size_;
 	msg_id id_; ///< Unique message ID
 	uchar flag_;
 	uchar lengthStyle_;	///< Fixed or variable length
-	uint lengthParam_;	///< This depends on lengthStyle
+	ushort lengthParam_;	///< This depends on lengthStyle
 	const char *name_;	///< The name of the interface method
 	msg_handler_cb pHandler_; /// msg handler
-
+	uint fixed_totals_;
 	/*
 	value among:
 	const int RELIABLE_ORDER= 0;
@@ -382,24 +389,19 @@ struct GECOAPI interface_element_t
 		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
 		NULL, uint msg_rel_or = RELIABLE_ORDER) :
 		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
-			name), pHandler_(pHandler),ro_(msg_rel_or), flag_(0)
+			name), pHandler_(pHandler), ro_(msg_rel_or), flag_(0)
 	{
 		if (lengthStyle_ == FIXED_LENGTH_MESSAGE)
 		{
-			hdr_len_ = 2*sizeof(uchar)+sizeof(ushort);
+			flag_ |= MSG_FIX;
 			nominal_body_size_ = lengthParam_;
-		}
-		else if (lengthStyle_ == VARIABLE_LENGTH_MESSAGE)
-		{
-			hdr_len_ = lengthParam_ + sizeof(uchar);
-			nominal_body_size_ = 0;
 		}
 		else
 		{
-			hdr_len_ = 0;
+			flag_ |= MSG_VAR;
 			nominal_body_size_ = 0;
 		}
-
+		fixed_totals_ = nominal_body_size_ + MSG_HDR_SIZE;
 	}
 
 	void Set(const char * name, msg_id id, uchar lengthStyle,
@@ -410,27 +412,7 @@ struct GECOAPI interface_element_t
 		lengthParam_ = lengthParam;
 		name_ = name;
 	}
-	/**
-	 *  This method returns the number of bytes occupied by a header
-	 *  for this type of message.
-	 *
-	 *  @return Number of bytes needed for this header.
-	 */
-	uint read_hdr_len() const
-	{
-		return hdr_len_;
-	}
-	/**
-	 *  This method returns the number of bytes nominally occupied by the body
-	 *  of this type of message.
-	 *
-	 *  @return Number of bytes.
-	 */
-	uint nominalBodySize() const
-	{
-		// never guesses for variable-length messages
-		return (lengthStyle_ == FIXED_LENGTH_MESSAGE) ? lengthParam_ : 0;
-	}
+
 	bool is_valid_len(uint length) const
 	{
 		return (lengthStyle_ != VARIABLE_LENGTH_MESSAGE)
@@ -453,7 +435,7 @@ struct GECOAPI interface_element_t
 	 *
 	 *	@return 0 if successful.
 	 */
-	int compress_length(uchar* hdr, int length,geco_bundle_t& bundle, int isRequest ) const
+	int compress_length(uchar* hdr, int length, geco_bundle_t& bundle, int isRequest) const
 	{
 		return 0;//TODO
 	}
@@ -502,59 +484,59 @@ class packet_recv_t
 	geco_engine_reason process_packet();
 };
 
-const int DEFAULT_BUNDLE_SEND_BUF_SIZE = 1500-20-8;
+const int DEFAULT_BUNDLE_SEND_BUF_SIZE = 1500 - 20 - 8;
 const int DEFAULT_REPLY_MSG_TIMEOUT = 3000; // default request timeout in ms 5 senonds
 
 class geco_channel_t
 {
-	public:
-		/*
-		 *	decide the reliablity to use.
-		 *	There are two types of channels that we handle. The first is a
-		 *	channel between server and server. These channels are low latency,
-		 *	high bandwidth, and low loss. The second is a channel between client
-		 *	and server, which is high latency, low bandwidth, and high loss.
-		 *	Since bandwidth is scarce on client/server channels, only reliable
-		 *	data is resent on these channels. Unreliable data is stripped from
-		 *	dropped packets and discarded.
-		 */
-		enum:uint
-		{
-			WAN = 0,//server and server.
-			LAN = 1//client and server.
-		};
-		uint m_uiType;
+public:
+	/*
+	 *	decide the reliablity to use.
+	 *	There are two types of channels that we handle. The first is a
+	 *	channel between server and server. These channels are low latency,
+	 *	high bandwidth, and low loss. The second is a channel between client
+	 *	and server, which is high latency, low bandwidth, and high loss.
+	 *	Since bandwidth is scarce on client/server channels, only reliable
+	 *	data is resent on these channels. Unreliable data is stripped from
+	 *	dropped packets and discarded.
+	 */
+	enum :uint
+	{
+		WAN = 0,//server and server.
+		LAN = 1//client and server.
+	};
+	uint m_uiType;
 
-		//streams RELIABLE_ORDER= 0
-		//streams RELIABLE_UNORDER= 1
-		//streams UNRELIABLE_ORDER= 2
-		//streams UNRELIABLE_UNORDER= 3
-		typedef int stream_id_t;
-		typedef eastl::vector<stream_id_t> stream_ids_t;
-		const int m_ostreams_total_size;
-		const int m_ostreams_avg_size;
-		stream_ids_t m_sids[4];
-		int curr_stream_idx[4];
+	//streams RELIABLE_ORDER= 0
+	//streams RELIABLE_UNORDER= 1
+	//streams UNRELIABLE_ORDER= 2
+	//streams UNRELIABLE_UNORDER= 3
+	typedef int stream_id_t;
+	typedef eastl::vector<stream_id_t> stream_ids_t;
+	const int m_ostreams_total_size;
+	const int m_ostreams_avg_size;
+	stream_ids_t m_sids[4];
+	int curr_stream_idx[4];
 
-		geco_channel_t(int ostreams_total_size=8):
-			m_ostreams_total_size(ostreams_total_size),
-			m_ostreams_avg_size(m_ostreams_total_size / 4)
-		{
-			if(m_ostreams_total_size <4 || m_ostreams_total_size&3>0) GECO_ASSERT(0);
-			m_sids[0].reserve(m_ostreams_avg_size);
-			m_sids[1].reserve(m_ostreams_avg_size);
-			m_sids[2].reserve(m_ostreams_avg_size);
-			m_sids[3].reserve(m_ostreams_avg_size);
-			curr_stream_idx[0] = -1;
-			curr_stream_idx[1] = -1;
-			curr_stream_idx[2] = -1;
-			curr_stream_idx[3] = -1;
-		}
+	geco_channel_t(int ostreams_total_size = 8) :
+		m_ostreams_total_size(ostreams_total_size),
+		m_ostreams_avg_size(m_ostreams_total_size / 4)
+	{
+		if (m_ostreams_total_size < 4 || m_ostreams_total_size & 3>0) GECO_ASSERT(0);
+		m_sids[0].reserve(m_ostreams_avg_size);
+		m_sids[1].reserve(m_ostreams_avg_size);
+		m_sids[2].reserve(m_ostreams_avg_size);
+		m_sids[3].reserve(m_ostreams_avg_size);
+		curr_stream_idx[0] = -1;
+		curr_stream_idx[1] = -1;
+		curr_stream_idx[2] = -1;
+		curr_stream_idx[3] = -1;
+	}
 
-	    const char* c_str() const
-		{
-			return "c_str";
-		}
+	const char* c_str() const
+	{
+		return "c_str";
+	}
 };
 
 struct geco_nub_t
@@ -695,30 +677,21 @@ AckOrders m_kAckOrders;
 class GECOAPI geco_bundle_t
 {
 public:
-		// stores all the requests for this bundle.
-		typedef eastl::vector< response_order_t> response_orders_t;
-		response_orders_t m_kReplyOrders;
+	// stores all the requests for this bundle.
+	typedef eastl::vector< response_order_t> response_orders_t;
+	response_orders_t m_kReplyOrders;
 
-		typedef std::vector< piggy_back_t* > piggy_backs_t;
-		piggy_backs_t m_kPiggybacks;
-
-		//skip
-		FvReliableVector m_kReliableOrders; // This vector stores all the reliable messages for this bundle.
-		int	m_iReliableOrdersExtracted;
-		bool m_bIsCritical; 	// If true, this Bundle's packets will be considered to be 'critical' by the Channel.
-		AckOrders m_kAckOrders;
-
-		uchar* m_spFirstPacket;
-		uchar*	m_pkCurrentPacket;
-		bool m_bFinalised;
-		bool m_bReliableDriver;	//skip
-		uchar	m_uiExtraSize;
+	uchar* m_spFirstPacket;
+	uchar*	m_pkCurrentPacket;
+	bool m_bFinalised;
+	bool m_bReliableDriver;	//skip
+	uchar	m_uiExtraSize;
 
 private:
 	geco_channel_t* m_pkChannel;// This is the Channel that owns this Bundle, or NULL if not on a Channel.
 
 	// per message stuff
-	interface_element_t const *m_pkCurIE;
+	interface_element_t  *m_pkCurIE;
 	uint	m_iMsgLen;
 	uint	m_iMsgExtra;
 	msg_id* m_pHeader;
@@ -737,6 +710,10 @@ private:
 	uint m_iNumMessagesTotalBytes;
 
 	geco_bit_stream_t m_ucSendBuffers[4];  // 4 buffers for messages with different reliabilities (unrel&uno, unrel&o, rel&o, rel&uno)
+	uint m_write_positions[4];
+	geco_bit_stream_t* m_CurrBuf;
+	uint m_CurrWritePos;
+	uchar	*m_MsgLenPtr;
 
 public:
 	// initialises an empty bundle for writing.
@@ -754,22 +731,22 @@ public:
 	uint size() const;
 	/// returns true if this Bundle is owned by an external channel.
 	bool is_external_channel() const;
-	void send(const sockaddrunion& address, geco_network_interface_t& networkInterface,geco_channel_t* pChannel);
+	void send(const sockaddrunion& address, geco_network_interface_t& networkInterface, geco_channel_t* pChannel);
 	/// gets a start pointer to this many bytes 
-	uchar* reserve(int nBytes);
+	uchar* reserve(uint nBytes);
 
 	/**
 	 * 	write a request message without response on the bundle. The expected length
 	 *	should only be filled in if known (and only for variable-length messages)
 	 *	as a hint to whether to start this message on the current packet or to
 	 *	send the current bundle then bring in this message into current packet again
-	 * 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered, 
+	 * 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered,
 	 * it is gueeted they are handled in sequence by receiver.
-	 * 
+	 *
 	 *
 	 * 	@param ie			The type of message to start.
 	 */
-	void start_request_message( const interface_element_t& ie);
+	geco_bit_stream_t* start_request_message( interface_element_t& ie);
 
 	/**
 	* 	write a request message with response on the bundle, and call
@@ -784,20 +761,20 @@ public:
 	* 	@param arg			User argument that is sent to the handler.
 	* 	@param timeout		Time before a timeout exception is generated.
 	*/
-	void start_request_message(const interface_element_t& ie, response_handler_t& response_handler, void * arg=0, uint timeout= DEFAULT_REPLY_MSG_TIMEOUT);
+	geco_bit_stream_t* start_request_message( interface_element_t& ie, response_handler_t& response_handler, void * arg = 0, uint timeout = DEFAULT_REPLY_MSG_TIMEOUT);
 
 	/**
 	* 	write a response to a request message. All reply id are should be the replyID
 	* 	from the message header of the request you're replying to.
 	* 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered,
 	*  it is gueeted they are handled in sequence by receiver.
-	* 
+	*
 	* 	@param id			The id of the message being replied to
 	*/
-	void start_response_message(const interface_element_t& ie);
+	geco_bit_stream_t* start_response_message( interface_element_t& ie);
 
 	/// finalises a message. It is called from a number of places within Bundle when necessary.
-	void end_message();
+	void end_message(uint size);
 
 private:
 	void dispose();
@@ -808,7 +785,7 @@ private:
 	 * 	@param extra	Number of extra bytes to reserve.
 	 * 	@return	Pointer to the body of the message.
 	 */
-	uchar* new_message( uint extra = 0);
+	void new_message();
 };
 
 /**
