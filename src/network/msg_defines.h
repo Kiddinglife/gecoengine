@@ -564,6 +564,11 @@ struct geco_network_interface_t
 	}
 };
 
+class interface_elements_t
+{
+
+};
+
 #include <functional>
 typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_monitor_handler_t; //in and out
 
@@ -681,10 +686,8 @@ public:
 	typedef eastl::vector< response_order_t> response_orders_t;
 	response_orders_t m_kReplyOrders;
 
-	uchar* m_spFirstPacket;
-	uchar*	m_pkCurrentPacket;
 	bool m_bFinalised;
-	bool m_bReliableDriver;	//skip
+	bool m_isExternal;
 	uchar	m_uiExtraSize;
 
 private:
@@ -697,9 +700,8 @@ private:
 	msg_id* m_pHeader;
 	uint m_uiHeaderLen;
 	uchar	*m_puiMsgBeg;
-	ushort m_uiMsgChunkOffset;
-	bool m_bMsgReliable;
 	bool m_bMsgRequest;
+	unpacked_msg_hdr_t m_unpacked_msg_hdr;
 
 	// statistics
 	uint	m_iNumMessages;//numMessages
@@ -710,10 +712,10 @@ private:
 	uint m_iNumMessagesTotalBytes;
 
 	geco_bit_stream_t m_ucSendBuffers[4];  // 4 buffers for messages with different reliabilities (unrel&uno, unrel&o, rel&o, rel&uno)
-	uint m_write_positions[4];
+	//uint m_write_positions[4];
 	geco_bit_stream_t* m_CurrBuf;
-	uint m_CurrWritePos;
-	uchar	*m_MsgLenPtr;
+	//uint m_CurrWritePos;
+	//uchar	*m_MsgLenPtr;
 
 public:
 	// initialises an empty bundle for writing.
@@ -742,7 +744,6 @@ public:
 	 *	send the current bundle then bring in this message into current packet again
 	 * 	usually, a void message is reliable but unordered. only when messages are all reliable and ordered,
 	 * it is gueeted they are handled in sequence by receiver.
-	 *
 	 *
 	 * 	@param ie			The type of message to start.
 	 */
@@ -773,11 +774,7 @@ public:
 	*/
 	geco_bit_stream_t* start_response_message( interface_element_t& ie);
 
-	/// finalises a message. It is called from a number of places within Bundle when necessary.
-	void end_message(uint size);
-
 private:
-	void dispose();
 	/**
 	 * 	This message begins a new message, with the given number of extra bytes in
 	 * 	the header. These extra bytes are normally used for request information.
@@ -786,6 +783,9 @@ private:
 	 * 	@return	Pointer to the body of the message.
 	 */
 	void new_message();
+	void dispose();
+	unpacked_msg_hdr_t* decode_message(interface_element_t& ie);
+	geco_engine_reason disassemble_messages(sockaddrunion& sockaddr, geco_channel_t* pchanel, interface_elements_t& interface_elements);
 };
 
 /**
