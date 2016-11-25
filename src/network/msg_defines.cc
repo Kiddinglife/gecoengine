@@ -176,10 +176,4 @@ geco_bit_stream_t* geco_bundle_t::start_response_message(interface_element_t& ie
 	return m_CurrBuf;
 }
 
-unpacked_msg_hdr_t* geco_bundle_t::decode_message(interface_element_t& ie)
-{
-	m_unpacked_msg_hdr.m_uiIdentifier = ie.id_;
-	m_unpacked_msg_hdr.
-}
-
 

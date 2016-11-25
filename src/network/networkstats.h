@@ -34,6 +34,19 @@
 #include "../common/debugging/gecowatchert.h"
 #include "../common/ds/eastl/EASTL/vector.h"
 
+struct ProfileVal
+{
+	void start()
+	{
+
+	}
+	void stop(uint qty)
+	{
+
+	}
+};
+
+
 template <class TYPE>
 class stat_watcher_factory_t;
 extern stat_watcher_factory_t<uint>& read_uint_stat_watcher_factory();
@@ -301,4 +314,57 @@ struct network_send_stats_t
 	void updateStatAverages(double elapsedTime);
 };
 
+const float INTERFACE_ELEMENT_STAT_AVERAGE_BIAS = -2.f / (5 + 1);
+class interface_element_stats_t
+{
+	/// The maximum bytes received for a single message for this interface element.
+	uint64 		maxBytesReceived_;
+	/// The number of bytes received over all messages for this interface element.
+	uint64		numBytesReceived_;
+	/// The number of messages received for this interface element.
+	uint64		numMessagesReceived_;
+	/// The per-second exponentially weighted moving average for bytes receivedfor this interface element./
+	cumulative_ema_t< uint > avgBytesReceivedPerSecond_;
+	/// The per-second exponentially weighted moving average for messages received for this interface element.
+	cumulative_ema_t< uint > avgMessagesReceivedPerSecond_;
+	ProfileVal profile_;
+
+public:
+	interface_element_stats_t() :
+		maxBytesReceived_(0),
+		numBytesReceived_(0),
+		numMessagesReceived_(0),
+		avgBytesReceivedPerSecond_(INTERFACE_ELEMENT_STAT_AVERAGE_BIAS),
+		avgMessagesReceivedPerSecond_(INTERFACE_ELEMENT_STAT_AVERAGE_BIAS)
+	{
+	}
+	//  called every second.
+	void tick()
+	{
+		avgBytesReceivedPerSecond_.sample();
+		avgMessagesReceivedPerSecond_.sample();
+	}
+	uint64 MaxBytesReceived() const { return maxBytesReceived_; }
+	uint64 NumBytesReceived() const { return numBytesReceived_; }
+	uint64 NumMessagesReceived() const { return numMessagesReceived_; }
+	float AvgBytesReceivedPerSecond() const { return avgBytesReceivedPerSecond_.average(); }
+	float AvgMessagesReceivedPerSecond() const { return avgMessagesReceivedPerSecond_.average(); }
+	float AvgMessageLength() const { return numMessagesReceived_ ? float(numBytesReceived_) / float(numMessagesReceived_) : 0.0f; }
+	void startProfile()
+	{
+		profile_.start();
+	}
+
+	void stopProfile(uint32 msgLen)
+	{
+		profile_.stop(msgLen);
+
+		++avgMessagesReceivedPerSecond_.value();
+		avgBytesReceivedPerSecond_.value() += msgLen;
+
+		++numMessagesReceived_;
+		numBytesReceived_ += msgLen;
+		maxBytesReceived_ = msgLen > maxBytesReceived_ ? msgLen : maxBytesReceived_;
+	}
+};
 #endif /* SRC_NETWORK_NETWORKSTATS_H_ */

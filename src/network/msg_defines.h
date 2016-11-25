@@ -30,6 +30,7 @@
 #include "../common/debugging/debug.h"
 #include "callback_defines.h"
 #include "../common/ds/geco-bit-stream.h"
+#include "networkstats.h"
 
 #ifndef _WIN32
 #ifndef _LP64
@@ -347,11 +348,11 @@ const char VARIABLE_LENGTH_MESSAGE = 1;
 const char INVALID_MESSAGE = 2;
 
 //00 last bit 0 = var 1=fix
-const uchar MSG_VAR = 0; 
+const uchar MSG_VAR = 0;
 const uchar MSG_FIX = 1;
 //01 last second bit 0 = request 1 = response
-const uchar MSG_REQUEST = 0; 
-const uchar MSG_RESPONSE = 2; 
+const uchar MSG_REQUEST = 0;
+const uchar MSG_RESPONSE = 2;
 
 /**
  * 	@internal
@@ -367,23 +368,25 @@ class geco_bundle_t;
 const uint MSG_HDR_SIZE = 4;
 struct GECOAPI interface_element_t
 {
-	static const interface_element_t REPLY;
-	uint nominal_body_size_;
 	msg_id id_; ///< Unique message ID
 	uchar flag_;
+	uint nominal_body_size_;
+	uint fixed_totals_;
+
 	uchar lengthStyle_;	///< Fixed or variable length
 	ushort lengthParam_;	///< This depends on lengthStyle
+
 	const char *name_;	///< The name of the interface method
 	msg_handler_cb pHandler_; /// msg handler
-	uint fixed_totals_;
-	/*
-	value among:
+
+	/* value among:
 	const int RELIABLE_ORDER= 0;
 	const int RELIABLE_UNORDER= 1;
 	const int UNRELIABLE_ORDER= 2;
-	const int UNRELIABLE_UNORDER= 3;
-	*/
+	const int UNRELIABLE_UNORDER= 3; */
 	uint ro_;
+
+	interface_element_stats_t stats_;
 
 	interface_element_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
 		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
@@ -404,42 +407,14 @@ struct GECOAPI interface_element_t
 		fixed_totals_ = nominal_body_size_ + MSG_HDR_SIZE;
 	}
 
-	void Set(const char * name, msg_id id, uchar lengthStyle,
-		int lengthParam)
-	{
-		id_ = id;
-		lengthStyle_ = lengthStyle;
-		lengthParam_ = lengthParam;
-		name_ = name;
-	}
-
-	bool is_valid_len(uint length) const
-	{
-		return (lengthStyle_ != VARIABLE_LENGTH_MESSAGE)
-			|| (length > 0
-				&& length < (uint)((1 << (8 * lengthParam_)) - 1));
-	}
-
 	const char* c_str() const
 	{
 		static char buf[128];
 		snprintf(buf, sizeof(buf), "%s/%u", name_, id_);
 		return buf;
 	}
-
-	/**
-	 * 	compresses a length into the given header.
-	 *
-	 *	@param data		Pointer to the header
-	 *	@param length	Length to compress
-	 *
-	 *	@return 0 if successful.
-	 */
-	int compress_length(uchar* hdr, int length, geco_bundle_t& bundle, int isRequest) const
-	{
-		return 0;//TODO
-	}
 };
+typedef eastl::vector<interface_element_t> interface_elements_t;
 /////////////////////////////////////// interface_element_t ends ////////////////////////////////////
 
 
@@ -562,11 +537,6 @@ struct geco_network_interface_t
 	{
 
 	}
-};
-
-class interface_elements_t
-{
-
 };
 
 #include <functional>
@@ -747,7 +717,7 @@ public:
 	 *
 	 * 	@param ie			The type of message to start.
 	 */
-	geco_bit_stream_t* start_request_message( interface_element_t& ie);
+	geco_bit_stream_t* start_request_message(interface_element_t& ie);
 
 	/**
 	* 	write a request message with response on the bundle, and call
@@ -762,7 +732,7 @@ public:
 	* 	@param arg			User argument that is sent to the handler.
 	* 	@param timeout		Time before a timeout exception is generated.
 	*/
-	geco_bit_stream_t* start_request_message( interface_element_t& ie, response_handler_t& response_handler, void * arg = 0, uint timeout = DEFAULT_REPLY_MSG_TIMEOUT);
+	geco_bit_stream_t* start_request_message(interface_element_t& ie, response_handler_t& response_handler, void * arg = 0, uint timeout = DEFAULT_REPLY_MSG_TIMEOUT);
 
 	/**
 	* 	write a response to a request message. All reply id are should be the replyID
@@ -772,7 +742,7 @@ public:
 	*
 	* 	@param id			The id of the message being replied to
 	*/
-	geco_bit_stream_t* start_response_message( interface_element_t& ie);
+	geco_bit_stream_t* start_response_message(interface_element_t& ie);
 
 private:
 	/**
@@ -784,8 +754,6 @@ private:
 	 */
 	void new_message();
 	void dispose();
-	unpacked_msg_hdr_t* decode_message(interface_element_t& ie);
-	geco_engine_reason disassemble_messages(sockaddrunion& sockaddr, geco_channel_t* pchanel, interface_elements_t& interface_elements);
 };
 
 /**
