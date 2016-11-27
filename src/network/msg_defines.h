@@ -314,13 +314,16 @@ inline geco_bit_stream_t& operator >> (geco_bit_stream_t &is, entity_mb &d)
 	return is;
 }
 
+class geco_bundle_t;
+class network_interface_t;
+class geco_nub_t;
 
 /////////////////////////////////////// interface_element_t starts ////////////////////////////////////
+const uint MSG_HDR_SIZE = 4;
 const int RELIABLE_ORDER = 0;
 const int RELIABLE_UNORDER = 1;
 const int UNRELIABLE_ORDER = 2;
 const int UNRELIABLE_UNORDER = 3;
-
 /**
  * 	@internal
  * 	This constant indicates a fixed length message.
@@ -330,7 +333,6 @@ const int UNRELIABLE_UNORDER = 3;
  * 	messages of this type.
  */
 const char FIXED_LENGTH_MESSAGE = 0;
-
 /**
  * 	@internal
  * 	This constant indicates a variable length message.
@@ -340,20 +342,16 @@ const char FIXED_LENGTH_MESSAGE = 0;
  * 	constant for all messages of this type.
  */
 const char VARIABLE_LENGTH_MESSAGE = 1;
-
 /**
- * 	@internal
  * 	This constant indicates the InterfaceElement has not been initialised.
  */
 const char INVALID_MESSAGE = 2;
-
 //00 last bit 0 = var 1=fix
 const uchar MSG_VAR = 0;
 const uchar MSG_FIX = 1;
 //01 last second bit 0 = request 1 = response
 const uchar MSG_REQUEST = 0;
 const uchar MSG_RESPONSE = 2;
-
 /**
  * 	@internal
  *	This structure describes a single message within an
@@ -364,8 +362,6 @@ const uchar MSG_RESPONSE = 2;
  *	messages, it defines the number of bytes needed to
  *	express the length.
  */
-class geco_bundle_t;
-const uint MSG_HDR_SIZE = 4;
 struct GECOAPI interface_element_t
 {
 	msg_id id_; ///< Unique message ID
@@ -385,14 +381,10 @@ struct GECOAPI interface_element_t
 	const int UNRELIABLE_ORDER= 2;
 	const int UNRELIABLE_UNORDER= 3; */
 	uint ro_;
-
 	interface_element_stats_t stats_;
 
-	interface_element_t(const char * name = "", msg_id id = 0, uchar lengthStyle =
-		INVALID_MESSAGE, int lengthParam = 0, msg_handler_cb pHandler =
-		NULL, uint msg_rel_or = RELIABLE_ORDER) :
-		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(
-			name), pHandler_(pHandler), ro_(msg_rel_or), flag_(0)
+	interface_element_t(const char * name = "", msg_id id = 0, uchar lengthStyle = INVALID_MESSAGE, ushort lengthParam = 0, msg_handler_cb* pHandler = NULL, uint msg_rel_or = RELIABLE_ORDER) :
+		id_(id), lengthStyle_(lengthStyle), lengthParam_(lengthParam), name_(name), pHandler_(*pHandler), ro_(msg_rel_or), flag_(0)
 	{
 		if (lengthStyle_ == FIXED_LENGTH_MESSAGE)
 		{
@@ -414,7 +406,21 @@ struct GECOAPI interface_element_t
 		return buf;
 	}
 };
-typedef eastl::vector<interface_element_t> interface_elements_t;
+class GECOAPI interface_elements_t
+{
+public:
+	interface_elements_t(const char * name);
+	interface_element_t& Add(interface_element_t& ie);
+	msg_handler_cb* handler(int msgid);
+	void handler(int msgid, msg_handler_cb * pHandler);
+	const interface_element_t & InterfaceElement(uchar id) const;
+	void RegisterWithNub(geco_nub_t& nub);
+	geco_engine_reason RegisterWithMachined(geco_nub_t& nub, int id) const;
+private:
+	typedef eastl::vector<interface_element_t> interface_elements;
+	interface_elements m_kElements;
+	const char *m_pcName;
+};
 /////////////////////////////////////// interface_element_t ends ////////////////////////////////////
 
 
@@ -442,13 +448,14 @@ struct GECOAPI unpacked_msg_hdr_t// 4 BYTES
 /**
 *	This class manages sets of channels.
 */
-class network_interface_t
+class GECOAPI network_interface_t
 {
 };
+
 /**
 *	responsible for receiving game packets from protocol stack (sctp, udp, tcp and so on).
 */
-class packet_recv_t
+class GECOAPI packet_recv_t
 {
 	uint curr_channel_id_;
 	sockaddrunion curr_saddr_;
@@ -462,7 +469,7 @@ class packet_recv_t
 const int DEFAULT_BUNDLE_SEND_BUF_SIZE = 1500 - 20 - 8;
 const int DEFAULT_REPLY_MSG_TIMEOUT = 3000; // default request timeout in ms 5 senonds
 
-class geco_channel_t
+class GECOAPI geco_channel_t
 {
 public:
 	/*
@@ -514,12 +521,14 @@ public:
 	}
 };
 
-struct geco_nub_t
+struct GECOAPI geco_nub_t
 {
-
+	interface_elements_t* m_InterfaceElements;;
+	void ServeInterfaceElement(interface_elements_t& ies);
+	geco_engine_reason RegisterWithMachined(const eastl::string& name, int id, bool isRegister = true);
 };
 
-struct geco_network_interface_t
+struct GECOAPI  geco_network_interface_t
 {
 	/**
 	* 	This method sends a bundle to the given address.
@@ -539,6 +548,7 @@ struct geco_network_interface_t
 	}
 };
 
+
 #include <functional>
 typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_monitor_handler_t; //in and out
 
@@ -547,7 +557,7 @@ typedef std::function<void(const sockaddrunion& addr, uchar* packet)> packet_mon
  *  When a client issues a request with response, an interface of this type should
  *  be provided to handle the reply.
  */
-struct response_handler_t
+struct GECOAPI response_handler_t
 {
 	/*
 	 * 	called by Mercury to deliver a reply message.
@@ -569,7 +579,7 @@ struct response_handler_t
 };
 
 ///  represents a request that requires a reply.
-struct response_order_t
+struct GECOAPI response_order_t
 {
 	response_handler_t response_handler;
 	void *arg;	//User argument passed to the handler.
@@ -577,56 +587,12 @@ struct response_order_t
 };
 
 
-struct piggy_back_t
+struct GECOAPI piggy_back_t
 {
 	uchar* m_spPacket;
 	ushort	m_iLen;
 };
 
-
-//skip
-class FvNetReliableOrder
-{
-public:
-	uchar	*m_uiSegBegin;
-	ushort m_uiSegLength;
-	ushort m_uiSegPartOfRequest;
-};
-typedef std::vector<FvNetReliableOrder> FvReliableVector;
-
-//skip
-enum FvNetReliableTypeEnum
-{
-	FV_NET_RELIABLE_NO = 0,
-	FV_NET_RELIABLE_DRIVER = 1,
-	FV_NET_RELIABLE_PASSENGER = 2,
-	FV_NET_RELIABLE_CRITICAL = 3
-};
-
-//skip
-struct FvNetReliableType
-{
-	FvNetReliableType(FvNetReliableTypeEnum e) : m_eReliableType(e) { }
-	FvNetReliableType(bool b) : m_eReliableType(b ? FV_NET_RELIABLE_DRIVER : FV_NET_RELIABLE_NO) { }
-
-	bool IsReliable() const { return m_eReliableType != FV_NET_RELIABLE_NO; }
-
-	bool IsDriver() const { return m_eReliableType & FV_NET_RELIABLE_DRIVER; }
-
-	bool operator== (const FvNetReliableTypeEnum e) { return e == m_eReliableType; }
-
-	FvNetReliableTypeEnum m_eReliableType;
-};
-
-//skip
-struct AckOrder
-{
-	uchar	*p;
-	uint	forseq;
-};
-
-typedef std::vector<AckOrder> AckOrders;
-AckOrders m_kAckOrders;
 
 /*-----------------------------------------------------------------------------
  Section: Bundle
@@ -703,9 +669,6 @@ public:
 	uint size() const;
 	/// returns true if this Bundle is owned by an external channel.
 	bool is_external_channel() const;
-	void send(const sockaddrunion& address, geco_network_interface_t& networkInterface, geco_channel_t* pChannel);
-	/// gets a start pointer to this many bytes 
-	uchar* reserve(uint nBytes);
 
 	/**
 	 * 	write a request message without response on the bundle. The expected length
@@ -760,7 +723,7 @@ private:
 *  This class is useful when you have a lot of data you want to send to a
 *  collection of other apps, but want to group the sends to each app together.
 */
-class bundle_send_map_t
+class GECOAPI  bundle_send_map_t
 {
 public:
 	bundle_send_map_t(geco_nub_t & nub) : m_kNub(nub) {}

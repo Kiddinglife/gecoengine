@@ -62,12 +62,6 @@ inline bool geco_bundle_t::empty() const { return (m_iNumMessages == 0); }
 inline uint geco_bundle_t::size() const { return m_iNumMessagesTotalBytes; }
 inline bool geco_bundle_t::is_external_channel() const { return m_pkChannel && m_pkChannel->m_uiType == geco_channel_t::WAN; }
 
-
-void geco_bundle_t::send(const sockaddrunion& address, geco_network_interface_t& networkInterface, geco_channel_t* pChannel)
-{
-	//@TODO
-}
-
 void geco_bundle_t::cancel_requests()
 {
 	response_orders_t::iterator iter = m_kReplyOrders.begin();
@@ -78,12 +72,6 @@ void geco_bundle_t::cancel_requests()
 		++iter;
 	}
 	m_kReplyOrders.clear();
-}
-
-inline uchar* geco_bundle_t::reserve(uint extra)
-{
-	m_CurrBuf->AppendBitsCouldRealloc(extra << 3);
-	return m_CurrBuf->get_written_bytes() + m_CurrBuf->uchar_data();
 }
 
 inline void geco_bundle_t::new_message()
@@ -161,7 +149,6 @@ geco_bit_stream_t* geco_bundle_t::start_request_message(interface_element_t& ie,
 	return m_CurrBuf;
 }
 
-
 geco_bit_stream_t* geco_bundle_t::start_response_message(interface_element_t& ie)
 {
 	if (m_pkChannel == NULL)
@@ -176,4 +163,42 @@ geco_bit_stream_t* geco_bundle_t::start_response_message(interface_element_t& ie
 	return m_CurrBuf;
 }
 
-
+interface_elements_t::interface_elements_t(const char * name) :
+	m_pcName(name)
+{
+	this->m_kElements.reserve(512);
+}
+interface_element_t & interface_elements_t::Add(interface_element_t& ie)
+{
+	ie.id_ = m_kElements.size();
+	m_kElements.push_back(ie);
+	return m_kElements.back();
+}
+msg_handler_cb* interface_elements_t::handler(int index)
+{
+	return &m_kElements[index].pHandler_;
+}
+void interface_elements_t::handler(int index, msg_handler_cb * pHandler)
+{
+	m_kElements[index].pHandler_ = *pHandler;
+}
+const interface_element_t& interface_elements_t::InterfaceElement(uchar id) const
+{
+	return m_kElements[id];
+}
+void interface_elements_t::RegisterWithNub(geco_nub_t& nub)
+{
+	nub.m_InterfaceElements = this;
+}
+geco_engine_reason interface_elements_t::RegisterWithMachined(geco_nub_t& nub, int uid) const
+{
+	return nub.RegisterWithMachined(this->m_pcName, uid,true);
+}
+void geco_nub_t::ServeInterfaceElement(interface_elements_t& ies)
+{
+	//TODO
+}
+geco_engine_reason geco_nub_t::RegisterWithMachined(const eastl::string& name, int id, bool isRegister /*= true*/)
+{
+	return geco_engine_reason::SUCCESS;	//TODO
+}
