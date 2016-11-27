@@ -147,10 +147,10 @@ int gettimenow_ms(time_t* ret)
 }
 int gettimenow_us(time_t* ret)
 {
-	struct timeval now;
+	static struct timeval now;
 	if (gettimenow(&now) > -1)
 	{
-		EVENTLOG2(EXTERNAL_TRACE, "Time now: %ld sec, %ld usec \n", now.tv_sec, now.tv_usec);
+		//EVENTLOG2(EXTERNAL_TRACE, "Time now: %ld sec, %ld usec \n", now.tv_sec, now.tv_usec);
 		*ret = ((time_t)now.tv_sec) * 1000000 + (time_t)now.tv_usec;
 		return 0;
 	}

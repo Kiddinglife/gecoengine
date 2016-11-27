@@ -497,7 +497,7 @@ public:
 		m_ostreams_total_size(ostreams_total_size),
 		m_ostreams_avg_size(m_ostreams_total_size / 4)
 	{
-		if (m_ostreams_total_size < 4 || m_ostreams_total_size & 3>0) GECO_ASSERT(0);
+		//if (m_ostreams_total_size < 4 || m_ostreams_total_size & 3>0) return;
 		m_sids[0].reserve(m_ostreams_avg_size);
 		m_sids[1].reserve(m_ostreams_avg_size);
 		m_sids[2].reserve(m_ostreams_avg_size);

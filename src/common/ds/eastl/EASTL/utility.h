@@ -6,7 +6,6 @@
 #ifndef EASTL_UTILITY_H
 #define EASTL_UTILITY_H
 
-
 #include <EASTL/internal/config.h>
 #include <EASTL/type_traits.h>
 #include <EASTL/iterator.h>

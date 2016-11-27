@@ -71,9 +71,6 @@ class WatcherPacketHandler;
  4. complie again and use it !
  */
 struct selector;
-
-#if ENABLE_WATCHERS
-
 class geco_watcher_base_t;
 class watcher_visitor_t;
 
@@ -320,9 +317,17 @@ inline std::string& watcher_value_to_string(bool value)
 	return value ? t : f;
 }/* protocol v1 ends */
 
+
 // GET OPT PROTOCOL
-#define read_watcher_value_from_stream(result,value,valtype,mode) \
-result.Read(valtype);result.Read(mode);result.Read(value)
+//#define read_watcher_value_from_stream(result,value,valtype,mode) \
+//result.Read(valtype);result.Read(mode);result.Read(value)
+template <class vt>
+void read_watcher_value_from_stream(geco_bit_stream_t & result, vt& value, ushort& valtype, ushort& mode)
+{
+	result.Read(valtype);
+	result.Read(mode);
+	result.Read(value);
+}
 
 // SET OPT PROTOCOL
 //CANNOT BE REPLCAED BY A SINGLE MACRO AS WE RELIES ON OVERLOAD TO SERILIZE WVT
@@ -1398,6 +1403,5 @@ static_cast< TYPE& (CLASS::*)()>(&CLASS::rMETHOD),static_cast< void (CLASS::*)(T
 static_cast<TYPE& (*)()>(rFUNC),static_cast< void (*)(TYPE&)   >(NULL)
 
 #define GECO_WATCH add_watcher
-#endif
 
 #endif /* SRC_COMMON_DEBUGGING_GECOWATCHERT_H_ */

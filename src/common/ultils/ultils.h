@@ -131,73 +131,18 @@ inline std::wstring geco_utf8tow(const std::string & s)
 }
 
 #if defined(_WIN32)
+#define geco_fopen ultils::win_fopen
 /*
  * @brief Converts the given narrow string to the wide representation.
  * using theactive code page on this system. Returns true if it succeeded, otherwise
  *	false if there was a decoding error.
  */
 extern bool win_geco_acp2w(const char * src, std::wstring& output);
-inline bool win_geco_acp2w(const std::string & s, std::wstring& output)
-{
-	return win_geco_acp2w(s.c_str(), output);
-}
-inline std::wstring win_geco_acp2w(const std::string & s)
-{
-	std::wstring ret;
-	win_geco_acp2w(s, ret);
-	return ret;
-}
-#define geco_fopen win_fopen
-inline FILE* win_fopen(const char* filename, const char* mode)
-{
-	std::wstring wfilename;
-	std::wstring wmode;
-
-	geco_utf8tow(filename, wfilename);
-	geco_utf8tow(mode, wmode);
-
-	return _wfopen(wfilename.c_str(), wmode.c_str());
-}
-
-inline long win_geco_file_size(FILE* file)
-{
-	long currentLocation = ftell(file);
-	if (currentLocation < 0)
-	{
-		currentLocation = 0;
-	}
-	/*set curr location to file beginning*/
-	int res = fseek(file, 0, SEEK_END);
-	if (res)
-	{
-		//ERRORLOG("bw_fileSize: fseek failed\n");
-		return -1;
-	}
-	long length = ftell(file);
-	/*set back curr location after getting file length*/
-	res = fseek(file, currentLocation, SEEK_SET);
-	if (res)
-	{
-		//ERRORLOG("bw_fileSize: fseek failed\n");
-		return -1;
-	}
-	return length;
-}
-
-inline std::wstring win_get_temp_file_path_name()
-{
-	wchar_t tempDir[MAX_PATH + 1];
-	wchar_t tempFile[MAX_PATH + 1];
-
-	if (GetTempPath(MAX_PATH + 1, tempDir) < MAX_PATH)
-	{
-		if (GetTempFileName(tempDir, L"BWT", 0, tempFile))
-		{
-			return tempFile;
-		}
-	}
-	return L"";
-}
+extern bool win_geco_acp2w(const std::string & s, std::wstring& output);
+extern std::wstring win_geco_acp2w(const std::string & s);
+extern FILE* win_fopen(const char* filename, const char* mode);
+extern long win_geco_file_size(FILE* file);
+extern std::wstring win_get_temp_file_path_name();
 #else
 #include<stdio.h>
 #define geco_fopen fopen //bw_fopen might be used directly

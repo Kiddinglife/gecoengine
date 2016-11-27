@@ -62,6 +62,7 @@
 #endif
 #include <EABase/eahave.h>
 
+#include "../test/packages/EAStdC/include/EAStdC/EASprintf.h"
 #if defined(EA_PRAGMA_ONCE_SUPPORTED)
 	#pragma once
 #endif

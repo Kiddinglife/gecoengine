@@ -169,6 +169,7 @@
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\allocator_eastl.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\assert.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\EASprintf.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\fixed_pool.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\hashtable.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\intrusive_list.cpp" />
@@ -277,6 +278,7 @@
       <PreprocessorDefinitions>STATIC_LIB_BUILD;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
+      <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

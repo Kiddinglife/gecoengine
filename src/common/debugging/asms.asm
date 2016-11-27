@@ -7,13 +7,13 @@ Int_3 PROC
 	int 3 ;中断指令
 Int_3 ENDP 
 
-;函数原型： uint64 asm_gettimestamp()
+;函数原型： uint64 asm_time()
 ;MSVC complains about no return value here.
 ;According to the help, this warning is 'harmless', and
 ;they even have example code which does it. Go figure.
-gettimestamp PROC 
+asm_time PROC 
 	rdtsc ;指令
-	ret
-gettimestamp ENDP 
+	;ret
+asm_time ENDP 
 
 END  // 文件结束

@@ -29,20 +29,435 @@
 #ifndef SRC_NETWORK_NETWORKSTATS_H_
 #define SRC_NETWORK_NETWORKSTATS_H_
 
-#include "../common/ds/eastl/EASTL/utility.h"
-#include "../math/stat_rate_of_change.h"
-#include "../common/debugging/gecowatchert.h"
-#include "../common/ds/eastl/EASTL/vector.h"
+#include <thread>
 
-struct ProfileVal
+#include "../common/ds/eastl/EASTL/utility.h"
+#include "../common/ds/eastl/EASTL/vector.h"
+#include "../common/ds/eastl/EASTL/hash_map.h"
+#include "../common/ds/eastl/EASTL/string.h"
+
+#include "../common/debugging/gecowatchert.h"
+#include "../math/stat_rate_of_change.h"
+#include "../common/debugging/timestamp.h"
+
+#define PROFILER_DECLARE( id, name )	int g_profilerSlot_##id = Profiler::instance().declareSlot( name )
+#define PROFILER_DECLARE2( id, name, flags )	int g_profilerSlot_##id = Profiler::instance().declareSlot( name, flags )
+#define PROFILER_SCOPED( id )	extern int g_profilerSlot_##id; ScopedProfile scopedProfiler_##id( g_profilerSlot_##id )
+
+#define AUTO_SCOPED_PROFILE( NAME )	static ProfileVal _localProfile( NAME );	ScopedProfile _autoScopedProfile( _localProfile, __FILE__, __LINE__ );
+#define SCOPED_PROFILE( PROFILE ) ScopedProfile _scopedProfile( PROFILE, __FILE__, __LINE__ );
+#define START_PROFILE( PROFILE ) PROFILE.start();
+#define STOP_PROFILE( PROFILE )  PROFILE.stop( __FILE__, __LINE__ );
+#define STOP_PROFILE_WITH_CHECK( PROFILE )           if (PROFILE.stop( __FILE__, __LINE__ ))
+#define STOP_PROFILE_WITH_DATA( PROFILE, DATA )   PROFILE.stop( __FILE__, __LINE__ , DATA );
+
+class ProfileVal;
+class ProfileGroup;
+
+/**
+*  A class to wrap up a group of profiles. The grouping associates profiles
+*  with each for internal time calculations, i.e. only one profile from a group
+*  can be accumulating internal time at once.
+*
+*  Profiles in the same group must be started and stopped in a stack-like
+*  fashion.  Attempting to bridge starts and stops will trigger an assertion.
+*/
+class GECOAPI ProfileGroup : public geco_watcher_director_t
 {
+public:
+	explicit ProfileGroup(const char * watcherPath = NULL);
+	~ProfileGroup();
+
+	typedef eastl::vector< ProfileVal* > Profiles;
+	typedef Profiles::iterator iterator;
+
+	iterator begin() { return profiles_.begin(); }
+	iterator end() { return profiles_.end(); }
+
+	Profiles & stack() { return stack_; }
+	/// adds a new profile to this group.
+	void add(ProfileVal& pVal);
+	/// This method resets all of the ProfileVal's in this ProfileGroup.
+	void reset();
+
+	ProfileVal * pRunningTime() { return profiles_[0]; }
+	const ProfileVal * pRunningTime() const { return profiles_[0]; }
+	/// sets the timer profile for this group, i.e. the one that is always running and exists to track how long the group has been running for.
+	time_stamp_t runningTime() const;
+	/// returns a reference to the default group.
+	static ProfileGroup & defaultGroup();
+
+private:
+	/// The profiles that are part of this group.
+	Profiles profiles_;
+
+	/// The stack of profiles currently executing in this group.
+	Profiles stack_;
+
+	/// The watcher subdirectories for this group
+	geco_watcher_director_t* pSummaries_;
+	geco_watcher_director_t* pDetails_;
+
+	/// The default global group for profiles.
+	static ProfileGroup* s_pDefaultGroup_;
+};
+
+/**
+*	This class is used to profile the performance of parts of the code.
+*/
+#include <stdlib.h> 
+class GECOAPI ProfileVal
+{
+private:
+	static time_stamp_t s_warningPeriod_;
+
+public:
+	ProfileVal(const eastl::string & name = "", ProfileGroup * pGroup = NULL);
+	~ProfileVal();
+
+	/// String description of this profile.
+	eastl::string	name_;
+
+	/// The profile group this profile belongs to, if any.
+	ProfileGroup * pGroup_;
+
+	time_stamp_t		lastTime_;		///< The time the profile was started.
+	time_stamp_t		sumTime_;		///< The total time between all start/stops.
+	time_stamp_t		lastIntTime_;	///< The last internal time for this profile.
+	time_stamp_t		sumIntTime_;	///< The sum of internal time for this profile.
+	uint32		lastQuantity_;	///< The last value passed into stop.
+	uint32		sumQuantity_;	///< The total of all values passed into stop.
+	uint32		count_;			///< The number of times stop has been called.
+	int			inProgress_;	///< Whether the profile is currently timing.
+
+	static geco_watcher_base_t& pSummaryWatcher(ProfileVal& profileVal);
+	static geco_watcher_base_t& pWatcherStamps(ProfileVal& profileVal);
+
+	static void setWarningPeriod(time_stamp_t warningPeriod);
+
+	/**
+	*	This method starts this profile.
+	*/
 	void start()
 	{
+		time_stamp_t now = gettimestamp();
 
+		if (inProgress_ == 0)
+		{
+			lastTime_ = now;
+		}
+
+		++inProgress_;
+
+		ProfileGroup::Profiles & stack = pGroup_->stack();
+
+		// Disable the existing internal profile
+		if (!stack.empty())
+		{
+			ProfileVal & profile = *stack.back();
+			int val = int(now - profile.lastIntTime_);
+			profile.lastIntTime_ = val<0 ? abs(val) : val;
+			profile.sumIntTime_ += profile.lastIntTime_;
+		}
+
+		// This profile is now the active internal profile
+		stack.push_back(this);
+		lastIntTime_ = now;
 	}
-	void stop(uint qty)
-	{
 
+	/**
+	*  This method stops this profile.
+	*/
+	void stop(uint32 qty = 0)
+	{
+		time_stamp_t now = gettimestamp();
+		int val;
+		if (--inProgress_ == 0)
+		{
+			val = int(now - lastIntTime_);
+			lastIntTime_ = val < 0 ? abs(val) : val;
+			sumTime_ += lastTime_;
+		}
+
+		lastQuantity_ = qty;
+		sumQuantity_ += qty;
+
+		++count_;
+
+		ProfileGroup::Profiles & stack = pGroup_->stack();
+		GECO_ASSERT(stack.back() == this);
+		stack.pop_back();
+
+		// Disable internal time counting for this profile
+		val = int(now - lastIntTime_);
+		lastIntTime_ = val < 0 ? abs(val) : val;
+		sumIntTime_ += lastIntTime_;
+
+		// Re-enable the internal counter for the frame above this one.
+		if (!stack.empty())
+		{
+			stack.back()->lastIntTime_ = now;
+		}
+	}
+
+	/**
+	*	This method stops the profile and warns if it took too long.
+	*/
+	bool stop(const char * filename, int lineNum, uint32 qty = 0)
+	{
+		this->stop(qty);
+
+		const bool tooLong = this->isTooLong();
+
+		if (tooLong)
+		{
+			WARNING_MSG("%s:%d: Profile %s took %.2f seconds\n", filename, lineNum, name_.c_str(), lastTime_ / stamps_per_sec_double());
+		}
+		return tooLong;
+	}
+
+	bool isTooLong() const
+	{
+		return !this->running() &&
+			(lastTime_ > s_warningPeriod_);
+	}
+
+	/**
+	*  This method resets this profile.
+	*/
+	void reset()
+	{
+		lastTime_ = 0;
+		sumTime_ = 0;
+		lastIntTime_ = 0;
+		sumIntTime_ = 0;
+		lastQuantity_ = 0;
+		sumQuantity_ = 0;
+		count_ = 0;
+		inProgress_ = 0;
+	}
+
+
+	/**
+	*	This method returns whether or not this profile is currently running.
+	*	That is, start has been called more times than stop.
+	*/
+	bool running() const
+	{
+		return inProgress_ > 0;
+	}
+
+
+	time_stamp_t lastTime() const
+	{
+		return this->running() ? time_stamp_t(0) : lastTime_;
+	}
+
+	/**
+	*  Returns the readable description of this profile.
+	*/
+	inline const char * c_str() const { return name_.c_str(); }
+	inline double lastTimeInSeconds() const { return stamps2sec(lastTime_); }
+	inline double sumTimeInSeconds() const { return stamps2sec(sumTime_); }
+	inline double lastIntTimeInSeconds() const { return stamps2sec(lastIntTime_); }
+	inline double sumIntTimeInSeconds() const { return stamps2sec(sumIntTime_); }
+};
+
+#include <iostream>
+/// output stream operator for a ProfileVal.
+std::ostream & operator<<(std::ostream  & s, const ProfileVal & val);
+///  input stream operator for ProfileVal.
+std::istream& operator >> (std::istream  & s, ProfileVal & v);
+void read_watcher_value_from_stream(geco_bit_stream_t & result, ProfileVal& value, ushort& valtype, ushort& mode);
+void write_watcher_value_to_stream(geco_bit_stream_t & result, const ProfileVal& value, const WatcherMode mode);
+
+/**
+*	This structure wraps up a TimeStamp timestamp delta and has an operator defined on it to print it out nicely.
+*/
+struct GECOAPI NiceTime
+{
+	/// Constructor
+	explicit NiceTime(time_stamp_t t) : t_(t) {}
+	time_stamp_t t_;	///< Associated timestamp.
+};
+/// output stream operator for a NiceTime.
+std::stringstream& operator<<(std::stringstream &o, const NiceTime &nt);
+
+/**
+*	This singleton class resets all registered ProfileGroups when a nominated ProfileVal is reset.
+*/
+struct GECOAPI ProfileGroupResetter
+{
+	ProfileGroupResetter();
+	~ProfileGroupResetter();
+	/**
+	* Records the ProfileVal whose reset should trigger a global reset.
+	* Note: If this is in a ProfileGroup, you shouldn't add to the
+	* group after you call this function as it could move the memory
+	* containing the vector elements around and stuff everything up.*/
+	void nominateProfileVal(ProfileVal * pVal = NULL);
+	/**
+	* Records a ProfileGroup which should be reset when the nominated
+	* ProfileVal is. Don't call this when profiles are being reset.*/
+	void addProfileGroup(ProfileGroup * pGroup);
+	/// Static function to get the singleton instance.
+	static ProfileGroupResetter & instance();
+	ProfileVal * nominee_;
+	eastl::vector< ProfileGroup*>	groups_;
+	bool doingReset_;
+	/// called by every ProfileVal when it is reset
+	void resetIfDesired(ProfileVal & val);
+	friend std::istringstream& operator >> (std::istringstream &s, ProfileVal &v);
+};
+class ScopedProfile
+{
+public:
+	ScopedProfile(ProfileVal & profile, const char * filename, int lineNum) :
+		profile_(profile),
+		filename_(filename),
+		lineNum_(lineNum)
+	{
+		profile_.start();
+	}
+
+	~ScopedProfile()
+	{
+		profile_.stop(filename_, lineNum_);
+	}
+
+private:
+	ProfileVal & profile_;
+	const char * filename_;
+	int lineNum_;
+};
+
+
+class GECOAPI Profiler
+{
+private:
+	enum
+	{
+		NUM_FRAMES = 64,
+		MAX_SLOTS = 256,
+		SLOT_STACK_DEPTH = 64,
+	};
+
+public:
+	enum
+	{
+		FLAG_WATCH = (1 << 0),
+	};
+
+private:
+	struct Slot
+	{
+		const char*			name_;
+		float				curTimeMs_;
+		int					curCount_;
+		uint64				times_[NUM_FRAMES];
+		int					counts_[NUM_FRAMES];
+	};
+
+#ifdef _WIN32
+	struct ThreadInfo
+	{
+		eastl::string name_;
+		uint64 base_;
+		float time_;
+	};
+#endif
+
+public:
+	Profiler();
+	~Profiler();
+
+	static Profiler&	instance()
+	{
+		if (!Profiler::instance_) new Profiler;
+		return *Profiler::instance_;
+	}
+	static Profiler&	instanceNoCreate()
+	{
+		return *Profiler::instance_;
+	}
+	static Profiler*	instanceNoCreateP() { return instance_; }
+	void				tick();
+
+	int					declareSlot(const char* name, uint32 flags = 0);
+	///Add to current and push slotId
+	void				begin(int slotId)
+	{
+		if (std::this_thread::get_id() != Profiler::instanceNoCreate().threadId_)
+			return;
+		this->addTimeToCurrentSlot();
+		slotStack_[slotStackPos_++] = curSlot_;
+		curSlot_ = slotId;
+		slots_[slotId].counts_[frameCount_]++;
+	}
+	///Add to current and pop
+	void				end()
+	{
+		if (std::this_thread::get_id() != Profiler::instanceNoCreate().threadId_)
+			return;
+		this->addTimeToCurrentSlot();
+		curSlot_ = slotStack_[--slotStackPos_];
+	}
+
+#ifdef _WIN32
+	void				addThread(HANDLE thread, const char* name);
+	void				removeThread(HANDLE thread);
+#endif
+
+	void				setNewHistory(const char* historyFileName);
+	void				closeHistory();
+	void				flushHistory();
+
+private:
+	void				addTimeToCurrentSlot()
+	{
+		uint64 curTime = ::gettimestamp();
+		uint64 delta = curTime - prevTime_;
+		prevTime_ = curTime;
+		slots_[curSlot_].times_[frameCount_] += delta;
+	}
+
+private:
+	static Profiler* 	instance_;
+
+	std::thread::id		threadId_;
+	eastl::string threadIdString_;
+
+	uint64				curTime_;
+	uint64				prevTime_;
+
+	FILE*				historyFile_;
+	bool				slotNamesWritten_;
+
+	int					frameCount_;
+
+	int					numSlots_;
+	int					curSlot_;
+
+	int					slotStack_[SLOT_STACK_DEPTH];
+	int					slotStackPos_;
+	Slot				slots_[MAX_SLOTS];
+
+#ifdef _WIN32
+	typedef eastl::hash_map<HANDLE, ThreadInfo*> ThreadInfoMap;
+	ThreadInfoMap		threads_;
+#endif
+};
+class GECOAPI ScopedProfiler
+{
+public:
+	ScopedProfiler(int id)
+	{
+		Profiler::instanceNoCreate().begin(id);
+	}
+
+	~ScopedProfiler()
+	{
+		Profiler::instanceNoCreate().end();
 	}
 };
 
@@ -52,7 +467,7 @@ class stat_watcher_factory_t;
 extern stat_watcher_factory_t<uint>& read_uint_stat_watcher_factory();
 
 template <class TYPE>
-class stat_watcher_factory_t
+class GECOAPI stat_watcher_factory_t
 {
 	typedef eastl::pair< std::string, float > stat_entry_t;
 	typedef eastl::vector< stat_entry_t > stat_entries_t;
@@ -178,7 +593,7 @@ private:
 /**
  *	This class is used to collect statistics about all recv.
  */
-struct network_recv_stats_t
+struct GECOAPI network_recv_stats_t
 {
 	typedef intrusive_stat_rate_of_change_t< uint> stat;
 	eastl::intrusive_list<stat>  pStats_;
@@ -200,8 +615,8 @@ struct network_recv_stats_t
 	int		maxTxQueueSize_;
 	int		maxRxQueueSize_;
 
-	//ProfileVal	mercuryTimer_;
-	//ProfileVal	systemTimer_;
+	ProfileVal	mercuryTimer_;
+	ProfileVal	systemTimer_;
 
 	network_recv_stats_t();
 
@@ -251,7 +666,7 @@ struct network_recv_stats_t
 /**
 *	This class is used to collect statistics about all send.
 */
-struct network_send_stats_t
+struct GECOAPI network_send_stats_t
 {
 	static float SEND_STATS_UPDATE_RATE;
 	typedef intrusive_stat_rate_of_change_t< uint> stat;
@@ -270,8 +685,8 @@ struct network_send_stats_t
 	stat numFailedPacketSend_;
 	stat numFailedBundleSend_;
 
-	//ProfileVal	mercuryTimer_;
-	//ProfileVal	systemTimer_;
+	ProfileVal	mercuryTimer_;
+	ProfileVal	systemTimer_;
 
 	network_send_stats_t();
 
@@ -315,7 +730,7 @@ struct network_send_stats_t
 };
 
 const float INTERFACE_ELEMENT_STAT_AVERAGE_BIAS = -2.f / (5 + 1);
-class interface_element_stats_t
+class GECOAPI interface_element_stats_t
 {
 	/// The maximum bytes received for a single message for this interface element.
 	uint64 		maxBytesReceived_;
