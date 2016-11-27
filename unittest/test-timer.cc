@@ -110,30 +110,19 @@ TEST(GECO_DEBUGGING_TIMESTAMP, test_gettimestamp_func)
 		times, size, size / (float)times * 100, maxus, accus / times, end - start);
 }
 
-
-static ProfileVal& test_profile()
-{
-	AUTO_SCOPED_PROFILE("test_profile");
-	return _localProfile;
-}
 TEST(NETWORK_STATS, test_profile)
 {
-	ProfileVal* ptr;
-	uint totaltime = 10000000;
-
-	for (int i = 0; i < totaltime;i++)
+	static ProfileVal _localProfile("test_profile");
+	uint count = 1000;
+	for (int i = 0;i < count;i++)
 	{
-		ptr = &test_profile();
+		_localProfile.start();
+		geco_sleep(2);
+		_localProfile.stop();
 	}
-
-	ProfileVal& _localProfile  = *ptr;
-	printf("count %d, LastIntTime %.5f ms\nLastTime %.5f ms\nSumIntTime %.5f ms\nSumTime %.5f ms\n",
-		_localProfile.count_,
-		_localProfile.lastIntTimeInSeconds() * 1000,
-		_localProfile.lastTimeInSeconds() * 1000,
-		_localProfile.sumIntTimeInSeconds() * 1000,
-		_localProfile.sumTimeInSeconds() * 1000);
-	//AUTO_SCOPED_PROFILE("test_profile");
+	if (!almost_equal(_localProfile.lastIntTimeInSeconds(), 1,1))
+		printf("_localProfile.lastIntTimeInSeconds() %.5f\n", _localProfile.lastIntTimeInSeconds());
+	std::cout << _localProfile;
 }
 //static int naive_clz(int bits, uint64_t v)
 //{

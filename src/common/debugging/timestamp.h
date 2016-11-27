@@ -35,8 +35,10 @@
 // under 2.4 kernels where two consecutive calls to gettimeofday may actually
 // return a result that goes backwards.
 #ifndef _XBOX360
-# define GECO_USE_RDTSC
 #endif // _XBOX360
+
+//#define GECO_USE_RDTSC
+
 #if defined(__unix__) || defined(__linux__)
 		/**　This function returns the processor's (real-time) clock cycle counter.
 		 *　Read Time-Stamp Counterloads current value of processor's timestamp counter into EDX:EAX
@@ -45,7 +47,7 @@ inline uint64 gettimestamp()
 {
 	uint32 rethi, retlo;
 	__asm__ __volatile__(
-		"rdtsc":
+		"rdtsc\n":
 	"=d" (rethi),
 		"=a" (retlo)
 		);
@@ -78,6 +80,19 @@ inline uint64 gettimestamp()
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);
 	return counter.QuadPart;
+}
+inline uint64 gettimeofday() //us
+{
+	static uint64 curTime;
+	static LARGE_INTEGER PerfVal;
+	static LARGE_INTEGER yo1;
+	static uint64 quotient, remainder;
+	QueryPerformanceFrequency(&yo1);
+	QueryPerformanceCounter(&PerfVal);
+	quotient = ((PerfVal.QuadPart) / yo1.QuadPart);
+	remainder = ((PerfVal.QuadPart) % yo1.QuadPart);
+	curTime = (uint64)quotient*(uint64)1000000 + (remainder * 1000000 / yo1.QuadPart);
+	return curTime;
 }
 #endif
 #elif defined( PLAYSTATION3 )

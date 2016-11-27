@@ -81,9 +81,9 @@ public:
 	void reset();
 
 	ProfileVal * pRunningTime() { return profiles_[0]; }
-	const ProfileVal * pRunningTime() const { return profiles_[0]; }
+	const ProfileVal * pRunningTime() const { return profiles_[0]; } 
 	/// sets the timer profile for this group, i.e. the one that is always running and exists to track how long the group has been running for.
-	time_stamp_t runningTime() const;
+	time_stamp_t runningTime() const; // 由此可得到系统profile时间
 	/// returns a reference to the default group.
 	static ProfileGroup & defaultGroup();
 
@@ -104,6 +104,7 @@ private:
 
 /**
 *	This class is used to profile the performance of parts of the code.
+*  as there maybe some other pairs of starts/stops invovled by this start and stop
 */
 #include <stdlib.h> 
 class GECOAPI ProfileVal
@@ -122,13 +123,13 @@ public:
 	ProfileGroup * pGroup_;
 
 	time_stamp_t		lastTime_;		///< The time the profile was started.
-	time_stamp_t		sumTime_;		///< The total time between all start/stops.
+	time_stamp_t		sumTime_;		///< The total time between all start/stops. count_次的总时间
 	time_stamp_t		lastIntTime_;	///< The last internal time for this profile.
-	time_stamp_t		sumIntTime_;	///< The sum of internal time for this profile.
+	time_stamp_t		sumIntTime_;	///< The sum of internal time for this profile.  count_次内部总时间
 	uint32		lastQuantity_;	///< The last value passed into stop.
 	uint32		sumQuantity_;	///< The total of all values passed into stop.
 	uint32		count_;			///< The number of times stop has been called.
-	int			inProgress_;	///< Whether the profile is currently timing.
+	int			inProgress_;	///< Whether the profile is currently timing. 	// 记录第几次处理, 如递归等
 
 	static geco_watcher_base_t& pSummaryWatcher(ProfileVal& profileVal);
 	static geco_watcher_base_t& pWatcherStamps(ProfileVal& profileVal);
@@ -141,27 +142,21 @@ public:
 	void start()
 	{
 		time_stamp_t now = gettimestamp();
-
-		if (inProgress_ == 0)
-		{
-			lastTime_ = now;
-		}
-
-		++inProgress_;
-
+		// 记录第几次处理
+		if (inProgress_++ == 0) lastTime_ = now;
+		// 如果栈中有对象则自己是从上一个ProfileVal函数进入调用的
+		// 我们可以在此得到上一个函数进入到本函数之前的一段时间片
+		// 然后将其加入到sumIntTime_
 		ProfileGroup::Profiles & stack = pGroup_->stack();
-
-		// Disable the existing internal profile
 		if (!stack.empty())
 		{
 			ProfileVal & profile = *stack.back();
-			int val = int(now - profile.lastIntTime_);
-			profile.lastIntTime_ = val<0 ? abs(val) : val;
+			profile.lastIntTime_ = now - profile.lastIntTime_;
 			profile.sumIntTime_ += profile.lastIntTime_;
 		}
-
-		// This profile is now the active internal profile
+		// push self to stack
 		stack.push_back(this);
+		//	reset start time
 		lastIntTime_ = now;
 	}
 
@@ -171,17 +166,15 @@ public:
 	void stop(uint32 qty = 0)
 	{
 		time_stamp_t now = gettimestamp();
-		int val;
+		// 如果为0则表明自己是调用栈的产生着在此我们可以得到这个函数总共耗费的时间
 		if (--inProgress_ == 0)
 		{
-			val = int(now - lastIntTime_);
-			lastIntTime_ = val < 0 ? abs(val) : val;
+			lastTime_ = now - lastTime_;
 			sumTime_ += lastTime_;
 		}
 
 		lastQuantity_ = qty;
 		sumQuantity_ += qty;
-
 		++count_;
 
 		ProfileGroup::Profiles & stack = pGroup_->stack();
@@ -189,11 +182,13 @@ public:
 		stack.pop_back();
 
 		// Disable internal time counting for this profile
-		val = int(now - lastIntTime_);
-		lastIntTime_ = val < 0 ? abs(val) : val;
+		// 得到本函数所耗费的时间
+		lastIntTime_ = now - lastIntTime_;
 		sumIntTime_ += lastIntTime_;
 
 		// Re-enable the internal counter for the frame above this one.
+		// 我们需要在此重设上一个函数中的profile对象的最后一次内部时间
+		// 使其能够在start时正确得到自调用完本函数之后进入下一个profile函数中时所消耗的时间片段
 		if (!stack.empty())
 		{
 			stack.back()->lastIntTime_ = now;

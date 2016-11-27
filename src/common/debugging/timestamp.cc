@@ -37,7 +37,7 @@ static DWORD WINAPI busy_ldle_thread(LPVOID arg)
 {
 	// Set this thread to run on the first cpu.
 	// We want to throttle up only the cpu that the main thread runs on
-	//ProcessorAffinity::update(); //TODO
+	affinity_update();
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
 	while (continueBusyIdle) ++g_busyIdleCounter;
 	return 0;
@@ -50,7 +50,7 @@ static uint64 calc_stamps_pe_sec()
 
 	// Set this thread to run on the first cpu.
 	// Timestamps can be out of sync on separate cores/cpu's
-	geco::ultils::affinity_update();
+	affinity_update();
 
 	// start a low-priority busy idle thread to use 100% CPU on laptops
 	continueBusyIdle = true;
@@ -78,7 +78,6 @@ static uint64 calc_stamps_pe_sec()
 
 	continueBusyIdle = false;
 	CloseHandle(thread);
-
 	return (uint64)((stampDelta * uint64(frequency.QuadPart)) / countDelta);
 	// the multiply above won't overflow until we get over 4THz processors :)
 	//  (assuming the performance counter stays at about 1MHz)
@@ -87,7 +86,7 @@ static uint64 calc_stamps_pe_sec()
 static uint64 calc_stamps_pe_sec()
 {
 	LARGE_INTEGER rate;
-	MF_VERIFY(QueryPerformanceFrequency(&rate));
+	QueryPerformanceFrequency(&rate);
 	return rate.QuadPart;
 }
 #endif
@@ -123,20 +122,20 @@ static uint64 calc_stamps_pe_sec()
 }
 #endif
 
- uint64 stamps_per_sec()
+uint64 stamps_per_sec()
 {
 	static uint64 stampsPerSecondCache = calc_stamps_pe_sec();
 	return stampsPerSecondCache;
 }
- double stamps_per_sec_double()
+double stamps_per_sec_double()
 {
 	static double stampsPerSecondCacheD = double(stamps_per_sec());
 	return stampsPerSecondCacheD;
 }
- double stamps2sec(uint64 stamps)
+double stamps2sec(uint64 stamps)
 {
-	 static double val = stamps_per_sec_double();
-	 return stamps / val;
+	static double val = stamps_per_sec_double();
+	return stamps / val;
 }
 time_stamp_t time_stamp_t::fromSecs(double seconds)
 {
