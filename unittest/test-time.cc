@@ -149,12 +149,22 @@ TEST(TIME, test_timer_queue)
 	bool run = true;
 	th.handleTimeout = timeoutcb;
 	th.onRelease = on_timer_released;
-	uint64 interval = 3 * stamps_per_sec(); //repeated every 0.5s 
-	uint64 tout = gettimestamp() + stamps_per_sec();
+	uint64 interval = 3 * stamps_per_sec(); //timeout 3 secs 
+	uint64 tout = gettimestamp() + interval;
 	TimerID tid = pTimeQueue.add(tout, interval, &th, &run);
 	std::cout << "stamps_per_sec = " << stamps_per_sec() << " nextExp =" << pTimeQueue.nextExp(gettimestamp()) << "\n";
+	uint64 start = gettimestamp();
+	uint64 end;
+	int secs = 0;
 	while (run)
 	{
+		end = gettimestamp();
+		if (end - start >= stamps_per_sec())
+		{
+			start = end;
+			secs++;
+			std::cout << secs << "th sec\n";
+		}
 		pTimeQueue.process(gettimestamp());
 	}
 }
