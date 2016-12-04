@@ -84,13 +84,13 @@ inline uint64 gettimestamp()
 inline uint64 gettimeofday() //us
 {
 	static uint64 curTime;
-	static LARGE_INTEGER PerfVal;
+	static LARGE_INTEGER Peral;
 	static LARGE_INTEGER yo1;
 	static uint64 quotient, remainder;
 	QueryPerformanceFrequency(&yo1);
-	QueryPerformanceCounter(&PerfVal);
-	quotient = ((PerfVal.QuadPart) / yo1.QuadPart);
-	remainder = ((PerfVal.QuadPart) % yo1.QuadPart);
+	QueryPerformanceCounter(&Peral);
+	quotient = ((Peral.QuadPart) / yo1.QuadPart);
+	remainder = ((Peral.QuadPart) % yo1.QuadPart);
 	curTime = (uint64)quotient*(uint64)1000000 + (remainder * 1000000 / yo1.QuadPart);
 	return curTime;
 }
@@ -165,4 +165,5 @@ struct GECOAPI time_stamp_t
 	static time_stamp_t fromSecs(double seconds);
 
 };
+
 #endif

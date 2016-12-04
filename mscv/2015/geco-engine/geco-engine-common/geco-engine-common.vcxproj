@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\..\src\common\debugging\gecowatchert.h" />
     <ClInclude Include="..\..\..\..\src\common\debugging\profile_t.h" />
     <ClInclude Include="..\..\..\..\src\common\debugging\stack_tracker_t.h" />
+    <ClInclude Include="..\..\..\..\src\common\debugging\timer_queue_t.h" />
     <ClInclude Include="..\..\..\..\src\common\debugging\timestamp.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\array.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\arrlist.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="..\..\..\..\src\common\debugging\gecowatchert.cc" />
     <ClCompile Include="..\..\..\..\src\common\debugging\profile_t.cc" />
     <ClCompile Include="..\..\..\..\src\common\debugging\stack_tracker_t.cc" />
+    <ClCompile Include="..\..\..\..\src\common\debugging\timer_queue_t.cpp" />
     <ClCompile Include="..\..\..\..\src\common\debugging\timestamp.cc" />
     <ClCompile Include="..\..\..\..\src\common\ds\arrlist.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\allocator_eastl.cpp" />

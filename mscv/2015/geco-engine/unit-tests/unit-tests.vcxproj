@@ -192,7 +192,7 @@
     <ClCompile Include="..\..\..\..\unittest\test-debugging.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-geco-bit-stream.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
-    <ClCompile Include="..\..\..\..\unittest\test-timer.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-time.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-ultils.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-watcher.cc" />
   </ItemGroup>

@@ -521,11 +521,47 @@ public:
 	}
 };
 
-struct GECOAPI geco_nub_t
+class GECOAPI geco_nub_t
 {
-	interface_elements_t* m_InterfaceElements;;
+private:
+	struct InterfaceInfo
+	{
+		ushort		uiUserID;
+		ushort		uiID;
+		sockaddrunion	kAddr;
+		eastl::string		kName;
+
+		InterfaceInfo(ushort uiUserID_, ushort uiID_, sockaddrunion& kAddr_, eastl::string& kName_)
+			:uiUserID(uiUserID_), uiID(uiID_), kAddr(kAddr_), kName(kName_) {}
+	};
+	typedef eastl::vector<InterfaceInfo> InterfaceInfoVec;
+
+public:
+	static const char *USE_FVMACHINED;
+	interface_elements_t* m_InterfaceElements;
 	void ServeInterfaceElement(interface_elements_t& ies);
 	geco_engine_reason RegisterWithMachined(const eastl::string& name, int id, bool isRegister = true);
+};
+
+struct geco_transport_t
+{
+	// Statistics
+	time_stamp_t		accSpareTime_;
+	time_stamp_t		oldSpareTime_;
+	time_stamp_t		totSpareTime_;
+	time_stamp_t		lastStatisticsGathered_;
+	uint                     numTimerCalls_;
+	double               maxWait_;
+
+	bool breakProcessing_;
+
+	void processFrequentTasks();
+	void processTimers();
+	void processStats();
+	int processNetwork();
+
+	static geco_watcher_director_t* pWatcher();
+
 };
 
 struct GECOAPI  geco_network_interface_t
@@ -544,7 +580,6 @@ struct GECOAPI  geco_network_interface_t
 	*/
 	void send(const sockaddrunion& address, geco_bundle_t& bundle, geco_channel_t * pChannel)
 	{
-
 	}
 };
 
@@ -736,6 +771,7 @@ private:
 	typedef std::map< sockaddrunion, geco_channel_t* > Channels;
 	Channels m_kChannels;
 };
+
 
 /////////////////////////////////////// packet ends ////////////////////////////////////
 

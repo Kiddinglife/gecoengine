@@ -22,8 +22,9 @@ GTEST_API_ int main(int argc, char** argv)
 
 	//::testing::GTEST_FLAG(filter) = "RMI.*";
 
-	::testing::GTEST_FLAG(filter) = "NETWORK_STATS.test_profile";
-	//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_TIMESTAMP.test_gettimestamp_func";
+	//::testing::GTEST_FLAG(filter) = "TIME.test_profile";
+	//::testing::GTEST_FLAG(filter) = "TIME.test_gettimestamp_func";
+	::testing::GTEST_FLAG(filter) = "TIME.test_timer_queue";
 
 	//last run and pass on 14:18 PM 4 Oct 2016
 	//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";
