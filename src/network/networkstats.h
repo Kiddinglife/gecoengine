@@ -420,7 +420,7 @@ private:
 	static Profiler* 	instance_;
 
 	std::thread::id		threadId_;
-	eastl::string threadIdString_;
+	size_t 				hashedthreadId_;
 
 	uint64				curTime_;
 	uint64				prevTime_;

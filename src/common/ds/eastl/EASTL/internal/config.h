@@ -62,7 +62,7 @@
 #endif
 #include <EABase/eahave.h>
 
-#include "../test/packages/EAStdC/include/EAStdC/EASprintf.h"
+#include <test/packages/EAStdC/include/EAStdC/EASprintf.h>
 #if defined(EA_PRAGMA_ONCE_SUPPORTED)
 	#pragma once
 #endif
@@ -881,7 +881,6 @@ namespace eastl
 #ifndef EASTL_INT128_DEFINED
 	#if EASTL_INT128_SUPPORTED
 		#define EASTL_INT128_DEFINED 1
-
 		#if defined(__GNUC__)
 			typedef __int128_t   eastl_int128_t;
 			typedef __uint128_t eastl_uint128_t;

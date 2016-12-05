@@ -18,7 +18,7 @@
  *
  */
 
- // created on 28-June-2016 by Jackie Zhang
+// created on 28-June-2016 by Jackie Zhang
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
@@ -40,17 +40,17 @@
 //#define GECO_USE_RDTSC
 
 #if defined(__unix__) || defined(__linux__)
-		/**　This function returns the processor's (real-time) clock cycle counter.
-		 *　Read Time-Stamp Counterloads current value of processor's timestamp counter into EDX:EAX
-		 */
+/**　This function returns the processor's (real-time) clock cycle counter.
+ *　Read Time-Stamp Counterloads current value of processor's timestamp counter into EDX:EAX
+ */
 inline uint64 gettimestamp()
 {
 	uint32 rethi, retlo;
 	__asm__ __volatile__(
-		"rdtsc\n":
-	"=d" (rethi),
-		"=a" (retlo)
-		);
+			"rdtsc\n":
+			"=d" (rethi),
+			"=a" (retlo)
+	);
 	return uint64(rethi) << 32 | retlo;
 }
 #elif defined(_WIN32)
@@ -59,13 +59,17 @@ inline uint64 gettimestamp()
 #pragma warning (disable: 4035)
 #ifdef _AMD64_
 /* remember myself that i should use geco:debugging namespace in timestamp.cpp,
-* othwerwise will cause c3018 error */
+ * othwerwise will cause c3018 error */
 extern "C" uint64 _fastcall GECOAPI asm_time();
 #define gettimestamp asm_time
 #else
 inline GECOAPI uint64 gettimestamp()
 {
-	__asm rdtsc
+	//__asm rdtsc
+	// refers to this link http://blog.csdn.net/rabbit729/article/details/3849932
+	// 因为RDTSC不被C++的内嵌汇编器直接支持，所以我们要用_emit伪指令直接嵌入该指令的机器码形式0X0F、0X31，如下：
+	__asm _emit 0x0F
+	__asm _emit 0x31
 }
 #endif
 #pragma warning (pop)
@@ -107,9 +111,9 @@ inline uint64 gettimestamp()
 #endif
 
 /**
-*	This function tells you how many there are in a second. It caches its reply
-*	after being called for the first time, however that call may take some time.
-	*/
+ *	This function tells you how many there are in a second. It caches its reply
+ *	after being called for the first time, however that call may take some time.
+ */
 uint64 GECOAPI stamps_per_sec();
 /**
  *	This function tells you how many there are in a second as a double precision
@@ -121,48 +125,48 @@ double GECOAPI stamps2sec(uint64 stamps);
 /** This class stores a value in stamps but has access functions in seconds.*/
 struct GECOAPI time_stamp_t
 {
-	uint64 stamp_;
+		uint64 stamp_;
 
-	time_stamp_t(uint64 stamps = 0) :
-		stamp_(stamps)
-	{
-	}
-	operator uint64 &()
-	{
-		return stamp_;
-	}
-	operator uint64() const
-	{
-		return stamp_;
-	}
+		time_stamp_t(uint64 stamps = 0) :
+				stamp_(stamps)
+		{
+		}
+		operator uint64 &()
+		{
+			return stamp_;
+		}
+		operator uint64() const
+		{
+			return stamp_;
+		}
 
-	/*This method returns this timestamp in seconds.*/
-	double inSecs() const
-	{
-		return toSecs(stamp_);
-	}
-	/*This method sets this timestamp from seconds.*/
-	void setInSecs(double seconds)
-	{
-		stamp_ = fromSecs(seconds);
-	}
-	/*This method returns the number of stamps from this TimeStamp to now.*/
-	time_stamp_t ageInStamps() const
-	{
-		return gettimestamp() - stamp_;
-	}
-	/*This method returns the number of seconds from this TimeStamp to now.*/
-	double agesInSec() const
-	{
-		return toSecs(this->ageInStamps());
-	}
-	/*This static method converts a timestamp value into seconds.*/
-	static double toSecs(uint64 stamps)
-	{
-		return double(stamps) / stamps_per_sec_double();
-	}
-	/*This static method converts seconds into timestamps.*/
-	static time_stamp_t fromSecs(double seconds);
+		/*This method returns this timestamp in seconds.*/
+		double inSecs() const
+		{
+			return toSecs(stamp_);
+		}
+		/*This method sets this timestamp from seconds.*/
+		void setInSecs(double seconds)
+		{
+			stamp_ = fromSecs(seconds);
+		}
+		/*This method returns the number of stamps from this TimeStamp to now.*/
+		time_stamp_t ageInStamps() const
+		{
+			return gettimestamp() - stamp_;
+		}
+		/*This method returns the number of seconds from this TimeStamp to now.*/
+		double agesInSec() const
+		{
+			return toSecs(this->ageInStamps());
+		}
+		/*This static method converts a timestamp value into seconds.*/
+		static double toSecs(uint64 stamps)
+		{
+			return double(stamps) / stamps_per_sec_double();
+		}
+		/*This static method converts seconds into timestamps.*/
+		static time_stamp_t fromSecs(double seconds);
 
 };
 

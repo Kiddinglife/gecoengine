@@ -115,7 +115,7 @@ static uint64 calc_stamps_pe_sec()
 	gettimeofday(&tvAfter, NULL);
 	stampAfter = gettimestamp();
 
-	uint64 microDelta = (tvAfter.tv_usec + 1000000 - tvBefore.tv_usec) % 1000000;
+	uint64 microDelta = (tvAfter.tv_usec + 1000000 - tvBefore.tv_usec)　% 1000000;
 	uint64 stampDelta = stampAfter - stampBefore;
 	return (stampDelta * 1000000ULL) / microDelta;
 	// the multiply above won't overflow until we get over 4THz processors :)

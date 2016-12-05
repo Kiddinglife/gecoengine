@@ -22,9 +22,10 @@ GTEST_API_ int main(int argc, char** argv)
 
 	//::testing::GTEST_FLAG(filter) = "RMI.*";
 
+	// caution rdtsc imestamp is always accuate in linux but very rough in windows
 	//::testing::GTEST_FLAG(filter) = "TIME.test_profile";
 	//::testing::GTEST_FLAG(filter) = "TIME.test_gettimestamp_func";
-	::testing::GTEST_FLAG(filter) = "TIME.test_timer_queue";
+	//::testing::GTEST_FLAG(filter) = "TIME.test_timer_queue";
 
 	//last run and pass on 14:18 PM 4 Oct 2016
 	//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.*";

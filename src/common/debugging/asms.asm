@@ -12,8 +12,10 @@ Int_3 ENDP
 ;According to the help, this warning is 'harmless', and
 ;they even have example code which does it. Go figure.
 asm_time PROC 
-	rdtsc ;指令
-	;ret
+	;rdtsc ;指令
+	_emit 0x0F
+    _emit 0x31
+	ret
 asm_time ENDP 
 
 END  // 文件结束

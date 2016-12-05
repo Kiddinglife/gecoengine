@@ -9,6 +9,8 @@
 #include "../common/ultils/ultils.h"
 #include "networkstats.h"
 #include <iosfwd>
+#include <hash_fun.h>
+
 DECLARE_DEBUG_COMPONENT2("networkstats", 0)
 
 // ================= Profiler Definitions Starts ================
@@ -44,9 +46,10 @@ Profiler::Profiler() :
 {
 	memset(slots_, 0, sizeof(slots_));
 	slots_[0].name_ = "Unaccounted";
-	std::stringstream name;
-	std::this_thread::get_id()._To_text(name);
-	threadIdString_ = name.str().c_str();
+    //std::stringstream name;
+    //name << threadId_;
+	std::hash<std::thread::id> hasher;
+	hashedthreadId_ = hasher(threadId_);
 
 #ifdef _WIN32
 	GECO_WATCH("Profiler/Unaccounted", slots_[0].curTimeMs_, WT_READ_ONLY);

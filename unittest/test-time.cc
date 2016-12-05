@@ -115,14 +115,14 @@ TEST(TIME, test_gettimestamp_func)
 TEST(TIME, test_profile)
 {
 	static ProfileVal _localProfile("test_profile");
-	uint count = 1000;
+	uint count = 1;
 	for (int i = 0;i < count;i++)
 	{
 		_localProfile.start();
 		geco_sleep(2);
 		_localProfile.stop();
 	}
-	if (!almost_equal(_localProfile.lastIntTimeInSeconds(), 1, 1))
+	if (!almost_equal(_localProfile.lastIntTimeInSeconds(), 1))
 		printf("_localProfile.lastIntTimeInSeconds() %.5f\n", _localProfile.lastIntTimeInSeconds());
 	std::cout << _localProfile;
 }

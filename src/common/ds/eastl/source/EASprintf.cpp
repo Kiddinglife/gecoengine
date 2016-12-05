@@ -6,6 +6,7 @@
 
 #include <EABase/eabase.h>
 #include <stdio.h>
+#include <wchar.h>
 
 namespace EA {
 	namespace StdC {
