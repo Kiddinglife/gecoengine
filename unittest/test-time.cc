@@ -50,13 +50,14 @@ TEST(TIME, test_gettimestamp_func)
 		secs = (double)1 / (i + 1);
 		stampt = time_stamp_t::fromSecs(secs);
 		ASSERT_EQ(almost_equal(time_stamp_t::toSecs(stampt.stamp_), secs), true);
-
-		stampt = gettimestamp();
-		ageinsec = stampt.agesInSec();
-		ageinstamp = stampt.ageInStamps();
-		ASSERT_GT(ageinsec, 0);
-		ASSERT_GT(ageinstamp, 0);
 	}
+
+	stampt = gettimestamp();
+	ageinsec = stampt.agesInSec();
+	ageinstamp = stampt.ageInStamps();
+	ASSERT_GT(ageinsec, 0);
+	ASSERT_GT(ageinstamp, 0);
+
 	stampt = stamps_per_sec();
 	if (!almost_equal(time_stamp_t::toSecs(stampt.stamp_), 1))
 	{
@@ -119,7 +120,7 @@ TEST(TIME, test_profile)
 	for (int i = 0;i < count;i++)
 	{
 		_localProfile.start();
-		geco_sleep(2);
+		geco_sleep(1);
 		_localProfile.stop();
 	}
 	if (!almost_equal(_localProfile.lastIntTimeInSeconds(), 1))

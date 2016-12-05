@@ -22,7 +22,7 @@
     <ProjectGuid>{7547CE30-E374-4263-A0EE-97596D8A768E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gecoenginenetwork</RootNamespace>
-    <ProjectName>net</ProjectName>
+    <ProjectName>network</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

@@ -9,7 +9,6 @@
 #include "../common/ultils/ultils.h"
 #include "networkstats.h"
 #include <iosfwd>
-#include <hash_fun.h>
 
 DECLARE_DEBUG_COMPONENT2("networkstats", 0)
 

@@ -85,9 +85,17 @@ static uint64 calc_stamps_pe_sec()
 #else
 static uint64 calc_stamps_pe_sec()
 {
+
+	LARGE_INTEGER ratee;
 	LARGE_INTEGER rate;
-	QueryPerformanceFrequency(&rate);
-	return rate.QuadPart;
+	rate.QuadPart = 0;
+	uint64 count = 1000000;
+	for (int i = 0;i < count;i++)
+	{
+		QueryPerformanceFrequency(&ratee);
+		rate.QuadPart += ratee.QuadPart;
+	}
+	return rate.QuadPart / count;
 }
 #endif
 #else
@@ -115,7 +123,7 @@ static uint64 calc_stamps_pe_sec()
 	gettimeofday(&tvAfter, NULL);
 	stampAfter = gettimestamp();
 
-	uint64 microDelta = (tvAfter.tv_usec + 1000000 - tvBefore.tv_usec)　% 1000000;
+	uint64 microDelta = (tvAfter.tv_usec + 1000000 - tvBefore.tv_usec) % 1000000;
 	uint64 stampDelta = stampAfter - stampBefore;
 	return (stampDelta * 1000000ULL) / microDelta;
 	// the multiply above won't overflow until we get over 4THz processors :)
