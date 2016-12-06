@@ -1,7 +1,5 @@
 #include "msg_defines.h"
-
 DECLARE_DEBUG_COMPONENT2("Network", 0);
-
 
 inline geco_engine_reason packet_recv_t::process_packet()
 {
@@ -192,7 +190,7 @@ void interface_elements_t::RegisterWithNub(geco_nub_t& nub)
 }
 geco_engine_reason interface_elements_t::RegisterWithMachined(geco_nub_t& nub, int uid) const
 {
-	return nub.RegisterWithMachined(this->m_pcName, uid,true);
+	return nub.RegisterWithMachined(this->m_pcName, uid, true);
 }
 void geco_nub_t::ServeInterfaceElement(interface_elements_t& ies)
 {

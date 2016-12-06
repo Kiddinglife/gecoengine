@@ -56,8 +56,7 @@ public:
 	}
 
 	/**
-	*	This method updates the rate of change values using a sample over the
-	*	input period.
+	*	This method updates the rate of change values using a sample over the input period.
 	*/
 	void tick(double deltaTime)
 	{

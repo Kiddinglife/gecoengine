@@ -42,7 +42,7 @@
 
 #define PROFILER_DECLARE( id, name )	int g_profilerSlot_##id = Profiler::instance().declareSlot( name )
 #define PROFILER_DECLARE2( id, name, flags )	int g_profilerSlot_##id = Profiler::instance().declareSlot( name, flags )
-#define PROFILER_SCOPED( id )	extern int g_profilerSlot_##id; ScopedProfile scopedProfiler_##id( g_profilerSlot_##id )
+#define PROFILER_SCOPED( id )	extern int g_profilerSlot_##id; ScopedProfiler scopedProfiler_##id( g_profilerSlot_##id )
 
 #define AUTO_SCOPED_PROFILE( NAME )	static ProfileVal _localProfile( NAME );	ScopedProfile _autoScopedProfile( _localProfile, __FILE__, __LINE__ );
 #define SCOPED_PROFILE( PROFILE ) ScopedProfile _scopedProfile( PROFILE, __FILE__, __LINE__ );

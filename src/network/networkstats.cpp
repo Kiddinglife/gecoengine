@@ -609,7 +609,7 @@ void network_recv_stats_t::updateStatAverages(double elapsedTime)
 void network_recv_stats_t::update_stats(double elapsedTime) //seconds
 {
 	//uint64 currTime = gettimestamp();
-	// Wait at least a second. replay on timer cb 
+	// Wait at least a second. rely on timer cb 
 	//if (currTime >= (lastGatherTime_ + stamps_per_sec()))
 	//{
 	// Update stat averages
@@ -620,21 +620,18 @@ void network_recv_stats_t::update_stats(double elapsedTime) //seconds
 
 	// @TODO ask channel for lastTxQueueSize_ and lastRxQueueSize_
 	//mtra_get_queue_sizes(this->connection_id_,&lastTxQueueSize_,&lastRxQueueSize_ );
-
 	// Warn if the buffers are getting fuller
-	if ((lastTxQueueSize_ > maxTxQueueSize_) && (lastTxQueueSize_ > 128 * 1024))
-	{
-		WARNING_MSG("send queue peaked at new max (%d bytes)\n", lastTxQueueSize_);
-	}
-	if ((lastRxQueueSize_ > maxRxQueueSize_) && (lastRxQueueSize_ > 1024 * 1024))
-	{
-		WARNING_MSG("receive queue peaked at new max (%d bytes)\n", lastRxQueueSize_);
-	}
-
-	// update maxs
-	maxTxQueueSize_ = std::max(lastTxQueueSize_, maxTxQueueSize_);
-	maxRxQueueSize_ = std::max(lastRxQueueSize_, maxRxQueueSize_);
+	//if ((lastTxQueueSize_ > maxTxQueueSize_) && (lastTxQueueSize_ > 128 * 1024))
+	//{
+	//	WARNING_MSG("send queue peaked at new max (%d bytes)\n", lastTxQueueSize_);
 	//}
+	//if ((lastRxQueueSize_ > maxRxQueueSize_) && (lastRxQueueSize_ > 1024 * 1024))
+	//{
+	//	WARNING_MSG("receive queue peaked at new max (%d bytes)\n", lastRxQueueSize_);
+	//}
+	// update maxs
+	//maxTxQueueSize_ = std::max(lastTxQueueSize_, maxTxQueueSize_);
+	//maxRxQueueSize_ = std::max(lastRxQueueSize_, maxRxQueueSize_);
 }
 
 float network_send_stats_t::SEND_STATS_UPDATE_RATE = 1.0f;

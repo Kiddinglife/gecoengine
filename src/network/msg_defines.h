@@ -28,6 +28,7 @@
 #include "../common/geco-plateform.h"
 #include "../common/geco-export.h"
 #include "../common/debugging/debug.h"
+#include "../common/debugging/timer_queue_t.h"
 #include "callback_defines.h"
 #include "../common/ds/geco-bit-stream.h"
 #include "networkstats.h"
@@ -521,6 +522,107 @@ public:
 	}
 };
 
+/// Interface for a task to be added to the FrequentTasks collection.
+typedef std::function<void()> TickTask;
+
+/**
+*	This class is used to maintain the collection of frequent tasks.
+*/
+class TickTasks
+{
+public:
+	TickTasks() :
+		isDirty_(false),
+		pGotDestroyed_(NULL)
+	{
+	}
+
+	~TickTasks()
+	{
+		if (pGotDestroyed_ != NULL)
+		{
+			*pGotDestroyed_ = true;
+		}
+	}
+
+	void add(TickTask* pTask)
+	{
+		isDirty_ = true;
+		container_.push_back(pTask);
+	}
+	/**
+	*	Remove a frequent task.
+	*
+	*	@param pTask 		The frequent task to remove.
+	*
+	*	@return			Whether the frequent task previously existed.
+	*/
+	bool cancel(TickTask* pTask)
+	{
+		PROFILER_SCOPED(FrequentTasks_cancel);
+		isDirty_ = true;
+		Container::iterator iter = eastl::find(container_.begin(), container_.end(), pTask);
+		if (iter != container_.end())
+		{
+			container_.erase(iter);
+			return true;
+		}
+		return false;
+	}
+
+	void process()
+	{
+		bool wasInProcess = pGotDestroyed_ != NULL;
+		if (wasInProcess && isDirty_)
+		{
+			// not processing
+			return;
+		}
+		isDirty_ = false;
+		// This automatic boolean stores whether we get destroyed as a result of executing a FrequentTask.
+		bool gotDestroyed = false;
+		if (!wasInProcess)
+		{
+			pGotDestroyed_ = &gotDestroyed;
+		}
+		else
+		{
+			GECO_ASSERT(pGotDestroyed_ != NULL);
+		}
+
+		Container::iterator iter = container_.begin();
+		while (iter != container_.end())
+		{
+			TickTask* pTask = *iter;
+			// Save away in this call's stack in case we are destructed in do Task.
+			bool * pGotDestroyed = pGotDestroyed_;
+			GECO_ASSERT(pGotDestroyed != NULL);
+			(*pTask)();
+			if (*pGotDestroyed)
+			{
+				// Don't access any member state, exit immediately.
+				return;
+			}
+			// If the vector has been modified, the iterator is now invalid.
+			if (isDirty_)
+			{
+				break;
+			}
+			++iter;
+		}
+		if (!wasInProcess)
+		{
+			pGotDestroyed_ = NULL;
+		}
+	}
+
+private:
+	typedef eastl::vector<TickTask*> Container;
+	Container container_;
+	bool isDirty_;
+	bool * pGotDestroyed_;
+};
+
 class GECOAPI geco_nub_t
 {
 private:
@@ -536,11 +638,90 @@ private:
 	};
 	typedef eastl::vector<InterfaceInfo> InterfaceInfoVec;
 
+	TimeQueue64 pTimeQueue_;
+	TickTasks pFrequentTasks_;
+
+	// Statistics
+	time_stamp_t		accSpareTime_;
+	time_stamp_t		oldSpareTime_;
+	time_stamp_t		totSpareTime_;
+	time_stamp_t		lastStatisticsGathered_;
+	uint32                 numTimerCalls_;
+
+	bool breakProcessing_;
+	bool shouldIdle_;
+	interface_elements_t* m_InterfaceElements;
+	double maxWait_;
+
+private:
+	time_stamp_t spareTime()
+	{
+		//TODO ask mtra for this value
+		return 100;
+	}
+	void poll_stats()
+	{
+		// gather statistics every second
+		if (gettimestamp() - lastStatisticsGathered_ >= stamps_per_sec())
+		{
+			oldSpareTime_ = totSpareTime_;
+			totSpareTime_ = accSpareTime_ + spareTime();
+			lastStatisticsGathered_ = gettimestamp();
+		}
+	}
+
+	// select for network activity until earliest timer
+	int poll_network()
+	{
+		double maxWait; //sec
+		int mswait;
+		if (shouldIdle_)
+		{
+			maxWait = maxWait_;
+			if (!pTimeQueue_.empty())
+			{
+				maxWait = eastl::min(maxWait, pTimeQueue_.nextExp(gettimestamp()) / stamps_per_sec_double());
+			}
+			// translate to ms
+			int mswait = maxWait * 1000;
+		}
+		else
+		{
+			mswait = 0;
+		}
+
+		//TODO CALL mtra_poll()  and pass mswait to it do not impl very soon 
+	}
+	void loop()
+	{
+		while (!breakProcessing_)
+		{
+			pFrequentTasks_.process();
+			pTimeQueue_.process(gettimestamp());
+			poll_stats();
+			poll_network();
+		}
+	}
+
 public:
 	static const char *USE_FVMACHINED;
-	interface_elements_t* m_InterfaceElements;
+	geco_nub_t() :
+		breakProcessing_(false),
+		shouldIdle_(true),
+		//pErrorReporter_(NULL),
+		accSpareTime_(0),
+		oldSpareTime_(0),
+		totSpareTime_(0),
+		lastStatisticsGathered_(0),
+		numTimerCalls_(0),
+		maxWait_(0.01) // default max wait is 100ms
+	{
+	}
 	void ServeInterfaceElement(interface_elements_t& ies);
 	geco_engine_reason RegisterWithMachined(const eastl::string& name, int id, bool isRegister = true);
+
+	void ShouldIdle(bool val) { shouldIdle_ = val; }
+	void BreakProcessing(bool val) { breakProcessing_ = val; }
 };
 
 struct geco_transport_t
@@ -551,9 +732,10 @@ struct geco_transport_t
 	time_stamp_t		totSpareTime_;
 	time_stamp_t		lastStatisticsGathered_;
 	uint                     numTimerCalls_;
-	double               maxWait_;
+	uint32                 numTimerCalls_;
 
-	bool breakProcessing_;
+	double               maxWait_;
+	bool                  breakProcessing_;
 
 	void processFrequentTasks();
 	void processTimers();
