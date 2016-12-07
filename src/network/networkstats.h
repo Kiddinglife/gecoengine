@@ -620,7 +620,7 @@ struct GECOAPI network_recv_stats_t
 	 *	@TODO register a repeated timer with interval one sec for this function
 	 *	instead of test time slap
 	 */
-	void update_stats(double elapsedTime);
+	void update_stats();
 
 	/**
 	 *	This method updates the moving averages of the collected stats.

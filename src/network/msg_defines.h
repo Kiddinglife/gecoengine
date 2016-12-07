@@ -93,8 +93,8 @@ typedef int64 DatabaseID;
 
 typedef uint SeqNum;
 typedef uchar msg_id;
-typedef void * TimerID;
-const TimerID TIMER_ID_NONE = 0;
+//typedef void* TimerID;
+//const TimerID TIMER_ID_NONE = 0;
 typedef int ChannelID;
 typedef SeqNum ChannelVersion;
 typedef uint GridID;
@@ -640,17 +640,16 @@ private:
 
 	TimeQueue64 pTimeQueue_;
 	TickTasks pFrequentTasks_;
-
 	// Statistics
-	time_stamp_t		accSpareTime_;
-	time_stamp_t		oldSpareTime_;
-	time_stamp_t		totSpareTime_;
-	time_stamp_t		lastStatisticsGathered_;
-	uint32                 numTimerCalls_;
+	time_stamp_t			accSpareTime_;
+	time_stamp_t			oldSpareTime_;
+	time_stamp_t			totSpareTime_;
+	time_stamp_t			lastStatisticsGathered_;
+	uint32              	numTimerCalls_;
+	network_recv_stats_t 	recv_stats_;
 
 	bool breakProcessing_;
 	bool shouldIdle_;
-	interface_elements_t* m_InterfaceElements;
 	double maxWait_;
 
 private:
@@ -662,11 +661,12 @@ private:
 	void poll_stats()
 	{
 		// gather statistics every second
-		if (gettimestamp() - lastStatisticsGathered_ >= stamps_per_sec())
+		uint64 curr = gettimestamp();
+		if (curr - lastStatisticsGathered_ >= stamps_per_sec())
 		{
+			lastStatisticsGathered_ = curr;
 			oldSpareTime_ = totSpareTime_;
 			totSpareTime_ = accSpareTime_ + spareTime();
-			lastStatisticsGathered_ = gettimestamp();
 		}
 	}
 
@@ -675,6 +675,7 @@ private:
 	{
 		double maxWait; //sec
 		int mswait;
+
 		if (shouldIdle_)
 		{
 			maxWait = maxWait_;
@@ -683,14 +684,16 @@ private:
 				maxWait = eastl::min(maxWait, pTimeQueue_.nextExp(gettimestamp()) / stamps_per_sec_double());
 			}
 			// translate to ms
-			int mswait = maxWait * 1000;
+			mswait = maxWait * 1000;
 		}
 		else
 		{
 			mswait = 0;
 		}
 
-		//TODO CALL mtra_poll()  and pass mswait to it do not impl very soon 
+		//TODO CALL mtra_poll(mswait)  and pass mswait to it do not impl very soon
+		// need to add hook for recv and send so that we can have a chance to update recv stats and send stats
+		return 0;
 	}
 	void loop()
 	{
@@ -705,6 +708,8 @@ private:
 
 public:
 	static const char *USE_FVMACHINED;
+	interface_elements_t* m_InterfaceElements;
+
 	geco_nub_t() :
 		breakProcessing_(false),
 		shouldIdle_(true),
@@ -732,7 +737,6 @@ struct geco_transport_t
 	time_stamp_t		totSpareTime_;
 	time_stamp_t		lastStatisticsGathered_;
 	uint                     numTimerCalls_;
-	uint32                 numTimerCalls_;
 
 	double               maxWait_;
 	bool                  breakProcessing_;

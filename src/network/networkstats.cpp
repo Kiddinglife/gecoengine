@@ -606,17 +606,19 @@ void network_recv_stats_t::updateStatAverages(double elapsedTime)
 	}
 }
 
-void network_recv_stats_t::update_stats(double elapsedTime) //seconds
+void network_recv_stats_t::update_stats() //seconds
 {
-	//uint64 currTime = gettimestamp();
+	uint64 currTime = gettimestamp();
+	uint64 elapsedStamp = currTime - lastGatherTime_;
+
 	// Wait at least a second. rely on timer cb 
-	//if (currTime >= (lastGatherTime_ + stamps_per_sec()))
-	//{
-	// Update stat averages
-	//double elapsedTime = (currTime - lastGatherTime_)
-	//	/ stamps_per_sec_double();
-	this->updateStatAverages(elapsedTime);
-	//lastGatherTime_ = currTime;
+	if (elapsedStamp >= stamps_per_sec())
+	{
+		// Update stat averages
+		double elapsedTime = elapsedStamp/stamps_per_sec_double();
+		this->updateStatAverages(elapsedTime);
+		lastGatherTime_ = currTime;
+	}
 
 	// @TODO ask channel for lastTxQueueSize_ and lastRxQueueSize_
 	//mtra_get_queue_sizes(this->connection_id_,&lastTxQueueSize_,&lastRxQueueSize_ );
