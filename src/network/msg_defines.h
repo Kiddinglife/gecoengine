@@ -58,6 +58,7 @@
 #define PORT_PYTHON_CELL			50000
 
 const int UDP_OVERHEAD = 28;
+const int RAWSOCK_OVERHEAD = 20;
 const int BITS_PER_BYTE = 8;
 const uint LOCALHOST = 0x0100007F;
 const uint BROADCAST = 0xFFFFFFFF;
@@ -647,23 +648,41 @@ class GECOAPI geco_nub_t
 
 		TimeQueue64 pTimeQueue_;
 		TickTasks pFrequentTasks_;
+
 		// Statistics
 		time_stamp_t accSpareTime_;
 		time_stamp_t oldSpareTime_;
 		time_stamp_t totSpareTime_;
 		time_stamp_t lastStatisticsGathered_;
+
+		time_stamp_t startSelect_;
+		time_stamp_t endSelect_;
+		time_stamp_t spareTime_;
+
 		uint32 numTimerCalls_;
 		network_recv_stats_t recv_stats_;
+
+		TimerHandler stat_timer_;
+		TimerID stat_timerid_;
 
 		bool breakProcessing_;
 		bool shouldIdle_;
 		double maxWait_;
 
 	private:
-		time_stamp_t spareTime()
+
+		void clear_spare_time()
 		{
-			//TODO ask mtra for this value
-			return 100;
+			accSpareTime_ += spareTime_;
+			spareTime_ = 0;
+		}
+
+		void stat_timoeout_cb(TimerID id, void * pUser)
+		{
+			std::cout << "stat_timoeout_cb called\n";
+			// gather statistics every second
+			oldSpareTime_ = totSpareTime_;
+			totSpareTime_ = accSpareTime_ + spareTime_;
 		}
 
 		// assign this function to mtra socket_recv_cb
@@ -675,30 +694,44 @@ class GECOAPI geco_nub_t
 			recv_stats_.update_stats();
 			recv_stats_.mercuryTimer_.start();
 			recv_stats_.systemTimer_.start();
+			return 0;
 		}
-		int socket_read_end(void* args)
+		int socket_read_end(int sfd, bool isudpsocket, char* data, int datalen,
+				sockaddrunion* from, sockaddrunion* to, void* user_data)
 		{
-			int length = *(int*) args;
-			recv_stats_.systemTimer_.stop(length);
-			if (length > 0)
+			bool ret = datalen > 0;
+			recv_stats_.systemTimer_.stop(ret);
+			if (ret)
 			{
 				++recv_stats_.numPacketsReceivedPerSecond_;
-				int totalLength = length + UDP_OVERHEAD;
+				if (isudpsocket)
+					datalen += UDP_OVERHEAD;
+				else
+					datalen += RAWSOCK_OVERHEAD;
 				// Payload subtracted later
-				recv_stats_.numOverheadBytesReceived_ += totalLength;
-				recv_stats_.numBytesReceivedPerSecond_ += totalLength;
+				recv_stats_.numOverheadBytesReceived_ += datalen;
+				recv_stats_.numBytesReceivedPerSecond_ += datalen;
+				return 0;
 			}
-		}
-		void poll_stats()
-		{
-			// gather statistics every second
-			uint64 curr = gettimestamp();
-			if (curr - lastStatisticsGathered_ >= stamps_per_sec())
+			else
 			{
-				lastStatisticsGathered_ = curr;
-				oldSpareTime_ = totSpareTime_;
-				totSpareTime_ = accSpareTime_ + spareTime();
+				recv_stats_.mercuryTimer_.stop(ret);
 			}
+			return -1;
+		}
+
+		int select_start(void* user_data)
+		{
+			printf("select_start\n");
+			startSelect_ = gettimestamp();
+			return 0;
+		}
+		int select_end(void* user_data)
+		{
+			printf("select_end\n");
+			endSelect_ = gettimestamp();
+			spareTime_ += startSelect_ - endSelect_;
+			return 0;
 		}
 
 		// select for network activity until earliest timer
@@ -734,7 +767,6 @@ class GECOAPI geco_nub_t
 			{
 				pFrequentTasks_.process();
 				pTimeQueue_.process(gettimestamp());
-				poll_stats();
 				poll_network();
 			}
 		}
@@ -749,7 +781,15 @@ class GECOAPI geco_nub_t
 				accSpareTime_(0), oldSpareTime_(0), totSpareTime_(0), lastStatisticsGathered_(
 						0), numTimerCalls_(0), maxWait_(0.01) // default max wait is 100ms
 		{
+			stat_timer_.handleTimeout = std::bind(&geco_nub_t::stat_timoeout_cb,
+					*this, std::placeholders::_1, std::placeholders::_2);
+			stat_timerid_ = pTimeQueue_.add(gettimestamp() + stamps_per_sec(), stamps_per_sec(), &stat_timer_, 0);
 		}
+		~geco_nub_t()
+		{
+			stat_timerid_.cancel();
+		}
+
 		void ServeInterfaceElement(interface_elements_t& ies);
 		geco_engine_reason RegisterWithMachined(const eastl::string& name,
 				int id, bool isRegister = true);

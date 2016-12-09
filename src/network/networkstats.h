@@ -30,7 +30,7 @@
 #define SRC_NETWORK_NETWORKSTATS_H_
 
 #include <thread>
-
+#include <sys/queue.h>
 #include "../common/ds/eastl/EASTL/utility.h"
 #include "../common/ds/eastl/EASTL/vector.h"
 #include "../common/ds/eastl/EASTL/hash_map.h"
@@ -610,8 +610,8 @@ struct GECOAPI network_recv_stats_t
 	int		maxTxQueueSize_;
 	int		maxRxQueueSize_;
 
-	ProfileVal	mercuryTimer_;
-	ProfileVal	systemTimer_;
+	ProfileVal	mercuryTimer_; // time spent on completed network event cycle llp + ulp
+	ProfileVal	systemTimer_; // how much time we spend on system calls eg. read_msg() write_msg()
 
 	network_recv_stats_t();
 
