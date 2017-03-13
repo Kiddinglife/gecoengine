@@ -658,7 +658,7 @@ void TimeQueueNode::cancel()
 
 	state_ = STATE_CANCELLED;
 
-	if (pHandler_ && pHandler_->release)
+	if (pHandler_)
 	{
 			pHandler_->release(TimerID(this), pUserData_);
 		pHandler_ = NULL;
