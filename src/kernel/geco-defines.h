@@ -94,8 +94,7 @@
 #endif
 
 /* common includes */
-#include <limits>
-#include <math.h>
+#include <climits>
 
 /* 360 includes */
 
@@ -120,6 +119,7 @@
 #include <windows.h>
 #endif
 
+
 #if !defined( PLAYSTATION3 )
 #include <malloc.h>
 #endif
@@ -141,92 +141,90 @@ typedef unsigned int uint;
 /// This type is an unsigned longer.
 typedef unsigned long ulong;
 
-#if defined( PLAYSTATION3 )
-typedef int8_t int8;
-typedef int16_t int16;
-typedef int32_t int32;
-typedef int64_t int64;
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
-typedef intptr_t intptr;
-typedef uintptr_t uintptr;
-#define PRId64 "lld"
-#define PRIu64 "llu"
-#define PRIx64 "llx"
-#define PRIX64 "llX"
-#define PRIu32 "lu"
-#define PRId32 "ld"
-#else
-#ifdef _WIN32
-typedef __int8 int8;
-typedef unsigned __int8 uint8;
-typedef __int16 int16;
-typedef unsigned __int16 uint16;
-typedef unsigned __int16 ushort;
-typedef __int32 int32;
-typedef unsigned __int32 uint32;
-typedef unsigned __int32 uint;
-typedef __int64 int64;
-typedef unsigned __int64 uint64;
-/// This type is an integer with the size of a pointer.
-typedef INT_PTR intptr;
-/// This type is an unsigned integer with the size of a pointer.
-typedef UINT_PTR uintptr;
-#define PRId64 "lld"
-#define PRIu64 "llu"
-#define PRIx64 "llx"
-#define PRIX64 "llX"
-#define PRIu32 "lu"
-#define PRId32 "ld"
-#else //unix or linux
-/// This type is an integer with a size of 8 bits.
-typedef int8_t int8;
-/// This type is an unsigned integer with a size of 8 bits.
-typedef uint8_t uint8;
-/// This type is an integer with a size of 16 bits.
-typedef int16_t int16;
-/// This type is an unsigned integer with a size of 16 bits.
-typedef uint16_t uint16;
-/// This type is an integer with a size of 32 bits.
-typedef int32_t int32;
-/// This type is an unsigned integer with a size of 32 bits.
-typedef uint32_t uint32;
-/// This type is an integer with a size of 64 bits.
-typedef int64_t int64;
-/// This type is an unsigned integer with a size of 64 bits.
-typedef uint64_t uint64;
-#ifdef _LP64
-typedef int64 intptr;
-typedef uint64 uintptr;
-#define PRId64 "ld"
-#define PRIu64 "lu"
-#define PRIx64 "lx"
-#define PRIX64 "lX"
-#else
-typedef int32 intptr;
-typedef uint32 uintptr;
-#define PRId64 "lld"
-#define PRIu64 "llu"
-#define PRIx64 "llx"
-#define PRIX64 "llX"
-#endif
-#ifndef PRId32
-#define PRId32 "zd"
-#endif
-#ifndef PRIu32
-#define PRIu32 "zu"
-#endif
-#endif
-#endif
+//#if defined( PLAYSTATION3 )
+//typedef int8_t int8;
+//typedef int16_t int16;
+//typedef int32_t int32;
+//typedef int64_t int64;
+//typedef uint8_t uint8;
+//typedef uint16_t uint16;
+//typedef uint32_t uint32;
+//typedef uint64_t uint64;
+//typedef intptr_t intptr;
+//typedef uintptr_t uintptr;
+//#define PRId64 "lld"
+//#define PRIu64 "llu"
+//#define PRIx64 "llx"
+//#define PRIX64 "llX"
+//#define PRIu32 "lu"
+//#define PRId32 "ld"
+//#else
+//#ifdef _WIN32
+//typedef __int8 int8;
+//typedef unsigned __int8 uint8;
+//typedef __int16 int16;
+//typedef unsigned __int16 uint16;
+//typedef unsigned __int16 ushort;
+//typedef __int32 int32;
+//typedef unsigned __int32 uint32;
+//typedef unsigned __int32 uint;
+//typedef __int64 int64;
+//typedef unsigned __int64 uint64;
+///// This type is an integer with the size of a pointer.
+//typedef INT_PTR intptr;
+///// This type is an unsigned integer with the size of a pointer.
+//typedef UINT_PTR uintptr;
+//#define PRId64 "lld"
+//#define PRIu64 "llu"
+//#define PRIx64 "llx"
+//#define PRIX64 "llX"
+//#define PRIu32 "lu"
+//#define PRId32 "ld"
+//#else //unix or linux
+///// This type is an integer with a size of 8 bits.
+//typedef int8_t int8;
+///// This type is an unsigned integer with a size of 8 bits.
+//typedef uint8_t uint8;
+///// This type is an integer with a size of 16 bits.
+//typedef int16_t int16;
+///// This type is an unsigned integer with a size of 16 bits.
+//typedef uint16_t uint16;
+///// This type is an integer with a size of 32 bits.
+//typedef int32_t int32;
+///// This type is an unsigned integer with a size of 32 bits.
+//typedef uint32_t uint32;
+///// This type is an integer with a size of 64 bits.
+//typedef int64_t int64;
+///// This type is an unsigned integer with a size of 64 bits.
+//typedef uint64_t uint64;
+//#ifdef _LP64
+//typedef int64 intptr;
+//typedef uint64 uintptr;
+//#define PRId64 "ld"
+//#define PRIu64 "lu"
+//#define PRIx64 "lx"
+//#define PRIX64 "lX"
+//#else
+//typedef int32 intptr;
+//typedef uint32 uintptr;
+//#define PRId64 "lld"
+//#define PRIu64 "llu"
+//#define PRIx64 "llx"
+//#define PRIX64 "llX"
+//#endif
+//#ifndef PRId32
+//#define PRId32 "zd"
+//#endif
+//#ifndef PRIu32
+//#define PRIu32 "zu"
+//#endif
+//#endif
+//#endif
 
-//
-//struct uint24_t
+//struct uint24
 //{
 //	unsigned int val;
-//
-//	uint24_t() :
+//	uint24() :
 //		val(0)
 //	{
 //	}
@@ -239,112 +237,112 @@ typedef uint32 uintptr;
 //		return val;
 //	}
 //
-//	uint24_t(const uint24_t& a)
+//	uint24(const uint24& a)
 //	{
 //		val = a.val;
 //	}
-//	uint24_t operator++()
+//	uint24 operator++()
 //	{
 //		++val;
 //		val &= 0x00FFFFFF;
 //		return *this;
 //	}
-//	uint24_t operator--()
+//	uint24 operator--()
 //	{
 //		--val;
 //		val &= 0x00FFFFFF;
 //		return *this;
 //	}
-//	uint24_t operator++(int)
+//	uint24 operator++(int)
 //	{
-//		uint24_t temp(val);
+//		uint24 temp(val);
 //		++val;
 //		val &= 0x00FFFFFF;
 //		return temp;
 //	}
-//	uint24_t operator--(int)
+//	uint24 operator--(int)
 //	{
-//		uint24_t temp(val);
+//		uint24 temp(val);
 //		--val;
 //		val &= 0x00FFFFFF;
 //		return temp;
 //	}
-//	uint24_t operator&(const uint24_t& a)
+//	uint24 operator&(const uint24& a)
 //	{
-//		return uint24_t(val & a.val);
+//		return uint24(val & a.val);
 //	}
-//	uint24_t& operator=(const uint24_t& a)
+//	uint24& operator=(const uint24& a)
 //	{
 //		val = a.val;
 //		return *this;
 //	}
-//	uint24_t& operator+=(const uint24_t& a)
+//	uint24& operator+=(const uint24& a)
 //	{
 //		val += a.val;
 //		val &= 0x00FFFFFF;
 //		return *this;
 //	}
-//	uint24_t& operator-=(const uint24_t& a)
+//	uint24& operator-=(const uint24& a)
 //	{
 //		val -= a.val;
 //		val &= 0x00FFFFFF;
 //		return *this;
 //	}
-//	bool operator==(const uint24_t& right) const
+//	bool operator==(const uint24& right) const
 //	{
 //		return val == right.val;
 //	}
-//	bool operator!=(const uint24_t& right) const
+//	bool operator!=(const uint24& right) const
 //	{
 //		return val != right.val;
 //	}
-//	bool operator >(const uint24_t& right) const
+//	bool operator >(const uint24& right) const
 //	{
 //		return val > right.val;
 //	}
-//	bool operator <(const uint24_t& right) const
+//	bool operator <(const uint24& right) const
 //	{
 //		return val < right.val;
 //	}
-//	const uint24_t operator+(const uint24_t &other) const
+//	const uint24 operator+(const uint24 &other) const
 //	{
-//		return uint24_t(val + other.val);
+//		return uint24(val + other.val);
 //	}
-//	const uint24_t operator-(const uint24_t &other) const
+//	const uint24 operator-(const uint24 &other) const
 //	{
-//		return uint24_t(val - other.val);
+//		return uint24(val - other.val);
 //	}
-//	const uint24_t operator/(const uint24_t &other) const
+//	const uint24 operator/(const uint24 &other) const
 //	{
-//		return uint24_t(val / other.val);
+//		return uint24(val / other.val);
 //	}
-//	const uint24_t operator*(const uint24_t &other) const
+//	const uint24 operator*(const uint24 &other) const
 //	{
-//		return uint24_t(val * other.val);
+//		return uint24(val * other.val);
 //	}
 //
-//	uint24_t(const unsigned int& a)
+//	uint24(const unsigned int& a)
 //	{
 //		val = a;
 //		val &= 0x00FFFFFF;
 //	}
-//	uint24_t operator&(const unsigned int& a)
+//	uint24 operator&(const unsigned int& a)
 //	{
-//		return uint24_t(val & a);
+//		return uint24(val & a);
 //	}
-//	uint24_t& operator=(const unsigned int& a)
+//	uint24& operator=(const unsigned int& a)
 //	{
 //		val = a;
 //		val &= 0x00FFFFFF;
 //		return *this;
 //	}
-//	uint24_t& operator+=(const unsigned int& a)
+//	uint24& operator+=(const unsigned int& a)
 //	{
 //		val += a;
 //		val &= 0x00FFFFFF;
 //		return *this;
 //	}
-//	uint24_t& operator-=(const unsigned int& a)
+//	uint24& operator-=(const unsigned int& a)
 //	{
 //		val -= a;
 //		val &= 0x00FFFFFF;
@@ -366,193 +364,170 @@ typedef uint32 uintptr;
 //	{
 //		return val < (right & 0x00FFFFFF);
 //	}
-//	const uint24_t operator+(const unsigned int &other) const
+//	const uint24 operator+(const unsigned int &other) const
 //	{
-//		return uint24_t(val + other);
+//		return uint24(val + other);
 //	}
-//	const uint24_t operator-(const unsigned int &other) const
+//	const uint24 operator-(const unsigned int &other) const
 //	{
-//		return uint24_t(val - other);
+//		return uint24(val - other);
 //	}
-//	const uint24_t operator/(const unsigned int &other) const
+//	const uint24 operator/(const unsigned int &other) const
 //	{
-//		return uint24_t(val / other);
+//		return uint24(val / other);
 //	}
-//	const uint24_t operator*(const unsigned int &other) const
+//	const uint24 operator*(const unsigned int &other) const
 //	{
-//		return uint24_t(val * other);
+//		return uint24(val * other);
 //	}
 //};
-//
-///*-------------- Macros --------------*/
-///* array & structure macros */
-//#define ARRAYSZ(v)					(sizeof(v) / sizeof(v[0]))
-//#define ARRAY_SIZE(v)				(sizeof(v) / sizeof(v[0]))
-//
-///*print out*/
-//#if defined(__unix__) || defined(__linux__) || defined( PLAYSTATION3 )
-//#define geco_isnan isnan
-//#define geco_isinf isinf
-//#define geco_snprintf snprintf
-//#define geco_vsnprintf vsnprintf
-//#define geco_vsnwprintf vsnwprintf
-//#define geco_snwprintf swprintf
-//#define geco_stricmp strcasecmp
-//#define geco_strnicmp strncasecmp
-//#define geco_fileno fileno
-//#define geco_va_copy va_copy
-//#else
-//#define geco_isnan _isnan
-//#define geco_isinf(x) (!_finite(x) && !_isnan(x))
-//#define geco_snprintf _snprintf
-//#define geco_vsnprintf _vsnprintf
-//#define geco_vsnwprintf _vsnwprintf
-//#define geco_snwprintf _snwprintf
-//#define geco_stricmp _stricmp
-//#define geco_strnicmp _strnicmp
-//#define geco_fileno _fileno
-//#define geco_va_copy( dst, src) dst = src
-//#endif // unix or linux
-//
-///* string comparing */
-///// Returns true if two strings are equal.
-//#define STR_EQ(s, t)		(!strcmp((s), (t)))
-///// Returns true if two strings are the same, ignoring case.
-//#define STR_EQI(s, t)		(!geco_stricmp((s), (t)))
-///// Returns true if the first sz byte of the input string are equal, ignoring case.
-//#define STRN_EQI(s, t, sz) 	(!geco_strnicmp((s), (t), (sz)))
-///// Returns true if the first sz byte of the input string are equal, ignoring case.
-//#define STRN_EQ(s, t, sz) 	(!strncmp((s), (t), (sz)))
-///// Returns true if all three input string are equal.
-//#define STR_EQ2(s, t1, t2)	(!(strcmp((s), (t1)) || strcmp((s), (t2))))
-//
-///* scalar types comparing */
-//#include <algorithm>
-//#if defined(_WIN32)
-//#undef min
-//#define min min
-//#undef max
-//#define max max
-//template <class T> inline const T & min(const T & a, const T & b)
-//{
-//	return b < a ? b : a;
-//}
-//template <class T> inline const T & max(const T & a, const T & b)
-//{
-//	return a < b ? b : a;
-//}
-//#define GECO_MIN min
-//#define GECO_MAX max
-//#define NOMINMAX
-//#undef geco_sleep
-//#define geco_sleep Sleep
-//#else
-//#define GECO_MIN std::min
-//#define GECO_MAX std::max
-//#undef geco_sleep
-//#define geco_sleep sleep
-//#endif
-//
-///*
-//* Intel Architecture is little endian (low byte presented first)
-//* Motorola Architecture is big endian (high byte first)
-//*/
-///// The current architecture is Little Endian.
-//#define GECO_LITTLE_ENDIAN
-///*#define GECO_BIG_ENDIAN*/
-//
-///* accessing individual bytes (int8) and words (int16) within
-//* words and long words (int32).
-//* Macros ending with W deal with words, L macros deal with longs
-//*/
-//#ifdef GECO_LITTLE_ENDIAN
-///// Returns the high byte of a word.
-//#define HIBYTEW(b)		(((b) & 0xff00) >> 8)
-///// Returns the low byte of a word.
-//#define LOBYTEW(b)		( (b) & 0xff)
-///// Returns the high byte of a long.
-//#define HIBYTEL(b)		(((b) & 0xff000000L) >> 24)
-///// Returns the low byte of a long.
-//#define LOBYTEL(b)		( (b) & 0xffL)
-///// Returns byte 0 of a long.
-//#define BYTE0L(b)		( (b) & 0xffL)
-///// Returns byte 1 of a long.
-//#define BYTE1L(b)		(((b) & 0xff00L) >> 8)
-///// Returns byte 2 of a long.
-//#define BYTE2L(b)		(((b) & 0xff0000L) >> 16)
-///// Returns byte 3 of a long. 0xff000000L = 1111111 - 3CHARS
-//#define BYTE3L(b)		(((b) & 0xff000000L) >> 24)
-///// Returns the high word of a long.
-//#define HIWORDL(b)		(((b) & 0xffff0000L) >> 16)
-///// Returns the low word of a long.
-//#define LOWORDL(b)		( (b) & 0xffffL)
-///*This macro takes a dword ordered 0123 and reorder it to 3210.*/
-//#define SWAP_DW(a)	\
-//((((a)&0xff000000)>>24)|(((a)&0xff0000)>>8)|(((a)&0xff00)<<8)|(((a)&0xff)<<24))
-//#else
-///* big endian macros go here */
-//#endif
-//
-//#define GECO_SAFE_DELETE(p) if(p) {delete (p); (p) = NULL;}
-//#define GECO_SAFE_DELETE_ARRAY(p) if(p) {delete [] (p); (p) = NULL;}
-//
-//#define GECO_SAFE_FREE(p) if(p) {free(p); (p) = NULL;}
-//#define GECO_SAFE_FREE_ARRAY(p) if(p) {free(p); (p) = NULL;}
-//
-//#ifndef GECO_DECLARE_COPY_CTOR
-//#define GECO_DECLARE_COPY_CTOR(classname)  classname(const classname & );
-//#endif
-//
-//#ifndef GECO_DECLARE_COPY_OPT
-//#define GECO_DECLARE_COPY_OPT(classname)  void operator=( const classname& );
-//#endif
-//
-//#ifndef GECO_DECLARE_COMPARE_OPT
-//#define GECO_DECLARE_COMPARE_OPT(classname)  bool operator==( const classname& );
-//#endif
-//
-//#ifndef GECO_NOT_COPY
-//#define GECO_NOT_COPY(classname) \
-//	GECO_DECLARE_COPY_OPT(classname);\
-//	GECO_DECLARE_COPY_CTOR(classname);
-//#endif
-//
-//#ifndef GECO_NOT_COPY_COMPARE
-//#define GECO_NOT_COPY_COMPARE(classname) \
-//	GECO_DECLARE_COPY_OPT(classname);\
-//	GECO_DECLARE_COMPARE_OPT(classname);\
-//	GECO_DECLARE_COPY_CTOR(classname);
-//#endif
-//
-//#define GECO_MASK(location) (0x01 << (location))
-//#define GECO_MASK_HAS_ANY(flag,mask) (((flag) & (mask)) != 0)
-//#define GECO_MASK_HAS_ALL(flag,mask) (((flag) & (mask)) == (mask))
-//#define GECO_MASK_ADD(flag,mask) ((flag) |= (mask))
-//#define GECO_MASK_DEL(flag,mask) ((flag) &= (~(mask)))
-//#define GECO_MASK_REMOVE(flag,mask) ((flag) & (~(mask)))
-//#define GECO_MASK_CHANGE(location,flag)									\
-//if(GECO_MASK_HAS_ANY(flag,GECO_MASK(location)))							\
-//GECO_MASK_DEL(flag,GECO_MASK(location));							\
-//else																\
-//GECO_MASK_ADD(flag,GECO_MASK(location));
-//
-////how to complie asemble http://blog.csdn.net/robin__chou/article/details/50275061
-///// This macro is used to enter the debugger.
-//#if defined( _XBOX360 )
-//#define ENTER_DEBUGGER() DebugBreak()
-//#elif defined( _WIN32 )
-//extern "C" void _stdcall asm_int3();
-//#ifdef _AMD64_
-//#define ENTER_DEBUGGER() asm_int3()
-//#else
-//#define ENTER_DEBUGGER() __asm { int 3 }
-//#endif
-//#elif defined( PLAYSTATION3 )
-//#define ENTER_DEBUGGER() __asm__ volatile ( ".int 0" )
-//#else
-//#define ENTER_DEBUGGER() asm( "int $3" )
-//#endif
-//
+
+/*-------------- Macros --------------*/
+/* array & structure macros */
+#define ARRAYSZ(v)					(sizeof(v) / sizeof(v[0]))
+#define ARRAY_SIZE(v)				(sizeof(v) / sizeof(v[0]))
+
+/*print out*/
+#if defined(__unix__) || defined(__linux__) || defined( PLAYSTATION3 )
+#define geco_isnan isnan
+#define geco_isinf isinf
+#define geco_snprintf snprintf
+#define geco_vsnprintf vsnprintf
+#define geco_vsnwprintf vsnwprintf
+#define geco_snwprintf swprintf
+#define geco_stricmp strcasecmp
+#define geco_strnicmp strncasecmp
+#define geco_fileno fileno
+#define geco_va_copy va_copy
+#else
+#define geco_isnan _isnan
+#define geco_isinf(x) (!_finite(x) && !_isnan(x))
+#define geco_snprintf _snprintf
+#define geco_vsnprintf _vsnprintf
+#define geco_vsnwprintf _vsnwprintf
+#define geco_snwprintf _snwprintf
+#define geco_stricmp _stricmp
+#define geco_strnicmp _strnicmp
+#define geco_fileno _fileno
+#define geco_va_copy( dst, src) dst = src
+#endif // unix or linux
+
+/* string comparing */
+/// Returns true if two strings are equal.
+#define STR_EQ(s, t)		(!strcmp((s), (t)))
+/// Returns true if two strings are the same, ignoring case.
+#define STR_EQI(s, t)		(!geco_stricmp((s), (t)))
+/// Returns true if the first sz byte of the input string are equal, ignoring case.
+#define STRN_EQI(s, t, sz) 	(!geco_strnicmp((s), (t), (sz)))
+/// Returns true if the first sz byte of the input string are equal, ignoring case.
+#define STRN_EQ(s, t, sz) 	(!strncmp((s), (t), (sz)))
+/// Returns true if all three input string are equal.
+#define STR_EQ2(s, t1, t2)	(!(strcmp((s), (t1)) || strcmp((s), (t2))))
+
+/// scalar types comparing 
+#define GECO_MIN(a, b) (((b) < (a)) ? (b) : (a))
+#define GECO_MAX(a, b) (((a) < (b)) ? (b) : (a))
+
+/*
+* Intel Architecture is little endian (low byte presented first)
+* Motorola Architecture is big endian (high byte first)
+*/
+/// The current architecture is Little Endian.
+#define GECO_LITTLE_ENDIAN
+/*#define GECO_BIG_ENDIAN*/
+
+/* accessing individual bytes (int8) and words (int16) within
+* words and long words (int32).
+* Macros ending with W deal with words, L macros deal with longs
+*/
+#ifdef GECO_LITTLE_ENDIAN
+/// Returns the high byte of a word.
+#define HIBYTEW(b)		(((b) & 0xff00) >> 8)
+/// Returns the low byte of a word.
+#define LOBYTEW(b)		( (b) & 0xff)
+/// Returns the high byte of a long.
+#define HIBYTEL(b)		(((b) & 0xff000000L) >> 24)
+/// Returns the low byte of a long.
+#define LOBYTEL(b)		( (b) & 0xffL)
+/// Returns byte 0 of a long.
+#define BYTE0L(b)		( (b) & 0xffL)
+/// Returns byte 1 of a long.
+#define BYTE1L(b)		(((b) & 0xff00L) >> 8)
+/// Returns byte 2 of a long.
+#define BYTE2L(b)		(((b) & 0xff0000L) >> 16)
+/// Returns byte 3 of a long. 0xff000000L = 1111111 - 3CHARS
+#define BYTE3L(b)		(((b) & 0xff000000L) >> 24)
+/// Returns the high word of a long.
+#define HIWORDL(b)		(((b) & 0xffff0000L) >> 16)
+/// Returns the low word of a long.
+#define LOWORDL(b)		( (b) & 0xffffL)
+/*This macro takes a dword ordered 0123 and reorder it to 3210.*/
+#define SWAP_DW(a)	\
+((((a)&0xff000000)>>24)|(((a)&0xff0000)>>8)|(((a)&0xff00)<<8)|(((a)&0xff)<<24))
+#else
+/* big endian macros go here */
+#endif
+
+#define GECO_SAFE_DELETE(p) if(p) {delete (p); (p) = NULL;}
+#define GECO_SAFE_DELETE_ARRAY(p) if(p) {delete [] (p); (p) = NULL;}
+
+#define GECO_SAFE_FREE(p) if(p) {free(p); (p) = NULL;}
+#define GECO_SAFE_FREE_ARRAY(p) if(p) {free(p); (p) = NULL;}
+
+#ifndef GECO_DECLARE_COPY_CTOR
+#define GECO_DECLARE_COPY_CTOR(classname)  classname(const classname & );
+#endif
+
+#ifndef GECO_DECLARE_COPY_OPT
+#define GECO_DECLARE_COPY_OPT(classname)  void operator=( const classname& );
+#endif
+
+#ifndef GECO_DECLARE_COMPARE_OPT
+#define GECO_DECLARE_COMPARE_OPT(classname)  bool operator==( const classname& );
+#endif
+
+#ifndef GECO_NOT_COPY
+#define GECO_NOT_COPY(classname) \
+	GECO_DECLARE_COPY_OPT(classname);\
+	GECO_DECLARE_COPY_CTOR(classname);
+#endif
+
+#ifndef GECO_NOT_COPY_COMPARE
+#define GECO_NOT_COPY_COMPARE(classname) \
+	GECO_DECLARE_COPY_OPT(classname);\
+	GECO_DECLARE_COMPARE_OPT(classname);\
+	GECO_DECLARE_COPY_CTOR(classname);
+#endif
+
+#define GECO_MASK(location) (0x01 << (location))
+#define GECO_MASK_HAS_ANY(flag,mask) (((flag) & (mask)) != 0)
+#define GECO_MASK_HAS_ALL(flag,mask) (((flag) & (mask)) == (mask))
+#define GECO_MASK_ADD(flag,mask) ((flag) |= (mask))
+#define GECO_MASK_DEL(flag,mask) ((flag) &= (~(mask)))
+#define GECO_MASK_REMOVE(flag,mask) ((flag) & (~(mask)))
+#define GECO_MASK_CHANGE(location,flag)									\
+if(GECO_MASK_HAS_ANY(flag,GECO_MASK(location)))							\
+GECO_MASK_DEL(flag,GECO_MASK(location));							\
+else																\
+GECO_MASK_ADD(flag,GECO_MASK(location));
+
+//how to complie asemble http://blog.csdn.net/robin__chou/article/details/50275061
+/// This macro is used to enter the debugger.
+#if defined( _XBOX360 )
+#define ENTER_DEBUGGER() DebugBreak()
+#elif defined( WIN32 )
+extern "C" void _stdcall asm_int3();
+#ifdef _AMD64_
+#define ENTER_DEBUGGER() asm_int3()
+#else
+#define ENTER_DEBUGGER() __asm { int 3 }
+#endif
+#elif defined( PLAYSTATION3 )
+#define ENTER_DEBUGGER() __asm__ volatile ( ".int 0" )
+#else
+#define ENTER_DEBUGGER() asm( "int $3" )
+#endif
+
 ///**
 //*	This function returns user id.
 //*/
@@ -1420,4 +1395,3 @@ typedef uint32 uintptr;
 //}
 
 #endif
-

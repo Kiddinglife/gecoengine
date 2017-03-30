@@ -13,11 +13,6 @@
 #    include "geco-config-wince.h"
 #endif /* _WIN32_WCE */
 
-// Complain if WIN32 is not already defined.
-#if !defined (WIN32) && !defined (GECO_HAS_WINCE)
-# error Please define WIN32 in your project settings.
-#endif
-
 #define GECO_WIN32
 #if defined (_WIN64) || defined (WIN64)
 #  define GECO_WIN64
