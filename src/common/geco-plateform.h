@@ -18,7 +18,7 @@
  *
  */
 
-// created on 26-June-2016 by Jackie Zhang
+ // created on 26-June-2016 by Jackie Zhang
 #ifndef _SRC_GECO_ENGINE_PLATEFORM
 #define _SRC_GECO_ENGINE_PLATEFORM
 
@@ -75,6 +75,12 @@
 #endif
 #endif // __WATCOMC__
 
+#if defined(_MSC_VER)
+#define FV_FAST_CALL __fastcall
+#else // _MSC_VER
+#define FV_FAST_CALL
+#endif // !_MSC_VER
+
 /*-------------- basic type defs -------------*/
 /// This type is an unsigned character.
 typedef unsigned char uchar;
@@ -108,8 +114,10 @@ typedef __int8 int8;
 typedef unsigned __int8 uint8;
 typedef __int16 int16;
 typedef unsigned __int16 uint16;
+typedef unsigned __int16 ushort;
 typedef __int32 int32;
 typedef unsigned __int32 uint32;
+typedef unsigned __int32 uint;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 /// This type is an integer with the size of a pointer.
@@ -122,7 +130,6 @@ typedef UINT_PTR uintptr;
 #define PRIX64 "llX"
 #define PRIu32 "lu"
 #define PRId32 "ld"
-#define GECO_FAST_CALL __fastcall
 #else //unix or linux
 #define GECO_FAST_CALL
 /// This type is an integer with a size of 8 bits.
@@ -171,7 +178,7 @@ struct uint24_t
 	unsigned int val;
 
 	uint24_t() :
-			val(0)
+		val(0)
 	{
 	}
 	operator unsigned int()
@@ -378,9 +385,13 @@ struct uint24_t
 #undef max
 #define max max
 template <class T> inline const T & min(const T & a, const T & b)
-{	return b < a ? b : a;}
+{
+	return b < a ? b : a;
+}
 template <class T> inline const T & max(const T & a, const T & b)
-{	return a < b ? b : a;}
+{
+	return a < b ? b : a;
+}
 #define GECO_MIN min
 #define GECO_MAX max
 #define NOMINMAX
@@ -397,7 +408,7 @@ template <class T> inline const T & max(const T & a, const T & b)
  * Intel Architecture is little endian (low byte presented first)
  * Motorola Architecture is big endian (high byte first)
  */
-/// The current architecture is Little Endian.
+ /// The current architecture is Little Endian.
 #define GECO_LITTLE_ENDIAN
 /*#define GECO_BIG_ENDIAN*/
 
@@ -406,7 +417,7 @@ template <class T> inline const T & max(const T & a, const T & b)
  * Macros ending with W deal with words, L macros deal with longs
  */
 #ifdef GECO_LITTLE_ENDIAN
-/// Returns the high byte of a word.
+ /// Returns the high byte of a word.
 #define HIBYTEW(b)		(((b) & 0xff00) >> 8)
 /// Returns the low byte of a word.
 #define LOBYTEW(b)		( (b) & 0xff)
@@ -430,31 +441,38 @@ template <class T> inline const T & max(const T & a, const T & b)
 #define SWAP_DW(a)	\
 ((((a)&0xff000000)>>24)|(((a)&0xff0000)>>8)|(((a)&0xff00)<<8)|(((a)&0xff)<<24))
 #else
-/* big endian macros go here */
+ /* big endian macros go here */
 #endif
 
 #define GECO_SAFE_DELETE(p) if(p) {delete (p); (p) = NULL;}
 #define GECO_SAFE_DELETE_ARRAY(p) if(p) {delete [] (p); (p) = NULL;}
 
-#ifndef GECO_DECLARE_COPY_CONSTRUCTOR
-#define GECO_DECLARE_COPY_CONSTRUCTOR(classname)  classname(const classname & );
+#define GECO_SAFE_FREE(p) if(p) {free(p); (p) = NULL;}
+#define GECO_SAFE_FREE_ARRAY(p) if(p) {free(p); (p) = NULL;}
+
+#ifndef GECO_DECLARE_COPY_CTOR
+#define GECO_DECLARE_COPY_CTOR(classname)  classname(const classname & );
 #endif
-#ifndef GECO_DECLARE_COPY
-#define GECO_DECLARE_COPY(classname)  void operator=( const classname& );
+
+#ifndef GECO_DECLARE_COPY_OPT
+#define GECO_DECLARE_COPY_OPT(classname)  void operator=( const classname& );
 #endif
-#ifndef GECO_DECLARE_COMPARE
-#define GECO_DECLARE_COMPARE(classname)  bool operator==( const classname& );
+
+#ifndef GECO_DECLARE_COMPARE_OPT
+#define GECO_DECLARE_COMPARE_OPT(classname)  bool operator==( const classname& );
 #endif
+
 #ifndef GECO_NOT_COPY
 #define GECO_NOT_COPY(classname) \
-	GECO_DECLARE_COPY(classname);\
-	GECO_DECLARE_COPY_CONSTRUCTOR(classname);
+	GECO_DECLARE_COPY_OPT(classname);\
+	GECO_DECLARE_COPY_CTOR(classname);
 #endif
+
 #ifndef GECO_NOT_COPY_COMPARE
 #define GECO_NOT_COPY_COMPARE(classname) \
-	GECO_DECLARE_COPY(classname);\
-	GECO_DECLARE_COMPARE(classname);\
-	GECO_DECLARE_COPY_CONSTRUCTOR(classname);
+	GECO_DECLARE_COPY_OPT(classname);\
+	GECO_DECLARE_COMPARE_OPT(classname);\
+	GECO_DECLARE_COPY_CTOR(classname);
 #endif
 
 #define GECO_MASK(location) (0x01 << (location))
@@ -562,12 +580,12 @@ template<class MAP> struct MapTypes
 (abs(value1 - value2) < std::numeric_limits<float>::epsilon())
 // use 0.0004 because most existing functions are using it
 inline bool almost_equal(const float f1, const float f2, const float epsilon =
-		0.0004f)
+	0.0004f)
 {
 	return fabsf(f1 - f2) < epsilon;
 }
 inline bool almost_equal(const double d1, const double d2,
-		const double epsilon = 0.0004)
+	const double epsilon = 0.0004)
 {
 	return fabs(d1 - d2) < epsilon;
 }
@@ -581,7 +599,7 @@ inline bool almost_zero(const double d, const double epsilon = 0.0004)
 }
 template<typename T>
 inline bool almost_equal(const T& c1, const T& c2,
-		const float epsilon = 0.0004f)
+	const float epsilon = 0.0004f)
 {
 	if (c1.size() != c2.size())
 		return false;
@@ -742,8 +760,8 @@ static INLINE void memcpy_sse2_128(void *dst, const void *src)
 //---------------------------------------------------------------------
 static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 {
-	unsigned char *dd = ((unsigned char*) dst) + size;
-	const unsigned char *ss = ((const unsigned char*) src) + size;
+	unsigned char *dd = ((unsigned char*)dst) + size;
+	const unsigned char *ss = ((const unsigned char*)src) + size;
 
 	switch (size)
 	{
@@ -761,97 +779,97 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 66:
 		memcpy_sse2_64(dd - 66, ss - 66);
 	case 2:
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 67:
 		memcpy_sse2_64(dd - 67, ss - 67);
 	case 3:
-		*((uint16_t*) (dd - 3)) = *((uint16_t*) (ss - 3));
+		*((uint16_t*)(dd - 3)) = *((uint16_t*)(ss - 3));
 		dd[-1] = ss[-1];
 		break;
 
 	case 68:
 		memcpy_sse2_64(dd - 68, ss - 68);
 	case 4:
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 69:
 		memcpy_sse2_64(dd - 69, ss - 69);
 	case 5:
-		*((uint32_t*) (dd - 5)) = *((uint32_t*) (ss - 5));
+		*((uint32_t*)(dd - 5)) = *((uint32_t*)(ss - 5));
 		dd[-1] = ss[-1];
 		break;
 
 	case 70:
 		memcpy_sse2_64(dd - 70, ss - 70);
 	case 6:
-		*((uint32_t*) (dd - 6)) = *((uint32_t*) (ss - 6));
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint32_t*)(dd - 6)) = *((uint32_t*)(ss - 6));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 71:
 		memcpy_sse2_64(dd - 71, ss - 71);
 	case 7:
-		*((uint32_t*) (dd - 7)) = *((uint32_t*) (ss - 7));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 7)) = *((uint32_t*)(ss - 7));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 72:
 		memcpy_sse2_64(dd - 72, ss - 72);
 	case 8:
-		*((uint64_t*) (dd - 8)) = *((uint64_t*) (ss - 8));
+		*((uint64_t*)(dd - 8)) = *((uint64_t*)(ss - 8));
 		break;
 
 	case 73:
 		memcpy_sse2_64(dd - 73, ss - 73);
 	case 9:
-		*((uint64_t*) (dd - 9)) = *((uint64_t*) (ss - 9));
+		*((uint64_t*)(dd - 9)) = *((uint64_t*)(ss - 9));
 		dd[-1] = ss[-1];
 		break;
 
 	case 74:
 		memcpy_sse2_64(dd - 74, ss - 74);
 	case 10:
-		*((uint64_t*) (dd - 10)) = *((uint64_t*) (ss - 10));
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint64_t*)(dd - 10)) = *((uint64_t*)(ss - 10));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 75:
 		memcpy_sse2_64(dd - 75, ss - 75);
 	case 11:
-		*((uint64_t*) (dd - 11)) = *((uint64_t*) (ss - 11));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint64_t*)(dd - 11)) = *((uint64_t*)(ss - 11));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 76:
 		memcpy_sse2_64(dd - 76, ss - 76);
 	case 12:
-		*((uint64_t*) (dd - 12)) = *((uint64_t*) (ss - 12));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint64_t*)(dd - 12)) = *((uint64_t*)(ss - 12));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 77:
 		memcpy_sse2_64(dd - 77, ss - 77);
 	case 13:
-		*((uint64_t*) (dd - 13)) = *((uint64_t*) (ss - 13));
-		*((uint32_t*) (dd - 5)) = *((uint32_t*) (ss - 5));
+		*((uint64_t*)(dd - 13)) = *((uint64_t*)(ss - 13));
+		*((uint32_t*)(dd - 5)) = *((uint32_t*)(ss - 5));
 		dd[-1] = ss[-1];
 		break;
 
 	case 78:
 		memcpy_sse2_64(dd - 78, ss - 78);
 	case 14:
-		*((uint64_t*) (dd - 14)) = *((uint64_t*) (ss - 14));
-		*((uint64_t*) (dd - 8)) = *((uint64_t*) (ss - 8));
+		*((uint64_t*)(dd - 14)) = *((uint64_t*)(ss - 14));
+		*((uint64_t*)(dd - 8)) = *((uint64_t*)(ss - 8));
 		break;
 
 	case 79:
 		memcpy_sse2_64(dd - 79, ss - 79);
 	case 15:
-		*((uint64_t*) (dd - 15)) = *((uint64_t*) (ss - 15));
-		*((uint64_t*) (dd - 8)) = *((uint64_t*) (ss - 8));
+		*((uint64_t*)(dd - 15)) = *((uint64_t*)(ss - 15));
+		*((uint64_t*)(dd - 8)) = *((uint64_t*)(ss - 8));
 		break;
 
 	case 80:
@@ -871,14 +889,14 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 82, ss - 82);
 	case 18:
 		memcpy_sse2_16(dd - 18, ss - 18);
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 83:
 		memcpy_sse2_64(dd - 83, ss - 83);
 	case 19:
 		memcpy_sse2_16(dd - 19, ss - 19);
-		*((uint16_t*) (dd - 3)) = *((uint16_t*) (ss - 3));
+		*((uint16_t*)(dd - 3)) = *((uint16_t*)(ss - 3));
 		dd[-1] = ss[-1];
 		break;
 
@@ -886,14 +904,14 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 84, ss - 84);
 	case 20:
 		memcpy_sse2_16(dd - 20, ss - 20);
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 85:
 		memcpy_sse2_64(dd - 85, ss - 85);
 	case 21:
 		memcpy_sse2_16(dd - 21, ss - 21);
-		*((uint32_t*) (dd - 5)) = *((uint32_t*) (ss - 5));
+		*((uint32_t*)(dd - 5)) = *((uint32_t*)(ss - 5));
 		dd[-1] = ss[-1];
 		break;
 
@@ -901,16 +919,16 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 86, ss - 86);
 	case 22:
 		memcpy_sse2_16(dd - 22, ss - 22);
-		*((uint32_t*) (dd - 6)) = *((uint32_t*) (ss - 6));
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint32_t*)(dd - 6)) = *((uint32_t*)(ss - 6));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 87:
 		memcpy_sse2_64(dd - 87, ss - 87);
 	case 23:
 		memcpy_sse2_16(dd - 23, ss - 23);
-		*((uint32_t*) (dd - 7)) = *((uint32_t*) (ss - 7));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 7)) = *((uint32_t*)(ss - 7));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 88:
@@ -986,14 +1004,14 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 98, ss - 98);
 	case 34:
 		memcpy_sse2_32(dd - 34, ss - 34);
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 99:
 		memcpy_sse2_64(dd - 99, ss - 99);
 	case 35:
 		memcpy_sse2_32(dd - 35, ss - 35);
-		*((uint16_t*) (dd - 3)) = *((uint16_t*) (ss - 3));
+		*((uint16_t*)(dd - 3)) = *((uint16_t*)(ss - 3));
 		dd[-1] = ss[-1];
 		break;
 
@@ -1001,14 +1019,14 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 100, ss - 100);
 	case 36:
 		memcpy_sse2_32(dd - 36, ss - 36);
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 101:
 		memcpy_sse2_64(dd - 101, ss - 101);
 	case 37:
 		memcpy_sse2_32(dd - 37, ss - 37);
-		*((uint32_t*) (dd - 5)) = *((uint32_t*) (ss - 5));
+		*((uint32_t*)(dd - 5)) = *((uint32_t*)(ss - 5));
 		dd[-1] = ss[-1];
 		break;
 
@@ -1016,30 +1034,30 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 102, ss - 102);
 	case 38:
 		memcpy_sse2_32(dd - 38, ss - 38);
-		*((uint32_t*) (dd - 6)) = *((uint32_t*) (ss - 6));
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint32_t*)(dd - 6)) = *((uint32_t*)(ss - 6));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 103:
 		memcpy_sse2_64(dd - 103, ss - 103);
 	case 39:
 		memcpy_sse2_32(dd - 39, ss - 39);
-		*((uint32_t*) (dd - 7)) = *((uint32_t*) (ss - 7));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 7)) = *((uint32_t*)(ss - 7));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 104:
 		memcpy_sse2_64(dd - 104, ss - 104);
 	case 40:
 		memcpy_sse2_32(dd - 40, ss - 40);
-		*((uint64_t*) (dd - 8)) = *((uint64_t*) (ss - 8));
+		*((uint64_t*)(dd - 8)) = *((uint64_t*)(ss - 8));
 		break;
 
 	case 105:
 		memcpy_sse2_64(dd - 105, ss - 105);
 	case 41:
 		memcpy_sse2_32(dd - 41, ss - 41);
-		*((uint64_t*) (dd - 9)) = *((uint64_t*) (ss - 9));
+		*((uint64_t*)(dd - 9)) = *((uint64_t*)(ss - 9));
 		dd[-1] = ss[-1];
 		break;
 
@@ -1047,32 +1065,32 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 106, ss - 106);
 	case 42:
 		memcpy_sse2_32(dd - 42, ss - 42);
-		*((uint64_t*) (dd - 10)) = *((uint64_t*) (ss - 10));
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint64_t*)(dd - 10)) = *((uint64_t*)(ss - 10));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 107:
 		memcpy_sse2_64(dd - 107, ss - 107);
 	case 43:
 		memcpy_sse2_32(dd - 43, ss - 43);
-		*((uint64_t*) (dd - 11)) = *((uint64_t*) (ss - 11));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint64_t*)(dd - 11)) = *((uint64_t*)(ss - 11));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 108:
 		memcpy_sse2_64(dd - 108, ss - 108);
 	case 44:
 		memcpy_sse2_32(dd - 44, ss - 44);
-		*((uint64_t*) (dd - 12)) = *((uint64_t*) (ss - 12));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint64_t*)(dd - 12)) = *((uint64_t*)(ss - 12));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 109:
 		memcpy_sse2_64(dd - 109, ss - 109);
 	case 45:
 		memcpy_sse2_32(dd - 45, ss - 45);
-		*((uint64_t*) (dd - 13)) = *((uint64_t*) (ss - 13));
-		*((uint32_t*) (dd - 5)) = *((uint32_t*) (ss - 5));
+		*((uint64_t*)(dd - 13)) = *((uint64_t*)(ss - 13));
+		*((uint32_t*)(dd - 5)) = *((uint32_t*)(ss - 5));
 		dd[-1] = ss[-1];
 		break;
 
@@ -1080,16 +1098,16 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 		memcpy_sse2_64(dd - 110, ss - 110);
 	case 46:
 		memcpy_sse2_32(dd - 46, ss - 46);
-		*((uint64_t*) (dd - 14)) = *((uint64_t*) (ss - 14));
-		*((uint64_t*) (dd - 8)) = *((uint64_t*) (ss - 8));
+		*((uint64_t*)(dd - 14)) = *((uint64_t*)(ss - 14));
+		*((uint64_t*)(dd - 8)) = *((uint64_t*)(ss - 8));
 		break;
 
 	case 111:
 		memcpy_sse2_64(dd - 111, ss - 111);
 	case 47:
 		memcpy_sse2_32(dd - 47, ss - 47);
-		*((uint64_t*) (dd - 15)) = *((uint64_t*) (ss - 15));
-		*((uint64_t*) (dd - 8)) = *((uint64_t*) (ss - 8));
+		*((uint64_t*)(dd - 15)) = *((uint64_t*)(ss - 15));
+		*((uint64_t*)(dd - 8)) = *((uint64_t*)(ss - 8));
 		break;
 
 	case 112:
@@ -1112,7 +1130,7 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 50:
 		memcpy_sse2_32(dd - 50, ss - 50);
 		memcpy_sse2_16(dd - 18, ss - 18);
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 115:
@@ -1120,7 +1138,7 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 51:
 		memcpy_sse2_32(dd - 51, ss - 51);
 		memcpy_sse2_16(dd - 19, ss - 19);
-		*((uint16_t*) (dd - 3)) = *((uint16_t*) (ss - 3));
+		*((uint16_t*)(dd - 3)) = *((uint16_t*)(ss - 3));
 		dd[-1] = ss[-1];
 		break;
 
@@ -1129,7 +1147,7 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 52:
 		memcpy_sse2_32(dd - 52, ss - 52);
 		memcpy_sse2_16(dd - 20, ss - 20);
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 117:
@@ -1137,7 +1155,7 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 53:
 		memcpy_sse2_32(dd - 53, ss - 53);
 		memcpy_sse2_16(dd - 21, ss - 21);
-		*((uint32_t*) (dd - 5)) = *((uint32_t*) (ss - 5));
+		*((uint32_t*)(dd - 5)) = *((uint32_t*)(ss - 5));
 		dd[-1] = ss[-1];
 		break;
 
@@ -1146,8 +1164,8 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 54:
 		memcpy_sse2_32(dd - 54, ss - 54);
 		memcpy_sse2_16(dd - 22, ss - 22);
-		*((uint32_t*) (dd - 6)) = *((uint32_t*) (ss - 6));
-		*((uint16_t*) (dd - 2)) = *((uint16_t*) (ss - 2));
+		*((uint32_t*)(dd - 6)) = *((uint32_t*)(ss - 6));
+		*((uint16_t*)(dd - 2)) = *((uint16_t*)(ss - 2));
 		break;
 
 	case 119:
@@ -1155,8 +1173,8 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 	case 55:
 		memcpy_sse2_32(dd - 55, ss - 55);
 		memcpy_sse2_16(dd - 23, ss - 23);
-		*((uint32_t*) (dd - 7)) = *((uint32_t*) (ss - 7));
-		*((uint32_t*) (dd - 4)) = *((uint32_t*) (ss - 4));
+		*((uint32_t*)(dd - 7)) = *((uint32_t*)(ss - 7));
+		*((uint32_t*)(dd - 4)) = *((uint32_t*)(ss - 4));
 		break;
 
 	case 120:
@@ -1236,8 +1254,8 @@ static INLINE void *memcpy_tiny(void *dst, const void *src, size_t size)
 //---------------------------------------------------------------------
 static void* memcpy_fast(void *destination, const void *source, size_t size)
 {
-	unsigned char *dst = (unsigned char*) destination;
-	const unsigned char *src = (const unsigned char*) source;
+	unsigned char *dst = (unsigned char*)destination;
+	const unsigned char *src = (const unsigned char*)source;
 	static size_t cachesize = 0x200000; // L2-cache size
 	size_t padding;
 
@@ -1248,7 +1266,7 @@ static void* memcpy_fast(void *destination, const void *source, size_t size)
 	}
 
 	// align destination to 16 bytes boundary
-	padding = (16 - (((size_t) dst) & 15)) & 15;
+	padding = (16 - (((size_t)dst) & 15)) & 15;
 
 	if (padding > 0)
 	{
@@ -1274,7 +1292,7 @@ static void* memcpy_fast(void *destination, const void *source, size_t size)
 			c5 = _mm_loadu_si128(((const __m128i *) src) + 5);
 			c6 = _mm_loadu_si128(((const __m128i *) src) + 6);
 			c7 = _mm_loadu_si128(((const __m128i *) src) + 7);
-			_mm_prefetch((const char* )(src + 256), _MM_HINT_NTA);
+			_mm_prefetch((const char*)(src + 256), _MM_HINT_NTA);
 			src += 128;
 			_mm_store_si128((((__m128i *) dst) + 0), c0);
 			_mm_store_si128((((__m128i *) dst) + 1), c1);
@@ -1291,9 +1309,9 @@ static void* memcpy_fast(void *destination, const void *source, size_t size)
 	{		// big memory copy
 		__m128i c0, c1, c2, c3, c4, c5, c6, c7;
 
-		_mm_prefetch((const char* )(src), _MM_HINT_NTA);
+		_mm_prefetch((const char*)(src), _MM_HINT_NTA);
 
-		if ((((size_t) src) & 15) == 0)
+		if ((((size_t)src) & 15) == 0)
 		{	// source aligned
 			for (; size >= 128; size -= 128)
 			{
@@ -1305,7 +1323,7 @@ static void* memcpy_fast(void *destination, const void *source, size_t size)
 				c5 = _mm_load_si128(((const __m128i *) src) + 5);
 				c6 = _mm_load_si128(((const __m128i *) src) + 6);
 				c7 = _mm_load_si128(((const __m128i *) src) + 7);
-				_mm_prefetch((const char* )(src + 256), _MM_HINT_NTA);
+				_mm_prefetch((const char*)(src + 256), _MM_HINT_NTA);
 				src += 128;
 				_mm_stream_si128((((__m128i *) dst) + 0), c0);
 				_mm_stream_si128((((__m128i *) dst) + 1), c1);
@@ -1330,7 +1348,7 @@ static void* memcpy_fast(void *destination, const void *source, size_t size)
 				c5 = _mm_loadu_si128(((const __m128i *) src) + 5);
 				c6 = _mm_loadu_si128(((const __m128i *) src) + 6);
 				c7 = _mm_loadu_si128(((const __m128i *) src) + 7);
-				_mm_prefetch((const char* )(src + 256), _MM_HINT_NTA);
+				_mm_prefetch((const char*)(src + 256), _MM_HINT_NTA);
 				src += 128;
 				_mm_stream_si128((((__m128i *) dst) + 0), c0);
 				_mm_stream_si128((((__m128i *) dst) + 1), c1);
