@@ -242,15 +242,6 @@ bool GecoAlmostEqual(const GecoVector2& kVector0, const GecoVector2& kVector1,
 		almost_equal(kVector0.y, kVector1.y, fEpsilon);
 }
 
-#include "../common/ds/geco-bit-stream.h"
-void GecoVector2::to(geco_bit_stream_t& kOS, bool normalized)
-{
-	normalized ? kOS.WriteNormVector(x, y) : kOS.WriteVector(x, y);
-}
-void GecoVector2::from(geco_bit_stream_t& kIS, bool normalized)
-{
-	normalized ? kIS.ReadNormVector(x, y) : kIS.ReadVector(x, y);
-}
 //---------------------------------------------------------------------------
 
 const GecoVector3 GecoVector3::ZERO = GecoVector3(0, 0, 0);
