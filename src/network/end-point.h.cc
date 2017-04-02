@@ -45,7 +45,7 @@ struct if_nameindex
 struct if_nameindex *if_nameindex(void)
 {
 	static struct if_nameindex staticIfList[3] =
-	{ { 1, "eth0" }, { 2, FV_NET_LOCALHOSTNAME }, { 0, 0 } };
+	{ { 1, "eth0" }, { 2, GECO_NET_LOCALHOSTNAME }, { 0, 0 } };
 
 	return staticIfList;
 }
@@ -54,7 +54,7 @@ INLINE void if_freenameindex(struct if_nameindex *)
 {}
 #endif	// !unix
 
-//FV_DECLARE_DEBUG_COMPONENT2("GecoNetwork", 0)
+//GECO_DECLARE_DEBUG_COMPONENT2("GecoNetwork", 0)
 
 GecoNetEndpoint::GecoNetEndpoint(bool useSyncHijack) :
 	m_kSocket(NO_SOCKET),
@@ -74,7 +74,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 	bool isResultSet = false;
 
 #ifdef unix
-	//	FV_ASSERT( errno == ECONNREFUSED );
+	//	GECO_ASSERT( errno == ECONNREFUSED );
 
 	struct sockaddr_in	offender;
 	offender.sin_family = 0;
@@ -194,7 +194,7 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 
 		while (iter != ms_kFrontEndInterfaces.end())
 		{
-			if (iter->first != FV_NET_LOCALHOSTNAME)
+			if (iter->first != GECO_NET_LOCALHOSTNAME)
 			{
 				strcpy(name, iter->first.c_str());
 				return 0;
@@ -355,7 +355,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 
 				if ((htip >> netmaskshift) == (netmaskmatch >> netmaskshift))
 				{
-					//FV_DEBUG_MSG("Endpoint::bind(): found a match\n");
+					//GECO_DEBUG_MSG("Endpoint::bind(): found a match\n");
 					strncpy(name, currName, IFNAMSIZ);
 					break;
 				}
@@ -383,7 +383,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 
 int GecoNetEndpoint::GetInterfaceFlags(char * name, int & flags)
 {
-	if (_stricmp(name, FV_NET_LOCALHOSTNAME))
+	if (_stricmp(name, GECO_NET_LOCALHOSTNAME))
 	{
 		flags = IFF_UP | IFF_LOOPBACK | IFF_RUNNING;
 	}
@@ -511,7 +511,7 @@ int GecoNetEndpoint::GetQueueSizes(int &, int &) const
 int GecoNetEndpoint::GetBufferSize(int optname) const
 {
 #ifdef unix
-	FV_ASSERT(optname == SO_SNDBUF || optname == SO_RCVBUF);
+	GECO_ASSERT(optname == SO_SNDBUF || optname == SO_RCVBUF);
 
 	int recvbuf = -1;
 	socklen_t rbargsize = sizeof(int);
@@ -563,11 +563,11 @@ bool GecoNetEndpoint::RecvAll(void * gramData, int gramSize)
 		{
 			if (len == 0)
 			{
-				//FV_WARNING_MSG("GecoNetEndpoint::RecvAll: Connection lost\n");
+				//GECO_WARNING_MSG("GecoNetEndpoint::RecvAll: Connection lost\n");
 			}
 			else
 			{
-				//FV_WARNING_MSG("GecoNetEndpoint::RecvAll: Got error '%s'\n",strerror(errno));
+				//GECO_WARNING_MSG("GecoNetEndpoint::RecvAll: Got error '%s'\n",strerror(errno));
 			}
 
 			return false;
@@ -743,8 +743,8 @@ void GetAdaptersAddresses()
 			sockaddr_in* pAddr = (sockaddr_in*)pkCurrAddresses->FirstUnicastAddress->Address.lpSockaddr;
 
 			//! 判断是否是127.0.0.1
-			if (pAddr->sin_addr.s_addr == FV_NET_LOCALHOST)
-				kFriendlyName = FV_NET_LOCALHOSTNAME;
+			if (pAddr->sin_addr.s_addr == GECO_NET_LOCALHOST)
+				kFriendlyName = GECO_NET_LOCALHOSTNAME;
 
 			s_kAdapterInfoList.push_back(AdapterInfo(kFriendlyName, pAddr->sin_addr.s_addr));
 		}
@@ -755,7 +755,7 @@ void GetAdaptersAddresses()
 	//! 交换位置,第一个放非localhost地址
 	if (s_kAdapterInfoList.size() > 1)
 	{
-		if (s_kAdapterInfoList[0].kName == FV_NET_LOCALHOSTNAME)
+		if (s_kAdapterInfoList[0].kName == GECO_NET_LOCALHOSTNAME)
 		{
 			AdapterInfo kTmp = s_kAdapterInfoList.back();
 			s_kAdapterInfoList.back() = s_kAdapterInfoList.front();

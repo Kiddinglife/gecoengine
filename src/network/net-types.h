@@ -15,61 +15,6 @@
 #include <vector>
 #include <limits>
 
-class GecoWatcher;
-
-class GecoBinaryIStream;
-class GecoBinaryOStream;
-
-const int FV_NET_UDP_OVERHEAD = 28;
-
-const int FV_NET_BITS_PER_BYTE = 8;
-
-const uint FV_NET_LOCALHOST = 0x0100007F;
-
-const uint FV_NET_BROADCAST = 0xFFFFFFFF;
-
-static const int FV_NET_WN_PACKET_SIZE = 0x10000;
-
-typedef uint GecoTimeStamp;
-
-typedef int GecoEntityID;
-
-const uchar FV_ENTITY_DEF_INIT_FLG = 0;
-
-const GecoEntityID FV_NULL_ENTITY = ((GecoEntityID)0);
-//! Server (0, 0x20000000)
-const GecoEntityID FV_MIN_SERVER_ENTITY = ((GecoEntityID)0);
-const GecoEntityID FV_MAX_SERVER_ENTITY = ((GecoEntityID)0x20000000);
-//! Client (0x1FFFFFFF, 0x40000000)
-const GecoEntityID FV_MIN_CLIENT_ENTITY = ((GecoEntityID)0x1FFFFFFF);
-const GecoEntityID FV_MAX_CLIENT_ENTITY = ((GecoEntityID)0x40000000);
-//! Global (0x3FFFFFFF, 0x7FFFFFFF)
-const GecoEntityID FV_MIN_GLOBAL_ENTITY = ((GecoEntityID)0x3FFFFFFF);
-const GecoEntityID FV_MAX_GLOBAL_ENTITY = ((GecoEntityID)0x7FFFFFFF);
-
-typedef int GecoSpaceID;
-
-const GecoSpaceID FV_NULL_SPACE = ((GecoSpaceID)0);
-//! Server (0, 0x40000000)
-const GecoSpaceID FV_MIN_SERVER_SPACE = ((GecoSpaceID)0);
-const GecoSpaceID FV_MAX_SERVER_SPACE = ((GecoSpaceID)0x40000000);
-//! Global (0x3FFFFFFF, 0x7FFFFFFF)
-const GecoSpaceID FV_MIN_GLOBAL_SPACE = ((GecoSpaceID)0x3FFFFFFF);
-const GecoSpaceID FV_MAX_GLOBAL_SPACE = ((GecoSpaceID)0x7FFFFFFF);
-
-typedef int GecoCellAppID;
-
-typedef int GecoBaseAppID;
-
-typedef uint GecoSessionKey;
-
-typedef GecoVector3 GecoPosition3D;
-
-typedef ushort GecoEntityTypeID;
-const GecoEntityTypeID FV_INVALID_ENTITY_TYPE_ID = GecoEntityTypeID(-1);
-
-typedef int64 GecoDatabaseID;
-
 #ifndef _WIN32
 #ifndef _LP64
 #define FMT_DBID "lld"
@@ -80,44 +25,108 @@ typedef int64 GecoDatabaseID;
 #define FMT_DBID "I64d"
 #endif
 
-typedef uint GecoGridID;
-
-typedef uint GecoEventNumber;
-const GecoEventNumber FV_INITIAL_EVENT_NUMBER = 1;
-
-typedef std::vector< GecoEventNumber > GecoCacheStamps;
-
-typedef ushort GecoVolatileNumber;
-
-typedef uchar GecoDetailLevel;
-
-const int FV_MAX_DATA_LOD_LEVELS = 6;
-
 #ifdef _WIN32//! win32
-#define	FV_NET_LOCALHOSTNAME "localhost"
+#define	GECO_NET_LOCALHOSTNAME "localhost"
 #else
-#define FV_NET_LOCALHOSTNAME "lo"
+#define GECO_NET_LOCALHOSTNAME "lo"
 #endif
 
-//
-//struct GECOAPI GecoDirection3
-//{
-//	GecoDirection3() {};
-//	GecoDirection3( const GecoVector3 & v ) :
-//		m_fRoll ( v[0] ),
-//		m_fPitch( v[1] ),
-//		m_fYaw  ( v[2] ) {}
-//
-//	GecoVector3 AsVector3() const { return GecoVector3( m_fRoll, m_fPitch, m_fYaw ); }
-//
-//	float m_fRoll;		
-//	float m_fPitch;	
-//	float m_fYaw;
-//};
+const int GECO_NET_UDP_OVERHEAD = 28;
+const int GECO_NET_BITS_PER_BYTE = 8;
+const uint GECO_NET_LOCALHOST = 0x0100007F;
+const uint GECO_NET_BROADCAST = 0xFFFFFFFF;
+static const int GECO_NET_WN_PACKET_SIZE = 0x10000;
+typedef uint GecoTimeStamp;
+typedef int GecoEntityID;
+const uchar GECO_ENTITY_DEF_INIT_FLG = 0;
+const GecoEntityID GECO_NULL_ENTITY = ((GecoEntityID)0);
+//! Server (0, 0x20000000)
+const GecoEntityID GECO_MIN_SERVER_ENTITY = ((GecoEntityID)0);
+const GecoEntityID GECO_MAX_SERVER_ENTITY = ((GecoEntityID)0x20000000);
+//! Client (0x1FFFFFFF, 0x40000000)
+const GecoEntityID GECO_MIN_CLIENT_ENTITY = ((GecoEntityID)0x1FFFFFFF);
+const GecoEntityID GECO_MAX_CLIENT_ENTITY = ((GecoEntityID)0x40000000);
+//! Global (0x3FFFFFFF, 0x7FFFFFFF)
+const GecoEntityID GECO_MIN_GLOBAL_ENTITY = ((GecoEntityID)0x3FFFFFFF);
+const GecoEntityID GECO_MAX_GLOBAL_ENTITY = ((GecoEntityID)0x7FFFFFFF);
+typedef int GecoSpaceID;
+const GecoSpaceID GECO_NULL_SPACE = ((GecoSpaceID)0);
+//! Server (0, 0x40000000)
+const GecoSpaceID GECO_MIN_SERVER_SPACE = ((GecoSpaceID)0);
+const GecoSpaceID GECO_MAX_SERVER_SPACE = ((GecoSpaceID)0x40000000);
+//! Global (0x3FFFFFFF, 0x7FFFFFFF)
+const GecoSpaceID GECO_MIN_GLOBAL_SPACE = ((GecoSpaceID)0x3FFFFFFF);
+const GecoSpaceID GECO_MAX_GLOBAL_SPACE = ((GecoSpaceID)0x7FFFFFFF);
+typedef int GecoCellAppID;
+typedef int GecoBaseAppID;
+typedef uint GecoSessionKey;
+typedef GecoVector3 GecoPosition3D;
+typedef ushort GecoEntityTypeID;
+const GecoEntityTypeID GECO_INVALID_ENTITY_TYPE_ID = GecoEntityTypeID(-1);
+typedef int64 GecoDatabaseID;
 
-//FV_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoDirection3)
+typedef uint GecoGridID;
+typedef uint GecoEventNumber;
+const GecoEventNumber GECO_INITIAL_EVENT_NUMBER = 1;
+typedef std::vector< GecoEventNumber > GecoCacheStamps;
+typedef ushort GecoVolatileNumber;
+typedef uchar GecoDetailLevel;
+const int GECO_MAX_DATA_LOD_LEVELS = 6;
 
+typedef int GecoNetSeqNum;
+typedef uchar GecoNetMessageID;
+typedef void * GecoNetTimerID;
+const GecoNetTimerID GECO_NET_TIMER_ID_NONE = 0;
+typedef int GecoNetChannelID;
+const GecoNetChannelID GECO_NET_CHANNEL_ID_NULL = 0;
+typedef GecoNetSeqNum GecoNetChannelVersion;
+typedef int GecoNetReplyID;
+const GecoNetReplyID GECO_NET_REPLY_ID_NONE = -1;
+const GecoNetReplyID GECO_NET_REPLY_ID_MAX = 1000000;
+const int GECO_NET_DEFAULT_ONCEOFF_RESEND_PERIOD = 200 * 1000; /* 200 ms */
+const int GECO_NET_DEFAULT_ONCEOFF_MAX_RESENDS = 50;
 
+enum GecoNetReason
+{
+	GECO_NET_REASON_SUCCESS = 0,
+	GECO_NET_REASON_TIMER_EXPIRED = -1,
+	GECO_NET_REASON_NO_SUCH_PORT = -2,
+	GECO_NET_REASON_GENERAL_NETWORK = -3,
+	GECO_NET_REASON_CORRUPTED_PACKET = -4,
+	GECO_NET_REASON_NONEXISTENT_ENTRY = -5,
+	GECO_NET_REASON_WINDOW_OVERFLOW = -6,
+	GECO_NET_REASON_INACTIVITY = -7,
+	GECO_NET_REASON_RESOURCE_UNAVAILABLE = -8,
+	GECO_NET_REASON_CLIENT_DISCONNECTED = -9,
+	GECO_NET_REASON_TRANSMIT_QUEUE_FULL = -10,
+	GECO_NET_REASON_CHANNEL_LOST = -11
+};
+INLINE const char * NetReasonToString(GecoNetReason reason)
+{
+	static const char * reasons[] =
+	{
+		"GECO_NET_REASON_SUCCESS",
+		"GECO_NET_REASON_TIMER_EXPIRED",
+		"GECO_NET_REASON_NO_SUCH_PORT",
+		"GECO_NET_REASON_GENERAL_NETWORK",
+		"GECO_NET_REASON_CORRUPTED_PACKET",
+		"GECO_NET_REASON_NONEXISTENT_ENTRY",
+		"GECO_NET_REASON_WINDOW_OVERFLOW",
+		"GECO_NET_REASON_INACTIVITY",
+		"GECO_NET_REASON_RESOURCE_UNAVAILABLE",
+		"GECO_NET_REASON_CLIENT_DISCONNECTED",
+		"GECO_NET_REASON_TRANSMIT_QUEUE_FULL",
+		"GECO_NET_REASON_CHANNEL_LOST"
+	};
+	unsigned int index = -reason;
+	if (index < sizeof(reasons) / sizeof(reasons[0]))
+	{
+		return reasons[index];
+	}
+	return "GECO_NET_REASON_UNKNOWN";
+}
+
+class GecoWatcher;
 class GECOAPI GecoNetAddress
 {
 public:
@@ -153,7 +162,7 @@ private:
 INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b);
 INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b);
 INLINE bool operator<(const GecoNetAddress & a, const GecoNetAddress & b);
-//FV_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoNetAddress)
+//GECO_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoNetAddress)
 
 
 GECOAPI bool  WatcherStringToValue(const char *, GecoNetAddress &);
@@ -186,13 +195,13 @@ struct GecoEntityMailBoxRef
 
 	GecoEntityMailBoxRef()
 	{
-		SetType(FV_INVALID_ENTITY_TYPE_ID);
+		SetType(GECO_INVALID_ENTITY_TYPE_ID);
 	}
 };
 
 INLINE bool operator==(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b);
 INLINE bool operator!=(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b);
-//FV_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoEntityMailBoxRef)
+//GECO_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoEntityMailBoxRef)
 
 
 class GecoCapabilities
@@ -216,7 +225,7 @@ class GecoSpaceEntryID : public GecoNetAddress { };
 INLINE bool operator==(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
 INLINE bool operator!=(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
 INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
-//FV_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoSpaceEntryID)
+//GECO_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoSpaceEntryID)
 
 
 struct InterfaceListenerMsg
@@ -237,8 +246,21 @@ struct InterfaceListenerMsg
 		kName[0] = 0;
 	}
 };
-
-//FV_IOSTREAM_IMP_BY_MEMCPY(INLINE, InterfaceListenerMsg)
-//#include "GecoNetTypes.inl"
+geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, InterfaceListenerMsg& kDes)
+{
+	kIS.ReadMini(kDes.uiIP);
+	kIS.ReadMini(kDes.uiPort);
+	kIS.ReadMini(kDes.uiUserID);
+	kIS.ReadMini(kDes.kName);
+	return kIS;
+}
+geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const InterfaceListenerMsg& kDes)
+{
+	kOS.WriteMini(kDes.uiIP);
+	kOS.WriteMini(kDes.uiPort);
+	kOS.WriteMini(kDes.uiUserID);
+	kOS.WriteMini(kDes.kName);
+	return kOS;
+}
 
 #endif // __GecoNetTypes_H__

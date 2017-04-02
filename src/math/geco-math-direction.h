@@ -3,6 +3,7 @@
 #define __GecoDirection3_H__
 
 #include "geco-math-power.h"
+#include "common/ds/geco-bit-stream.h"
 
 struct GecoDegree
 {
@@ -84,6 +85,8 @@ public:
 	bool IsEqual(const GecoDirection3& kOther)const;
 	static bool IsEqual(const GecoDirection3& kOne, const GecoDirection3& kOther);
 
+	void to(geco_bit_stream_t& gbs);
+	void from(geco_bit_stream_t& gbs);
 private:
 
 	float m_fYaw;

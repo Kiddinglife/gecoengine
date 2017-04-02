@@ -104,7 +104,7 @@ public:
 	bool GetClosedPort(GecoNetAddress & closedPort);
 
 	int SendTo(void * gramData, int gramSize,
-		u_int16_t networkPort, u_int32_t networkAddr = FV_NET_BROADCAST);
+		u_int16_t networkPort, u_int32_t networkAddr = GECO_NET_BROADCAST);
 	int SendTo(void * gramData, int gramSize, struct sockaddr_in & sin);
 	int RecvFrom(void * gramData, int gramSize,
 		u_int16_t * networkPort, u_int32_t * networkAddr);
@@ -112,7 +112,7 @@ public:
 		struct sockaddr_in & sin);
 
 	int Listen(int backlog = 5);
-	int Connect(u_int16_t networkPort, u_int32_t networkAddr = FV_NET_BROADCAST);
+	int Connect(u_int16_t networkPort, u_int32_t networkAddr = GECO_NET_BROADCAST);
 	GecoNetEndpoint * Accept(
 		u_int16_t * networkPort = NULL, u_int32_t * networkAddr = NULL);
 
@@ -789,7 +789,7 @@ INLINE int GecoNetEndpoint::GetInterfaceFlags(char * name, int & flags)
 			IFF_RUNNING | IFF_MULTICAST;
 		return 0;
 	}
-	else if (!strcmp(name, FV_NET_LOCALHOSTNAME))
+	else if (!strcmp(name, GECO_NET_LOCALHOSTNAME))
 	{
 		flags = IFF_UP | IFF_LOOPBACK | IFF_RUNNING;
 		return 0;
@@ -822,7 +822,7 @@ INLINE int GecoNetEndpoint::GetInterfaceAddress(const char * name, u_int32_t & a
 #endif
 		return 0;
 	}
-	else if (!strcmp(name, FV_NET_LOCALHOSTNAME))
+	else if (!strcmp(name, GECO_NET_LOCALHOSTNAME))
 	{
 		address = htonl(0x7F000001);
 		return 0;
