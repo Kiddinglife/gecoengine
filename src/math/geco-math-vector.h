@@ -3,11 +3,12 @@
 #define __FvVector2_H__
 
 #include "geco-math-power.h"
-class geco_bit_stream_t;
+
 class GECOAPI GecoVector2
 {
 public:
 	float x, y;
+	bool Normalised;
 
 	enum Coord
 	{
@@ -77,6 +78,7 @@ class GECOAPI GecoVector3
 {
 public:
 	float x, y, z;
+	bool Normalised;
 
 	enum Coord
 	{
@@ -154,5 +156,59 @@ GECOAPI bool GecoAlmostEqual(const GecoVector2& kVector0, const GecoVector2& kVe
 GECOAPI float FvDistance(const GecoVector3 &kVector0, const GecoVector3 &kVector1);
 GECOAPI float FvDistance2(const GecoVector3 &kVector0, const GecoVector3 &kVector1);//! length*length
 
+
+INLINE geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoVector2& kDes)
+{
+	if (kIS.is_compression_mode())
+	{
+		kDes.Normalised ? kIS.ReadNormVector(kDes.x, kDes.y) : kIS.ReadVector(kDes.x, kDes.y);
+	}
+	else
+	{
+		kIS.Read(kDes.x);
+		kIS.Read(kDes.y);
+	}
+	return kIS;
+}
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoVector2& kDes)
+{
+	if (kOS.is_compression_mode())
+	{
+		kDes.Normalised ? kOS.WriteNormVector(kDes.x, kDes.y) : kOS.WriteVector(kDes.x, kDes.y);
+	}
+	{
+		kOS.Write(kDes.x);
+		kOS.Write(kDes.y);
+	}
+	return kOS;
+}
+
+INLINE geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoVector3& kDes)
+{
+	if (kIS.is_compression_mode())
+	{
+		kDes.Normalised ? kIS.ReadNormVector(kDes.x, kDes.y, kDes.z) : kIS.ReadVector(kDes.x, kDes.y, kDes.z);
+	}
+	else
+	{
+		kIS.Read(kDes.x);
+		kIS.Read(kDes.y);
+		kIS.Read(kDes.z);
+	}
+	return kIS;
+}
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoVector3& kDes)
+{
+	if (kOS.is_compression_mode())
+	{
+		kDes.Normalised ? kOS.WriteNormVector(kDes.x, kDes.y, kDes.z) : kOS.WriteVector(kDes.x, kDes.y, kDes.z);
+	}
+	{
+		kOS.Write(kDes.x);
+		kOS.Write(kDes.y);
+		kOS.Write(kDes.z);
+	}
+	return kOS;
+}
 
 #endif /* __FvVector2_H__ */

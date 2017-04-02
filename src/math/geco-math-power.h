@@ -3,6 +3,7 @@
 #define __GecoMathPower_H__
 
 #include "../common/Geco-plateform.h"
+#include "common/ds/geco-bit-stream.h"
 
 #define GECO_FLOAT_POINT(p) ((float*)p)
 #define GECO_FLOAT_POINT_CONST(p) ((const float*)p)

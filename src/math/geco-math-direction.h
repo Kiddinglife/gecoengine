@@ -3,7 +3,6 @@
 #define __GecoDirection3_H__
 
 #include "geco-math-power.h"
-#include "common/ds/geco-bit-stream.h"
 
 struct GecoDegree
 {
@@ -85,13 +84,42 @@ public:
 	bool IsEqual(const GecoDirection3& kOther)const;
 	static bool IsEqual(const GecoDirection3& kOne, const GecoDirection3& kOther);
 
-	void to(geco_bit_stream_t& gbs);
-	void from(geco_bit_stream_t& gbs);
-private:
-
 	float m_fYaw;
 	float m_fPitch;
 	float m_fRoll;
 };
+
+INLINE geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoDirection3& kDes)
+{
+	if (kIS.is_compression_mode())
+	{
+		kIS.read_ranged_float(kDes.m_fYaw, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+		kIS.read_ranged_float(kDes.m_fPitch, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+		kIS.read_ranged_float(kDes.m_fRoll, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+	}
+	else
+	{
+		kIS.Read(kDes.m_fYaw);
+		kIS.Read(kDes.m_fPitch);
+		kIS.Read(kDes.m_fRoll);
+	}
+	return kIS;
+}
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoDirection3& kDes)
+{
+	if (kOS.is_compression_mode())
+	{
+		kOS.write_ranged_float(kDes.m_fYaw, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+		kOS.write_ranged_float(kDes.m_fPitch, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+		kOS.write_ranged_float(kDes.m_fRoll, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+	}
+	else
+	{
+		kOS.Write(kDes.m_fYaw);
+		kOS.Write(kDes.m_fPitch);
+		kOS.Write(kDes.m_fRoll);
+	}
+	return kOS;
+}
 
 #endif /* __GecoVector2_H__ */

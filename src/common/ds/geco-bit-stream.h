@@ -53,9 +53,9 @@
 #define SignedInteger false
 
 /// Threshold at which to do a malloc / free rather than pushing data onto a fixed stack
-/// for the bitstream class. 512 is an arbitrary size, just picking something likely to be larger
+/// for the bitstream class. 1512 is an arbitrary size, just picking something likely to be larger
 /// than  most packets
-#define GECO_STREAM_STACK_ALLOC_BYTES 1472
+#define GECO_STREAM_STACK_ALLOC_BYTES 1512
 #define GECO_STREAM_STACK_ALLOC_BITS (BYTES_TO_BITS(GECO_STREAM_STACK_ALLOC_BYTES))
 
 // another imple of singleton using static methods instead of inhertance
@@ -232,6 +232,7 @@ private:
 	/// false if writting is allowed
 	bool is_read_only_;
 	uchar statck_buffer_[GECO_STREAM_STACK_ALLOC_BYTES];
+	bool enabble_compression;
 
 public:
 	GECO_STATIC_FACTORY_DELC(geco_bit_stream_t);
@@ -445,11 +446,9 @@ public:
 	}
 
 	inline void Read(float &dest) {
-		assert(get_payloads() >= sizeof(int));
-		int v;
-		Read(v);
-		//dest = fabs(BitsToFloat(v));
-		dest = fabs(BitsToFloat(v));
+		//assert(get_payloads() >= sizeof(int));
+		//int v;Read(v);dest = fabs(BitsToFloat(v));
+		ReadBits((uchar*)&dest, BYTES_TO_BITS(sizeof(float)), true);
 	}
 
 	/// TODO MOVE THIS into network_address_t by operator <<
@@ -1159,9 +1158,8 @@ public:
 	}
 
 	inline void Write(const float &src) {
-		//int v = FloatToBits(fabs(src));
-		int v = FloatToBits(src);
-		Write(v);
+		//int v = FloatToBits(src);Write(v);
+		WriteBits((uchar*)&src, BYTES_TO_BITS(sizeof(float)));
 	}
 
 	/// TODO MOVE THIS into network_address_t by operator <<
@@ -2013,7 +2011,10 @@ public:
 		WriteMini(kData);
 		return *this;
 	}
-};
+	void disable_compression() { enabble_compression = false; }
+	void enable_compression() { enabble_compression = true; }
+	bool is_compression_mode() { return enabble_compression; }
+	};
 
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& kOS, const std::string& kData)
 {

@@ -216,15 +216,3 @@ bool GecoDirection3::IsEqual(const GecoDirection3& kOne, const GecoDirection3& k
 {
 	return (kOne.m_fYaw == kOther.m_fYaw) && (kOne.m_fPitch == kOther.m_fPitch) && (kOne.m_fRoll == kOther.m_fRoll);
 }
-void GecoDirection3::to(geco_bit_stream_t& kis)
-{
-	kis.Write(m_fYaw);
-	kis.Write(m_fPitch);
-	kis.Write(m_fRoll);
-}
-void GecoDirection3::from(geco_bit_stream_t& kis)
-{
-	kis.Read(m_fYaw);
-	kis.Read(m_fPitch);
-	kis.Read(m_fRoll);
-}

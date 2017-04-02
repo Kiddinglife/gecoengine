@@ -9,21 +9,24 @@ const GecoVector2 GecoVector2::UNIT_Y = GecoVector2(0, 1);
 GecoVector2::GecoVector2()
 {
 	GecoZero2f(GECO_FLOAT_POINT_THIS);
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector2::GecoVector2(float fX, float fY) : x(fX), y(fY)
 {
-
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector2::GecoVector2(const float* fpVector)
 {
 	GecoSet2f(GECO_FLOAT_POINT_THIS, fpVector);
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector2::GecoVector2(const GecoVector2& kVector)
 {
 	GecoSet2f(GECO_FLOAT_POINT_THIS, GECO_FLOAT_POINT_CONST(kVector));
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector2::operator float* ()
@@ -176,6 +179,7 @@ void GecoVector2::Normalise()
 	float fLengthSquared = LengthSquared();
 	if (fLengthSquared)
 		*this *= GecoInvSqrtf(fLengthSquared);
+	Normalised = true;
 }
 //---------------------------------------------------------------------------
 float GecoVector2::DotProduct(const GecoVector2& kVector) const
@@ -258,33 +262,36 @@ const GecoVector3 GecoVector3::UNIT_Z = GecoVector3(0, 0, 1);
 GecoVector3::GecoVector3()
 {
 	GecoZero3f(GECO_FLOAT_POINT_THIS);
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector3::GecoVector3(float fX, float fY, float fZ) : x(fX), y(fY), z(fZ)
 {
-
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector3::GecoVector3(const float* fpVector)
 {
 	GecoSet3f(GECO_FLOAT_POINT_THIS, fpVector);
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector3::GecoVector3(const GecoVector3& kVector)
 {
 	GecoSet3f(GECO_FLOAT_POINT_THIS, GECO_FLOAT_POINT_CONST(kVector));
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector3::GecoVector3(const GecoVector2& kVector, float fZ) : x(kVector.x),
 y(kVector.y), z(fZ)
 {
-
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector3::GecoVector3(float fX, const GecoVector2& kVector) : x(fX),
 y(kVector.x), z(kVector.y)
 {
-
+	Normalised = false;
 }
 //---------------------------------------------------------------------------
 GecoVector3::operator float* ()
@@ -438,6 +445,7 @@ void GecoVector3::Normalise()
 	float fLengthSquared = LengthSquared();
 	if (fLengthSquared)
 		*this *= GecoInvSqrtf(fLengthSquared);
+	Normalised = true;
 }
 //---------------------------------------------------------------------------
 void GecoVector3::SetPitchYaw(float fPitchInRadians, float fYawInRadians)
