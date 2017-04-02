@@ -42,7 +42,6 @@
 #include <vector>
 
 #include "../geco-plateform.h"
-#include "../geco-engine-feature.h"
 #include "../ultils/geco-malloc.h"
 
   // MSWin uses _copysign, others use copysign...
@@ -430,7 +429,7 @@ public:
 			ReadBits((uchar*)&dest, BYTES_TO_BITS(sizeof(IntegralType)), true);
 #endif
 		}
-		}
+	}
 
 	/// @method Read
 	/// @access public
@@ -542,6 +541,15 @@ public:
 			languageId = 0;
 		geco_string_compressor_t::Instance()->DecodeString(varString, 0xFFFF,
 			this, languageId);
+	}
+	inline void ReadMini(std::string&varString, bool readLanguageId = false) {
+		Read(varString, readLanguageId);
+	}
+	inline void ReadMini(uchar *varString, bool readLanguageId = false) {
+		ReadMini((char*)varString, readLanguageId);
+	}
+	inline void ReadMini(char *varString, bool readLanguageId = false) {
+		Read(varString, readLanguageId);
 	}
 	//
 	//inline bool Read(wchar_t *&varString)
@@ -1241,6 +1249,14 @@ public:
 			WriteMini((uchar*)&language_id, sizeof(uchar) << 3, true);
 		geco_string_compressor_t::Instance()->EncodeString(inStringVar, 0xFFFF,
 			this, write_language_id);
+	}
+	inline void WriteMini(const std::string &src, uchar language_id = 0,
+		bool write_language_id = false) {
+		Write(src, language_id, write_language_id);
+	}
+	inline void WriteMini(const char* inStringVar, uchar language_id = 0,
+		bool write_language_id = false) {
+		Write(inStringVar, language_id, write_language_id);
 	}
 
 	inline void Write(const wchar_t * const &inStringVar) {
@@ -1983,6 +1999,124 @@ public:
 	void Bitify(bool hide_zero_low_bytes = false);
 	static void Hexlify(char* outstr, bit_size_t bitsPrint, uchar* src);
 	void Hexlify(void);
-	};
 
+	template <class T>
+	geco_bit_stream_t& operator >> (T& kData)
+	{
+		kIS.ReadMini(kData);
+		return kIS;
+	}
+
+	template <class T>
+	geco_bit_stream_t& operator<<(const T& kData)
+	{
+		kOS.WriteMini(kData);
+		return kOS;
+	}
+};
+
+INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& kOS, const std::string& kData)
+{
+	kOS.Write(kData);
+	return kOS;
+}
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, std::string& kData)
+{
+	kIS.Read(kData);
+	return kIS;
+}
+
+INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& kOS, const char* kData)
+{
+	kOS.Write(kData);
+	return kOS;
+}
+INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& kOS, char* kData)
+{
+	kOS.Write(kData);
+	return kOS;
+}
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, char* kData)
+{
+	kIS.Read(kData);
+	return kIS;
+}
+
+template <class T>
+INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::vector<T> & data)
+{
+	b.WriteMini(data.size());
+	for (uint i = 0; i < max; i++)
+		b << data[i];
+	return b;
+}
+template <class T>
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& b, std::vector<T> & data)
+{
+	uint max;
+	b.ReadMini(max);
+	data.clear();
+	data.reserve(max);
+	T val;
+	for (uint i = 0; i < max; i++)
+	{
+		b >> val;
+		data.push_back(val);
+	}
+	return b;
+}
+
+template <class T>
+INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::list<T> & data)
+{
+	b.WriteMini(data.size());
+	for (uint i = 0; i < max; i++)
+		b << data[i];
+	return b;
+}
+template <class T>
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& b, std::list<T> & data)
+{
+	uint max;
+	b.ReadMini(max);
+	data.clear();
+	T elt;
+	for (uint i = 0; i < max; i++)
+	{
+		b >> elt;
+		data.push_back(elt);
+	}
+	return b;
+}
+
+template <class T, class A>
+INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::map<T, A> & data)
+{
+	b.WriteMini(data.size());
+	std::map<T, A>::const_iterator itrB = data.begin();
+	std::map<T, A>::const_iterator itrE = data.end();
+	while (itrB != itrE)
+	{
+		b << itrB->first;
+		b << itrB->second;
+		++itrB;
+	}
+	return b;
+}
+template <class T, class A>
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& b, const std::map<T, A> & data)
+{
+	uint max;
+	b.ReadMini(max);
+	T idx;
+	A elt;
+	data.clear();
+	for (uint i = 0; i < max; i++)
+	{
+		b >> idx;
+		b >> elt;
+		data.insert(std::make_pair(idx, elt));
+	}
+	return b;
+}
 #endif /* SRC_COMMON_DS_GECO_BIT_STREAM_H_ */

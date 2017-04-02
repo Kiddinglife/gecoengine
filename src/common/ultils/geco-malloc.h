@@ -22,6 +22,8 @@
 #ifndef __INCLUDE_GECO_MALLOC_H
 #define __INCLUDE_GECO_MALLOC_H
 
+#define FILE_AND_LINE  __FILE__,__LINE__
+
 #if defined(__FreeBSD__)
 #include <stdlib.h>
 #elif defined ( __APPLE__ ) || defined ( __APPLE_CC__ )

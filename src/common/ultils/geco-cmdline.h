@@ -1,9 +1,9 @@
 #ifndef _SRC_GECO_CMDLINE
 #define _SRC_GECO_CMDLINE
 
-//see GECO_ULTILS.test_geco_cmdline_t to leran how to use it
-#include "../geco-export.h"
+#include "../../common/geco-plateform.h"
 
+//see GECO_ULTILS.test_geco_cmdline_t to leran how to use it
 class GECOAPI geco_cmdline_t
 {
 public:

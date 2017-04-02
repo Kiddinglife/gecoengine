@@ -26,7 +26,6 @@
 #include "../protocol/geco-net-common.h" 
 #include "../protocol/geco-net-msg.h"
 #include "../common/geco-plateform.h"
-#include "../common/geco-export.h"
 #include "../common/debugging/debug.h"
 #include "../common/debugging/timer_queue_t.h"
 #include "callback_defines.h"

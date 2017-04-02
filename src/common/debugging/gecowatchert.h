@@ -34,6 +34,7 @@
 #include <functional>
 #include <sstream>
 #include <memory>
+#include <vector>
 
 #include "../geco-engine-feature.h"
 #include "../geco-plateform.h"
@@ -1236,7 +1237,7 @@ public:
 
 		size_t lIter = 0;
 		//DEBUG_MSG("usevector size(%d)",  useVector.size());
-		size_t ende = std::min(cLabels, useVector.size());
+		size_t ende = GECO_MIN(cLabels, useVector.size());
 		SEQ_iterator sIter = useVector.begin();
 		while (lIter < ende)
 		{

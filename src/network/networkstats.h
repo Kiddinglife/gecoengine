@@ -30,7 +30,6 @@
 #define SRC_NETWORK_NETWORKSTATS_H_
 
 #include <thread>
-#include <sys/queue.h>
 #include "../common/ds/eastl/EASTL/utility.h"
 #include "../common/ds/eastl/EASTL/vector.h"
 #include "../common/ds/eastl/EASTL/hash_map.h"

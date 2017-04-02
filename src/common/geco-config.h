@@ -156,11 +156,84 @@ UNIX   - Any UNIX BSD/SYSV system
 #  define Q_OS_UNIX
 #endif
 
+#ifndef INLINE
+#ifdef __GNUC__
+#if (__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1))
+#define INLINE         __inline__ __attribute__((always_inline))
+#else
+#define INLINE         __inline__
+#endif
+#elif defined(_MSC_VER)
+#define INLINE __forceinline
+#elif (defined(__BORLANDC__) || defined(__WATCOMC__))
+#define INLINE __inline
+#else
+#define INLINE
+#endif
+#endif
+
+#if defined(_MSC_VER)
+#define GECO_FAST_CALL __fastcall
+#else 
+#define GECO_FAST_CALL
+#endif 
+
+#if defined (GECO_BUILD_STATIC_LIBS)
+# if !defined (GECO_HAS_DLL)
+#   define GECO_HAS_DLL 0
+# endif /* ! GECO_HAS_DLL */
+#else
+# if !defined (GECO_HAS_DLL)
+#   define GECO_HAS_DLL 1
+# endif /* ! GECO_HAS_DLL */
+#endif /* GECO_AS_STATIC_LIB */
+
+#if defined (GECO_HAS_DLL)
+#  if (GECO_HAS_DLL == 1)
+#    if defined (GECO_BUILD_DLL) || defined (GECO_EXPORT_DLL)
+#      define GECO_Export GECO_Proper_Export_Flag
+#      define GECO_SINGLETON_DECLARATION(T) GECO_EXPORT_SINGLETON_DECLARATION (T)
+#      define GECO_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) GECO_EXPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK)
+#    else
+#      define GECO_Export GECO_Proper_Import_Flag
+#      define GECO_SINGLETON_DECLARATION(T) GECO_IMPORT_SINGLETON_DECLARATION (T)
+#      define GECO_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) GECO_IMPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK)
+#    endif /* GECO_BUILD_DLL */
+#  else
+#    define GECO_Export
+#    define GECO_SINGLETON_DECLARATION(T)
+#    define GECO_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK)
+#  endif   /* ! GECO_HAS_DLL == 1 */
+#else
+#  define GECO_Export
+#  define GECO_SINGLETON_DECLARATION(T)
+#  define GECO_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK)
+#endif     /* GECO_HAS_DLL */
+
+#ifdef GECO_BUILD_STATIC_LIBS
+#define GECOAPI 
+#define GECO_EXTERN_VAR 
+#elif defined (WIN32)
+#if defined(GECO_BUILD_DLL) || defined(GECO_EXPORT_DLL)
+#define GECOAPI GECO_Proper_Export_Flag 
+#define GECO_EXTERN_VAR GECO_Proper_Export_Flag
+#else 
+#define GECOAPI GECO_Proper_Import_Flag 
+#define GECO_EXTERN_VAR GECO_Proper_Import_Flag
+#endif
+#else
+#define GECOAPI 
+#define GECO_EXTERN_VAR 
+#endif // !GECO_POWER_EXPORT
+
 #if defined (Q_OS_WIN32) || defined (Q_OS_WIN64)
+#define GECO_LITTLE_ENDIAN
 #include "geco-config-win.h"
 #elif defined (Q_OS_LINUX) || defined (Q_OS_BSD4)
+#define GECO_BIG_ENDIAN
 // #include "geco-config-unix-like.h"
 #else
 #  error "unknow plateform"
 #endif
+
 #endif /* __GECO_CONFIG_H__ */

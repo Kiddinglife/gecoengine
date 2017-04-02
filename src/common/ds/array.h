@@ -8,7 +8,6 @@
 #ifndef __COMMON_DS_ARRARY_LIST_H
 #define __COMMON_DS_ARRARY_LIST_H
 
-#include "../geco-export.h"
 #include "../ultils/geco-malloc.h"
 namespace geco
 {
