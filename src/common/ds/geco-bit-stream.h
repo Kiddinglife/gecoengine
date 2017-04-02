@@ -2003,15 +2003,15 @@ public:
 	template <class T>
 	geco_bit_stream_t& operator >> (T& kData)
 	{
-		kIS.ReadMini(kData);
-		return kIS;
+		ReadMini(kData);
+		return *this;
 	}
 
 	template <class T>
 	geco_bit_stream_t& operator<<(const T& kData)
 	{
-		kOS.WriteMini(kData);
-		return kOS;
+		WriteMini(kData);
+		return *this;
 	}
 };
 

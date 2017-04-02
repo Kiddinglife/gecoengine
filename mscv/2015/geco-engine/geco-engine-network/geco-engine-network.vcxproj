@@ -22,7 +22,7 @@
     <ProjectGuid>{7547CE30-E374-4263-A0EE-97596D8A768E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gecoenginenetwork</RootNamespace>
-    <ProjectName>network</ProjectName>
+    <ProjectName>engine-network</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -99,8 +99,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../../src;../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
@@ -159,14 +159,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\network\deamon.h" />
-    <ClInclude Include="..\..\..\..\src\network\msg_defines.h" />
-    <ClInclude Include="..\..\..\..\src\network\callback_defines.h" />
+    <ClInclude Include="..\..\..\..\src\network\end-point.h" />
+    <ClInclude Include="..\..\..\..\src\network\net-types.cc" />
     <ClInclude Include="..\..\..\..\src\network\networkstats.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\network\deamon.cc" />
-    <ClCompile Include="..\..\..\..\src\network\msg_defines.cc" />
+    <ClCompile Include="..\..\..\..\src\network\end-point.h.cc" />
+    <ClCompile Include="..\..\..\..\src\network\net-types.h" />
     <ClCompile Include="..\..\..\..\src\network\networkstats.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -137,8 +137,14 @@
     <ClInclude Include="..\..\..\..\src\common\ds\eastl\EASTL\weak_ptr.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\geco-bit-stream.h" />
     <ClInclude Include="..\..\..\..\src\common\ds\spsc-queue.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config-win-common.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config-win-msvc-7.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config-win-msvc-8.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config-win-msvc-9.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config-win-msvc.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config-win.h" />
+    <ClInclude Include="..\..\..\..\src\common\geco-config.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-engine-feature.h" />
-    <ClInclude Include="..\..\..\..\src\common\geco-export.h" />
     <ClInclude Include="..\..\..\..\src\common\geco-plateform.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\affinity.h" />
     <ClInclude Include="..\..\..\..\src\common\ultils\geco-cmdline.h" />
@@ -181,6 +187,7 @@
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\string.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\eastl\source\thread_support.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ds\geco-bit-stream.cpp" />
+    <ClCompile Include="..\..\..\..\src\common\geco-plateform.cc" />
     <ClCompile Include="..\..\..\..\src\common\ultils\affinity.cpp" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-cmdline.cc" />
     <ClCompile Include="..\..\..\..\src\common\ultils\geco-ds-wheel-timer.cpp" />
@@ -192,7 +199,7 @@
     <ProjectGuid>{9DB6451B-55F3-4A06-9C23-22C43B515E3D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gecoenginecommon</RootNamespace>
-    <ProjectName>common</ProjectName>
+    <ProjectName>geco-common</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -277,7 +284,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>STATIC_LIB_BUILD;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
       <CallingConvention>Cdecl</CallingConvention>
