@@ -32,8 +32,8 @@
 
 // �ɴ˿ɵõ�ϵͳprofileʱ��
 extern uint64 runningTime();
-struct Profiles;
-struct Profile
+struct GECOAPI Profiles;
+struct GECOAPI Profile
 {
 	std::string            strName_;
 	Profiles*              pProfiles_;
@@ -122,7 +122,7 @@ struct Profile
 	}
 };
 
-struct Profiles : public base_singleton_t< Profiles >
+struct GECOAPI Profiles : public base_singleton_t< Profiles >
 {
 	typedef std::vector<Profile*> ProfilesType;
 	typedef ProfilesType::iterator iterator;
@@ -143,7 +143,7 @@ struct Profiles : public base_singleton_t< Profiles >
 	bool initializeWatcher();
 	inline const ProfilesType& profiles()const;
 };
-struct AutoScopedProfile
+struct GECOAPI AutoScopedProfile
 {
 	AutoScopedProfile(Profile& profile, const char * filename, int lineNum) :
 		profile_(profile),

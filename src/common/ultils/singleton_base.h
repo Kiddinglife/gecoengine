@@ -18,40 +18,37 @@
  *
  */
 
-/**
- * singleton_base.h
- *
- *  Created on: 15Jul.,2016
- *      Author: jackiez
- */
+ /**
+  * singleton_base.h
+  *
+  *  Created on: 15Jul.,2016
+  *      Author: jackiez
+  */
 
 #ifndef SRC_COMMON_ULTILS_SINGLETON_BASE_H_
 #define SRC_COMMON_ULTILS_SINGLETON_BASE_H_
 
 #include "../debugging/debug.h"
 
-/**
- *	This class is used to implement singletons. Generally singletons should be
- *	avoided. If they _need_ to be used, try to use this as the base class.
- *
- *	If creating a singleton class MyApp:
- *	class MyApp : public Singleton< MyApp >	{};
- *
- *	In cpp file,
- *	GECO_SINGLETON_DEFI( MyApp )
- *
- *	To use:
- *	MyApp app; // This will be registered as the singleton
- *	MyApp * pApp = MyApp::instance_ptr();
- *	MyApp & app = MyApp::instance_ref();
- */
+  /**
+   *	This class is used to implement singletons. Generally singletons should be
+   *	avoided. If they _need_ to be used, try to use this as the base class.
+   *
+   *	If creating a singleton class MyApp:
+   *	class MyApp : public Singleton< MyApp >	{};
+   *
+   *	In cpp file,
+   *	GECO_SINGLETON_DEFI( MyApp )
+   *
+   *	To use:
+   *	MyApp app; // This will be registered as the singleton
+   *	MyApp * pApp = MyApp::instance_ptr();
+   *	MyApp & app = MyApp::instance_ref();
+   */
 template<class T>
-class base_singleton_t
+struct  GECOAPI base_singleton_t
 {
-protected:
 	static T * s_pInstance;
-
-public:
 	base_singleton_t()
 	{
 		GECO_ASSERT(NULL == s_pInstance);
@@ -77,8 +74,7 @@ public:
 	}
 };
 
-#define GECO_SINGLETON_DEFI( TYPE ) \
-template <>	TYPE * base_singleton_t< TYPE >::s_pInstance = NULL;
+#define GECO_SINGLETON_DEFI( TYPE ) template <> TYPE * base_singleton_t< TYPE >::s_pInstance = NULL;
 
 // another imple of singleton using static methods instead of inhertance
 #define GECO_STATIC_FACTORY_DELC(TYPE) \

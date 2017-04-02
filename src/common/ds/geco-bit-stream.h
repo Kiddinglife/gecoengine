@@ -95,7 +95,7 @@ struct CharacterEncoding {
 };
 /// This generates special cases of the huffman encoding tree using 8 bit keys
 /// with the additional condition that unused combinations of 8 bits are treated as a frequency of 1
-class HuffmanEncodingTree {
+class GECOAPI HuffmanEncodingTree {
 
 public:
 	HuffmanEncodingTree();
@@ -127,7 +127,7 @@ private:
 	std::vector<CharacterEncoding*> encodingTableSorted;
 };
 
-class geco_string_compressor_t {
+class GECOAPI geco_string_compressor_t {
 private:
 	/// Singleton instance
 	static geco_string_compressor_t *instance;
@@ -1524,7 +1524,7 @@ public:
 		}
 	}
 
-	/// @method write_normal_vector
+	/// @method WriteNormVector
 	/// @access public
 	/// @returns void
 	/// @param [in] templateType x
@@ -1537,13 +1537,13 @@ public:
 	/// Will further compress y or z axis aligned vectors.
 	/// templateType for this function must be a float or double
 	/// @see
-	template<class templateType> void write_normal_vector(templateType x,
+	template<class templateType> void WriteNormVector(templateType x,
 		templateType y) {
 		assert(x <= 1.01 && y <= 1.01 && x >= -1.01 && y >= -1.01);
 		write_ranged_float((float)x, -1.0f, 1.0f);
 		write_ranged_float((float)y, -1.0f, 1.0f);
 	}
-	template<class templateType> void write_normal_vector(templateType x,
+	template<class templateType> void WriteNormVector(templateType x,
 		templateType y, templateType z) {
 		assert(
 			x <= 1.01 && y <= 1.01 && z <= 1.01 && x >= -1.01 && y >= -1.01
@@ -1553,7 +1553,7 @@ public:
 		write_ranged_float((float)z, -1.0f, 1.0f);
 	}
 
-	/// @method write_vector
+	/// @method WriteVector
 	/// @access public
 	/// @returns void
 	/// @brief Write a vector, using 10 bytes instead of 12.
@@ -1562,7 +1562,7 @@ public:
 	/// so only use if accuracy is not important
 	/// templateType for this function must be a float or double
 	/// @see
-	template<class templateType> void write_vector(templateType x,
+	template<class templateType> void WriteVector(templateType x,
 		templateType y) {
 		templateType magnitude = sqrt(x * x + y * y);
 		Write((float)magnitude);
@@ -1571,7 +1571,7 @@ public:
 			WriteMini((float)(y / magnitude));
 		}
 	}
-	template<class templateType> void write_vector(templateType x,
+	template<class templateType> void WriteVector(templateType x,
 		templateType y, templateType z) {
 		templateType magnitude = sqrt(x * x + y * y + z * z);
 		Write((float)magnitude);

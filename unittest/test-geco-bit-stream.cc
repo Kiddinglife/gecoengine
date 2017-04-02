@@ -181,11 +181,11 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes) {
 
 			s8.WriteBits(&particialByte, 4, true);
 			s8.WriteMini(uint24);
-			s8.write_normal_vector(vector_.x, vector_.y, vector_.z);
+			s8.WriteNormVector(vector_.x, vector_.y, vector_.z);
 
 			s8.write_ranged_integer(curr, min, max);
 
-			s8.write_vector(vector__.x, vector__.y, vector__.z);
+			s8.WriteVector(vector__.x, vector__.y, vector__.z);
 
 			s8.WriteMini(uint32);
 			s8.WriteMini(int16, false);
@@ -390,11 +390,11 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed) {
 
 			s8.WriteBits(&particialByte, 4, true);
 			s8.Write(uint24);
-			s8.write_normal_vector(vector_.x, vector_.y, vector_.z);
+			s8.WriteNormVector(vector_.x, vector_.y, vector_.z);
 
 			s8.write_ranged_integer(curr, min, max);
 
-			s8.write_vector(vector__.x, vector__.y, vector__.z);
+			s8.WriteVector(vector__.x, vector__.y, vector__.z);
 
 			s8.Write(uint32);
 			s8.Write(int16);
