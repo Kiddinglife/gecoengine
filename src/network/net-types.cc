@@ -11,8 +11,10 @@
 #include <arpa/inet.h>
 #endif
 
-//FV_DECLARE_DEBUG_COMPONENT2("GecoNetwork", 0)
-
+extern std::shared_ptr<spdlog::logger> geco_network_console_logger = spdlog::stdout_color_mt("geco-network-console-logger");
+// Create a file rotating logger with 5mb size max and 3 rotated files
+extern std::shared_ptr<spdlog::logger> geco_network_daily_logger =
+spdlog::rotating_logger_mt("geco-network-daily_logger", "logs/geco-network-daily_log", 1048576 * 5, 3);
 
 char GecoNetAddress::ms_pcStringBuf[2][GecoNetAddress::MAX_STRLEN];
 int GecoNetAddress::ms_iCurrStringBuf = 0;

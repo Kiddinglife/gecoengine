@@ -286,7 +286,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../../src/common/debugging;../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
       <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
     <Link>

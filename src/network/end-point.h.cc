@@ -5,6 +5,7 @@
 #include <iphlpapi.h>
 #pragma comment(lib, "IPHLPAPI.lib")
 #endif
+
 #include "end-point.h"
 
 GecoNetEndpoint * GecoNetEndpoint::ms_pkHijackEndpointSync = NULL;
@@ -12,7 +13,7 @@ GecoNetEndpoint * GecoNetEndpoint::ms_pkHijackEndpointAsync = NULL;
 geco_bit_stream_t * GecoNetEndpoint::ms_pkHijackStream = NULL;
 GecoNetEndpoint::FrontEndInterfaces GecoNetEndpoint::ms_kFrontEndInterfaces;
 
-#ifdef __unix__
+#ifdef ____linux____
 extern "C" {
 	/// 32 bit unsigned integer.
 #define __u32 uint
@@ -52,9 +53,7 @@ struct if_nameindex *if_nameindex(void)
 
 INLINE void if_freenameindex(struct if_nameindex *)
 {}
-#endif	// !unix
-
-//GECO_DECLARE_DEBUG_COMPONENT2("GecoNetwork", 0)
+#endif	// !__linux__
 
 GecoNetEndpoint::GecoNetEndpoint(bool useSyncHijack) :
 	m_kSocket(NO_SOCKET),
@@ -73,7 +72,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 {
 	bool isResultSet = false;
 
-#ifdef unix
+#ifdef __linux__
 	//	GECO_ASSERT( errno == ECONNREFUSED );
 
 	struct sockaddr_in	offender;
@@ -135,7 +134,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 
 		isResultSet = true;
 	}
-#endif // unix
+#endif // __linux__
 
 	return isResultSet;
 }
@@ -206,7 +205,7 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 		return -1;
 	}
 
-#ifndef unix
+#ifndef __linux__
 
 #ifdef _WIN32
 
@@ -227,7 +226,7 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 
 #endif
 
-#else // unix
+#else // __linux__
 	int		ret = -1;
 
 	struct if_nameindex* pIfInfo = if_nameindex();
@@ -263,7 +262,7 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 	}
 
 	return ret;
-#endif // !unix
+#endif // !__linux__
 }
 
 int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
@@ -355,8 +354,8 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 
 				if ((htip >> netmaskshift) == (netmaskmatch >> netmaskshift))
 				{
-					//GECO_DEBUG_MSG("Endpoint::bind(): found a match\n");
 					strncpy(name, currName, IFNAMSIZ);
+					geco_network_console_logger->debug("Endpoint::bind(): found a match address {}\n", name);
 					break;
 				}
 			}
@@ -419,11 +418,11 @@ int GecoNetEndpoint::ConvertAddress(const char * string, u_int32_t & address)
 {
 	u_int32_t	trial;
 
-#ifdef unix
+#ifdef __linux__
 	if (inet_aton(string, (struct in_addr*)&trial) != 0)
-#else // unix
+#else // __linux__
 	if ((trial = inet_addr(string)) != INADDR_NONE)
-#endif // !unix
+#endif // !__linux__
 	{
 		address = trial;
 		return 0;
@@ -454,7 +453,7 @@ int GecoNetEndpoint::ConvertAddress(const char * string, u_int32_t & address)
 }
 
 
-#ifdef unix
+#ifdef __linux__
 int GecoNetEndpoint::GetQueueSizes(int & tx, int & rx) const
 {
 	int	ret = -1;
@@ -500,17 +499,17 @@ int GecoNetEndpoint::GetQueueSizes(int & tx, int & rx) const
 
 	return ret;
 }
-#else // unix
+#else // __linux__
 int GecoNetEndpoint::GetQueueSizes(int &, int &) const
 {
 	return -1;
 }
-#endif // !unix
+#endif // !__linux__
 
 
 int GecoNetEndpoint::GetBufferSize(int optname) const
 {
-#ifdef unix
+#ifdef __linux__
 	GECO_ASSERT(optname == SO_SNDBUF || optname == SO_RCVBUF);
 
 	int recvbuf = -1;
@@ -532,22 +531,22 @@ int GecoNetEndpoint::GetBufferSize(int optname) const
 		return -1;
 	}
 
-#else // unix
+#else // __linux__
 	return -1;
-#endif // !unix
+#endif // !__linux__
 }
 
 
 bool GecoNetEndpoint::SetBufferSize(int optname, int size)
 {
-#ifdef unix
+#ifdef __linux__
 	setsockopt(m_kSocket, SOL_SOCKET, optname, (const char*)&size,
 		sizeof(size));
 #else
 	//! add by Uman,2009/10/22
 	return setsockopt(m_kSocket, SOL_SOCKET, optname, (const char*)&size,
 		sizeof(size)) == 0;
-#endif // unix
+#endif // __linux__
 
 	return this->GetBufferSize(optname) >= size;
 }
@@ -563,11 +562,11 @@ bool GecoNetEndpoint::RecvAll(void * gramData, int gramSize)
 		{
 			if (len == 0)
 			{
-				//GECO_WARNING_MSG("GecoNetEndpoint::RecvAll: Connection lost\n");
+				geco_network_console_logger->warn("GecoNetEndpoint::RecvAll: Connection lost\n");
 			}
 			else
 			{
-				//GECO_WARNING_MSG("GecoNetEndpoint::RecvAll: Got error '%s'\n",strerror(errno));
+				geco_network_console_logger->warn("GecoNetEndpoint::RecvAll: Got error '{}'\n", strerror(errno));
 			}
 
 			return false;
@@ -640,18 +639,15 @@ void GecoNetEndpoint::AddFrontEndInterface(const eastl::string & name, u_int32_t
 static bool s_networkInitted = false;
 void InitNetwork()
 {
+	geco_network_console_logger->info("init geco network module...");
 	if (s_networkInitted) return;
 	s_networkInitted = true;
-
 #if !defined( PLAYSTATION3 )
-
-#ifndef unix
+#ifndef __linux__
 	WSAData wsdata;
 	WSAStartup(0x202, &wsdata);
-#endif // !unix
-
-#endif // unix
-
+#endif // !__linux__
+#endif // __linux__
 }
 
 #ifdef _WIN32

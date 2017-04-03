@@ -1132,7 +1132,7 @@ public:
 			WriteBits((uchar*)&src, BYTES_TO_BITS(sizeof(IntergralType)));
 		}
 		else {
-#ifndef DO_NOT_SWAP_ENDIAN
+#ifndef DO_NOT_SWAP_ENDIAN  
 			if (DoEndianSwap()) {
 				uchar output[sizeof(IntergralType)];
 				ReverseBytes((uchar*)&src, output, sizeof(IntergralType));
@@ -2014,7 +2014,7 @@ public:
 	void disable_compression() { enabble_compression = false; }
 	void enable_compression() { enabble_compression = true; }
 	bool is_compression_mode() { return enabble_compression; }
-	};
+};
 
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& kOS, const std::string& kData)
 {

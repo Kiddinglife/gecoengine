@@ -31,6 +31,11 @@
 #define GECO_NET_LOCALHOSTNAME "lo"
 #endif
 
+#include "common/debugging/spdlog/spdlog.h"
+#include "common/debugging/spdlog/logger.h"
+extern std::shared_ptr<spdlog::logger> geco_network_console_logger;
+extern std::shared_ptr<spdlog::logger> geco_network_daily_logger;
+
 const int GECO_NET_UDP_OVERHEAD = 28;
 const int GECO_NET_BITS_PER_BYTE = 8;
 const uint GECO_NET_LOCALHOST = 0x0100007F;
@@ -162,7 +167,38 @@ private:
 INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b);
 INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b);
 INLINE bool operator<(const GecoNetAddress & a, const GecoNetAddress & b);
-//GECO_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoNetAddress)
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, GecoNetAddress& kDes)
+{
+	if (kIS.is_compression_mode())
+	{
+		kIS.ReadMini(kDes.m_uiIP);
+		kIS.ReadMini(kDes.m_uiPort);
+		kIS.ReadMini(kDes.m_uiSalt);
+	}
+	else
+	{
+		kIS.Read(kDes.m_uiIP);
+		kIS.Read(kDes.m_uiPort);
+		kIS.Read(kDes.m_uiSalt);
+	}
+	return kIS;
+}
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoNetAddress& kDes)
+{
+	if (kOS.is_compression_mode())
+	{
+		kOS.WriteMini(kDes.m_uiIP);
+		kOS.WriteMini(kDes.m_uiPort);
+		kOS.WriteMini(kDes.m_uiSalt);
+	}
+	else
+	{
+		kOS.WriteMini(kDes.m_uiIP);
+		kOS.WriteMini(kDes.m_uiPort);
+		kOS.WriteMini(kDes.m_uiSalt);
+	}
+	return kOS;
+}
 
 
 GECOAPI bool  WatcherStringToValue(const char *, GecoNetAddress &);
@@ -198,11 +234,44 @@ struct GecoEntityMailBoxRef
 		SetType(GECO_INVALID_ENTITY_TYPE_ID);
 	}
 };
-
 INLINE bool operator==(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b);
 INLINE bool operator!=(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b);
-//GECO_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoEntityMailBoxRef)
-
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, GecoEntityMailBoxRef& kDes)
+{
+	if (kIS.is_compression_mode())
+	{
+		kIS.ReadMini(kDes.m_iID);
+		kIS.ReadMini(kDes.m_kAddr.m_uiIP);
+		kIS.ReadMini(kDes.m_kAddr.m_uiPort);
+		kIS.ReadMini(kDes.m_kAddr.m_uiSalt);
+	}
+	else
+	{
+		kIS.Read(kDes.m_iID);
+		kIS.Read(kDes.m_kAddr.m_uiIP);
+		kIS.Read(kDes.m_kAddr.m_uiPort);
+		kIS.Read(kDes.m_kAddr.m_uiSalt);
+	}
+	return kIS;
+}
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoEntityMailBoxRef& kDes)
+{
+	if (kOS.is_compression_mode())
+	{
+		kOS.WriteMini(kDes.m_iID);
+		kOS.WriteMini(kDes.m_kAddr.m_uiIP);
+		kOS.WriteMini(kDes.m_kAddr.m_uiPort);
+		kOS.WriteMini(kDes.m_kAddr.m_uiSalt);
+	}
+	else
+	{
+		kOS.Write(kDes.m_iID);
+		kOS.Write(kDes.m_kAddr.m_uiIP);
+		kOS.Write(kDes.m_kAddr.m_uiPort);
+		kOS.Write(kDes.m_kAddr.m_uiSalt);
+	}
+	return kOS;
+}
 
 class GecoCapabilities
 {
@@ -220,13 +289,42 @@ private:
 	CapsType m_uiCaps;
 };
 
-
 class GecoSpaceEntryID : public GecoNetAddress { };
 INLINE bool operator==(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
 INLINE bool operator!=(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
 INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
-//GECO_IOSTREAM_IMP_BY_MEMCPY(INLINE, GecoSpaceEntryID)
-
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, GecoSpaceEntryID& kDes)
+{
+	if (kIS.is_compression_mode())
+	{
+		kIS.ReadMini(kDes.m_uiIP);
+		kIS.ReadMini(kDes.m_uiPort);
+		kIS.ReadMini(kDes.m_uiSalt);
+	}
+	else
+	{
+		kIS.Read(kDes.m_uiIP);
+		kIS.Read(kDes.m_uiPort);
+		kIS.Read(kDes.m_uiSalt);
+	}
+	return kIS;
+}
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoSpaceEntryID& kDes)
+{
+	if (kOS.is_compression_mode())
+	{
+		kOS.WriteMini(kDes.m_uiIP);
+		kOS.WriteMini(kDes.m_uiPort);
+		kOS.WriteMini(kDes.m_uiSalt);
+	}
+	else
+	{
+		kOS.WriteMini(kDes.m_uiIP);
+		kOS.WriteMini(kDes.m_uiPort);
+		kOS.WriteMini(kDes.m_uiSalt);
+	}
+	return kOS;
+}
 
 struct InterfaceListenerMsg
 {
@@ -246,21 +344,126 @@ struct InterfaceListenerMsg
 		kName[0] = 0;
 	}
 };
-geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, InterfaceListenerMsg& kDes)
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, InterfaceListenerMsg& kDes)
 {
-	kIS.ReadMini(kDes.uiIP);
-	kIS.ReadMini(kDes.uiPort);
-	kIS.ReadMini(kDes.uiUserID);
-	kIS.ReadMini(kDes.kName);
+	if (kIS.is_compression_mode())
+	{
+		kIS.ReadMini(kDes.uiIP);
+		kIS.ReadMini(kDes.uiPort);
+		kIS.ReadMini(kDes.uiUserID);
+		kIS.ReadMini(kDes.kName);
+	}
+	else
+	{
+		kIS.Read(kDes.uiIP);
+		kIS.Read(kDes.uiPort);
+		kIS.Read(kDes.uiUserID);
+		kIS.Read(kDes.kName);
+	}
 	return kIS;
 }
-geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const InterfaceListenerMsg& kDes)
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const InterfaceListenerMsg& kDes)
 {
-	kOS.WriteMini(kDes.uiIP);
-	kOS.WriteMini(kDes.uiPort);
-	kOS.WriteMini(kDes.uiUserID);
-	kOS.WriteMini(kDes.kName);
+	if (kOS.is_compression_mode())
+	{
+		kOS.WriteMini(kDes.uiIP);
+		kOS.WriteMini(kDes.uiPort);
+		kOS.WriteMini(kDes.uiUserID);
+		kOS.WriteMini(kDes.kName);
+	}
+	else
+	{
+		kOS.Write(kDes.uiIP);
+		kOS.Write(kDes.uiPort);
+		kOS.Write(kDes.uiUserID);
+		kOS.Write(kDes.kName);
+	}
 	return kOS;
+}
+
+INLINE GecoNetAddress::GecoNetAddress()
+{
+}
+
+INLINE GecoNetAddress::GecoNetAddress(uint ipArg, ushort portArg) :
+	m_uiIP(ipArg),
+	m_uiPort(portArg),
+	m_uiSalt(0)
+{
+}
+
+INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b)
+{
+	return (a.m_uiIP == b.m_uiIP) && (a.m_uiPort == b.m_uiPort);
+}
+
+INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b)
+{
+	return (a.m_uiIP != b.m_uiIP) || (a.m_uiPort != b.m_uiPort);
+}
+
+INLINE bool operator<(const GecoNetAddress & a, const GecoNetAddress & b)
+{
+	return (a.m_uiIP < b.m_uiIP) || (a.m_uiIP == b.m_uiIP && (a.m_uiPort < b.m_uiPort));
+}
+
+INLINE bool operator==(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b)
+{
+	return (a.m_iID == b.m_iID) && (a.m_kAddr == b.m_kAddr) && (a.m_kAddr.m_uiSalt == b.m_kAddr.m_uiSalt);
+}
+
+INLINE bool operator!=(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b)
+{
+	return (a.m_iID != b.m_iID) || (a.m_kAddr != b.m_kAddr) || (a.m_kAddr.m_uiSalt != b.m_kAddr.m_uiSalt);
+}
+
+INLINE GecoCapabilities::GecoCapabilities() :
+	m_uiCaps(0)
+{
+}
+
+INLINE void GecoCapabilities::Add(unsigned int cap)
+{
+	m_uiCaps |= 1 << cap;
+}
+
+INLINE bool GecoCapabilities::Has(unsigned int cap) const
+{
+	return !!(m_uiCaps & (1 << cap));
+}
+
+INLINE bool GecoCapabilities::Empty() const
+{
+	return m_uiCaps == 0;
+}
+
+INLINE bool GecoCapabilities::Match(const GecoCapabilities& on,
+	const GecoCapabilities& off) const
+{
+	return (on.m_uiCaps & m_uiCaps) == on.m_uiCaps &&
+		(off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
+}
+
+INLINE bool GecoCapabilities::MatchAny(const GecoCapabilities& on,
+	const GecoCapabilities& off) const
+{
+	return !!(on.m_uiCaps & m_uiCaps) && (off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
+}
+
+INLINE bool operator==(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
+{
+	return operator==((GecoNetAddress)a, (GecoNetAddress)b) && a.m_uiSalt == b.m_uiSalt;
+}
+
+INLINE bool operator!=(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
+{
+	return operator!=((GecoNetAddress)a, (GecoNetAddress)b) || a.m_uiSalt != b.m_uiSalt;
+}
+
+INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
+{
+	return operator<((GecoNetAddress)a, (GecoNetAddress)b) ||
+		(operator==((GecoNetAddress)a, (GecoNetAddress)b) && (a.m_uiSalt < b.m_uiSalt));
 }
 
 #endif // __GecoNetTypes_H__

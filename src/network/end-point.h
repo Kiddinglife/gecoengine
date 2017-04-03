@@ -2,7 +2,9 @@
 #ifndef __GecoNetEndpoint_H__
 #define __GecoNetEndpoint_H__
 
+
 #include "net-types.h"
+#include "common/debugging/spdlog/spdlog.h"
 #include "common/ds/eastl/EASTL/map.h"
 #include "common/ds/eastl/EASTL/vector.h"
 
@@ -10,7 +12,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#if defined(__unix__ ) || defined( PLAYSTATION3 )
+#if defined(__linux__ ) || defined( PLAYSTATION3 )
 #include <sys/time.h>
 #include <sys/socket.h>
 #ifndef PLAYSTATION3
@@ -26,7 +28,7 @@
 #include <WINSOCK.H>
 #endif
 
-#ifndef __unix__
+#ifndef __linux__
 
 #ifdef PLAYSTATION3
 typedef uint8_t 	u_int8_t;
@@ -165,9 +167,9 @@ public:
 
 private:
 
-#if defined( unix ) || defined( PLAYSTATION3 )
+#if defined( __linux__ ) || defined( PLAYSTATION3 )
 	int	m_kSocket;
-#else //ifdef unix
+#else //ifdef __linux__
 	SOCKET	m_kSocket;
 #endif //def _WIN32
 
@@ -190,91 +192,6 @@ private:
 };
 
 extern void InitNetwork();
-
-INLINE GecoNetAddress::GecoNetAddress()
-{
-}
-
-INLINE GecoNetAddress::GecoNetAddress(uint ipArg, ushort portArg) :
-	m_uiIP(ipArg),
-	m_uiPort(portArg),
-	m_uiSalt(0)
-{
-}
-
-INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b)
-{
-	return (a.m_uiIP == b.m_uiIP) && (a.m_uiPort == b.m_uiPort);
-}
-
-INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b)
-{
-	return (a.m_uiIP != b.m_uiIP) || (a.m_uiPort != b.m_uiPort);
-}
-
-INLINE bool operator<(const GecoNetAddress & a, const GecoNetAddress & b)
-{
-	return (a.m_uiIP < b.m_uiIP) || (a.m_uiIP == b.m_uiIP && (a.m_uiPort < b.m_uiPort));
-}
-
-INLINE bool operator==(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b)
-{
-	return (a.m_iID == b.m_iID) && (a.m_kAddr == b.m_kAddr) && (a.m_kAddr.m_uiSalt == b.m_kAddr.m_uiSalt);
-}
-
-INLINE bool operator!=(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b)
-{
-	return (a.m_iID != b.m_iID) || (a.m_kAddr != b.m_kAddr) || (a.m_kAddr.m_uiSalt != b.m_kAddr.m_uiSalt);
-}
-
-INLINE GecoCapabilities::GecoCapabilities() :
-	m_uiCaps(0)
-{
-}
-
-INLINE void GecoCapabilities::Add(unsigned int cap)
-{
-	m_uiCaps |= 1 << cap;
-}
-
-INLINE bool GecoCapabilities::Has(unsigned int cap) const
-{
-	return !!(m_uiCaps & (1 << cap));
-}
-
-INLINE bool GecoCapabilities::Empty() const
-{
-	return m_uiCaps == 0;
-}
-
-INLINE bool GecoCapabilities::Match(const GecoCapabilities& on,
-	const GecoCapabilities& off) const
-{
-	return (on.m_uiCaps & m_uiCaps) == on.m_uiCaps &&
-		(off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
-}
-
-INLINE bool GecoCapabilities::MatchAny(const GecoCapabilities& on,
-	const GecoCapabilities& off) const
-{
-	return !!(on.m_uiCaps & m_uiCaps) && (off.m_uiCaps & ~m_uiCaps) == off.m_uiCaps;
-}
-
-INLINE bool operator==(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
-{
-	return operator==((GecoNetAddress)a, (GecoNetAddress)b) && a.m_uiSalt == b.m_uiSalt;
-}
-
-INLINE bool operator!=(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
-{
-	return operator!=((GecoNetAddress)a, (GecoNetAddress)b) || a.m_uiSalt != b.m_uiSalt;
-}
-
-INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
-{
-	return operator<((GecoNetAddress)a, (GecoNetAddress)b) ||
-		(operator==((GecoNetAddress)a, (GecoNetAddress)b) && (a.m_uiSalt < b.m_uiSalt));
-}
 
 #ifdef PLAYSTATION3
 #include <netex/libnetctl.h>
@@ -310,7 +227,7 @@ INLINE bool GecoNetEndpoint::Good() const
 INLINE void GecoNetEndpoint::Socket(int type)
 {
 	this->SetFileDescriptor((int)::socket(AF_INET, type, 0));
-#ifndef unix
+#ifndef __linux__
 #ifndef PLAYSTATION3
 	if ((m_kSocket == INVALID_SOCKET) && (WSAGetLastError() == WSANOTINITIALISED))
 	{
@@ -324,7 +241,7 @@ INLINE void GecoNetEndpoint::Socket(int type)
 
 INLINE int GecoNetEndpoint::SetNonblocking(bool nonblocking)
 {
-#ifdef unix
+#ifdef __linux__
 	int val = nonblocking ? O_NONBLOCK : 0;
 	return ::fcntl(m_kSocket, F_SETFL, val);
 #elif defined( PLAYSTATION3 )
@@ -338,7 +255,7 @@ INLINE int GecoNetEndpoint::SetNonblocking(bool nonblocking)
 
 INLINE int GecoNetEndpoint::SetBroadcast(bool broadcast)
 {
-#ifdef unix
+#ifdef __linux__
 	int val;
 	if (broadcast)
 	{
@@ -355,7 +272,7 @@ INLINE int GecoNetEndpoint::SetBroadcast(bool broadcast)
 
 INLINE int GecoNetEndpoint::SetReuseaddr(bool reuseaddr)
 {
-#ifdef unix
+#ifdef __linux__
 	int val;
 #else
 	bool val;
@@ -366,7 +283,7 @@ INLINE int GecoNetEndpoint::SetReuseaddr(bool reuseaddr)
 }
 INLINE int GecoNetEndpoint::SetKeepalive(bool keepalive)
 {
-#ifdef unix
+#ifdef __linux__
 	int val;
 #else
 	bool val;
@@ -400,7 +317,7 @@ INLINE int GecoNetEndpoint::Bind(u_int16_t networkPort, u_int32_t networkAddr)
 
 INLINE int GecoNetEndpoint::JoinMulticastGroup(u_int32_t networkAddr)
 {
-#ifdef unix
+#ifdef __linux__
 	struct ip_mreqn req;
 	req.imr_multiaddr.s_addr = networkAddr;
 	req.imr_address.s_addr = INADDR_ANY;
@@ -413,7 +330,7 @@ INLINE int GecoNetEndpoint::JoinMulticastGroup(u_int32_t networkAddr)
 
 INLINE int GecoNetEndpoint::QuitMulticastGroup(u_int32_t networkAddr)
 {
-#ifdef unix
+#ifdef __linux__
 	struct ip_mreqn req;
 	req.imr_multiaddr.s_addr = networkAddr;
 	req.imr_address.s_addr = INADDR_ANY;
@@ -431,7 +348,7 @@ INLINE int GecoNetEndpoint::Close()
 		return 0;
 	}
 
-#ifdef unix
+#ifdef __linux__
 	int ret = ::close(m_kSocket);
 #elif defined( PLAYSTATION3 )
 	int ret = ::socketclose(m_kSocket);
@@ -515,7 +432,6 @@ INLINE int GecoNetEndpoint::GetRemoteHostname(eastl::string * host) const
 	}
 	return ret;
 }
-
 
 INLINE void GecoNetEndpoint::HijackSendOpen(u_int16_t port, u_int32_t addr)
 {
@@ -671,7 +587,7 @@ INLINE GecoNetEndpoint * GecoNetEndpoint::Accept(
 	sockaddr_in		sin;
 	socklen_t		sinLen = sizeof(sin);
 	int ret = (int)::accept(m_kSocket, (sockaddr*)&sin, &sinLen);
-#if defined( unix ) || defined( PLAYSTATION3 )
+#if defined( __linux__ ) || defined( PLAYSTATION3 )
 	if (ret < 0) return NULL;
 #else
 	if (ret == INVALID_SOCKET) return NULL;
@@ -706,7 +622,7 @@ INLINE int GecoNetEndpoint::Recv(void * gramData, int gramSize)
 }
 
 
-#ifdef unix
+#ifdef __linux__
 INLINE int GecoNetEndpoint::GetInterfaceFlags(char * name, int & flags)
 {
 	assert(!GecoNetEndpoint::IsHijacked());
