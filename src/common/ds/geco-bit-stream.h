@@ -765,7 +765,7 @@ public:
 	/// @param floatMin and @param floatMax
 	/// @notice
 	/// @see
-	void read_ranged_float(float &outFloat, float floatMin, float floatMax);
+	void read_ranged_float(float &outFloat, float floatMin = -1.0f, float floatMax = 1.0f);
 
 	/// @brief Read bytes, starting at the next aligned byte.
 	/// @details Note that the modulus 8 starting offset of the sequence
@@ -816,14 +816,14 @@ public:
 	/// @notice templateType for this function must be a float or double
 	template<class templateType>
 	void ReadNormVector(templateType &x, templateType &y) {
-		read_ranged_float(x, -1.0f, 1.0f);
-		read_ranged_float(y, -1.0f, 1.0f);
+		read_ranged_float(x);
+		read_ranged_float(y);
 	}
 	template<class templateType>
 	void ReadNormVector(templateType &x, templateType &y, templateType &z) {
-		read_ranged_float(x, -1.0f, 1.0f);
-		read_ranged_float(y, -1.0f, 1.0f);
-		read_ranged_float(z, -1.0f, 1.0f);
+		read_ranged_float(x);
+		read_ranged_float(y);
+		read_ranged_float(z);
 	}
 
 	/// @brief Read 3 floats or doubles, using 10 bytes,
@@ -841,8 +841,8 @@ public:
 		Read(magnitude);
 
 		if (magnitude > 0.00001f) {
-			ReadMini(x);
-			ReadMini(y);
+			read_ranged_float(x);
+			read_ranged_float(y);
 			x *= magnitude;
 			y *= magnitude;
 		}
@@ -857,9 +857,9 @@ public:
 		Read(magnitude);
 
 		if (magnitude > 0.00001f) {
-			ReadMini(x);
-			ReadMini(y);
-			ReadMini(z);
+			read_ranged_float(x);
+			read_ranged_float(y);
+			read_ranged_float(z);
 			x *= magnitude;
 			y *= magnitude;
 			z *= magnitude;
@@ -1115,7 +1115,7 @@ public:
 	/// @param [in] [float floatMax] Predetermined max value of f
 	/// @return bool
 	/// @author mengdi[Jackie]
-	void write_ranged_float(float src, float floatMin, float floatMax);
+	void write_ranged_float(float src, float floatMin = -1.0f, float floatMax = 1.0f);
 
 	/// @func Write
 	/// @brief write any integral type to a bitstream.
@@ -1538,17 +1538,17 @@ public:
 	template<class templateType> void WriteNormVector(templateType x,
 		templateType y) {
 		assert(x <= 1.01 && y <= 1.01 && x >= -1.01 && y >= -1.01);
-		write_ranged_float((float)x, -1.0f, 1.0f);
-		write_ranged_float((float)y, -1.0f, 1.0f);
+		write_ranged_float((float)x);
+		write_ranged_float((float)y);
 	}
 	template<class templateType> void WriteNormVector(templateType x,
 		templateType y, templateType z) {
 		assert(
 			x <= 1.01 && y <= 1.01 && z <= 1.01 && x >= -1.01 && y >= -1.01
 			&& z >= -1.01);
-		write_ranged_float((float)x, -1.0f, 1.0f);
-		write_ranged_float((float)y, -1.0f, 1.0f);
-		write_ranged_float((float)z, -1.0f, 1.0f);
+		write_ranged_float((float)x);
+		write_ranged_float((float)y);
+		write_ranged_float((float)z);
 	}
 
 	/// @method WriteVector
@@ -1556,7 +1556,7 @@ public:
 	/// @returns void
 	/// @brief Write a vector, using 10 bytes instead of 12.
 	/// @notice
-	/// Loses accuracy to about 3/10ths and only saves 2 bytes,
+	/// Loses accuracy to about 1/32767.5. and only saves 2 bytes,
 	/// so only use if accuracy is not important
 	/// templateType for this function must be a float or double
 	/// @see
@@ -1565,8 +1565,8 @@ public:
 		templateType magnitude = sqrt(x * x + y * y);
 		Write((float)magnitude);
 		if (magnitude > 0.00001f) {
-			WriteMini((float)(x / magnitude));
-			WriteMini((float)(y / magnitude));
+			write_ranged_float((float)(x / magnitude));
+			write_ranged_float((float)(y / magnitude));
 		}
 	}
 	template<class templateType> void WriteVector(templateType x,
@@ -1574,9 +1574,9 @@ public:
 		templateType magnitude = sqrt(x * x + y * y + z * z);
 		Write((float)magnitude);
 		if (magnitude > 0.00001f) {
-			WriteMini((float)(x / magnitude));
-			WriteMini((float)(y / magnitude));
-			WriteMini((float)(z / magnitude));
+			write_ranged_float((float)(x / magnitude));
+			write_ranged_float((float)(y / magnitude));
+			write_ranged_float((float)(z / magnitude));
 		}
 	}
 

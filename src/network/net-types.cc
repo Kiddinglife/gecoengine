@@ -11,11 +11,6 @@
 #include <arpa/inet.h>
 #endif
 
-extern std::shared_ptr<spdlog::logger> geco_network_console_logger = spdlog::stdout_color_mt("geco-network-console-logger");
-// Create a file rotating logger with 5mb size max and 3 rotated files
-extern std::shared_ptr<spdlog::logger> geco_network_daily_logger =
-spdlog::rotating_logger_mt("geco-network-daily_logger", "logs/geco-network-daily_log", 1048576 * 5, 3);
-
 char GecoNetAddress::ms_pcStringBuf[2][GecoNetAddress::MAX_STRLEN];
 int GecoNetAddress::ms_iCurrStringBuf = 0;
 const GecoNetAddress GecoNetAddress::NONE(0, 0);
@@ -23,21 +18,16 @@ const GecoNetAddress GecoNetAddress::NONE(0, 0);
 bool WatcherStringToValue(const char * valueStr, GecoNetAddress & value)
 {
 	int a1, a2, a3, a4, a5;
-
 	if (sscanf(valueStr, "%d.%d.%d.%d:%d",
 		&a1, &a2, &a3, &a4, &a5) != 5)
 	{
-		//FV_WARNING_MSG("WatcherStringToValue: "
-		//	"Cannot convert '%s' to an Address.\n", valueStr);
+		g_network_logger->error("WatcherStringToValue: Cannot convert '{}' to an Address.\n", valueStr);
 		return false;
 	}
-
 	value.m_uiIP = (a1 << 24) | (a2 << 16) | (a3 << 8) | a4;
-
 	value.m_uiPort = ushort(a5);
 	value.m_uiPort = ntohs(value.m_uiPort);
 	value.m_uiIP = ntohl(value.m_uiIP);
-
 	return true;
 }
 

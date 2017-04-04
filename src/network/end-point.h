@@ -4,7 +4,6 @@
 
 
 #include "net-types.h"
-#include "common/debugging/spdlog/spdlog.h"
 #include "common/ds/eastl/EASTL/map.h"
 #include "common/ds/eastl/EASTL/vector.h"
 

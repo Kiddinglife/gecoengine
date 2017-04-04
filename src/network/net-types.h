@@ -32,9 +32,7 @@
 #endif
 
 #include "common/debugging/spdlog/spdlog.h"
-#include "common/debugging/spdlog/logger.h"
-extern std::shared_ptr<spdlog::logger> geco_network_console_logger;
-extern std::shared_ptr<spdlog::logger> geco_network_daily_logger;
+extern std::shared_ptr<spdlog::logger> g_network_logger;
 
 const int GECO_NET_UDP_OVERHEAD = 28;
 const int GECO_NET_BITS_PER_BYTE = 8;
