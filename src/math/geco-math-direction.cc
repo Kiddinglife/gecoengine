@@ -1,5 +1,25 @@
 #include "geco-math-direction.h"
 
+struct GecoDegree
+{
+	GecoDegree(float fValue)
+	{
+		m_fDegree = fValue;
+	}
+
+	float m_fDegree;
+};
+
+struct GecoRadians
+{
+	GecoRadians(float fValue)
+	{
+		m_fRadians = fValue;
+	}
+
+	float m_fRadians;
+};
+
 //----------------------------------------------------------------------------
 GecoAngle::GecoAngle()
 {
@@ -216,3 +236,96 @@ bool GecoDirection3::IsEqual(const GecoDirection3& kOne, const GecoDirection3& k
 {
 	return (kOne.m_fYaw == kOther.m_fYaw) && (kOne.m_fPitch == kOther.m_fPitch) && (kOne.m_fRoll == kOther.m_fRoll);
 }
+//geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoDirection3& kDes)
+//{
+//	if (kIS.is_compression_mode())
+//	{
+//		kIS.read_ranged_float(kDes.m_fYaw, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+//		kIS.read_ranged_float(kDes.m_fPitch, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+//		kIS.read_ranged_float(kDes.m_fRoll, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+//	}
+//	else
+//	{
+//		kIS.Read(kDes.m_fYaw);
+//		kIS.Read(kDes.m_fPitch);
+//		kIS.Read(kDes.m_fRoll);
+//	}
+//	return kIS;
+//}
+//geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoDirection3& kDes)
+//{
+//	if (kOS.is_compression_mode())
+//	{
+//		kOS.write_ranged_float(kDes.m_fYaw, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+//		kOS.write_ranged_float(kDes.m_fPitch, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+//		kOS.write_ranged_float(kDes.m_fRoll, -GECO_MATH_PI_F, GECO_MATH_PI_F);
+//	}
+//	else
+//	{
+//		kOS.Write(kDes.m_fYaw);
+//		kOS.Write(kDes.m_fPitch);
+//		kOS.Write(kDes.m_fRoll);
+//	}
+//	return kOS;
+//}
+
+uchar AngleToInt8(float angle)
+{
+	return (uchar)floorf((angle * 128.f) / GECO_MATH_PI_F + 0.5f);
+}
+float Int8ToAngle(uchar angle)
+{
+	return float(angle) * (GECO_MATH_PI_F / 128.f);
+}
+uchar HalfAngleToInt8(float angle)
+{
+	return (uchar)floorf((angle * 256.f) / GECO_MATH_PI_F + 0.5f);
+}
+float Int8ToHalfAngle(uchar angle)
+{
+	return float(angle) * (GECO_MATH_PI_F / 256.f);
+}
+
+GecoYawPitch::GecoYawPitch(float yaw, float pitch)
+{
+	this->Set(yaw, pitch);
+}
+GecoYawPitch::GecoYawPitch() {};
+void GecoYawPitch::Set(float yaw, float pitch)
+{
+	m_uiYaw = AngleToInt8(yaw);
+	m_uiPitch = HalfAngleToInt8(pitch);
+}
+void GecoYawPitch::Get(float & yaw, float & pitch) const
+{
+	yaw = Int8ToAngle(m_uiYaw);
+	pitch = Int8ToHalfAngle(m_uiPitch);
+}
+//geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoYawPitch& kDes)
+//{
+//	if (kIS.is_compression_mode())
+//	{
+//		kIS.ReadMini(kDes.m_uiYaw);
+//		kIS.ReadMini(kDes.m_uiPitch);
+//	}
+//	else
+//	{
+//		kIS.Read(kDes.m_uiYaw);
+//		kIS.Read(kDes.m_uiPitch);
+//	}
+//	return kIS;
+//}
+//geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoYawPitch& kDes)
+//{
+//	if (kOS.is_compression_mode())
+//	{
+//		kOS.WriteMini(kDes.m_uiYaw);
+//		kOS.WriteMini(kDes.m_uiPitch);
+//	}
+//	else
+//	{
+//		kOS.Write(kDes.m_uiYaw);
+//		kOS.Write(kDes.m_uiPitch);
+//	}
+//	return kOS;
+//}

@@ -464,4 +464,12 @@ INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
 		(operator==((GecoNetAddress)a, (GecoNetAddress)b) && (a.m_uiSalt < b.m_uiSalt));
 }
 
+/************************************************************************/
+/*
+弧度=角度乘以π后再除以180
+角度=弧度除以π再乘以180
+*/
+/************************************************************************/
+typedef GecoVector3 GecoCoord;
+
 #endif // __GecoNetTypes_H__
