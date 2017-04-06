@@ -27,6 +27,10 @@
 #include <WINSOCK.H>
 #endif
 
+#ifdef PLAYSTATION3
+#include <netex/libnetctl.h>
+#endif
+
 #ifndef __linux__
 
 #ifdef PLAYSTATION3
@@ -67,18 +71,51 @@ enum
 
 class geco_bit_stream_t;
 
+/**
+*	This class provides a wrapper around a socket.
+*
+*	@ingroup network
+*/
 class GECOAPI GecoNetEndpoint
 {
+private:
+	/// This is internal socket representation of the Endpoint.
+#if defined( __linux__ ) || defined( PLAYSTATION3 )
+	int	m_kSocket;
+#else //ifdef __linux__
+	SOCKET	m_kSocket;
+#endif //def _WIN32
+
+	/// this for one-off socket
+	bool m_bUseSyncHijack;
+	bool m_bShouldSendClose;
+	u_int16_t m_uiHijackPort;
+	u_int32_t m_uiHijackAddr;
+	GecoNetEndpoint *m_pkHijackEndpoint;
+	static GecoNetEndpoint *ms_pkHijackEndpointAsync;
+	static GecoNetEndpoint *ms_pkHijackEndpointSync;
+	static geco_bit_stream_t *ms_pkHijackStream;
+	typedef eastl::map< eastl::string, u_int32_t > FrontEndInterfaces;
+	static FrontEndInterfaces ms_kFrontEndInterfaces;
+
 public:
+	/// @name Construction/Destruction
+	//@{
 	GecoNetEndpoint(bool useSyncHijack = true);
 	~GecoNetEndpoint();
+	//@}
 
 	static const int NO_SOCKET = -1;
 
+	/// @name File descriptor access
+	//@{
 	operator int() const;
 	void SetFileDescriptor(int fd);
 	bool Good() const;
+	//@}
 
+	/// @name General Socket Methods
+	//@{
 	void Socket(int type);
 
 	int SetNonblocking(bool nonblocking);
@@ -94,16 +131,17 @@ public:
 	int Close();
 	int Detach();
 
-	int GetLocalAddress(
-		u_int16_t * networkPort, u_int32_t * networkAddr) const;
-	int GetRemoteAddress(
-		u_int16_t * networkPort, u_int32_t * networkAddr) const;
+	int GetLocalAddress(u_int16_t * networkPort, u_int32_t * networkAddr) const;
+	int GetRemoteAddress(u_int16_t * networkPort, u_int32_t * networkAddr) const;
 
 	const char * c_str() const;
 	int GetRemoteHostname(eastl::string * name) const;
 
 	bool GetClosedPort(GecoNetAddress & closedPort);
+	//@}
 
+	/// @name Connectionless Socket Methods
+	//@{
 	int SendTo(void * gramData, int gramSize,
 		u_int16_t networkPort, u_int32_t networkAddr = GECO_NET_BROADCAST);
 	int SendTo(void * gramData, int gramSize, struct sockaddr_in & sin);
@@ -111,16 +149,21 @@ public:
 		u_int16_t * networkPort, u_int32_t * networkAddr);
 	int RecvFrom(void * gramData, int gramSize,
 		struct sockaddr_in & sin);
+	//@}
 
+	/// @name Connecting Socket Methods
+	//@{
 	int Listen(int backlog = 5);
 	int Connect(u_int16_t networkPort, u_int32_t networkAddr = GECO_NET_BROADCAST);
 	GecoNetEndpoint * Accept(
 		u_int16_t * networkPort = NULL, u_int32_t * networkAddr = NULL);
-
 	int Send(const void * gramData, int gramSize);
 	int Recv(void * gramData, int gramSize);
 	bool RecvAll(void * gramData, int gramSize);
+	//@}
 
+	/// @name Network Interface Methods
+	//@{
 	int GetInterfaceFlags(char * name, int & flags);
 	int GetInterfaceAddress(const char * name, u_int32_t & address);
 	int GetInterfaceNetmask(const char * name, u_int32_t & netmask);
@@ -128,14 +171,23 @@ public:
 	int FindDefaultInterface(char * name);
 	int FindIndicatedInterface(const char * spec, char * name);
 	static int ConvertAddress(const char * string, u_int32_t & address);
+	//@}
 
+	/// @name Queue Size Methods
+	//@{
 	int TransmitQueueSize() const;
 	int ReceiveQueueSize() const;
 	int GetQueueSizes(int & tx, int & rx) const;
+	//@}
 
+	/// @name Buffer Size Methods
+	//@{
 	int GetBufferSize(int optname) const;
 	bool SetBufferSize(int optname, int size);
+	//@}
 
+	/// @name HiJack Methods (one-off )
+	//@{
 	enum
 	{
 		HIJACK_MSG_OPEN_TCP = 3,
@@ -156,47 +208,15 @@ public:
 
 	void HijackSendOpen(u_int16_t port, u_int32_t addr);
 	void HijackSendClose();
-	bool HijackRecvAllFrom(void * gramData, int gramSize,
-		u_int16_t * pPort, u_int32_t * pAddr);
+	bool HijackRecvAllFrom(void * gramData, int gramSize,u_int16_t * pPort, u_int32_t * pAddr);
 	int HijackFD() const;
 
 	static bool IsHijacked() { return ms_pkHijackEndpointAsync != NULL; }
-	static void AddFrontEndInterface(const eastl::string & name,
-		u_int32_t addr);
-
-private:
-
-#if defined( __linux__ ) || defined( PLAYSTATION3 )
-	int	m_kSocket;
-#else //ifdef __linux__
-	SOCKET	m_kSocket;
-#endif //def _WIN32
-
-	bool m_bUseSyncHijack;
-
-	bool m_bShouldSendClose;
-
-	u_int16_t m_uiHijackPort;
-	u_int32_t m_uiHijackAddr;
-
-	GecoNetEndpoint *m_pkHijackEndpoint;
-
-	static GecoNetEndpoint *ms_pkHijackEndpointAsync;
-	static GecoNetEndpoint *ms_pkHijackEndpointSync;
-
-	static geco_bit_stream_t *ms_pkHijackStream;
-
-	typedef eastl::map< eastl::string, u_int32_t > FrontEndInterfaces;
-	static FrontEndInterfaces ms_kFrontEndInterfaces;
+	static void AddFrontEndInterface(const eastl::string & name,u_int32_t addr);
+	//@}
 };
 
 extern void InitNetwork();
-
-#ifdef PLAYSTATION3
-#include <netex/libnetctl.h>
-#endif
-
-#include <algorithm>
 
 INLINE GecoNetEndpoint::~GecoNetEndpoint()
 {

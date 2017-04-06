@@ -85,6 +85,16 @@
 #define GecoRadiantToDegreef(R)	((R) * 57.2957795130823208767981548f)
 #define GecoFracf(number)			((number)-(float)((int)(number)))
 
+/**
+*	This function returns the value clamped in between the minimum and
+*	maximum values supplied.
+*
+*	@param minValue	The minimum the result can be.
+*	@param value	The value to clamp.
+*	@param maxValue	The maximum the result can be.
+*
+*	@return The value clamped between the minimum and maximum values.
+*/
 #define GecoClampEx(min,val,max)	((val) < (min) ? (min) : ((val) > (max) ? (max) : (val)))
 #define GecoClamp(mag,val)		(GecoClampEx(-(mag),(val),(mag)))
 

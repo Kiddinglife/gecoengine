@@ -150,11 +150,11 @@ public:
 	static const GecoVector3 UNIT_Z;
 };
 
-GECOAPI bool FvAlmostEqual(const GecoVector3 &kVector0, const GecoVector3 &kVector1, const float fEpsilon = 0.0004f);
+GECOAPI bool GecoAlmostEqual(const GecoVector3 &kVector0, const GecoVector3 &kVector1, const float fEpsilon = 0.0004f);
 GECOAPI bool GecoAlmostEqual(const GecoVector2& kVector0, const GecoVector2& kVector1, const float fEpsilon = 0.0004f);
 
-GECOAPI float FvDistance(const GecoVector3 &kVector0, const GecoVector3 &kVector1);
-GECOAPI float FvDistance2(const GecoVector3 &kVector0, const GecoVector3 &kVector1);//! length*length
+GECOAPI float GecoDistance(const GecoVector3 &kVector0, const GecoVector3 &kVector1);
+GECOAPI float GecoDistance2(const GecoVector3 &kVector0, const GecoVector3 &kVector1);//! length*length
 
 
 INLINE geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoVector2& kDes)

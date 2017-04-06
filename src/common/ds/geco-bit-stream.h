@@ -72,8 +72,107 @@ void FATHER_TYPE::reclaim_instance(FATHER_TYPE* i){ delete i;}
 #define BITS_TO_BYTES(x) (((x)+7)>>3)
 #define BYTES_TO_BITS(x) ((x)<<3)
 
+#ifdef GECO_BIG_ENDIAN
+INLINE short GECO_HTONS(short x)
+{
+	short res =
+		((x & 0x00ff) << 8) |
+		((x & 0xff00) >> 8);
+	return res;
+}
+INLINE long GECO_HTONL(long x)
+{
+	long res =
+		((x & 0x000000ff) << 24) |
+		((x & 0x0000ff00) << 8) |
+		((x & 0x00ff0000) >> 8) |
+		((x & 0xff000000) >> 24);
+	return res;
+}
+INLINE long long GECO_HTONLL(long long x)
+{
+	long long res =
+		((x & 0x00000000000000ffULL) << 56) |
+		((x & 0x000000000000ff00ULL) << 40) |
+		((x & 0x0000000000ff0000ULL) << 24) |
+		((x & 0x00000000ff000000ULL) << 8) |
+		((x & 0x000000ff00000000ULL) >> 8) |
+		((x & 0x0000ff0000000000ULL) >> 24) |
+		((x & 0x00ff000000000000ULL) >> 40) |
+		((x & 0xff00000000000000ULL) >> 56);
+	return res;
+}
+INLINE float GECO_HTONF(float f)
+{
+	FvNetLong n;
+	n.f = f;
+	n.u32 = GECO_HTONL(n.u32);
+	return n.f;
+}
+INLINE void GECO_HTONF_ASSIGN(float &dest, float f)
+{
+	FvNetLong *pDest = (FvNetLong*)&dest;
+	pDest->u32 = *(uint*)&f;
+	pDest->u32 = GECO_HTONL(pDest->u32);
+}
+INLINE void GECO_HTON3_ASSIGN(char *pDest, const char *pData)
+{
+	pDest[0] = pData[2];
+	pDest[1] = pData[1];
+	pDest[2] = pData[0];
+}
+INLINE void GECO_PACK3(char *pDest, uint src)
+{
+	pDest[0] = (char)(src >> 16);
+	pDest[1] = (char)(src >> 8);
+	pDest[2] = (char)src;
+}
+INLINE uint GECO_UNPACK3(const char *pData)
+{
+	const uchar *data = (const uchar*)pData;
+	return (data[0] << 16) | (data[1] << 8) | data[2];
+}
+#else // BIG_ENDIAN
+#define GECO_HTONS( x ) x
+#define GECO_HTONL( x ) x
+#define GECO_HTONLL( x ) x
+#define GECO_HTONF( x ) x
+#define GECO_HTONF_ASSIGN( dest, x ) (dest = x)
+INLINE void GECO_HTON3_ASSIGN(char *pDest, const char *pData)
+{
+	pDest[0] = pData[0];
+	pDest[1] = pData[1];
+	pDest[2] = pData[2];
+}
+INLINE void GECO_PACK3(char *pDest, uint src)
+{
+	pDest[0] = (char)src;
+	pDest[1] = (char)(src >> 8);
+	pDest[2] = (char)(src >> 16);
+}
+INLINE uint GECO_UNPACK3(const char *pData)
+{
+	const uchar *data = (const uchar*)pData;
+	return data[0] | (data[1] << 8) | (data[2] << 16);
+}
+#endif
+
+#define GECO_NTOHS( x ) GECO_HTONS( x )
+#define GECO_NTOHL( x ) GECO_HTONL( x )
+#define GECO_NTOHLL( x ) GECO_HTONLL( x )
+#define GECO_NTOHF( x ) GECO_HTONF( x )
+#define GECO_NTOHF_ASSIGN( dest, x ) GECO_HTONF_ASSIGN( dest, x )
+#define GECO_NTOH3_ASSIGN( pDest, pData ) GECO_HTON3_ASSIGN( pDest, pData )
+
 typedef uint32 bit_size_t;
 typedef uint32 byte_size_t;
+
+union MultiType
+{
+	float asFloat;
+	unsigned int asUint;
+	int asInt;
+};
 
 class uint24_t;
 class geco_bit_stream_t;
@@ -233,6 +332,12 @@ private:
 	bool is_read_only_;
 	uchar statck_buffer_[GECO_STREAM_STACK_ALLOC_BYTES];
 	bool enabble_compression;
+
+	union
+	{
+		unsigned char m_acZData[2];
+		ushort m_acZShort;
+	};
 
 public:
 	GECO_STATIC_FACTORY_DELC(geco_bit_stream_t);
@@ -620,7 +725,12 @@ public:
 	inline void ReadMini(uint24_t &dest) {
 		ReadMini(dest.val);
 	}
-
+	inline void ReadMini(float &dest) {
+		Read(m_acZShort);
+		dest = GetZ();
+		// range checking is done on the input value or rounding of the result. (-131070.0, 131070.0)
+		assert(dest > -131070.0f && dest < 131070.0f);
+	}
 	inline void ReadMini(bool &dest) {
 		Read(dest);
 	}
@@ -1431,6 +1541,66 @@ public:
 	//        {
 	//            WriteMini(src.g);
 	//        }
+
+	/**
+	*	This method sets the packed y value from a float.
+	*/
+	void SetZ(float fZ)
+	{
+		// range checking is done on the input value or rounding of the result. (-131070.0, 131070.0)
+		assert(fZ > -131070.0f && fZ < 131070.0f);
+
+		// Add bias to the value to force the floating point exponent to be in the
+		// range [2, 15], which translates to an IEEE754 exponent in the range
+		// 10000000 to 1000FFFF (which contains a +127 bias).
+		// Thus only the least significant 4 bits of the exponent need to be
+		// stored.
+		const static float addValues[] = { 2.f, -2.f };
+		MultiType z; z.asFloat = fZ;
+		z.asFloat += addValues[z.asInt < 0];
+
+		ushort& zDataInt = *(ushort*)m_acZData;
+
+		// Extract the lower 4 bits of the exponent, and the 11 most significant
+		// bits of the mantissa (15 bits all up).
+		zDataInt = (z.asUint >> 12) & 0x7fff;
+
+		// Transfer the sign bit.
+		zDataInt |= ((z.asUint >> 16) & 0x8000);
+	}
+
+	/**
+	*	This method returns the packed z value as a float.
+	*/
+	float GetZ() const
+	{
+		// Preload output value with 0(sign) 10000000(exponent) 00..(mantissa).
+		MultiType z;
+		z.asUint = 0x40000000;
+
+		ushort& zDataInt = *(ushort*)m_acZData;
+
+		// Copy the 4-bit lower 4 bits of the exponent and the
+		// 11 most significant bits of the mantissa.
+		z.asUint |= (zDataInt & 0x7fff) << 12;
+
+		// Remove value bias.
+		z.asFloat -= 2.f;
+
+		// Copy the sign bit.
+		z.asUint |= (zDataInt & 0x8000) << 16;
+
+		return z.asFloat;
+	}
+	
+	///  var must between (-131070.0, 131070.0)
+	inline void WriteMini(const float &var) {
+		// range checking is done on the input value or rounding of the result. (-131070.0, 131070.0)
+		assert(var > -131070.0f && var < 131070.0f);
+		SetZ(var);
+		Write(m_acZShort);
+	}
+
 	inline void WriteMini(const uint24_t &var) {
 		WriteMini(var.val);
 	}
@@ -1683,7 +1853,7 @@ public:
 		// we leave memory allocation to caller which is more flexable
 		if (size2copy == 0)
 			size2copy = get_bytes_length();
-		memcpy(dest, uchar_data_ + start_offset, sizeof(uchar) * size2copy);
+		memcpy_fast(dest, uchar_data_ + start_offset, sizeof(uchar) * size2copy);
 		return BITS_TO_BYTES(writable_bit_pos_) - start_offset;
 	}
 	/// @brief Makes a copy of the internal data for you @param _data
@@ -1697,7 +1867,7 @@ public:
 		if (allocmem)
 			_data = (uchar*)geco_malloc_ext(BITS_TO_BYTES(writable_bit_pos_),
 				FILE_AND_LINE);
-		memcpy(_data, uchar_data_,
+		memcpy_fast(_data, uchar_data_,
 			sizeof(uchar) * BITS_TO_BYTES(writable_bit_pos_));
 		return writable_bit_pos_;
 	}
@@ -1717,7 +1887,7 @@ public:
 
 	// @pre: writable_bit_pos_ is on the byte boundary
 	void write_one_aligned_byte(const char *inByteArray) {
-		assert((writable_bit_pos_ & 7) == 0);
+		align_writable_bit_pos();
 		AppendBitsCouldRealloc(8);
 		uchar_data_[writable_bit_pos_ >> 3] = inByteArray[0];
 		writable_bit_pos_ += 8;
@@ -1725,14 +1895,14 @@ public:
 
 	// @pre: readable_bit_pos_ is on the byte boundary
 	void read_one_aligned_byte(char *inOutByteArray) {
-		assert((readable_bit_pos_ & 7) == 0);
+		align_readable_bit_pos();
 		assert(get_payloads() >= 8);
 		inOutByteArray[0] = uchar_data_[(readable_bit_pos_ >> 3)];
 		readable_bit_pos_ += 8;
 	}
 
 	void write_two_aligned_bytes(const char *inByteArray) {
-		assert((writable_bit_pos_ & 7) == 0);
+		align_writable_bit_pos();
 		AppendBitsCouldRealloc(16);
 #ifndef DO_NOT_SWAP_ENDIAN
 		if (DoEndianSwap()) {
@@ -1749,6 +1919,7 @@ public:
 		writable_bit_pos_ += 16;
 	}
 	void read_two_aligned_bytes(char *inOutByteArray) {
+		align_readable_bit_pos();
 		assert((readable_bit_pos_ & 7) == 0);
 		assert(get_payloads() >= 16);
 		//if (mReadPosBits + 16 > mWritePosBits) return ;
@@ -1768,6 +1939,7 @@ public:
 	}
 
 	void WriteFourAlignedBytes(const char *inByteArray) {
+		align_writable_bit_pos();
 		assert((writable_bit_pos_ & 7) == 0);
 		AppendBitsCouldRealloc(32);
 #ifndef DO_NOT_SWAP_ENDIAN
@@ -1789,6 +1961,7 @@ public:
 		writable_bit_pos_ += 32;
 	}
 	void ReadFourAlignedBytes(char *inOutByteArray) {
+		align_readable_bit_pos();
 		assert((readable_bit_pos_ & 7) == 0);
 		assert(get_payloads() >= 32);
 		//if (mReadPosBits + 4 * 8 > mWritePosBits) return;
@@ -1809,6 +1982,47 @@ public:
 		}
 
 		readable_bit_pos_ += 32;
+	}
+	void WriteThreeAlignedBytes(const char *inByteArray) {
+		align_writable_bit_pos();
+		assert((writable_bit_pos_ & 7) == 0);
+		AppendBitsCouldRealloc(24);
+#ifndef DO_NOT_SWAP_ENDIAN
+		if (DoEndianSwap()) {
+			uchar_data_[(writable_bit_pos_ >> 3) + 0] = inByteArray[3];
+			uchar_data_[(writable_bit_pos_ >> 3) + 1] = inByteArray[2];
+			uchar_data_[(writable_bit_pos_ >> 3) + 2] = inByteArray[1];
+		}
+		else
+#endif
+		{
+			uchar_data_[(writable_bit_pos_ >> 3) + 0] = inByteArray[0];
+			uchar_data_[(writable_bit_pos_ >> 3) + 1] = inByteArray[1];
+			uchar_data_[(writable_bit_pos_ >> 3) + 2] = inByteArray[2];
+		}
+
+		writable_bit_pos_ += 24;
+	}
+	void ReadThreeAlignedBytes(char *inOutByteArray) {
+		align_readable_bit_pos();
+		assert((readable_bit_pos_ & 7) == 0);
+		assert(get_payloads() >= 24);
+		//if (mReadPosBits + 4 * 8 > mWritePosBits) return;
+#ifndef DO_NOT_SWAP_ENDIAN
+		if (DoEndianSwap()) {
+			inOutByteArray[0] = uchar_data_[(readable_bit_pos_ >> 3) + 3];
+			inOutByteArray[1] = uchar_data_[(readable_bit_pos_ >> 3) + 2];
+			inOutByteArray[2] = uchar_data_[(readable_bit_pos_ >> 3) + 1];
+		}
+		else
+#endif
+		{
+			inOutByteArray[0] = uchar_data_[(readable_bit_pos_ >> 3) + 0];
+			inOutByteArray[1] = uchar_data_[(readable_bit_pos_ >> 3) + 1];
+			inOutByteArray[2] = uchar_data_[(readable_bit_pos_ >> 3) + 2];
+		}
+
+		readable_bit_pos_ += 24;
 	}
 	void WriteBitOnes(uint num) {
 		assert(num > 0);
@@ -2047,7 +2261,7 @@ template <class T>
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::vector<T> & data)
 {
 	b.WriteMini(data.size());
-    for (auto& ele : data)
+	for (auto& ele : data)
 		b << ele;
 	return b;
 }
@@ -2070,7 +2284,7 @@ INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& b, std::vector<T> & da
 template <class T>
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::list<T> & data)
 {
-    b.WriteMini(data.size());
+	b.WriteMini(data.size());
 	for (auto& ele : data)
 		b << ele;
 	return b;
@@ -2094,7 +2308,7 @@ template <class T, class A>
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::map<T, A> & data)
 {
 	b.WriteMini(data.size());
-    for (auto& ele : data)
+	for (auto& ele : data)
 	{
 		b << ele.first;
 		b << ele.second;

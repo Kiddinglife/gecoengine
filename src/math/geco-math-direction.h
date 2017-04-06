@@ -7,6 +7,46 @@
 struct GecoDegree;
 struct GecoRadians;
 
+/**
+*	This method is used to compress an angle in the range [-pi, pi) to an int8.
+*
+*	@see int8ToAngle
+*/
+INLINE uchar AngleToInt8(float angle)
+{
+	return (uchar)floorf((angle * 128.f) / GECO_MATH_PI_F + 0.5f);
+}
+/**
+*	This method is used to convert an compressed angle to an angle in the range
+*	[-pi, pi).
+*
+*	@see angleToInt8
+*/
+INLINE float Int8ToAngle(uchar angle)
+{
+	return float(angle) * (GECO_MATH_PI_F / 128.f);
+}
+/**
+*	This method is used to convert an angle in the range [-pi/2, pi/2) to an
+*	int8.
+*
+*	@see int8ToHalfAngle
+*/
+INLINE uchar HalfAngleToInt8(float angle)
+{
+	return (uchar)GecoClampEx(-128.f, floorf((angle * 254.f) / GECO_MATH_PI_F + 0.5f), 127.f);
+}
+/**
+*	This method is used to convert an compressed angle to an angle in the range
+*	[-pi/2, pi/2).
+*
+*	@see halfAngleToInt8
+*/
+INLINE float Int8ToHalfAngle(uchar angle)
+{
+	return float(angle) * (GECO_MATH_PI_F / 254.f);
+}
+
 class GECOAPI GecoAngle
 {
 public:
@@ -71,8 +111,6 @@ public:
 	float m_fPitch;
 	float m_fRoll;
 };
-//GECOAPI geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoDirection3& kDes);
-//GECOAPI geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoDirection3& kDes);
 INLINE geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoDirection3& kDes)
 {
 	if (kIS.is_compression_mode())
@@ -102,47 +140,6 @@ INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoDirecti
 		kOS.Write(kDes.m_fYaw);
 		kOS.Write(kDes.m_fPitch);
 		kOS.Write(kDes.m_fRoll);
-	}
-	return kOS;
-}
-
-class GECOAPI GecoYawPitch
-{
-public:
-	GecoYawPitch(float yaw, float pitch);
-	GecoYawPitch();
-
-	void Set(float yaw, float pitch);
-	void Get(float & yaw, float & pitch) const;
-
-	uchar	m_uiYaw;
-	uchar	m_uiPitch;
-};
-INLINE geco_bit_stream_t & operator >> (geco_bit_stream_t& kIS, GecoYawPitch& kDes)
-{
-	if (kIS.is_compression_mode())
-	{
-		kIS.ReadMini(kDes.m_uiYaw);
-		kIS.ReadMini(kDes.m_uiPitch);
-	}
-	else
-	{
-		kIS.Read(kDes.m_uiYaw);
-		kIS.Read(kDes.m_uiPitch);
-	}
-	return kIS;
-}
-INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoYawPitch& kDes)
-{
-	if (kOS.is_compression_mode())
-	{
-		kOS.WriteMini(kDes.m_uiYaw);
-		kOS.WriteMini(kDes.m_uiPitch);
-	}
-	else
-	{
-		kOS.Write(kDes.m_uiYaw);
-		kOS.Write(kDes.m_uiPitch);
 	}
 	return kOS;
 }

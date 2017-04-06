@@ -241,7 +241,8 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 				{
 					strcpy(name, pIfInfoCur->if_name);
 					ret = 0;
-
+					// we only stop if it's not a loopback address,
+					// otherwise we continue, hoping to find a better one
 					if (!(flags & IFF_LOOPBACK)) break;
 				}
 			}

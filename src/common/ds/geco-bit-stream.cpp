@@ -470,7 +470,7 @@ geco_bit_stream_t::geco_bit_stream_t(uchar* src, const byte_size_t len,
 				can_free_ = true;
 				memset(uchar_data_, 0, len);
 			}
-			memcpy(uchar_data_, src, len);
+			memcpy_fast(uchar_data_, src, len);
 		}
 		else {
 			uchar_data_ = 0;
@@ -588,7 +588,7 @@ void geco_bit_stream_t::AppendBitsCouldRealloc(const bit_size_t bits2Append) {
 				//　uchar_data_ = (uchar *) gMallocEx(bytes2Alloc, TRACKE_MALLOC);
 				uchar_data_ = (uchar *)malloc(bytes2Alloc);
 				if (writable_bit_pos_ > 0)
-					memcpy(uchar_data_, statck_buffer_,
+					memcpy_fast(uchar_data_, statck_buffer_,
 						BITS_TO_BYTES(allocated_bits_size_));
 				can_free_ = true;
 			}
@@ -634,14 +634,14 @@ void geco_bit_stream_t::ReadBits(uchar *dest, bit_size_t bits2Read,
 	byte_size_t readPosByte = readable_bit_pos_ >> 3;
 
 	if (startReadPosBits == 0 && (bits2Read & 7) == 0) {
-		memcpy(dest, uchar_data_ + (readable_bit_pos_ >> 3), bits2Read >> 3);
+		memcpy_fast(dest, uchar_data_ + (readable_bit_pos_ >> 3), bits2Read >> 3);
 		readable_bit_pos_ += bits2Read;
 		return;
 	}
 
-	/// if @mReadPosBits is aligned  do memcpy for efficiency
+	/// if @mReadPosBits is aligned  do memcpy_fast for efficiency
 	if (startReadPosBits == 0) {
-		memcpy(dest, &uchar_data_[readPosByte], BITS_TO_BYTES(bits2Read));
+		memcpy_fast(dest, &uchar_data_[readPosByte], BITS_TO_BYTES(bits2Read));
 		readable_bit_pos_ += bits2Read;
 
 		/// if @bitsSize is not multiple times of 8,
@@ -713,7 +713,7 @@ void geco_bit_stream_t::ReadAlignedBytes(uchar *dest,
 	// Byte align
 	align_readable_bit_pos();
 	// read the data
-	memcpy(dest, uchar_data_ + (readable_bit_pos_ >> 3), bytes2Read);
+	memcpy_fast(dest, uchar_data_ + (readable_bit_pos_ >> 3), bytes2Read);
 	readable_bit_pos_ += (bytes2Read << 3);
 }
 
@@ -772,9 +772,9 @@ void geco_bit_stream_t::WriteBits(const uchar* src, bit_size_t bits2Write,
 	/// @startWritePosBits could be zero
 	const bit_size_t startWritePosBits = writable_bit_pos_ & 7;
 
-	// If currently aligned and numberOfBits is a multiple of 8, just memcpy for speed
+	// If currently aligned and numberOfBits is a multiple of 8, just memcpy_fast for speed
 	if (startWritePosBits == 0 && (bits2Write & 7) == 0) {
-		memcpy(uchar_data_ + (writable_bit_pos_ >> 3), src, bits2Write >> 3);
+		memcpy_fast(uchar_data_ + (writable_bit_pos_ >> 3), src, bits2Write >> 3);
 		writable_bit_pos_ += bits2Write;
 		return;
 	}
