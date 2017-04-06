@@ -3,7 +3,7 @@
 #define __GecoNetTypes_H__
 
 #include "common/geco-plateform.h"
-#include "math\ema.h"
+#include "math/ema.h"
 #include "math/geco-math-vector.h"
 #include "math/geco-math-direction.h"
 #include "common/ds/geco-bit-stream.h"
@@ -342,7 +342,7 @@ struct GECOAPI InterfaceListenerMsg
 	InterfaceListenerMsg(uint uiIP_, ushort uiPort_, ushort uiUserID_, const eastl::string& kName_)
 		:uiIP(uiIP_), uiPort(uiPort_), uiUserID(uiUserID_)
 	{
-		strncpy_s(kName, sizeof(kName), kName_.c_str(), sizeof(kName));
+		strncpy(kName, kName_.c_str(), sizeof(kName));
 	}
 	InterfaceListenerMsg()
 		:uiIP(0), uiPort(0), uiUserID(1)
@@ -389,8 +389,8 @@ INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const InterfaceLi
 
 /************************************************************************/
 /*
-»¡¶È=½Ç¶È³ËÒÔ¦ÐºóÔÙ³ýÒÔ180
-½Ç¶È=»¡¶È³ýÒÔ¦ÐÔÙ³ËÒÔ180
+ï¿½ï¿½ï¿½ï¿½=ï¿½Ç¶È³ï¿½ï¿½Ô¦Ðºï¿½ï¿½Ù³ï¿½ï¿½ï¿½180
+ï¿½Ç¶ï¿½=ï¿½ï¿½ï¿½È³ï¿½ï¿½Ô¦ï¿½ï¿½Ù³ï¿½ï¿½ï¿½180
 */
 /************************************************************************/
 typedef GecoVector3 GecoCoord;

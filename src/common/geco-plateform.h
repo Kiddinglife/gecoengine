@@ -47,6 +47,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include <pwd.h>
 #define geco_sleep sleep
 #else
 #define WIN32_LEAN_AND_MEAN
@@ -60,10 +61,9 @@ typedef struct passwd
 	char    *pw_gecos;
 	char    *pw_dir;
 	char    *pw_shell;
-} *LP_FV_PASSWD;
+};
 #define geco_sleep Sleep
 #endif
-
 
 #if !defined( PLAYSTATION3 )
 #include <malloc.h>
@@ -302,8 +302,8 @@ const char*
 #endif
 GECO_FAST_CALL getUsername();
 GECOAPI int GECO_FAST_CALL geco_get_pid();
-GECOAPI LP_FV_PASSWD GECO_FAST_CALL  geco_get_pw_user_id(int iUID);
-GECOAPI LP_FV_PASSWD  GECO_FAST_CALL geco_get_pw_nam(const char *pcName);
+GECOAPI passwd* GECO_FAST_CALL  geco_get_pw_user_id(int iUID);
+GECOAPI passwd*  GECO_FAST_CALL geco_get_pw_nam(const char *pcName);
 /*
 *	This function is used to strip the path and
 * return just the basename from a path string.
@@ -343,7 +343,7 @@ GECOAPI void* GECO_FAST_CALL memcpy_fast(void *destination, const void *source, 
 #define GECO_SAFE_FREE_ARRAY(p) if(p) {free(p); (p) = NULL;}
 #define geco_zero_mem(dst,len) (memset((dst),0,(len)))
 #define geco_zero_mem_ex(dst,size,count) (geco_zero_mem((dst),(size)*(count)))
-#define geco_mem_cpy(dst,src,len) (memcpy_s((dst),(len),(src),(len)))
+#define geco_mem_cpy(dst,src,len) (memcpy((dst),(src),(len)))
 #define geco_mem_cpy_ex(dst,src,size,count) (geco_mem_cpy((dst),(src),(size)*(count)))
 
 #ifndef GECO_DECLARE_COPY_CTOR

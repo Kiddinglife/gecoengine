@@ -1,5 +1,5 @@
 //{future source message}
-#include "Geco-math-power.h"
+#include "geco-math-power.h"
 
 #include <cstdlib>
 #include <cstring>

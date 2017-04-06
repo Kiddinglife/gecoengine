@@ -2,7 +2,7 @@
 #ifndef __GecoMathPower_H__
 #define __GecoMathPower_H__
 
-#include "../common/Geco-plateform.h"
+#include "common/geco-plateform.h"
 #include "common/ds/geco-bit-stream.h"
 
 #define GECO_FLOAT_POINT(p) ((float*)p)

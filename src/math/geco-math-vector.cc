@@ -1,5 +1,5 @@
 //{future source message}
-#include "Geco-math-vector.h"
+#include "geco-math-vector.h"
 
 const GecoVector2 GecoVector2::ZERO = GecoVector2(0, 0);
 const GecoVector2 GecoVector2::UNIT_X = GecoVector2(1, 0);

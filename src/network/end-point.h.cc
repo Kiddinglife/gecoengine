@@ -1,5 +1,5 @@
 
-// must include <winsock2.h> before <windows.h>
+// must include <winsock2.h> before <windows.h> that has been included in "end-point.h"
 #ifdef _WIN32
 #include <winsock2.h>
 #include <iphlpapi.h>
@@ -13,7 +13,7 @@ GecoNetEndpoint * GecoNetEndpoint::ms_pkHijackEndpointAsync = NULL;
 geco_bit_stream_t * GecoNetEndpoint::ms_pkHijackStream = NULL;
 GecoNetEndpoint::FrontEndInterfaces GecoNetEndpoint::ms_kFrontEndInterfaces;
 
-#ifdef ____linux____
+#ifdef __linux__
 extern "C" {
 	/// 32 bit unsigned integer.
 #define __u32 uint
@@ -36,11 +36,8 @@ void GetAdaptersAddresses();
 #else
 struct if_nameindex
 {
-
 	unsigned int if_index;
-
 	char *if_name;
-
 };
 
 struct if_nameindex *if_nameindex(void)
@@ -73,7 +70,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 	bool isResultSet = false;
 
 #ifdef __linux__
-	//	GECO_ASSERT( errno == ECONNREFUSED );
+	//assert( errno == ECONNREFUSED );
 
 	struct sockaddr_in	offender;
 	offender.sin_family = 0;
@@ -124,13 +121,11 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 		{
 			offender = *(sockaddr_in*)SO_EE_OFFENDER(extError);
 			offender.sin_port = 0;
-
-			printf("GecoNetNub::ProcessPendingEvents: "
-				"Kernel has a bug: recv_msg did not set msg_name.\n");
+			g_network_logger->error<const char*>("ProcessPendingEvents:Kernel has a bug:recv_msg did not set msg_name.\n");
 		}
 
-		closedPort.ip = offender.sin_addr.s_addr;
-		closedPort.port = offender.sin_port;
+		closedPort.m_uiIP = offender.sin_addr.s_addr;
+		closedPort.m_uiPort = offender.sin_port;
 
 		isResultSet = true;
 	}
@@ -256,8 +251,8 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 	}
 	else
 	{
-		printf("GecoNetEndpoint::FindDefaultInterface: "
-			"if_nameindex returned NULL (%s)\n",
+		g_network_logger->error("GecoNetEndpoint::FindDefaultInterface: "
+			"if_nameindex returned NULL ({})\n",
 			strerror(errno));
 	}
 
@@ -330,6 +325,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 				++iter;
 			}
 		}
+#ifdef _WIN32
 		else
 		{
 			if (!s_kAdapterInfoList.empty())
@@ -340,7 +336,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 				}
 			}
 		}
-
+#endif
 		eastl::vector< eastl::string >::iterator iter = interfaceNames.begin();
 
 		while (iter != interfaceNames.end())
@@ -462,7 +458,7 @@ int GecoNetEndpoint::GetQueueSizes(int & tx, int & rx) const
 	this->GetLocalAddress(&nport, NULL);
 
 	char		match[16];
-	GecoSNPrintf(match, sizeof(match), "%04X", (int)ntohs(nport));
+	geco_snprintf(match, sizeof(match), "%04X", (int)ntohs(nport));
 
 	FILE * f = fopen("/proc/net/udp", "r");
 
@@ -510,7 +506,7 @@ int GecoNetEndpoint::GetQueueSizes(int &, int &) const
 int GecoNetEndpoint::GetBufferSize(int optname) const
 {
 #ifdef __linux__
-	GECO_ASSERT(optname == SO_SNDBUF || optname == SO_RCVBUF);
+	assert(optname == SO_SNDBUF || optname == SO_RCVBUF);
 
 	int recvbuf = -1;
 	socklen_t rbargsize = sizeof(int);
@@ -562,7 +558,7 @@ bool GecoNetEndpoint::RecvAll(void * gramData, int gramSize)
 		{
 			if (len == 0)
 			{
-				g_network_logger->warn("GecoNetEndpoint::RecvAll: Connection lost\n");
+				g_network_logger->warn<const char*>("GecoNetEndpoint::RecvAll: Connection lost\n");
 			}
 			else
 			{
@@ -754,7 +750,7 @@ void GetAdaptersAddresses()
 			WCharToSTLStr(pkCurrAddresses->FriendlyName, kFriendlyName);
 			sockaddr_in* pAddr = (sockaddr_in*)pkCurrAddresses->FirstUnicastAddress->Address.lpSockaddr;
 
-			//! ÅÐ¶ÏÊÇ·ñÊÇ127.0.0.1
+			//! ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½127.0.0.1
 			if (pAddr->sin_addr.s_addr == GECO_NET_LOCALHOST)
 				kFriendlyName = GECO_NET_LOCALHOSTNAME;
 
@@ -764,7 +760,7 @@ void GetAdaptersAddresses()
 		pkCurrAddresses = pkCurrAddresses->Next;
 	}
 
-	//! ½»»»Î»ÖÃ,µÚÒ»¸ö·Å·ÇlocalhostµØÖ·
+	//! ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½,ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Å·ï¿½localhostï¿½ï¿½Ö·
 	if (s_kAdapterInfoList.size() > 1)
 	{
 		if (s_kAdapterInfoList[0].kName == GECO_NET_LOCALHOSTNAME)

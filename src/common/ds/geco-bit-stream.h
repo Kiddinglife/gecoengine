@@ -2047,8 +2047,8 @@ template <class T>
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::vector<T> & data)
 {
 	b.WriteMini(data.size());
-	for (uint i = 0; i < max; i++)
-		b << data[i];
+    for (auto& ele : data)
+		b << ele;
 	return b;
 }
 template <class T>
@@ -2070,9 +2070,9 @@ INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& b, std::vector<T> & da
 template <class T>
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::list<T> & data)
 {
-	b.WriteMini(data.size());
-	for (uint i = 0; i < max; i++)
-		b << data[i];
+    b.WriteMini(data.size());
+	for (auto& ele : data)
+		b << ele;
 	return b;
 }
 template <class T>
@@ -2094,13 +2094,10 @@ template <class T, class A>
 INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& b, const std::map<T, A> & data)
 {
 	b.WriteMini(data.size());
-	std::map<T, A>::const_iterator itrB = data.begin();
-	std::map<T, A>::const_iterator itrE = data.end();
-	while (itrB != itrE)
+    for (auto& ele : data)
 	{
-		b << itrB->first;
-		b << itrB->second;
-		++itrB;
+		b << ele.first;
+		b << ele.second;
 	}
 	return b;
 }
