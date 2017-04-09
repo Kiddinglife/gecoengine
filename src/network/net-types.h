@@ -34,15 +34,43 @@
 
 #include "common/debugging/spdlog/spdlog.h"
 extern std::shared_ptr<spdlog::logger> g_network_logger;
+extern bool g_enable_stats;
 
 class GecoWatcher;
 class GecoNetBundle;
 class GecoNetPacket;
-class GecoNetInterfaceElement;
+class GecoNetworkInterface;
 
 const uchar REPLY_MESSAGE_IDENTIFIER = 0xFF;
+
+/**
+*	@internal
+*	This is the default request timeout in microseconds.
+*/
+const int DEFAULT_REQUEST_TIMEOUT = 5000000; // 5 SECS
+
+/**
+* 	@internal
+* 	This constant indicates a fixed length message.
+* 	It is used as the lengthStyle in an InterfaceElement.
+* 	For this type of message, lengthParam is the number
+* 	of bytes in the message. This is constant for all
+* 	messages of this type.
+*/
 const char FIXED_LENGTH_MESSAGE = 0;
+/**
+* 	@internal
+* 	This constant indicates a variable length message.
+* 	It is used as the lengthStyle in an InterfaceElement.
+* 	For this type of message, lengthParam is the number
+* 	of bytes used to store the message size. This is
+* 	constant for all messages of this type.
+*/
 const char VARIABLE_LENGTH_MESSAGE = 1;
+/**
+* 	@internal
+* 	This constant indicates the InterfaceElement has not been initialised.
+*/
 const char INVALID_MESSAGE = 2;
 const int PACKET_MAX_SIZE = 1472; // 1500 - iphdr 20 - updhdr 8 = 1472
 
@@ -542,10 +570,83 @@ INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const InterfaceLi
 */
 typedef GecoVector3 GecoCoord;
 
-struct GECOAPI GecoNetInputMessageHandler
+struct GecoNetInterfaceElement;
+/**
+*	This class declares an interface for receiving reply messages.
+*	When a client issues a request, an interface of this type should
+*	be provided to handle the reply.
+*
+*	@see Bundle::startRequest
+*	@see Bundle::startReply
+*
+*	@ingroup mercury
+*/
+struct GecoNetInputMessageHandler
 {
+
 	virtual ~GecoNetInputMessageHandler() {};
-	virtual void HandleMessage(const GecoNetAddress & source, geco_bit_stream_t & data) = 0;
+
+	/**
+	* 	This method is called to hndle a request,reply or normal message.
+	*
+	* 	@param from	The address at which the message originated.
+	* 	@param ier	 This contains the message type, size, and flags.
+	* 	@param msgbody		The actual message data.
+	* 	@param arg		This is user-defined data that was passed in with the request that generated this reply.
+	*/
+	virtual int HandleMessage(const GecoNetAddress & from, GecoNetInterfaceElement& ie, geco_bit_stream_t & msgbody, void* data = NULL) = 0;
+
+	/**
+	* 	This method is called by Mercury when the request fails. The
+	* 	normal reason for this happening is a timeout.
+	*
+	* 	@param exception	The reason for failure.
+	* 	@param arg			The user-defined data associated with the request.
+	*/
+	virtual void handleException(const char* exception, void * arg = NULL)
+	{
+		g_network_logger->warn("ReplyMessageHandler::handleException: Not handled. Possible memory leak.");
+	}
+	virtual void handleShuttingDown(const char* exception, void * arg = NULL)
+	{
+		g_network_logger->warn("ReplyMessageHandler::handleShuttingDown: Not handled. Possible memory leak.");
+	}
+};
+
+/**
+*	Abstract class for a message filter.
+*
+*	A message filter has first-pass handling of messages before their
+*	destination message handlers. They are associated with channels.
+*
+*	They may or may not decide to pass, alter the message to the handler. One
+*	example of use is to implement rate-limiting of message dispatches, where
+*	message handling can be deferred.
+*
+*	Message filters are reference-counted.
+*/
+struct GecoMessageFilter
+{
+	/** Constructor. */
+	GecoMessageFilter()
+	{}
+
+	/** Destructor. */
+	virtual ~GecoMessageFilter() {}
+
+	/**
+	*	Override this method to implement the message filter.
+	*
+	*	@param srcAddr 		The source address of the message.
+	*	@param header 		The message header.
+	*	@param data 		The message data stream.
+	*	@param pHandler 	The destination message handler.
+	*  @return true filtered otherwise flase
+	*/
+	virtual bool filterMessage(const GecoNetAddress & from, GecoNetInterfaceElement& ie, geco_bit_stream_t & msgbody)
+	{
+		return false;
+	}
 };
 
 struct GecoNetPacket
@@ -582,24 +683,44 @@ struct GecoNetPacket
 	const GecoNetPacket* Next() const { return m_spNext; }
 };
 
-class GECOAPI GecoNetInterfaceElement
+/**
+* 	@internal
+*	This structure describes a single message within an
+*	interface. It describes how to encode and decode the
+*	header of the message, including whether the message
+*	is fixed length or variable.  For fixed length messages, it
+*	defines the length of the message. For variable length
+*	messages, it defines the number of bytes needed to
+*	express the length.
+*/
+struct GECOAPI GecoNetInterfaceElement
 {
-public:
+	/**
+	* 	@internal
+	*	This structure contains the standard interface definition for a reply
+	*	message. It is used internally by Mercury.
+	*/
 	static const GecoNetInterfaceElement REPLY;
 
-protected:
-	GecoNetMessageID m_uiID;
-	uchar m_uiLengthStyle;
-	int	m_iLengthParam;
-	const char *m_pcName;
-	GecoNetInputMessageHandler *m_pkHandler;
+	/*below are all variables that are assigned values read from config file*/
+	GecoNetMessageID m_uiID; ///< Unique message ID
+	uchar m_uiLengthStyle; ///< Fixed or variable length
+	int	m_iLengthParam; 	///< This depends on lengthStyle
+	const char *m_pcName; ///< The name of the interface method
+	bool m_ubVoidMsg; ///> when not void, m_ubReliable IS USUALLY true but can be false
 
-protected:
+	uchar m_uiFlag; ///> Indicates this is req or res message. Write bit 0 for req or 1 for res after msgid field to ostream
+	ushort m_usStreamID;
+	ushort m_usStreamIdentity;
+	bool m_ubReliable;
+	bool m_ubOrderable;
+
+	GecoNetInputMessageHandler *m_pkHandler; ///< decode args carried in the msg body and call real function
+
 	int SpecialExpandLength(void * header, GecoNetPacket * pPacket) const;
 	int SpecialCompressLength(void * header, int length,
 		GecoNetBundle & bundle) const;
 
-public:
 	GecoNetInterfaceElement(const char * name = "", GecoNetMessageID id = 0,
 		uchar lengthStyle = INVALID_MESSAGE, int lengthParam = 0,
 		GecoNetInputMessageHandler * pHandler = NULL) :
@@ -618,15 +739,44 @@ public:
 		m_iLengthParam = lengthParam;
 		m_pcName = name;
 	}
-
+	/**
+	* 	This method returns the number of bytes occupied by a header
+	* 	for this type of message.
+	*
+	* 	@return Number of bytes needed for this header.
+	*/
 	int HeaderSize() const;
+	/**
+	* 	This method returns the number of bytes nominally occupied by the body
+	* 	of this type of message. never guesses for variable-length messages
+	*
+	* 	@return Number of bytes lengthParam_ if fixed msg otherwise 0.
+	*/
 	int NominalBodySize() const;
+	/**
+	* 	This method compresses a length into the given header.
+	*
+	*	@param[in] data		Pointer to the header
+	*	@param[in] length	Length to compress
+	*
+	*	@return 0 if successful.
+	*/
 	int CompressLength(void * header, int length, GecoNetBundle & bundle) const;
 	int ExpandLength(void * header, GecoNetPacket * pPacket) const;
+	/**
+	* This method returns bool that indicates if  m_iLengthParam field has enough bytes to
+	* represent the length of msg body.
+	*
+	* @param[in] length: the length of message body in bytes
+	*/
 	bool CanHandleLength(int length) const
 	{
-		return (m_uiLengthStyle != VARIABLE_LENGTH_MESSAGE) ||
+		return (
+			/*true if it is fix length msg */
+			m_uiLengthStyle != VARIABLE_LENGTH_MESSAGE) ||
+			/*true if  it is variable length msg and its m_iLengthParam is big enough(greater than sizeof(int32))*/
 			(m_iLengthParam >= int(sizeof(int32))) ||
+			/*true if it is variable length msg and its m_iLengthParam is big enough(greater than @param[in] length)*/
 			(length < (1 << (8 * m_iLengthParam)) - 1);
 	}
 
@@ -647,69 +797,117 @@ public:
 	GecoNetInputMessageHandler *GetHandler() const { return m_pkHandler; }
 	void SetHandler(GecoNetInputMessageHandler * pHandler) { m_pkHandler = pHandler; }
 };
+INLINE int GecoNetInterfaceElement::CompressLength(void * header, int length, GecoNetBundle & bundle) const
+{
+	switch (m_uiLengthStyle)
+	{
+	case FIXED_LENGTH_MESSAGE:
+		if (length != m_iLengthParam)
+		{
+			g_network_logger->critical("GecoNetInterfaceElement::CompressLength( {} ):"
+				"Fixed length message has wrong length ({} instead of {})",
+				this->c_str(), length, m_iLengthParam);
+		}
+		break;
+	case VARIABLE_LENGTH_MESSAGE:
+		// Beware of overflow in length, not sure if this actually happens in
+		// practice, but it definitely happens on the expandLength() side of
+		// things so it's probably worth having this check here
+		if (length < 0)
+		{
+			g_network_logger->critical("GecoNetInterfaceElement::CompressLength({}): "
+				"Possible overflow in length ({} bytes) for "
+				"variable length message",
+				this->c_str(), length);
+		}
+		char *pLen = ((char*)header) + 1; // advance to the start position of msg body
+		int len = length;
+		bool oversize = false; // false means len is lee than max value that m_iLengthParam can represent
+		switch (m_iLengthParam)
+		{
+		case 1:
+			*(uchar*)pLen = (uchar)len;
+			if (len >= UINT8_MAX) oversize = true;
+			break;
+		case 2:
+			*(ushort*)pLen = GECO_HTONS(len);
+			if (len >= UINT16_MAX) oversize = true;
+			break;
+		case 3:
+			GECO_PACK3(pLen, len);
+			if (len >= 0xffffff) oversize = true;
+			break;
+		case 4:
+			*(uint*)pLen = GECO_HTONL((uint32)len);
+			break;
+		default:
+			g_network_logger->critical("InterfaceElement::compressLength( {} ): "
+				"Unsupported variable length width: {}",
+				this->c_str(), m_iLengthParam);
+		}
+		// If the message length could not fit into a standard length field, we
+		// need to handle this as a special case.
+		if (oversize)
+		{
+			//return this->SpecialCompressLength(data, length, bundle);
+		}
+		break;
+	}
+}
 
+#include "networkstats.h"
+
+const float INTERFACE_ELEMENT_STAT_AVERAGE_BIAS = -2.f / (5 + 1);
 class GECOAPI GecoNetInterfaceElementWithStats : public GecoNetInterfaceElement
 {
-private:
-	unsigned int m_uiMaxBytesReceived;
-	unsigned int m_uiNumBytesReceived;
-	unsigned int m_uiNumMessagesReceived;
-	cumulative_ema_t< unsigned int > m_kAvgBytesReceivedPerSecond;
-	cumulative_ema_t< unsigned int > m_kAvgMessagesReceivedPerSecond;
-	static const float AVERAGE_BIAS;
-
-private:
-	int IDAsInt() const { return this->GetID(); }
-
-public:
-	static GecoWatcher* GetWatcher();
+	/// The maximum bytes received for a single message for this interface element.
+	uint64 		maxBytesReceived_;
+	/// The number of bytes received over all messages for this interface element.
+	uint64		numBytesReceived_;
+	/// The number of messages received for this interface element.
+	uint64		numMessagesReceived_;
+	/// The per-second exponentially weighted moving average for bytes receivedfor this interface element./
+	cumulative_ema_t< uint > avgBytesReceivedPerSecond_;
+	/// The per-second exponentially weighted moving average for messages received for this interface element.
+	cumulative_ema_t< uint > avgMessagesReceivedPerSecond_;
+	ProfileVal profile_;
 
 public:
 	GecoNetInterfaceElementWithStats() :
-		m_uiMaxBytesReceived(0),
-		m_uiNumBytesReceived(0),
-		m_uiNumMessagesReceived(0),
-		m_kAvgBytesReceivedPerSecond(AVERAGE_BIAS),
-		m_kAvgMessagesReceivedPerSecond(AVERAGE_BIAS)
+		maxBytesReceived_(0),
+		numBytesReceived_(0),
+		numMessagesReceived_(0),
+		avgBytesReceivedPerSecond_(INTERFACE_ELEMENT_STAT_AVERAGE_BIAS),
+		avgMessagesReceivedPerSecond_(INTERFACE_ELEMENT_STAT_AVERAGE_BIAS)
 	{
 	}
-
-	void MessageReceived(unsigned int msgLen)
+	//  called every second.
+	void tick()
 	{
-		++m_uiNumMessagesReceived;
-		++m_kAvgMessagesReceivedPerSecond.value();
-		m_uiNumBytesReceived += msgLen;
-		m_kAvgBytesReceivedPerSecond.value() += msgLen;
-		m_uiMaxBytesReceived = std::max(msgLen, m_uiMaxBytesReceived);
+		avgBytesReceivedPerSecond_.sample();
+		avgMessagesReceivedPerSecond_.sample();
+	}
+	uint64 MaxBytesReceived() const { return maxBytesReceived_; }
+	uint64 NumBytesReceived() const { return numBytesReceived_; }
+	uint64 NumMessagesReceived() const { return numMessagesReceived_; }
+	float AvgBytesReceivedPerSecond() const { return avgBytesReceivedPerSecond_.average(); }
+	float AvgMessagesReceivedPerSecond() const { return avgMessagesReceivedPerSecond_.average(); }
+	float AvgMessageLength() const { return numMessagesReceived_ ? float(numBytesReceived_) / float(numMessagesReceived_) : 0.0f; }
+	void startProfile()
+	{
+		profile_.start();
 	}
 
-	void Tick()
+	void stopProfile(uint32 msgLen)
 	{
-		m_kAvgBytesReceivedPerSecond.sample();
-		m_kAvgMessagesReceivedPerSecond.sample();
-	}
+		profile_.stop(msgLen);
 
-	unsigned int MaxBytesReceived() const { return m_uiMaxBytesReceived; }
+		++avgMessagesReceivedPerSecond_.value();
+		avgBytesReceivedPerSecond_.value() += msgLen;
 
-	unsigned int NumBytesReceived() const { return m_uiNumBytesReceived; }
-
-	unsigned int NumMessagesReceived() const { return m_uiNumMessagesReceived; }
-
-	float AvgMessagesReceivedPerSecond() const
-	{
-		return m_kAvgMessagesReceivedPerSecond.average();
-	}
-
-	float AvgBytesReceivedPerSecond() const
-	{
-		return m_kAvgBytesReceivedPerSecond.average();
-	}
-
-	float AvgMessageLength() const
-	{
-		return m_uiNumMessagesReceived ?
-			float(m_uiNumBytesReceived) / float(m_uiNumMessagesReceived) :
-			0.0f;
+		++numMessagesReceived_;
+		numBytesReceived_ += msgLen;
+		maxBytesReceived_ = msgLen > maxBytesReceived_ ? msgLen : maxBytesReceived_;
 	}
 };
 
@@ -721,12 +919,21 @@ public:
 class GECOAPI GecoYawPitch
 {
 public:
-	GecoYawPitch(float yaw, float pitch);
-	GecoYawPitch();
-
-	void Set(float yaw, float pitch);
-	void Get(float & yaw, float & pitch) const;
-
+	GecoYawPitch(float yaw, float pitch)
+	{
+		this->Set(yaw, pitch);
+	}
+	GecoYawPitch() {};
+	void Set(float yaw, float pitch)
+	{
+		m_uiYaw = AngleToInt8(yaw);
+		m_uiPitch = HalfAngleToInt8(pitch);
+	}
+	void Get(float & yaw, float & pitch) const
+	{
+		yaw = Int8ToAngle(m_uiYaw);
+		pitch = Int8ToHalfAngle(m_uiPitch);
+	}
 	uchar	m_uiYaw;
 	uchar	m_uiPitch;
 };
@@ -1181,4 +1388,86 @@ INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
 	return operator<((GecoNetAddress)a, (GecoNetAddress)b) ||
 		(operator==((GecoNetAddress)a, (GecoNetAddress)b) && (a.m_uiSalt < b.m_uiSalt));
 }
+
+class GecoNetworkInterface
+{
+};
+
+/**
+* 	The InterfaceMinder class manages a set of interface elements. It provides
+* 	an iterator for iterating over this set.
+*
+* 	@ingroup mercury
+*/
+struct GecoInterfaceMinder
+{
+	eastl::vector<GecoNetInterfaceElement>	elements_;
+	const char *			name_;
+
+	/**
+	* 	This is the default constructor.
+	* 	It initialises the InterfaceMinder without any interfaces.
+	*
+	* 	@param name	Name of the interface.
+	*/
+	GecoInterfaceMinder(const char * name)
+	{
+		elements_.reserve(256);
+	}
+
+	/**
+	* 	This method adds an msg handler to the interface minder.
+	*  @param name             Name of the interface element.
+	* 	@param lengthStyle		Specifies whether the message is fixed or variable.
+	*	@param lengthParam		This depends on lengthStyle.
+	*	@param pHandler			The message handler for this msg.
+	*/
+	GecoNetInterfaceElement & add(const char * name, int8 lengthStyle,
+		int lengthParam, GecoNetInputMessageHandler * pHandler = NULL)
+	{
+		// Set up the new bucket and add it to the list
+		return *(new (elements_.push_back_uninitialized()) GecoNetInterfaceElement(name, elements_.size(), lengthStyle, lengthParam, pHandler));
+	}
+
+	/**
+	* 	This method returns the handler for the given interface.
+	*
+	* 	@param index	Index of the interface required.
+	*
+	* 	@return The handler for the given interface index.
+	*/
+	GecoNetInputMessageHandler * handler(int index)
+	{
+		return elements_[index].GetHandler();
+	}
+
+	/**
+	* 	This method sets the handler for a given interface.
+	*
+	* 	@param index	The index for which to set a handler
+	* 	@param pHandler	A message handler object
+	*/
+	void handler(int index, GecoNetInputMessageHandler * pHandler)
+	{
+		elements_[index].SetHandler(pHandler);
+	}
+
+	/**
+	*	This method returns the InterfaceElement with the input id.
+	*/
+	const GecoNetInterfaceElement & interfaceElement(uint8 id) const
+	{
+		return elements_[id];
+	}
+
+	void registerWithInterface(GecoNetworkInterface & networkInterface)
+	{
+
+	}
+	GecoNetReason registerWithMachined(const GecoNetAddress & addr, int id) const
+	{
+		return GecoNetReason::GECO_NET_REASON_CHANNEL_LOST;
+	}
+};
+
 #endif // __GecoNetTypes_H__

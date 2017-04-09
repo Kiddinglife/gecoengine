@@ -55,7 +55,7 @@
 /// Threshold at which to do a malloc / free rather than pushing data onto a fixed stack
 /// for the bitstream class. 1512 is an arbitrary size, just picking something likely to be larger
 /// than  most packets
-#define GECO_STREAM_STACK_ALLOC_BYTES 1512
+#define GECO_STREAM_STACK_ALLOC_BYTES 1512 // 1KB
 #define GECO_STREAM_STACK_ALLOC_BITS (BYTES_TO_BITS(GECO_STREAM_STACK_ALLOC_BYTES))
 
 // another imple of singleton using static methods instead of inhertance
@@ -72,24 +72,21 @@ void FATHER_TYPE::reclaim_instance(FATHER_TYPE* i){ delete i;}
 #define BITS_TO_BYTES(x) (((x)+7)>>3)
 #define BYTES_TO_BITS(x) ((x)<<3)
 
-#ifdef GECO_BIG_ENDIAN
-INLINE short GECO_HTONS(short x)
+typedef union
 {
-	short res =
-		((x & 0x00ff) << 8) |
-		((x & 0xff00) >> 8);
-	return res;
-}
-INLINE long GECO_HTONL(long x)
-{
-	long res =
-		((x & 0x000000ff) << 24) |
-		((x & 0x0000ff00) << 8) |
-		((x & 0x00ff0000) >> 8) |
-		((x & 0xff000000) >> 24);
-	return res;
-}
-INLINE long long GECO_HTONLL(long long x)
+	uint u32;
+	int i32;
+	int i;
+	unsigned int ui;
+	long l;
+	unsigned long ul;
+	float f;
+} GecoNetLong;
+
+#ifdef GECO_LITTLE_ENDIAN
+#define GECO_HTONS( x ) htons(x)
+#define GECO_HTONL( x ) htonl(x)
+INLINE uint64 GECO_HTONLL(uint64 x)
 {
 	long long res =
 		((x & 0x00000000000000ffULL) << 56) |
@@ -104,16 +101,16 @@ INLINE long long GECO_HTONLL(long long x)
 }
 INLINE float GECO_HTONF(float f)
 {
-	FvNetLong n;
+	GecoNetLong n;
 	n.f = f;
-	n.u32 = GECO_HTONL(n.u32);
+	n.u32 = htonl(n.u32);
 	return n.f;
 }
 INLINE void GECO_HTONF_ASSIGN(float &dest, float f)
 {
-	FvNetLong *pDest = (FvNetLong*)&dest;
+	GecoNetLong *pDest = (GecoNetLong*)&dest;
 	pDest->u32 = *(uint*)&f;
-	pDest->u32 = GECO_HTONL(pDest->u32);
+	pDest->u32 = htonl(pDest->u32);
 }
 INLINE void GECO_HTON3_ASSIGN(char *pDest, const char *pData)
 {
@@ -132,7 +129,7 @@ INLINE uint GECO_UNPACK3(const char *pData)
 	const uchar *data = (const uchar*)pData;
 	return (data[0] << 16) | (data[1] << 8) | data[2];
 }
-#else // BIG_ENDIAN
+#else // !LITTLE ENDIAN
 #define GECO_HTONS( x ) x
 #define GECO_HTONL( x ) x
 #define GECO_HTONLL( x ) x
@@ -157,8 +154,6 @@ INLINE uint GECO_UNPACK3(const char *pData)
 }
 #endif
 
-#define GECO_NTOHS( x ) GECO_HTONS( x )
-#define GECO_NTOHL( x ) GECO_HTONL( x )
 #define GECO_NTOHLL( x ) GECO_HTONLL( x )
 #define GECO_NTOHF( x ) GECO_HTONF( x )
 #define GECO_NTOHF_ASSIGN( dest, x ) GECO_HTONF_ASSIGN( dest, x )
@@ -360,8 +355,8 @@ public:
 	/// false to just save a pointer to the @src.
 	/// @remarks
 	/// 99% of the time you will use this function to read Packet:;data,
-	/// in which case you should write something as follows:
-	/// JACKIE_INET::JackieStream js(packet->data, packet->length, false);
+	/// in which case you should use it as follows:
+	/// geco_bit_stream_t js(packet->data, packet->length, false);
 	/// @author mengdi[Jackie]
 	geco_bit_stream_t(uchar* src, const byte_size_t len, bool copy = false);
 
@@ -1592,7 +1587,7 @@ public:
 
 		return z.asFloat;
 	}
-	
+
 	///  var must between (-131070.0, 131070.0)
 	inline void WriteMini(const float &var) {
 		// range checking is done on the input value or rounding of the result. (-131070.0, 131070.0)

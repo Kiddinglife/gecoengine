@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 #endif
 
+bool g_enable_stats = true;
+
 /*GecoNetAddress*/
 char GecoNetAddress::ms_pcStringBuf[2][GecoNetAddress::MAX_STRLEN];
 int GecoNetAddress::ms_iCurrStringBuf = 0;

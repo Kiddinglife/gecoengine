@@ -86,6 +86,42 @@
 #define GecoFracf(number)			((number)-(float)((int)(number)))
 
 /**
+*	This function rounds the input value to the nearest integer and returns
+*	it as type <code>float</code>.
+*/
+INLINE float GECO_ROUNDF(float value)
+{
+	return floorf(value + 0.5f);
+}
+
+/**
+*	This function rounds the input value to the nearest integer and returns
+*	it as type <code>int</code>.
+*/
+INLINE int GECO_ROUNDF_TO_INT(float value)
+{
+	return int(GECO_ROUNDF(value));
+}
+
+/**
+*	This function rounds the input value to the nearest integer and returns
+*	it as type <code>double</code>.
+*/
+INLINE double GECO_ROUND(double value)
+{
+	return floor(value + 0.5);
+}
+
+/**
+*	This function rounds the input value to the nearest integer and returns
+*	it as type <code>int</code>.
+*/
+INLINE int GECO_ROUND_TO_INT(double value)
+{
+	return int(GECO_ROUND(value));
+}
+
+/**
 *	This function returns the value clamped in between the minimum and
 *	maximum values supplied.
 *
