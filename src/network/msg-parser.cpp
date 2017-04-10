@@ -31,7 +31,7 @@ class change_health_cb_handler_t: public GecoNetInputMessageHandler
 	{
 		msgbody >> CLIENTAPP::change_health_cbArgs;
 		//g_network_logger->debug("client received response msg {} {} (param health {}) from cell ...", ie.c_str(), ie.GetID(), CLIENTAPP::change_health_cbArgs.status);
-		printf("client received %s (param status {%s}) from cell ...\n", ie.c_str(), CLIENTAPP::change_health_cbArgs.status);
+		printf("client received %s (param status {%s}) from cell ...\n", ie.c_str(), CLIENTAPP::change_health_cbArgs.status.c_str());
 		//g_network_logger->debug("done...");
 
 		printf("done...\n");
@@ -50,7 +50,8 @@ void msg_call()
 {
 	geco_bit_stream_t encoder;
 	uchar msgid;
-
+	CELLAPP::gMinder.name_;
+	CLIENTAPP::gMinder.name_;
 	// 1.caller inits a msg callee
 	CELLAPP::change_healthArgs.health = 12;
 	encoder << CELLAPP::change_healthArgs;

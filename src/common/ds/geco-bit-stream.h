@@ -629,9 +629,6 @@ public:
 		geco_string_compressor_t::Instance()->DecodeString(&varString, 0xFFFF,
 			this, languageId);
 	}
-	inline void Read(uchar *varString, bool readLanguageId = false) {
-		Read((char*)varString, readLanguageId);
-	}
 	inline void Read(char *varString, bool readLanguageId = false) {
 		uchar languageId;
 		if (readLanguageId)
@@ -640,15 +637,6 @@ public:
 			languageId = 0;
 		geco_string_compressor_t::Instance()->DecodeString(varString, 0xFFFF,
 			this, languageId);
-	}
-	inline void ReadMini(std::string&varString, bool readLanguageId = false) {
-		Read(varString, readLanguageId);
-	}
-	inline void ReadMini(uchar *varString, bool readLanguageId = false) {
-		ReadMini((char*)varString, readLanguageId);
-	}
-	inline void ReadMini(char *varString, bool readLanguageId = false) {
-		Read(varString, readLanguageId);
 	}
 	//
 	//inline bool Read(wchar_t *&varString)
@@ -741,19 +729,15 @@ public:
 	//   outTemplateVar.ReadMini(this);
 	//}
 
-	inline void ReadMini(std::string &outTemplateVar) {
-		//outTemplateVar.ReadMini(this, false);
+	inline void ReadMini(std::string &outTemplateVar, bool readLanguageId = false) {
+		Read(outTemplateVar, readLanguageId);
 	}
-	inline void ReadMini(char *&outTemplateVar) {
-		//GecoString::ReadMini(outTemplateVar, this, false);
+	inline void ReadMini(char *&outTemplateVar, bool readLanguageId = false) {
+		Read(outTemplateVar, readLanguageId);
 	}
-	inline void ReadMiniTo(wchar_t *&outTemplateVar)
+	inline void ReadMiniTo(wchar_t *&outTemplateVar, bool readLanguageId = false)
 	{
-		//return RakWString::Deserialize(outTemplateVar, this);
-	}
-
-	inline void ReadMini(uchar *&outTemplateVar) {
-		//GecoString::ReadMini((char*)outTemplateVar, this, false);
+		//Read(outTemplateVar);
 	}
 
 	template<class srcType, class destType>

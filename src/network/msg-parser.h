@@ -56,7 +56,7 @@ END_GECO_INTERFACE()
 
 BEGIN_GECO_INTERFACE(CLIENTAPP)
 BEGIN_STRUCT_MESSAGE(change_health_cb, change_health_cb_handler)
-eastl::string status;
+std::string status;
 END_STRUCT_MESSAGE()
 BEGIN_GECO_OSTREAM(change_health_cb)
 os.WriteMini(args.status);
