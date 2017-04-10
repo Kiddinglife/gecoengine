@@ -153,8 +153,9 @@ public:
 		return true;
 	}
 };
+
 const GecoNetInterfaceElement GecoNetInterfaceElement::REPLY("Reply", REPLY_MESSAGE_IDENTIFIER, VARIABLE_LENGTH_MESSAGE, 4);
-const float GecoNetInterfaceElementWithStats::AVERAGE_BIAS = -2.f / (5 + 1);
+
 int GecoNetInterfaceElement::HeaderSize() const
 {
 	int headerLen = sizeof(GecoNetMessageID);
@@ -205,4 +206,41 @@ GecoWatcher* GecoNetInterfaceElementWithStats::GetWatcher()
 	//}
 	//return spWatcher;
 	return NULL;
+}
+
+static bool s_networkInitted = false;
+void InitNetwork()
+{
+	if (s_networkInitted) return;
+	s_networkInitted = true;
+#if !defined( PLAYSTATION3 )
+#ifndef __linux__
+	WSAData wsdata;
+	WSAStartup(0x202, &wsdata);
+#endif // !__linux__
+#endif // __linux__
+}
+static bool s_network_logger_inited = false;
+static std::shared_ptr<spdlog::logger> g_network_logger;
+std::shared_ptr<spdlog::logger>& network_logger()
+{
+	if (s_network_logger_inited = true)
+		return g_network_logger;
+
+	//This other example use a single logger with multiple sinks.
+	//This means that the same log_msg is forwarded to multiple sinks;
+	//Each sink can have it's own log level and a message will be logged.
+	std::vector<spdlog::sink_ptr> sinks;
+#ifdef _WIN32
+	sinks.push_back(std::make_shared<spdlog::sinks::wincolor_stdout_sink_st>());
+#else
+	sinks.push_back(std::make_shared<spdlog::sinks::ansicolor_sink>(spdlog::sinks::stdout_sink_st::instance()));
+#endif
+	// Create a file rotating logger with 5mb size max and 3 rotated files
+	sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_st>("logs/network", SPDLOG_FILENAME_T("log"), 1048576 * 5, 3));
+	sinks[0]->set_level(spdlog::level::trace);  // console. Allow everything.  Default value
+	sinks[1]->set_level(spdlog::level::info);  //  regular file. Allow everything.  Default value
+	g_network_logger = std::make_shared<spdlog::logger>("g_network_logger", sinks.begin(), sinks.end());
+	g_network_logger->set_level(spdlog::level::info);
+	spdlog::register_logger(g_network_logger);
 }

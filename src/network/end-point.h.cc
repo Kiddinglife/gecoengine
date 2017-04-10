@@ -121,7 +121,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 		{
 			offender = *(sockaddr_in*)SO_EE_OFFENDER(extError);
 			offender.sin_port = 0;
-			g_network_logger->error<const char*>("ProcessPendingEvents:Kernel has a bug:recv_msg did not set msg_name.\n");
+			network_logger()->error<const char*>("ProcessPendingEvents:Kernel has a bug:recv_msg did not set msg_name.\n");
 		}
 
 		closedPort.m_uiIP = offender.sin_addr.s_addr;
@@ -252,7 +252,7 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 	}
 	else
 	{
-		g_network_logger->error("GecoNetEndpoint::FindDefaultInterface: "
+		network_logger()->error("GecoNetEndpoint::FindDefaultInterface: "
 			"if_nameindex returned NULL ({})\n",
 			strerror(errno));
 	}
@@ -270,7 +270,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 
 	if (strlen(spec) > IFNAMSIZ)
 	{
-		g_network_logger->error("{}, InterfaceName:{} is Too long\n", __FUNCTION__, spec);
+		network_logger()->error("{}, InterfaceName:{} is Too long\n", __FUNCTION__, spec);
 		return -1;
 	}
 
@@ -290,7 +290,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 
 		if (!ok)
 		{
-			g_network_logger->error("GecoNetEndpoint::FindIndicatedInterface: "
+			network_logger()->error("GecoNetEndpoint::FindIndicatedInterface: "
 				"netmask match {} length {} is not valid.\n", iftemp, slash + 1);
 			return -1;
 		}
@@ -305,7 +305,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 	}
 	else
 	{
-		g_network_logger->error("GecoNetEndpoint::FindIndicatedInterface: "
+		network_logger()->error("GecoNetEndpoint::FindIndicatedInterface: "
 			"No interface matching interface spec '{}' found\n", spec);
 		return -1;
 	}
@@ -352,7 +352,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 				if ((htip >> netmaskshift) == (netmaskmatch >> netmaskshift))
 				{
 					strncpy(name, currName, IFNAMSIZ);
-					g_network_logger->debug("Endpoint::bind(): found a match address {}\n", name);
+					network_logger()->debug("Endpoint::bind(): found a match address {}\n", name);
 					break;
 				}
 			}
@@ -363,7 +363,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 		if (name[0] == 0)
 		{
 			uchar * qik = (uchar*)&addr;
-			g_network_logger->error("GecoNetEndpoint::FindIndicatedInterface: "
+			network_logger()->error("GecoNetEndpoint::FindIndicatedInterface: "
 				"No interface matching netmask spec '%s' found "
 				"(evals to {}.{}.{}.{}:{})\n", spec,
 				qik[0], qik[1], qik[2], qik[3], netmaskbits);
@@ -465,7 +465,7 @@ int GecoNetEndpoint::GetQueueSizes(int & tx, int & rx) const
 
 	if (!f)
 	{
-		g_network_logger->error("GecoNetEndpoint::GetQueueSizes: "
+		network_logger()->error("GecoNetEndpoint::GetQueueSizes: "
 			"could not open /proc/net/udp: {}\n",
 			strerror(errno));
 		return -1;
@@ -520,7 +520,7 @@ int GecoNetEndpoint::GetBufferSize(int optname) const
 	}
 	else
 	{
-		g_network_logger->error("GecoNetEndpoint::GetBufferSize: "
+		network_logger()->error("GecoNetEndpoint::GetBufferSize: "
 			"Failed to read option {}: {}\n",
 			optname == SO_SNDBUF ? "SO_SNDBUF" : "SO_RCVBUF",
 			strerror(errno));
@@ -559,11 +559,11 @@ bool GecoNetEndpoint::RecvAll(void * gramData, int gramSize)
 		{
 			if (len == 0)
 			{
-				g_network_logger->warn<const char*>("GecoNetEndpoint::RecvAll: Connection lost\n");
+				network_logger()->warn<const char*>("GecoNetEndpoint::RecvAll: Connection lost\n");
 			}
 			else
 			{
-				g_network_logger->error("GecoNetEndpoint::RecvAll: Got error '{}'\n", strerror(errno));
+				network_logger()->error("GecoNetEndpoint::RecvAll: Got error '{}'\n", strerror(errno));
 			}
 
 			return false;
@@ -632,37 +632,6 @@ void GecoNetEndpoint::AddFrontEndInterface(const eastl::string & name, u_int32_t
 	ms_kFrontEndInterfaces[name] = addr;
 }
 
-
-static bool s_networkInitted = false;
-void InitNetwork()
-{
-	if (s_networkInitted) return;
-	s_networkInitted = true;
-#if !defined( PLAYSTATION3 )
-#ifndef __linux__
-	WSAData wsdata;
-	WSAStartup(0x202, &wsdata);
-#endif // !__linux__
-#endif // __linux__
-
-	// This other example use a single logger with multiple sinks.
-	// This means that the same log_msg is forwarded to multiple sinks;
-	// Each sink can have it's own log level and a message will be logged.
-	std::vector<spdlog::sink_ptr> sinks;
-#ifdef _WIN32
-	sinks.push_back(std::make_shared<spdlog::sinks::wincolor_stdout_sink_st>());
-#else
-	sinks.push_back(std::make_shared<spdlog::sinks::ansicolor_sink>(spdlog::sinks::stdout_sink_st::instance()));
-#endif
-	// Create a file rotating logger with 5mb size max and 3 rotated files
-	sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_st>("logs/network", SPDLOG_FILENAME_T("log"), 1048576 * 5, 3));
-	sinks[0]->set_level(spdlog::level::trace);  // console. Allow everything.  Default value
-	sinks[1]->set_level(spdlog::level::info);  //  regular file. Allow everything.  Default value
-	g_network_logger = std::make_shared<spdlog::logger>("g_network_logger", sinks.begin(), sinks.end());
-	g_network_logger->set_level(spdlog::level::info);
-	spdlog::register_logger(g_network_logger);
-}
-
 #ifdef _WIN32
 
 void WCharToSTLStr(WCHAR* pSrc, eastl::string& des)
@@ -720,7 +689,7 @@ void GetAdaptersAddresses()
 
 		if (dwRetVal == ERROR_NO_DATA)
 		{
-			g_network_logger->error("No addresses were found in GetAdaptersAddresses\n");
+			network_logger()->error("No addresses were found in GetAdaptersAddresses\n");
 		}
 		else
 		{

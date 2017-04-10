@@ -167,7 +167,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\network\end-point.h.cc" />
-    <ClCompile Include="..\..\..\..\src\network\msg-parser-generator.cpp" />
     <ClCompile Include="..\..\..\..\src\network\msg-parser.cpp" />
     <ClCompile Include="..\..\..\..\src\network\net-types.h" />
     <ClCompile Include="..\..\..\..\src\network\networkstats.cpp" />

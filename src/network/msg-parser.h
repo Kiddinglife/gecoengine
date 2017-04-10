@@ -29,13 +29,39 @@
 #ifndef __MSG_PARSER_H__
 #define __MSG_PARSER_H__
 
-
 #include "net-types.h"
 
  /// this function is used to parse a single msg (datagram)
  /// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
  /// @param[in] recvlen the msg length travelling on internet. when compressed by peer,
  /// it will be lwss than the actual msg length
-void parse_msg(uchar* msg, uint recvlen, GecoNetAddress& from, network_recv_stats_t& recv_stats);
-
+extern void parse_msg(uchar* msg, uint recvlen, GecoNetAddress& from, network_recv_stats_t& recv_stats);
+extern void msg_call();
 #endif /* __MSG_PARSER_H__ */
+
+#define USE_COMPRESS_STREAM // you must define this before 
+#include "msg-parser-generator.h"
+
+BEGIN_GECO_INTERFACE(CELLAPP)
+BEGIN_STRUCT_MESSAGE(change_health, change_health_handler)
+uint health;
+END_STRUCT_MESSAGE()
+BEGIN_GECO_OSTREAM(change_health)
+os.WriteMini(args.health);
+END_GECO_OSTREAM()
+BEGIN_GECO_ISTREAM(change_health)
+is.ReadMini(args.health);
+END_GECO_ISTREAM()
+END_GECO_INTERFACE()
+
+BEGIN_GECO_INTERFACE(CLIENTAPP)
+BEGIN_STRUCT_MESSAGE(change_health_cb, change_health_cb_handler)
+eastl::string status;
+END_STRUCT_MESSAGE()
+BEGIN_GECO_OSTREAM(change_health_cb)
+os.WriteMini(args.status);
+END_GECO_OSTREAM()
+BEGIN_GECO_ISTREAM(change_health_cb)
+is.ReadMini(args.status);
+END_GECO_ISTREAM()
+END_GECO_INTERFACE()

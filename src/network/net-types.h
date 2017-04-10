@@ -2,6 +2,11 @@
 #ifndef __GecoNetTypes_H__
 #define __GecoNetTypes_H__
 
+#include "common/debugging/spdlog/logger.h"
+#include "common/debugging/spdlog/spdlog.h"
+extern std::shared_ptr<spdlog::logger>& network_logger();
+extern bool g_enable_stats;
+
 #include "common/geco-plateform.h"
 #include "math/ema.h"
 #include "math/geco-math-vector.h"
@@ -31,10 +36,6 @@
 #else
 #define GECO_NET_LOCALHOSTNAME "lo"
 #endif
-
-#include "common/debugging/spdlog/spdlog.h"
-extern std::shared_ptr<spdlog::logger> g_network_logger;
-extern bool g_enable_stats;
 
 class GecoWatcher;
 class GecoNetBundle;
@@ -594,7 +595,10 @@ struct GecoNetInputMessageHandler
 	* 	@param msgbody		The actual message data.
 	* 	@param arg		This is user-defined data that was passed in with the request that generated this reply.
 	*/
-	virtual int HandleMessage(const GecoNetAddress & from, GecoNetInterfaceElement& ie, geco_bit_stream_t & msgbody, void* data = NULL) = 0;
+	virtual int HandleMessage(const GecoNetAddress & from, GecoNetInterfaceElement& ie, geco_bit_stream_t & msgbody, void* data = NULL)
+	{
+		return 0;
+	};
 
 	/**
 	* 	This method is called by Mercury when the request fails. The
@@ -605,11 +609,11 @@ struct GecoNetInputMessageHandler
 	*/
 	virtual void handleException(const char* exception, void * arg = NULL)
 	{
-		g_network_logger->warn("ReplyMessageHandler::handleException: Not handled. Possible memory leak.");
+		////network_logger()()->warn("ReplyMessageHandler::handleException: Not handled. Possible memory leak.");
 	}
 	virtual void handleShuttingDown(const char* exception, void * arg = NULL)
 	{
-		g_network_logger->warn("ReplyMessageHandler::handleShuttingDown: Not handled. Possible memory leak.");
+		////network_logger()()->warn("ReplyMessageHandler::handleShuttingDown: Not handled. Possible memory leak.");
 	}
 };
 
@@ -804,9 +808,7 @@ INLINE int GecoNetInterfaceElement::CompressLength(void * header, int length, Ge
 	case FIXED_LENGTH_MESSAGE:
 		if (length != m_iLengthParam)
 		{
-			g_network_logger->critical("GecoNetInterfaceElement::CompressLength( {} ):"
-				"Fixed length message has wrong length ({} instead of {})",
-				this->c_str(), length, m_iLengthParam);
+			//network_logger()()->critical("GecoNetInterfaceElement::CompressLength( {} ):" "Fixed length message has wrong length ({} instead of {})",this->c_str(), length, m_iLengthParam);
 		}
 		break;
 	case VARIABLE_LENGTH_MESSAGE:
@@ -815,10 +817,7 @@ INLINE int GecoNetInterfaceElement::CompressLength(void * header, int length, Ge
 		// things so it's probably worth having this check here
 		if (length < 0)
 		{
-			g_network_logger->critical("GecoNetInterfaceElement::CompressLength({}): "
-				"Possible overflow in length ({} bytes) for "
-				"variable length message",
-				this->c_str(), length);
+			//network_logger()()->critical("GecoNetInterfaceElement::CompressLength({}): " "Possible overflow in length ({} bytes) for " "variable length message",this->c_str(), length);
 		}
 		char *pLen = ((char*)header) + 1; // advance to the start position of msg body
 		int len = length;
@@ -841,9 +840,8 @@ INLINE int GecoNetInterfaceElement::CompressLength(void * header, int length, Ge
 			*(uint*)pLen = GECO_HTONL((uint32)len);
 			break;
 		default:
-			g_network_logger->critical("InterfaceElement::compressLength( {} ): "
-				"Unsupported variable length width: {}",
-				this->c_str(), m_iLengthParam);
+			//network_logger()()->critical("InterfaceElement::compressLength( {} ): " "Unsupported variable length width: {}", this->c_str(), m_iLengthParam);
+			break;
 		}
 		// If the message length could not fit into a standard length field, we
 		// need to handle this as a special case.
@@ -909,6 +907,7 @@ public:
 		numBytesReceived_ += msgLen;
 		maxBytesReceived_ = msgLen > maxBytesReceived_ ? msgLen : maxBytesReceived_;
 	}
+	GecoWatcher* GetWatcher();
 };
 
 /**
@@ -1391,6 +1390,11 @@ INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
 
 class GecoNetworkInterface
 {
+public:
+	INLINE const GecoNetAddress & address() const
+	{
+		return GecoNetAddress();
+	}
 };
 
 /**
@@ -1469,5 +1473,7 @@ struct GecoInterfaceMinder
 		return GecoNetReason::GECO_NET_REASON_CHANNEL_LOST;
 	}
 };
+
+extern void InitNetwork();
 
 #endif // __GecoNetTypes_H__

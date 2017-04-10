@@ -17,7 +17,6 @@
 
 #include "gtest/gtest.h"
 
-#include "protocol/geco-net-common.h"
 #include "common/debugging/debug.h"
 #include "common/geco-plateform.h"
 #include "common/ultils/geco-ds-wheel-timer.h"
@@ -31,87 +30,6 @@ using namespace geco::ds;
 
 DECLARE_DEBUG_COMPONENT2("UNIT-TEST", 0);
 
-TEST(TIME, test_gettimestamp_func)
-{
-	uint times = 10000000;
-	double secs = 0;
-	bool ret;
-
-	double ageinsec;
-	uint64 ageinstamp;
-
-	time_stamp_t stampt;
-	time_stamp_t stamptcpy;
-
-	time_t start;
-	time_t end;
-	for (uint i = 0; i < times; i++)
-	{
-		secs = (double)1 / (i + 1);
-		stampt = time_stamp_t::fromSecs(secs);
-		ASSERT_EQ(almost_equal(time_stamp_t::toSecs(stampt.stamp_), secs), true);
-	}
-
-	stampt = gettimestamp();
-	ageinsec = stampt.agesInSec();
-	ageinstamp = stampt.ageInStamps();
-	ASSERT_GT(ageinsec, 0);
-	ASSERT_GT(ageinstamp, 0);
-
-	stampt = stamps_per_sec();
-	if (!almost_equal(time_stamp_t::toSecs(stampt.stamp_), 1))
-	{
-		printf("%.15f secs, %" PRIu64 " stamps\n", ageinsec, ageinstamp);
-	}
-
-	gettimenow_us(&start);
-	double accus = 0;
-	double maxus = 0;
-	uint size = 0;
-	for (uint i = 0; i < times; i++)
-	{
-		stampt = gettimestamp();
-		stamptcpy = gettimestamp();
-
-		double us = (fabsl(stamptcpy - stampt) * 1000000) / stamps_per_sec_double();
-		maxus = us > maxus ? us : maxus;
-		accus += us;
-		if (us > 100)
-		{
-			size++;
-			//printf("substraction stampcpy - stamp =  {%f}\n", us);
-		}
-	}
-	gettimenow_us(&end);
-	printf("call gettimestamp %d times, greater than 100us  {%d times, %f percentages}, max us %f , average us %f, time stamp spent %d\n",
-		times, size, size / (float)times * 100, maxus, accus / times, end - start);
-
-
-	accus = 0;
-	maxus = 0;
-	size = 0;
-	time_t t1;
-	time_t t2;
-
-	gettimenow_us(&start);
-	for (uint i = 0; i < times; i++)
-	{
-		gettimenow_us(&t1);
-		gettimenow_us(&t2);
-
-		double us = fabsl(t2 - t1);
-		maxus = us > maxus ? us : maxus;
-		accus += us;
-		if (us > 100)
-		{
-			size++;
-			//printf("substraction stampcpy - stamp =  {%f}\n", us);
-		}
-	}
-	gettimenow_us(&end);
-	printf("call sys gettimestamp %d times, greater than 100us  {%d times, %f percentages}, max us %f , average us %f, time stamp spent %d\n",
-		times, size, size / (float)times * 100, maxus, accus / times, end - start);
-}
 
 TEST(TIME, test_profile)
 {

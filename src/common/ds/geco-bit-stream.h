@@ -2207,19 +2207,6 @@ public:
 	static void Hexlify(char* outstr, bit_size_t bitsPrint, uchar* src);
 	void Hexlify(void);
 
-	template <class T>
-	geco_bit_stream_t& operator >> (T& kData)
-	{
-		ReadMini(kData);
-		return *this;
-	}
-
-	template <class T>
-	geco_bit_stream_t& operator<<(const T& kData)
-	{
-		WriteMini(kData);
-		return *this;
-	}
 	void disable_compression() { enabble_compression = false; }
 	void enable_compression() { enabble_compression = true; }
 	bool is_compression_mode() { return enabble_compression; }

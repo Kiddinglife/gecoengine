@@ -208,15 +208,13 @@ public:
 
 	void HijackSendOpen(u_int16_t port, u_int32_t addr);
 	void HijackSendClose();
-	bool HijackRecvAllFrom(void * gramData, int gramSize,u_int16_t * pPort, u_int32_t * pAddr);
+	bool HijackRecvAllFrom(void * gramData, int gramSize, u_int16_t * pPort, u_int32_t * pAddr);
 	int HijackFD() const;
 
 	static bool IsHijacked() { return ms_pkHijackEndpointAsync != NULL; }
-	static void AddFrontEndInterface(const eastl::string & name,u_int32_t addr);
+	static void AddFrontEndInterface(const eastl::string & name, u_int32_t addr);
 	//@}
 };
-
-extern void InitNetwork();
 
 INLINE GecoNetEndpoint::~GecoNetEndpoint()
 {
@@ -558,7 +556,16 @@ INLINE int GecoNetEndpoint::RecvFrom(void * gramData, int gramSize,
 		// If there was an artificial packet waiting for us, use it instead.
 		u_int32_t addr;
 		u_int16_t port;
-		(*ms_pkHijackStream) >> (uint&)addr >> (ushort&)port;
+		if (ms_pkHijackStream->is_compression_mode())
+		{
+			ms_pkHijackStream->WriteMini(addr);
+			ms_pkHijackStream->WriteMini(port);
+		}
+		else
+		{
+			ms_pkHijackStream->Write(addr);
+			ms_pkHijackStream->Write(port);
+		}
 
 		sin.sin_port = port;
 		sin.sin_addr.s_addr = addr;
@@ -576,7 +583,7 @@ INLINE int GecoNetEndpoint::RecvFrom(void * gramData, int gramSize,
 		errno = EAGAIN;
 #endif
 		return -1;
-	}
+}
 
 	socklen_t		sinLen = sizeof(sin);
 	int ret = ::recvfrom(m_kSocket, (char*)gramData, gramSize,
