@@ -42,6 +42,18 @@ GECO_STRUCT_MESSAGE( NAME, HANDLER )	\
 #define END_STRUCT_MESSAGE()\
 }; 
 
+ // class HANDLERTYPE : public GecoNetInputMessageHandler
+//  HANDLERTYPE contains real function pointer  and it will call it in HandleMessage()
+#define GECO_HANDLED_STRUCT_MESSAGE(NAME, HANDLERTYPE, HANDLERARG ) \
+	HANDLER_STATEMENT( NAME, HANDLERTYPE, HANDLERARG)					\
+	GECO_STRUCT_MESSAGE( NAME, HANDLER_ARGUMENT( NAME ) )			\
+
+#define BEGIN_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG )	\
+	GECO_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG ) \
+	{
+#define END_HANDLED_STRUCT_MESSAGE()	\
+	};																	
+
  //  declare GECO_STRUCT_MESSAGE, plus handler statement
 #define GECO_HANDLED_STRUCT_MESSAGE(	NAME, HANDLERTYPE, HANDLERARG ) \
 HANDLER_STATEMENT( NAME, HANDLERTYPE, HANDLERARG) \
@@ -66,6 +78,8 @@ GECO_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG )		\
 #undef HANDLER_ARGUMENT
 #undef NULL_IF_NOT_SERVER
 
+// when server, handler will be not null and can be called
+// when client,  server's handler should be null in case it is accidently invoked
 #ifdef DEFINE_SERVER_HERE
 #undef DEFINE_SERVER_HERE
 #ifndef DEFINE_INTERFACE_HERE
