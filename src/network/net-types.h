@@ -1427,7 +1427,8 @@ struct GecoInterfaceMinder
 		int lengthParam, GecoNetInputMessageHandler * pHandler = NULL)
 	{
 		// Set up the new bucket and add it to the list
-		return *(new (elements_.push_back_uninitialized()) GecoNetInterfaceElement(name, elements_.size() - 1, lengthStyle, lengthParam, pHandler));
+	    void* dest = elements_.push_back_uninitialized();
+		return *(new (dest) GecoNetInterfaceElement(name, elements_.size() - 1, lengthStyle, lengthParam, pHandler));
 	}
 
 	/**
