@@ -123,8 +123,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).exe</OutputFile>
-      <AdditionalDependencies>gmock_Debugx64.lib;geco-engine_geco-common_Debugx64.lib;geco-engine_geco-engine-network_Debugx64.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmock_Debugx64.lib;common.lib;math.lib;net.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../../../thirdparty/libs/;$(SolutionDir)$(Platform)\$(Configuration)\;</AdditionalLibraryDirectories>
       <StackReserveSize>4</StackReserveSize>
       <StackCommitSize>4</StackCommitSize>
@@ -133,6 +132,10 @@
       <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).exe</OutputFile>
       <AdditionalLibraryDirectories>../../../../thirdparty/googlemock/libs/;</AdditionalLibraryDirectories>
     </Lib>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

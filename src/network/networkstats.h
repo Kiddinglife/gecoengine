@@ -514,13 +514,9 @@ public:
 	*/
 	void initRatesOfChangeForStats(eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>> & stats)
 	{
-		typedef typename eastl::intrusive_list<intrusive_stat_rate_of_change_t<TYPE>>::iterator cit;
-		cit iter = stats.begin();
-		static cit end = stats.end();
-		while (iter != end)
+		for (auto& stat : stats)
 		{
-			initRatesOfChangeForStat(*iter);
-			++iter;
+			initRatesOfChangeForStat(stat);
 		}
 	}
 

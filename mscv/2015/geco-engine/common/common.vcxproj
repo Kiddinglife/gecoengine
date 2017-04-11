@@ -199,7 +199,7 @@
     <ProjectGuid>{9DB6451B-55F3-4A06-9C23-22C43B515E3D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gecoenginecommon</RootNamespace>
-    <ProjectName>geco-common</ProjectName>
+    <ProjectName>common</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -294,7 +294,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).lib</OutputFile>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>

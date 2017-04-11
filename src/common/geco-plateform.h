@@ -289,28 +289,28 @@ extern int GECO_EXTERN_VAR g_iBackEndUID;
 extern int GECO_EXTERN_VAR g_iBackEndPID;
 extern int GECO_EXTERN_VAR g_iIsBackEndProcess;
 
-GECOAPI void GECO_FAST_CALL geco_open_syslog(const char *pcIdent, int iOption, int iFacility);
-GECOAPI void GECO_FAST_CALL geco_syslog(int iPriority, const char *pcFormat, ...);
+GECOAPI void  geco_open_syslog(const char *pcIdent, int iOption, int iFacility);
+GECOAPI void  geco_syslog(int iPriority, const char *pcFormat, ...);
 
-GECOAPI void GECO_FAST_CALL geco_init_back_end_process(int iUID, int iPID);
-GECOAPI int GECO_FAST_CALL geco_get_user_id();
+GECOAPI void  geco_init_back_end_process(int iUID, int iPID);
+GECOAPI int  geco_get_user_id();
 GECOAPI 
 #ifdef _WIN32
 const wchar_t*
 #else
 const char*
 #endif
-GECO_FAST_CALL getUsername();
-GECOAPI int GECO_FAST_CALL geco_get_pid();
-GECOAPI passwd* GECO_FAST_CALL  geco_get_pw_user_id(int iUID);
-GECOAPI passwd*  GECO_FAST_CALL geco_get_pw_nam(const char *pcName);
+ getUsername();
+GECOAPI int  geco_get_pid();
+GECOAPI passwd*   geco_get_pw_user_id(int iUID);
+GECOAPI passwd*   geco_get_pw_nam(const char *pcName);
 /*
 *	This function is used to strip the path and
 * return just the basename from a path string.
 *　sample base path: logger/cppThresholds/ENGINE-UNITTEST-LOGGER/test-auth.cc
 */
-GECOAPI const char* GECO_FAST_CALL get_base_path(const char * path, const char * module);
-GECOAPI void* GECO_FAST_CALL memcpy_fast(void *destination, const void *source, size_t size);
+GECOAPI const char*  get_base_path(const char * path, const char * module);
+GECOAPI void*  memcpy_fast(void *destination, const void *source, size_t size);
 
 /*print out*/
 #if defined(__unix__) || defined(__linux__) || defined( PLAYSTATION3 )

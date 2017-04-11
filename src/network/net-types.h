@@ -2,24 +2,21 @@
 #ifndef __GecoNetTypes_H__
 #define __GecoNetTypes_H__
 
-#include "common/debugging/spdlog/logger.h"
-#include "common/debugging/spdlog/spdlog.h"
-extern std::shared_ptr<spdlog::logger>& network_logger();
-extern bool g_enable_stats;
-
 #include "common/geco-plateform.h"
+#include "common/ds/geco-bit-stream.h"
+#include "common/ds/eastl/EASTL/string.h"
+#include "common/debugging/spdlog/spdlog.h"
+
 #include "math/ema.h"
 #include "math/geco-math-vector.h"
 #include "math/geco-math-direction.h"
-#include "common/ds/geco-bit-stream.h"
-#include "common/ds/eastl/EASTL/string.h"
+
+#include <vector>
+#include <limits>
 
 #ifdef _XBOX360
 #include "GecoNet360.h"
 #endif
-
-#include <vector>
-#include <limits>
 
 #ifndef _WIN32
 #define GECO_NET_LOCALHOSTNAME "lo"
@@ -32,6 +29,9 @@ extern bool g_enable_stats;
 #define GECO_NET_LOCALHOSTNAME "localhost"
 #define FMT_DBID "I64d"
 #endif
+
+extern std::shared_ptr<spdlog::logger>& network_logger();
+extern bool g_enable_stats;
 
 class GecoWatcher;
 class GecoNetBundle;
@@ -1414,7 +1414,7 @@ struct GecoInterfaceMinder
 	*
 	* 	@param name	Name of the interface.
 	*/
-	GecoInterfaceMinder(const char * name)
+	GecoInterfaceMinder(const char * name) : name_(name)
 	{
 		elements_.reserve(256);
 	}

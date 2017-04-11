@@ -533,9 +533,7 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed) {
 }
 
 #include "network/msg-parser.h"
-
 TEST(GecoMemoryStreamTestCase, test_msg_call)
 {
-	//InitNetwork();
 	msg_call();
 }

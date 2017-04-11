@@ -152,40 +152,6 @@ namespace INAME \
 	void registerWithInterface(GecoNetworkInterface& networkInterface ); \
 	GecoNetReason registerWithMachined(GecoNetworkInterface & networkInterface, int id ); 
 
-//#ifdef USE_COMPRESS_STREAM
-//#define BEGIN_GECO_ISTREAM( NAME ) \
-//	INLINE geco_bit_stream_t& operator>>( geco_bit_stream_t &is, NAME##ArgsType &args ) \
-//	{
-///* add args compress decoder here ...*/
-//#define END_GECO_ISTREAM()\
-//        return is;\
-//	}
-//#define BEGIN_GECO_OSTREAM( NAME) \
-//	INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, const NAME##ArgsType &args ) \
-//	{ \
-//		os.WriteMini(NAME.m_uiID);
-//// add args uncompress encoder here ...
-//#define END_GECO_OSTREAM() \
-//		return os;\
-//	}
-//#else
-//#define BEGIN_GECO_ISTREAM( NAME ) \
-//	INLINE geco_bit_stream_t& operator>>( geco_bit_stream_t &is, NAME##ArgsType &args ) \
-//	{
-//// add args compress decoder here ...
-//#define END_GECO_ISTREAM() \
-//		return is;\
-//	}
-//#define BEGIN_GECO_OSTREAM( NAME) \
-//	INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, const NAME##ArgsType &args ) \
-//	{ \
-//		os.Write(NAME.m_uiID);
-//// add args uncompress encoder here ...
-//#define END_GECO_OSTREAM() \
-//		return os;\
-//	}
-//#endif
-
 #define BEGIN_GECO_ISTREAM( NAME ) \
   INLINE geco_bit_stream_t& operator>>( geco_bit_stream_t &is, NAME##ArgsType &args ) \
   {
@@ -201,7 +167,6 @@ namespace INAME \
 #define END_GECO_OSTREAM() \
       return os;\
   }
-
 
 //  declare GECO_MESSAGE, struct type that represents msg body, encoder and decoder msg body,
 #define GECO_STRUCT_MESSAGE( NAME, HANDLER) \

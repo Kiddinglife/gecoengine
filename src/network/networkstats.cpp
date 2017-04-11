@@ -571,8 +571,20 @@ network_recv_stats_t::network_recv_stats_t() :
 	mercuryTimer_("network_recv_stats_t mercury timer profile"),
 	systemTimer_("network_recv_stats_t system timer profile")
 {
+	//  init ema stat
+	pStats_.push_back(numBytesReceivedPerSecond_);
+	pStats_.push_back(numPacketsReceivedPerSecond_);
+	pStats_.push_back(numDuplicatePacketsReceived_);
+	pStats_.push_back(numPacketsReceivedOffChannel_);
+	pStats_.push_back(numBundlesReceived_);
+	pStats_.push_back(numMessagesReceivedPerSecond_);
+	pStats_.push_back(numOverheadBytesReceived_);
+	pStats_.push_back(numCorruptedPacketsReceived_);
+	pStats_.push_back(numCorruptedBundlesReceived_);
+	pStats_.push_back(numFilteredBundlesReceived_);
 	uint_stat_watcher_factory_.initRatesOfChangeForStats(pStats_);
-	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bytesReceived", this->numBytesReceivedPerSecond_);
+
+	// then create watcher for each stat and add to watchers
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "bytesReceived", this->numBytesReceivedPerSecond_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "packetsReceived", this->numPacketsReceivedPerSecond_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "duplicatePacketsReceived", this->numDuplicatePacketsReceived_);
@@ -582,12 +594,14 @@ network_recv_stats_t::network_recv_stats_t() :
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "overheadBytesReceived", this->numOverheadBytesReceived_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "corruptedPacketsReceived", this->numCorruptedPacketsReceived_);
 	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "corruptedBundlesReceived", this->numCorruptedBundlesReceived_);
+	uint_stat_watcher_factory_.AddStatWatchers(pwatchers_, "numFilteredBundlesReceived_", this->numFilteredBundlesReceived_);
 
+	// create watcher for non-ema stat 
 	GECO_WATCH("socket/transmitQueue", lastTxQueueSize_, WT_READ_ONLY, "sock stat", &pwatchers_);
 	GECO_WATCH("socket/receiveQueue", lastRxQueueSize_, WT_READ_ONLY, "sock stat", &pwatchers_);
 	GECO_WATCH("socket/maxTransmitQueue", maxTxQueueSize_, WT_READ_ONLY, "sock stat", &pwatchers_);
 	GECO_WATCH("socket/maxReceiveQueue", maxRxQueueSize_, WT_READ_ONLY, "sock stat", &pwatchers_);
-
+	// then add to watchers
 	pwatchers_.add_watcher("timing/mercury", ProfileVal::pWatcherStamps(mercuryTimer_));
 	pwatchers_.add_watcher("timing/system", ProfileVal::pWatcherStamps(systemTimer_));
 	pwatchers_.add_watcher("timingSummary/mercury", ProfileVal::pSummaryWatcher(mercuryTimer_));
