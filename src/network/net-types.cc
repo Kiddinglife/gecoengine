@@ -23,7 +23,7 @@ bool WatcherStringToValue(const char * valueStr, GecoNetAddress & value)
 	if (sscanf(valueStr, "%d.%d.%d.%d:%d",
 		&a1, &a2, &a3, &a4, &a5) != 5)
 	{
-		g_network_logger->error("WatcherStringToValue: Cannot convert '{}' to an Address.\n", valueStr);
+		network_logger()->error("WatcherStringToValue: Cannot convert '{}' to an Address", valueStr);
 		return false;
 	}
 	value.m_uiIP = (a1 << 24) | (a2 << 16) | (a3 << 8) | a4;
@@ -143,7 +143,7 @@ public:
 			pPacket_ = pPacket_->Next();
 			if (pPacket_ == NULL)
 			{
-				g_network_logger->error("BundleDataPos::AdvancedBy: Ran out of packets.\n");
+				network_logger()->error("BundleDataPos::AdvancedBy: Ran out of packets.\n");
 				return false;
 			}
 			pCurr_ = (uchar*)pPacket_->Body();

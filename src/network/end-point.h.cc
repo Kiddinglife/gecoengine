@@ -252,9 +252,9 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 	}
 	else
 	{
-		network_logger()->error("GecoNetEndpoint::FindDefaultInterface: "
-			"if_nameindex returned NULL ({})\n",
-			strerror(errno));
+	    network_logger()->error("GecoNetEndpoint::FindDefaultInterface: "
+	            "if_nameindex returned NULL ({})",
+	            strerror(errno));
 	}
 
 	return ret;

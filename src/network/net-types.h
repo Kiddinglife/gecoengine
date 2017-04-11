@@ -22,19 +22,15 @@ extern bool g_enable_stats;
 #include <limits>
 
 #ifndef _WIN32
+#define GECO_NET_LOCALHOSTNAME "lo"
 #ifndef _LP64
 #define FMT_DBID "lld"
 #else
 #define FMT_DBID "ld"
 #endif
 #else
+#define GECO_NET_LOCALHOSTNAME "localhost"
 #define FMT_DBID "I64d"
-#endif
-
-#ifdef _WIN32//! win32
-#define	GECO_NET_LOCALHOSTNAME "localhost"
-#else
-#define GECO_NET_LOCALHOSTNAME "lo"
 #endif
 
 class GecoWatcher;
@@ -996,8 +992,9 @@ public:
 
 	bool NearTo(const GecoYawPitchRoll & oth) const
 	{
-		return unsigned int((m_uiYaw - oth.m_uiYaw + 1) | (m_uiPitch - oth.m_uiPitch + 1) |
-			(m_uiRoll - oth.m_uiRoll + 1)) <= 3;
+		uint val = (m_uiYaw - oth.m_uiYaw + 1) | (m_uiPitch - oth.m_uiPitch + 1) |
+	            (m_uiRoll - oth.m_uiRoll + 1);
+	    return val <= 3;
 	}
 
 	uchar	m_uiYaw;
@@ -1049,7 +1046,7 @@ protected:
 
 public:
 	GecoPackedXY() {};
-	GecoPackedXY::GecoPackedXY(float x, float y)
+	GecoPackedXY(float x, float y)
 	{
 		this->PackXY(x, y);
 	}
@@ -1203,10 +1200,10 @@ private:
 class GecoPackedXYZ : public GecoPackedXY
 {
 public:
-	GecoPackedXYZ::GecoPackedXYZ()
+	GecoPackedXYZ()
 	{
 	}
-	GecoPackedXYZ::GecoPackedXYZ(float x, float y, float z)
+	GecoPackedXYZ(float x, float y, float z)
 	{
 		this->PackXY(x, y);
 		this->SetZ(z);
