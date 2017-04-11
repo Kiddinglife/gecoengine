@@ -220,11 +220,11 @@ void InitNetwork()
 #endif // !__linux__
 #endif // __linux__
 }
-static bool s_network_logger_inited = false;
-static std::shared_ptr<spdlog::logger> g_network_logger;
+
+static std::shared_ptr<spdlog::logger> g_network_logger (NULL);
 std::shared_ptr<spdlog::logger>& network_logger()
 {
-	if (s_network_logger_inited)
+	if (g_network_logger.get())
 		return g_network_logger;
 
 	//This other example use a single logger with multiple sinks.
@@ -243,6 +243,5 @@ std::shared_ptr<spdlog::logger>& network_logger()
 	g_network_logger = std::make_shared<spdlog::logger>("g_network_logger", sinks.begin(), sinks.end());
 	g_network_logger->set_level(spdlog::level::trace);
 	spdlog::register_logger(g_network_logger);
-	s_network_logger_inited = true;
 	return g_network_logger;
 }

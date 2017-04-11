@@ -29,12 +29,6 @@
 #ifndef __MSG_PARSER_H__
 #define __MSG_PARSER_H__
 #include "net-types.h"
-extern int parser;
- /// this function is used to parse a single msg (datagram)
- /// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
- /// @param[in] recvlen the msg length travelling on internet. when compressed by peer,
- /// it will be lwss than the actual msg length
-extern void parse_msg(uchar* msg, uint recvlen, GecoNetAddress& from, network_recv_stats_t& recv_stats);
 extern void msg_call();
 #endif /* __MSG_PARSER_H__ */
 
