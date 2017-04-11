@@ -116,29 +116,29 @@ void /*ProcessSocketStatsHelper::*/ stopMessageHandling(network_recv_stats_t& re
 /// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
 /// @param[in] recvlen the msg length travelling on internet. when compressed by peer,
 /// it will be lwss than the actual msg length
-//void parse_msg(uchar* msg, uint recvlen, GecoNetAddress& from, network_recv_stats_t& recv_stats)
-//{
-//	// msg = id+flag+payload
-//	uchar msgid;
-//	uchar msgflag;
-//
-//	geco_bit_stream_t msg_reader(msg, recvlen, false);
-//	msg_reader.ReadMini(msgid);
-//	msg_reader.ReadMini(msgflag);
-//
-//	GecoNetInterfaceElementWithStats& ie = table_[msgid];
-//
-//	if (g_enable_stats) startMessageHandling(recv_stats, recvlen);
-//	bool passed = msg_filter_.filterMessage(from, ie, msg_reader);
-//	if (!passed)
-//	{
-//		if (g_enable_stats) ie.startProfile();
-//		uint actual_msg_body_len = ie.GetHandler()->HandleMessage(from, ie, msg_reader, 0);
-//		if (g_enable_stats) ie.stopProfile(actual_msg_body_len);
-//	}
-//	else
-//	{
-//		++recv_stats.numFilteredBundlesReceived_;
-//	}
-//	if (g_enable_stats) stopMessageHandling(recv_stats);
-//}
+void parse_msg(uchar* msg, uint recvlen, GecoNetAddress& from, network_recv_stats_t& recv_stats)
+{
+	// msg = id+flag+payload
+	uchar msgid;
+	uchar msgflag;
+
+	geco_bit_stream_t msg_reader(msg, recvlen, false);
+	msg_reader.ReadMini(msgid);
+	msg_reader.ReadMini(msgflag);
+
+	GecoNetInterfaceElementWithStats& ie = table_[msgid];
+
+	if (g_enable_stats) startMessageHandling(recv_stats, recvlen);
+	bool passed = msg_filter_.filterMessage(from, ie, msg_reader);
+	if (!passed)
+	{
+		if (g_enable_stats) ie.startProfile();
+		uint actual_msg_body_len = ie.GetHandler()->HandleMessage(from, ie, msg_reader, 0);
+		if (g_enable_stats) ie.stopProfile(actual_msg_body_len);
+	}
+	else
+	{
+		++recv_stats.numFilteredBundlesReceived_;
+	}
+	if (g_enable_stats) stopMessageHandling(recv_stats);
+}

@@ -38,7 +38,7 @@
 									<listOptionValue builtIn="false" value="GECO_BUILD_STATIC_LIBS"/>
 									<listOptionValue builtIn="false" value="SERVER_BUILD"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.dialect.std.467911207" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.467911207" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.188004148" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="${RootPath}/src/"/>
 									<listOptionValue builtIn="false" value="${RootPath}/src/common/debugging/"/>

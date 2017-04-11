@@ -28,9 +28,7 @@
 
 #ifndef __MSG_PARSER_H__
 #define __MSG_PARSER_H__
-
 #include "net-types.h"
-
  /// this function is used to parse a single msg (datagram)
  /// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
  /// @param[in] recvlen the msg length travelling on internet. when compressed by peer,

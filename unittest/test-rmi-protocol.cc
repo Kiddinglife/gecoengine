@@ -17,7 +17,6 @@
 #include "gtest/gtest.h"
 #include "common/debugging/debug.h"
 #include "common/ultils/geco-engine-auth.h"
-#include "protocol/geco-net-common.h"
 
 #include <math.h>
 #ifdef _WIN32
@@ -60,8 +59,9 @@ struct arg_type_key_hash_functor
 		size_t operator()(const arg_type_key& addr) const
 		{
 			uint local_saaf = addr.arg0_type;
-			unsigned int lastHash = SuperFastHashIncremental(
-					(const char*) &addr.arg1_type, sizeof(uchar), local_saaf);
+			unsigned int lastHash = 100;
+			//unsigned int lastHash =
+			//SuperFastHashIncremental((const char*) &addr.arg1_type, sizeof(uchar), local_saaf);
 			return lastHash;
 		}
 };

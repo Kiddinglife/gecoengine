@@ -32,18 +32,18 @@
 #error "you must define USE_COMPRESS_STREAM before include this header"
 #endif
 
-#define GECO_FIXED_MESSAGE( NAME, PARAM, HANDLER )         GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, PARAM, HANDLER)
+#define GECO_FIXED_MESSAGE( NAME, PARAM, HANDLER )     GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, PARAM, HANDLER)
 #define GECO_VARIABLE_MESSAGE( NAME, PARAM, HANDLER )  GECO_MESSAGE( NAME, VARIABLE_LENGTH_MESSAGE, PARAM, HANDLER)
-#define GECO_EMPTY_MESSAGE( NAME, HANDLER )				     GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, 0, HANDLER )	
+#define GECO_EMPTY_MESSAGE( NAME, HANDLER )			   GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, 0, HANDLER )
 
-#define BEGIN_STRUCT_MESSAGE( NAME, HANDLER ) \
-GECO_STRUCT_MESSAGE( NAME, HANDLER )\
-{ 
-#define END_STRUCT_MESSAGE()\
-}; 
+#define BEGIN_STRUCT_MESSAGE( NAME, HANDLER )   \
+GECO_STRUCT_MESSAGE( NAME, HANDLER)        \
+{
+#define END_STRUCT_MESSAGE()    \
+};
 
- // class HANDLERTYPE : public GecoNetInputMessageHandler
-//  HANDLERTYPE contains real function pointer  and it will call it in HandleMessage()
+// class HANDLERTYPE : public GecoNetInputMessageHandler
+// HANDLERTYPE contains real function pointer  and it will call it in HandleMessage()
 #define GECO_HANDLED_STRUCT_MESSAGE(NAME, HANDLERTYPE, HANDLERARG ) \
 	HANDLER_STATEMENT( NAME, HANDLERTYPE, HANDLERARG)					\
 	GECO_STRUCT_MESSAGE( NAME, HANDLER_ARGUMENT( NAME ) )			\
@@ -52,18 +52,20 @@ GECO_STRUCT_MESSAGE( NAME, HANDLER )\
 	GECO_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG ) \
 	{
 #define END_HANDLED_STRUCT_MESSAGE()	\
-	};																	
+	};
 
  //  declare GECO_STRUCT_MESSAGE, plus handler statement
 #define GECO_HANDLED_STRUCT_MESSAGE(	NAME, HANDLERTYPE, HANDLERARG ) \
 HANDLER_STATEMENT( NAME, HANDLERTYPE, HANDLERARG) \
-GECO_STRUCT_MESSAGE( NAME, HANDLER_ARGUMENT( NAME ) ) 
- // Helper macro that declares GECO_HANDLED_STRUCT_MESSAGE plus GECO_STRUCT_GOODIES 
+GECO_STRUCT_MESSAGE( NAME, HANDLER_ARGUMENT( NAME ) )
+
+ // Helper macro that declares GECO_HANDLED_STRUCT_MESSAGE plus GECO_STRUCT_GOODIES
 #define BEGIN_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG )	\
 GECO_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG )		\
-{ 						
+{
 #define END_HANDLED_STRUCT_MESSAGE()	\
-};	
+};
+
 #endif /* __MSG_PARSER_GENERATOR_H_ */
 
  // Cleanup to prevent user accidently define same macros
@@ -153,9 +155,9 @@ namespace INAME \
 #define BEGIN_GECO_ISTREAM( NAME ) \
 	INLINE geco_bit_stream_t& operator>>( geco_bit_stream_t &is, NAME##ArgsType &args ) \
 	{ 
- // add args compress decoder here ...
-#define END_GECO_ISTREAM() \
-		return is;\
+ /* add args compress decoder here ...*/
+#define END_GECO_ISTREAM()\
+        return is;\
 	}
 #define BEGIN_GECO_OSTREAM( NAME) \
 	INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, const NAME##ArgsType &args ) \
@@ -184,7 +186,7 @@ namespace INAME \
 #endif
 
 //  declare GECO_MESSAGE, struct type that represents msg body, encoder and decoder msg body,
-#define GECO_STRUCT_MESSAGE( NAME, HANDLER, ISTREAM,OSTREAM) \
+#define GECO_STRUCT_MESSAGE( NAME, HANDLER) \
 	struct NAME##ArgsType;	\
 	extern NAME##ArgsType NAME##Args; \
 	GECO_MESSAGE( NAME, 0, 0, 0 ) \
@@ -195,3 +197,4 @@ namespace INAME \
 }
 
 #endif // DEFINE_INTERFACE_HERE
+
