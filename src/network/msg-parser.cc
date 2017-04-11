@@ -17,7 +17,7 @@ class change_health_handler_t : public GecoNetInputMessageHandler
 
 		CLIENTAPP::change_health_cbArgs.status = "OK";
 		msgbody << CLIENTAPP::change_health_cbArgs;
-		// sendmsg(encoder);
+		// sendmsg(stream);
 		network_logger()->debug("cell calls client::change_health_cb ...");
 
 		delete this;
@@ -56,11 +56,6 @@ struct MyMsgFilter : public GecoMessageFilter
 	}
 };
 
-// As msg is the smallest logic unit,
-// you must call syscall send() for each of msg with stream id, reliable flag
-// geco_bit_stream_t will help you handle the case where a single msg that is exceeding default 1MB
-geco_bit_stream_t send_buf_(1024 * 1024 * 1024); // 1MB
-
 /**
  *	 This method is called just before a message is dispatched to its handler.
  */
@@ -80,39 +75,42 @@ void /*ProcessSocketStatsHelper::*/stopMessageHandling(network_recv_stats_t& rec
 	recv_stats.mercuryTimer_.stop();
 }
 
+/// this function is used to parse a single msg (datagram) and call  handler
+/// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
+/// @param[in] recvlen the msg length travelling on internet. when compressed by peer,
+/// it will be lwss than the actual msg length
 void msg_call()
 {
-	geco_bit_stream_t encoder;
-	uchar msgid;
-
+	// As msg is the smallest logic unit,
+	// you must call syscall send() for each of msg with stream id, reliable flag
+	// geco_bit_stream_t will help you handle the case where a single msg that is exceeding default 1MB
+	geco_bit_stream_t stream(1024 * 1024 * 1024); // 1MB
 	network_recv_stats_t recv_stats_;
-
 	MyMsgFilter msg_filter_; /*bundle::*/
-
-	CELLAPP::gMinder.name_;
-	CLIENTAPP::gMinder.name_;
-	// 1.caller inits a msg callee
-	CELLAPP::change_healthArgs.health = 12;
-	encoder << CELLAPP::change_healthArgs;
-	network_logger()->debug("client calls cell::change_health ...");
-	// assume caller sendmsg(caller_encoder);
-
+	uchar msgid;
 	const GecoNetAddress from;
 	void* data = 0;
-	// assume callee receive request
-	encoder.Read(msgid);
-	// find ie vased on id here we just assign it as we are testing
+
+	// 1.caller inits a msg callee
+	CELLAPP::change_healthArgs.health = 12;
+	stream << CELLAPP::change_healthArgs;
+	network_logger()->debug("client calls cell::change_health ...");
+	// 2. assume caller sendmsg(stream);
+
+	// 3. assume callee receive request
+	stream.Read(msgid);
+	// 4. find ie vased on id here we just assign it as we are testing
 	GecoNetInterfaceElementWithStats& ie = CELLAPP::change_health;
 	if (g_enable_stats)
-		startMessageHandling(recv_stats_, encoder.get_bytes_length() + 1);
-	bool passed = msg_filter_.filterMessage(from, ie, encoder);
+		startMessageHandling(recv_stats_, stream.get_bytes_length() + 1);
+	bool passed = msg_filter_.filterMessage(from, ie, stream);
 	if (!passed)
 	{
 		if (g_enable_stats)
 			ie.startProfile();
-		ie.GetHandler()->HandleMessage(from, ie, encoder, data);
+		ie.GetHandler()->HandleMessage(from, ie, stream, data);
 		if (g_enable_stats)
-			ie.stopProfile(encoder.get_bytes_length());
+			ie.stopProfile(stream.get_bytes_length());
 	}
 	else
 	{
@@ -120,17 +118,13 @@ void msg_call()
 	}
 	if (g_enable_stats)
 		stopMessageHandling(recv_stats_);
+
+	// 5. assume caller receive reply
 	if (!passed)
 	{
-		// assume caller receive reply
-		encoder.Read(msgid);
-		// find ie vased on id here we just assign it as we are testing
+		stream.Read(msgid);
+		// 6. find ie vased on id here we just assign it as we are testing
 		ie = CLIENTAPP::change_health_cb;
-		CLIENTAPP::change_health_cb.GetHandler()->HandleMessage(from, ie, encoder, data);
+		CLIENTAPP::change_health_cb.GetHandler()->HandleMessage(from, ie, stream, data);
 	}
 }
-
-/// this function is used to parse a single msg (datagram)
-/// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
-/// @param[in] recvlen the msg length travelling on internet. when compressed by peer,
-/// it will be lwss than the actual msg length
