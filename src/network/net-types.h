@@ -703,7 +703,7 @@ struct GECOAPI GecoNetInterfaceElement
 	static const GecoNetInterfaceElement REPLY;
 
 	/*below are all variables that are assigned values read from config file*/
-	GecoNetMessageID m_uiID; ///< Unique message ID
+	GecoNetMessageID id; ///< Unique message ID
 	uchar m_uiLengthStyle; ///< Fixed or variable length
 	int	m_iLengthParam; 	///< This depends on lengthStyle
 	const char *m_pcName; ///< The name of the interface method
@@ -724,7 +724,7 @@ struct GECOAPI GecoNetInterfaceElement
 	GecoNetInterfaceElement(const char * name = "", GecoNetMessageID id = 0,
 		uchar lengthStyle = INVALID_MESSAGE, int lengthParam = 0,
 		GecoNetInputMessageHandler * pHandler = NULL) :
-		m_uiID(id),
+		id(id),
 		m_uiLengthStyle(lengthStyle),
 		m_iLengthParam(lengthParam),
 		m_pcName(name),
@@ -734,7 +734,7 @@ struct GECOAPI GecoNetInterfaceElement
 	void Set(const char * name, GecoNetMessageID id, uchar lengthStyle,
 		int lengthParam)
 	{
-		m_uiID = id;
+		id = id;
 		m_uiLengthStyle = lengthStyle;
 		m_iLengthParam = lengthParam;
 		m_pcName = name;
@@ -780,8 +780,8 @@ struct GECOAPI GecoNetInterfaceElement
 			(length < (1 << (8 * m_iLengthParam)) - 1);
 	}
 
-	GecoNetMessageID GetID() const { return m_uiID; }
-	void SetID(GecoNetMessageID id) { m_uiID = id; }
+	GecoNetMessageID GetID() const { return id; }
+	void SetID(GecoNetMessageID id) { id = id; }
 
 	uchar LengthStyle() const { return m_uiLengthStyle; }
 	int LengthParam() const { return m_iLengthParam; }
@@ -790,7 +790,7 @@ struct GECOAPI GecoNetInterfaceElement
 	const char *c_str() const
 	{
 		static char buf[256];
-		geco_snprintf(buf, sizeof(buf), "%s/%d", m_pcName, m_uiID);
+		geco_snprintf(buf, sizeof(buf), "%s/%d", m_pcName, id);
 		return buf;
 	}
 
@@ -867,7 +867,10 @@ class GECOAPI GecoNetInterfaceElementWithStats : public GecoNetInterfaceElement
 	ProfileVal profile_;
 
 public:
-	GecoNetInterfaceElementWithStats() :
+	GecoNetInterfaceElementWithStats(const char * name = "", GecoNetMessageID id = 0,
+	        uchar lengthStyle = INVALID_MESSAGE, int lengthParam = 0,
+	        GecoNetInputMessageHandler * pHandler = NULL) :
+	    GecoNetInterfaceElement(name, id, lengthStyle,lengthParam,pHandler),
 		maxBytesReceived_(0),
 		numBytesReceived_(0),
 		numMessagesReceived_(0),
@@ -1402,7 +1405,7 @@ public:
 */
 struct GecoInterfaceMinder
 {
-	eastl::vector<GecoNetInterfaceElement>	elements_;
+	eastl::vector<GecoNetInterfaceElementWithStats>	elements_;
 	const char *			name_;
 
 	/**
@@ -1423,12 +1426,12 @@ struct GecoInterfaceMinder
 	*	@param lengthParam		This depends on lengthStyle.
 	*	@param pHandler			The message handler for this msg.
 	*/
-	GecoNetInterfaceElement & add(const char * name, int8 lengthStyle,
+	GecoNetInterfaceElementWithStats & add(const char * name, int8 lengthStyle,
 		int lengthParam, GecoNetInputMessageHandler * pHandler = NULL)
 	{
 		// Set up the new bucket and add it to the list
 	    void* dest = elements_.push_back_uninitialized();
-		return *(new (dest) GecoNetInterfaceElement(name, elements_.size() - 1, lengthStyle, lengthParam, pHandler));
+		return *(new (dest) GecoNetInterfaceElementWithStats(name, elements_.size() - 1, lengthStyle, lengthParam, pHandler));
 	}
 
 	/**

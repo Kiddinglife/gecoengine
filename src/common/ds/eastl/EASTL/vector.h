@@ -2070,7 +2070,6 @@ namespace eastl
 
 	#endif
 
-
 	#if EASTL_MOVE_SEMANTICS_ENABLED && EASTL_VARIADIC_TEMPLATES_ENABLED
 		template <typename T, typename Allocator>
 		template<typename... Args>

@@ -52,7 +52,8 @@ public:
 	void monitorRateOfChange(float numSamples)
 	{
 		float bias = ema_t::calculateBiasFromNumSamples(numSamples);
-		averages_.push_back(ema_t(bias));
+		ema_t ema(bias);
+		averages_.push_back(ema);
 	}
 
 	/**
@@ -142,7 +143,7 @@ public:
 	TYPE val_;
 	TYPE prev_val_;
 
-	typedef eastl::vector< ema_t > Averages;
+	typedef eastl::vector<ema_t> Averages;
 	Averages averages_;
 };
 

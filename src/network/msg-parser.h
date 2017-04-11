@@ -37,18 +37,21 @@ extern void parse_msg(uchar* msg, uint recvlen, GecoNetAddress& from, network_re
 extern void msg_call();
 #endif /* __MSG_PARSER_H__ */
 
-#define USE_COMPRESS_STREAM // you must define this before 
 #include "msg-parser-generator.h"
 
+// the trick here is that we provide user a place to define all their own serilization for
+// specific types of specific msg in specific scope
+// for all lan cluster servers, we always define uncompress writer and reader for it.
+// because lan is low latency high bandwidth
 BEGIN_GECO_INTERFACE(CELLAPP)
 BEGIN_STRUCT_MESSAGE(change_health, change_health_handler)
 uint health;
 END_STRUCT_MESSAGE()
 BEGIN_GECO_OSTREAM(change_health)
-os.WriteMini(args.health);
+os.Write(args.health);
 END_GECO_OSTREAM()
 BEGIN_GECO_ISTREAM(change_health)
-is.ReadMini(args.health);
+is.Read(args.health);
 END_GECO_ISTREAM()
 END_GECO_INTERFACE()
 
