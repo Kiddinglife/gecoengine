@@ -34,30 +34,61 @@ extern void msg_call();
 
 #include "msg-parser-generator.h"
 
-// the trick here is that we provide user a place to define all their own serilization for
-// specific types of specific msg in specific scope
-// for all lan cluster servers, we always define uncompress writer and reader for it.
-// because lan is low latency high bandwidth
+// many-to-many dynamic dispatch model (eg. call entity method). request must know reply id for response
+// one-to-one static dispatch model (eg. the interface defined by macros at compile time they are fixed handlers)
+
+// below explains use dynamic reply id and handler for many-to-many dispatch model .
+// main reason is dynamically created interface eg, script layer functions and cbs.
+// 1. def store_items_cb(success_stored):  this is user defined cb func used to receive store fail or good in script level
+// 2. self.cell.store_items(items[], store_items_cb): this is user inits rmi of store_items on its cell part
+// c++ impl looks like this:
+// replyid = clientapp.register_cb(store_items_cb, eid, mtdid); //register cb and will genersate a new reply id and a new reply handler that contains eid and mtdid
+// cellappinterface::invoke_entity_mtdStructArgs.eid = 1;
+// cellappinterface::invoke_entity_mtdStructArgs.mtdid = 2;
+// cellappinterface::invoke_entity_mtdStructArgs.start_request();
+// os << replyid << invoke_entity_mtdStructArgs; os << [item1,item2,item3]
+// baseappchannel.send(os);
+// .....
+// in cell, its invoke_entity_mtd_handler handles the received msg and it then will callback peerlike this
+//  os << replyid << invoke_entity_mtdStructArgs; os << [item1,item2,item3]
+// 
+// in cient, it invoke reply_mtd_handler to handle cb
+//  client::replyhandlers[replyid].handle(is); //as handler has eid and cb mtd id so it can dispatch to  store_items_cb
+//
+// However we do not have to use reply id for every call in many-to-many dynamic dispatch model 
+// the key is to only involve reply msg id at the first call and then callee will store the cb relationship between request id and cb id
+// say player entity has client::store_items_cb id 0 and cell::scoped store_items  id 0
+// this design requires request and reply must be defined in entity.def to have a unique mtd id created for itself.
+
 BEGIN_GECO_INTERFACE(CELLAPP)
-BEGIN_STRUCT_MESSAGE(change_health, change_health_handler)
-uint health;
+BEGIN_STRUCT_MESSAGE(invoke_entity_mtd_with_cb, invoke_entity_mtd_cb_handler)
+uint eid;
+ushort mtdid;
+ushort cbmtdid;
 END_STRUCT_MESSAGE()
-BEGIN_GECO_OSTREAM(change_health)
-os.Write(args.health);
+BEGIN_GECO_OSTREAM(invoke_entity_mtd_with_cb)
+os.Write(args.eid);
+os.Write(args.mtdid);
+os.Write(args.cbmtdid);
 END_GECO_OSTREAM()
-BEGIN_GECO_ISTREAM(change_health)
-is.Read(args.health);
+BEGIN_GECO_ISTREAM(invoke_entity_mtd_with_cb)
+is.Read(args.eid);
+is.Read(args.mtdid);
+is.Read(args.cbmtdid);
 END_GECO_ISTREAM()
 END_GECO_INTERFACE()
 
 BEGIN_GECO_INTERFACE(CLIENTAPP)
-BEGIN_STRUCT_MESSAGE(change_health_cb, change_health_cb_handler)
-std::string status;
+BEGIN_STRUCT_MESSAGE(invoke_entity_mtd, invoke_entity_mtd_handler)
+uint eid;
+uint mtdid;
 END_STRUCT_MESSAGE()
-BEGIN_GECO_OSTREAM(change_health_cb)
-os.WriteMini(args.status);
+BEGIN_GECO_OSTREAM(invoke_entity_mtd)
+os.Write(args.eid);
+os.Write(args.mtdid);
 END_GECO_OSTREAM()
-BEGIN_GECO_ISTREAM(change_health_cb)
-is.ReadMini(args.status);
+BEGIN_GECO_ISTREAM(invoke_entity_mtd)
+is.Read(args.eid);
+is.Read(args.mtdid);
 END_GECO_ISTREAM()
 END_GECO_INTERFACE()

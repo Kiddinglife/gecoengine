@@ -580,7 +580,6 @@ struct GecoNetInterfaceElement;
 */
 struct GecoNetInputMessageHandler
 {
-
 	virtual ~GecoNetInputMessageHandler() {};
 
 	/**

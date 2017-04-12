@@ -18,17 +18,17 @@
  *
  */
 
-/*
- * networkstats.h
- *
- *  Created on: 18Nov.,2016
- *      Author: jackiez
- */
+ /*
+  * networkstats.h
+  *
+  *  Created on: 18Nov.,2016
+  *      Author: jackiez
+  */
 
 #ifndef __MSG_PARSER_GENERATOR_H__
 #define __MSG_PARSER_GENERATOR_H__   //  Prevent include the folowing macros more than one time
 
-/* Helper macros */
+  /* Helper macros */
 #define GECO_FIXED_MESSAGE( NAME, PARAM, HANDLER )     GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, PARAM, HANDLER)
 #define GECO_VARIABLE_MESSAGE( NAME, PARAM, HANDLER )  GECO_MESSAGE( NAME, VARIABLE_LENGTH_MESSAGE, PARAM, HANDLER)
 #define GECO_EMPTY_MESSAGE( NAME, HANDLER )			   GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, 0, HANDLER )
@@ -38,6 +38,7 @@ GECO_STRUCT_MESSAGE( NAME, HANDLER) \
 {
 #define END_STRUCT_MESSAGE() \
 };
+
 #define BEGIN_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG )\
 GECO_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG ) \
 {
@@ -49,7 +50,9 @@ GECO_HANDLED_STRUCT_MESSAGE( NAME, HANDLERTYPE, HANDLERARG ) \
 HANDLER_STATEMENT( NAME, HANDLERTYPE, HANDLERARG) \
 GECO_STRUCT_MESSAGE( NAME, HANDLER_ARGUMENT( NAME ) )
 
-
+#define GECO_HANDLED_PREFIXED_MESSAGE(NAME, PREFIXTYPE, HANDLERTYPE, HANDLERARG ) \
+HANDLER_STATEMENT( NAME, HANDLERTYPE, HANDLERARG ) \
+GECO_PREFIXED_MESSAGE( NAME, PREFIXTYPE,	HANDLER_ARGUMENT( NAME ) )									
 
 #endif /* __MSG_PARSER_GENERATOR_H_ */
 
@@ -119,8 +122,8 @@ namespace INAME \
 	}
 
 #define GECO_STRUCT_MESSAGE( NAME, HANDLER)\
-GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, sizeof(struct NAME##ArgsType), HANDLER )\
-struct NAME##ArgsType NAME##Args; \
+GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, sizeof(struct NAME##StructArgsType), HANDLER )\
+struct NAME##StructArgsType NAME##StructArgs; \
 struct dump_##NAME##_ArgsTypeDoNotUseThis 
 
 #define END_GECO_INTERFACE() \
@@ -142,14 +145,14 @@ namespace INAME \
 	GecoNetReason registerWithMachined(GecoNetworkInterface & networkInterface, int id ); 
 
 #define BEGIN_GECO_ISTREAM( NAME ) \
-  INLINE geco_bit_stream_t& operator>>( geco_bit_stream_t &is, NAME##ArgsType &args ) \
+  INLINE geco_bit_stream_t& operator>>( geco_bit_stream_t &is, NAME##StructArgsType &args ) \
   {
 // add args compress decoder here ...
 #define END_GECO_ISTREAM() \
       return is;\
   }
 #define BEGIN_GECO_OSTREAM( NAME) \
-  INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, const NAME##ArgsType &args ) \
+  INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, const NAME##StructArgsType &args ) \
   { \
     os.Write(NAME.id);
 // add args uncompress encoder here ...
@@ -159,10 +162,10 @@ namespace INAME \
 
 //  declare GECO_MESSAGE, struct type that represents msg body, encoder and decoder msg body,
 #define GECO_STRUCT_MESSAGE( NAME, HANDLER) \
-	struct NAME##ArgsType;	\
-	extern NAME##ArgsType NAME##Args; \
+	struct NAME##StructArgsType;	\
+	extern NAME##StructArgsType NAME##StructArgs; \
 	GECO_MESSAGE( NAME, 0, 0, 0 ) \
-	struct NAME##ArgsType
+	struct NAME##StructArgsType
 
 #define END_GECO_INTERFACE() \
 /** @} */	\
