@@ -580,7 +580,7 @@ struct GecoNetInterfaceElement;
 */
 struct GecoNetInputMessageHandler
 {
-	virtual ~GecoNetInputMessageHandler() {};
+    virtual ~GecoNetInputMessageHandler() {};
 
 	/**
 	* 	This method is called to hndle a request,reply or normal message.

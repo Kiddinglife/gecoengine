@@ -55,9 +55,6 @@ extern void msg_call();
 // in cient, it invoke reply_mtd_handler to handle cb
 //  client::replyhandlers[replyid].handle(is); //as handler has eid and cb mtd id so it can dispatch to  store_items_cb
 //
-// However we do not have to use reply id for every call in many-to-many dynamic dispatch model 
-// the key is to only involve reply msg id at the first call and then callee will store the cb relationship between request id and cb id
-// say player entity has client::store_items_cb id 0 and cell::scoped store_items  id 0
 // this design requires request and reply must be defined in entity.def to have a unique mtd id created for itself.
 
 BEGIN_GECO_INTERFACE(CELLAPP)
@@ -65,16 +62,19 @@ BEGIN_STRUCT_MESSAGE(invoke_entity_mtd_with_cb, invoke_entity_mtd_cb_handler)
 uint eid;
 ushort mtdid;
 ushort cbmtdid;
+geco_bit_stream_t* data;
 END_STRUCT_MESSAGE()
 BEGIN_GECO_OSTREAM(invoke_entity_mtd_with_cb)
 os.Write(args.eid);
 os.Write(args.mtdid);
 os.Write(args.cbmtdid);
+args.data = &os;
 END_GECO_OSTREAM()
 BEGIN_GECO_ISTREAM(invoke_entity_mtd_with_cb)
 is.Read(args.eid);
 is.Read(args.mtdid);
 is.Read(args.cbmtdid);
+args.data = &is;
 END_GECO_ISTREAM()
 END_GECO_INTERFACE()
 

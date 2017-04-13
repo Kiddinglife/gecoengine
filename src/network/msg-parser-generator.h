@@ -152,7 +152,7 @@ namespace INAME \
       return is;\
   }
 #define BEGIN_GECO_OSTREAM( NAME) \
-  INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, const NAME##StructArgsType &args ) \
+  INLINE geco_bit_stream_t& operator<<( geco_bit_stream_t &os, NAME##StructArgsType &args ) \
   { \
     os.Write(NAME.id);
 // add args uncompress encoder here ...
