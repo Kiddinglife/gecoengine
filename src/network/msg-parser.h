@@ -58,19 +58,19 @@ extern void msg_call();
 // this design requires request and reply must be defined in entity.def to have a unique mtd id created for itself.
 
 BEGIN_GECO_INTERFACE(CELLAPP)
-BEGIN_STRUCT_MESSAGE(invoke_entity_mtd_with_cb, invoke_entity_mtd_cb_handler)
+BEGIN_HANDLED_STRUCT_MESSAGE(cell_invoke_entity_mtd_with_cbid, CellEntityMsgHandler, &cell::invoke_entity_mtd)
 uint eid;
 ushort mtdid;
 ushort cbmtdid;
 geco_bit_stream_t* data;
-END_STRUCT_MESSAGE()
-BEGIN_GECO_OSTREAM(invoke_entity_mtd_with_cb)
+END_HANDLED_STRUCT_MESSAGE()
+BEGIN_GECO_OSTREAM(cell_invoke_entity_mtd_with_cbid)
 os.Write(args.eid);
 os.Write(args.mtdid);
 os.Write(args.cbmtdid);
 args.data = &os;
 END_GECO_OSTREAM()
-BEGIN_GECO_ISTREAM(invoke_entity_mtd_with_cb)
+BEGIN_GECO_ISTREAM(cell_invoke_entity_mtd_with_cbid)
 is.Read(args.eid);
 is.Read(args.mtdid);
 is.Read(args.cbmtdid);
@@ -79,16 +79,22 @@ END_GECO_ISTREAM()
 END_GECO_INTERFACE()
 
 BEGIN_GECO_INTERFACE(CLIENTAPP)
-BEGIN_STRUCT_MESSAGE(invoke_entity_mtd, invoke_entity_mtd_handler)
+BEGIN_STRUCT_MESSAGE(client_invoke_entity_mtd, invoke_entity_mtd_handler)
 uint eid;
 uint mtdid;
+std::string ret;
+geco_bit_stream_t* data;
 END_STRUCT_MESSAGE()
-BEGIN_GECO_OSTREAM(invoke_entity_mtd)
+BEGIN_GECO_OSTREAM(client_invoke_entity_mtd)
 os.Write(args.eid);
 os.Write(args.mtdid);
+os.Write(args.ret);
+args.data = &os;
 END_GECO_OSTREAM()
-BEGIN_GECO_ISTREAM(invoke_entity_mtd)
+BEGIN_GECO_ISTREAM(client_invoke_entity_mtd)
 is.Read(args.eid);
 is.Read(args.mtdid);
+is.Read(args.ret);
+geco_bit_stream_t* data;
 END_GECO_ISTREAM()
 END_GECO_INTERFACE()

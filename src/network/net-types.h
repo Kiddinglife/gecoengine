@@ -590,10 +590,7 @@ struct GecoNetInputMessageHandler
 	* 	@param msgbody		The actual message data.
 	* 	@param arg		This is user-defined data that was passed in with the request that generated this reply.
 	*/
-	virtual int HandleMessage(const GecoNetAddress & from, GecoNetInterfaceElement& ie, geco_bit_stream_t & msgbody, void* data = NULL)
-	{
-		return 0;
-	};
+	virtual int HandleMessage(const GecoNetAddress & from, GecoNetInterfaceElement& ie, geco_bit_stream_t & msgbody) = 0;
 
 	/**
 	* 	This method is called by Mercury when the request fails. The
@@ -604,11 +601,11 @@ struct GecoNetInputMessageHandler
 	*/
 	virtual void handleException(const char* exception, void * arg = NULL)
 	{
-		////network_logger()()->warn("ReplyMessageHandler::handleException: Not handled. Possible memory leak.");
+		throw std::exception("not inmplemented");
 	}
 	virtual void handleShuttingDown(const char* exception, void * arg = NULL)
 	{
-		////network_logger()()->warn("ReplyMessageHandler::handleShuttingDown: Not handled. Possible memory leak.");
+		throw std::exception("not inmplemented");
 	}
 };
 
