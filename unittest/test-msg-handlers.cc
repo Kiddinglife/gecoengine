@@ -1,11 +1,14 @@
 /*
- * networkstats.cpp
+ * test-auth.cc
  *
- *  Created on: 18Nov.,2016
+ *  Created on: 22Jul.,2016
  *      Author: jackiez
  */
 
-#include "msg-parser.h"
+#include "gtest/gtest.h"
+
+#include "network/net-types.h"
+#include "test-msg-handlers.h"
 
 struct cell
 {
@@ -83,7 +86,6 @@ class ClientEntityMsgHandler : public GecoNetInputMessageHandler
 		msgbody >> CLIENTAPP::client_invoke_entity_mtdStructArgs;
 		network_logger()->debug("ClientEntityMsgHandle::HandleMessage()::ret {}", CLIENTAPP::client_invoke_entity_mtdStructArgs.ret.c_str());
 		network_logger()->debug("done...");
-
 		return 0;
 	}
 };
@@ -91,10 +93,10 @@ class ClientEntityMsgHandler : public GecoNetInputMessageHandler
 //CellEntityMsgHandler* invoke_entity_mtd_cb_handler = new CellEntityMsgHandler(&cell::client_invoke_entity_mtd);
 ClientEntityMsgHandler* invoke_entity_mtd_handler = new ClientEntityMsgHandler;
 
-//this will set up handler in network element with NULL so you need to test handler is null before cll it
+// DEFINE_INTERFACE_HERE will set up handler in network element with NULL so
 //#define DEFINE_INTERFACE_HERE
 #define DEFINE_SERVER_HERE
-#include "msg-parser.h"
+#include "test-msg-handlers.h"
 
 eastl::vector<GecoNetInterfaceElementWithStats> /*bundle::*/table_;
 
@@ -110,8 +112,8 @@ struct MyMsgFilter : public GecoMessageFilter
 };
 
 /**
- *	 This method is called just before a message is dispatched to its handler.
- */
+*	 This method is called just before a message is dispatched to its handler.
+*/
 void /*ProcessSocketStatsHelper::*/startMessageHandling(network_recv_stats_t& recv_stats, int messageLength)
 {
 	++recv_stats.numMessagesReceivedPerSecond_;
@@ -120,24 +122,20 @@ void /*ProcessSocketStatsHelper::*/startMessageHandling(network_recv_stats_t& re
 	recv_stats.mercuryTimer_.start();
 }
 /**
- *	 This method is called just after a message has been processed by its
- *	 handler.
- */
+*	 This method is called just after a message has been processed by its
+*	 handler.
+*/
 void /*ProcessSocketStatsHelper::*/stopMessageHandling(network_recv_stats_t& recv_stats)
 {
 	recv_stats.mercuryTimer_.stop();
 }
 
-/// this function is used to parse a single msg (datagram) and call  handler
-/// @param[in] msg datagram when calling syscall receive(), it returns a complete msg
-/// @param[in] recvlen the msg length travelling on internet. when compressed by peer,
-/// it will be lwss than the actual msg length
-void msg_call()
+TEST(geco_engine_network, test_msg_handler_macros)
 {
-	// As msg is the smallest logic unit,
-	// you must call syscall send() for each of msg with stream id, reliable flag
-	// geco_bit_stream_t will help you handle the case where a single msg that is exceeding default 1MB
-	geco_bit_stream_t stream(1024 * 1024 * 1024); // 1MB
+	// sctp receive() returns a complete msg at one time and so msg is the smallest logic unit.
+	// call sctp send() to send a complete msg with reliable flg stream id and so on.
+	// geco_bit_stream_t will help you handle the case where a single msg that is exceeding default max msg size 1MB
+	geco_bit_stream_t stream(1024 * 1024 * 1024); // 1MB this is kept send buffer and wil be release when pragram exits so make it very big 1MB
 	network_recv_stats_t recv_stats_;
 	MyMsgFilter msg_filter_; /*bundle::*/
 	uchar msgid;
@@ -192,3 +190,4 @@ void msg_call()
 		CLIENTAPP::client_invoke_entity_mtd.GetHandler()->HandleMessage(from, ie, stream);
 	}
 }
+

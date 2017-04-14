@@ -25,8 +25,8 @@
   *      Author: jackiez
   */
 
-#ifndef __MSG_PARSER_GENERATOR_H__
-#define __MSG_PARSER_GENERATOR_H__   //  Prevent include the folowing macros more than one time
+#ifndef __MSG_HANDLER_DEFINES_H__
+#define __MSG_HANDLER_DEFINES_H__   //  Prevent include the folowing macros more than one time
 
   /* Helper macros */
 #define GECO_FIXED_MESSAGE( NAME, PARAM, HANDLER )     GECO_MESSAGE( NAME, FIXED_LENGTH_MESSAGE, PARAM, HANDLER)

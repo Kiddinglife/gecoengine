@@ -136,14 +136,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\network\end-point.h" />
-    <ClInclude Include="..\..\..\..\src\network\msg-parser-generator.h" />
-    <ClInclude Include="..\..\..\..\src\network\msg-parser.h" />
+    <ClInclude Include="..\..\..\..\src\network\msg-handler-defines.h" />
     <ClInclude Include="..\..\..\..\src\network\net-types.h" />
     <ClInclude Include="..\..\..\..\src\network\networkstats.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\network\end-point.h.cc" />
-    <ClCompile Include="..\..\..\..\src\network\msg-parser.cc" />
     <ClCompile Include="..\..\..\..\src\network\net-types.cc" />
     <ClCompile Include="..\..\..\..\src\network\networkstats.cpp" />
   </ItemGroup>

@@ -35,7 +35,8 @@ GTEST_API_ int main(int argc, char** argv)
 	// ::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_run_length";
 	// ::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_all_reads_and_writes";
 	//::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_all_reads_and_writes_un_compressed";
-	::testing::GTEST_FLAG(filter) = "GecoMemoryStreamTestCase.test_msg_call";
+
+	::testing::GTEST_FLAG(filter) = "geco_engine_network.test_msg_handler_macros";
 
 	//last run and pass on 14:18 PM 4 Oct 2016
 	//::testing::GTEST_FLAG(filter) = "GECO_DEBUGGING_TIMESTAMP.test_gettimestamp_func";

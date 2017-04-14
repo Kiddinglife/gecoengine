@@ -5,52 +5,69 @@
  *      Author: jackiez
  */
 
-// UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP was defined before
-// here undef it so that definitions can be included in the followings
-#if defined(DEFINE_INTERFACE_HERE) || defined( DEFINE_SERVER_HERE )
-    #undef UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP
-#endif
+#include "network/msg-handler-defines.h"
 
-#ifndef UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP
-#define UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP
+// many-to-many dynamic dispatch model (eg. call entity method). request must know reply id for response
+// one-to-one static dispatch model (eg. the interface defined by macros at compile time they are fixed handlers)
 
-#include "network/msg-parser-generator.h"
+// below explains use dynamic reply id and handler for many-to-many dispatch model .
+// main reason is dynamically created interface eg, script layer functions and cbs.
+// 1. def store_items_cb(success_stored):  this is user defined cb func used to receive store fail or good in script level
+// 2. self.cell.store_items(items[], store_items_cb): this is user inits rmi of store_items on its cell part
+// c++ impl looks like this:
+// replyid = clientapp.register_cb(store_items_cb, eid, mtdid); //register cb and will genersate a new reply id and a new reply handler that contains eid and mtdid
+// cellappinterface::invoke_entity_mtdStructArgs.eid = 1;
+// cellappinterface::invoke_entity_mtdStructArgs.mtdid = 2;
+// cellappinterface::invoke_entity_mtdStructArgs.start_request();
+// os << replyid << invoke_entity_mtdStructArgs; os << [item1,item2,item3]
+// baseappchannel.send(os);
+// .....
+// in cell, its invoke_entity_mtd_handler handles the received msg and it then will callback peerlike this
+//  os << replyid << invoke_entity_mtdStructArgs; os << [item1,item2,item3]
+// 
+// in cient, it invoke reply_mtd_handler to handle cb
+//  client::replyhandlers[replyid].handle(is); //as handler has eid and cb mtd id so it can dispatch to  store_items_cb
+//
+// this design requires request and reply must be defined in entity.def to have a unique mtd id created for itself.
 
-#undef INAME // in ase it has been defined in other module
-#define INAME BaseAppInternalInterface
-
-// Prevent multi-declarations when DEFINE_INTERFACE_HERE or DEFINE_SERVER_HERE
-#ifndef UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP_GUARD
-#define UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP_GUARD
-// These constants apply to the BaseAppIntInterface::logOnAttempt message.
-namespace INAME
-{
-    const uint8 LOG_ON_ATTEMPT_REJECTED = 0;
-}
-#endif // UNITTEST_FAKED_BASE_APP_EXTERNAL_INTERFACE_HPP_GUARD
-
-// put your msg macros here...
 BEGIN_GECO_INTERFACE(CELLAPP)
-BEGIN_STRUCT_MESSAGE(change_health, change_health_handler)
-uint health;
-END_STRUCT_MESSAGE()
-BEGIN_GECO_OSTREAM(change_health)
-os.Write(args.health);
+BEGIN_HANDLED_STRUCT_MESSAGE(cell_invoke_entity_mtd_with_cbid, CellEntityMsgHandler, &cell::invoke_entity_mtd)
+uint eid;
+ushort mtdid;
+ushort cbmtdid;
+geco_bit_stream_t* data;
+END_HANDLED_STRUCT_MESSAGE()
+BEGIN_GECO_OSTREAM(cell_invoke_entity_mtd_with_cbid)
+os.Write(args.eid);
+os.Write(args.mtdid);
+os.Write(args.cbmtdid);
+args.data = &os;
 END_GECO_OSTREAM()
-BEGIN_GECO_ISTREAM(change_health)
-is.Read(args.health);
+BEGIN_GECO_ISTREAM(cell_invoke_entity_mtd_with_cbid)
+is.Read(args.eid);
+is.Read(args.mtdid);
+is.Read(args.cbmtdid);
+args.data = &is;
 END_GECO_ISTREAM()
 END_GECO_INTERFACE()
 
-#endif /* UNITTEST_TEST_APP_MSG_HANDLERS_H_ */
-
-
-#if defined(DEFINE_INTERFACE_HERE) || defined( DEFINE_SERVER_HERE )
-    #undef UNITTEST_FAKED_CLIENT_APP_INTERFACE_HPP
-#endif
-
-#ifndef UNITTEST_FAKED_CLIENT_APP_INTERFACE_HPP
-#define UNITTEST_FAKED_CLIENT_APP_INTERFACE_HPP
-#include "network/msg-parser-generator.h"
-
-#endif /* UNITTEST_TEST_APP_MSG_HANDLERS_H_ */
+BEGIN_GECO_INTERFACE(CLIENTAPP)
+BEGIN_STRUCT_MESSAGE(client_invoke_entity_mtd, invoke_entity_mtd_handler)
+uint eid;
+uint mtdid;
+std::string ret;
+geco_bit_stream_t* data;
+END_STRUCT_MESSAGE()
+BEGIN_GECO_OSTREAM(client_invoke_entity_mtd)
+os.Write(args.eid);
+os.Write(args.mtdid);
+os.Write(args.ret);
+args.data = &os;
+END_GECO_OSTREAM()
+BEGIN_GECO_ISTREAM(client_invoke_entity_mtd)
+is.Read(args.eid);
+is.Read(args.mtdid);
+is.Read(args.ret);
+geco_bit_stream_t* data;
+END_GECO_ISTREAM()
+END_GECO_INTERFACE()

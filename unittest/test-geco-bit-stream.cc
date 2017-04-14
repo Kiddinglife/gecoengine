@@ -531,9 +531,3 @@ TEST(GecoMemoryStreamTestCase, test_all_reads_and_writes_un_compressed) {
 		s9.reset();
 	}
 }
-
-#include "network/msg-parser.h"
-TEST(GecoMemoryStreamTestCase, test_msg_call)
-{
-	msg_call();
-}

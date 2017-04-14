@@ -55,7 +55,7 @@
 /// Threshold at which to do a malloc / free rather than pushing data onto a fixed stack
 /// for the bitstream class. 1512 is an arbitrary size, just picking something likely to be larger
 /// than  most packets
-#define GECO_STREAM_STACK_ALLOC_BYTES 1512 // 1KB
+#define GECO_STREAM_STACK_ALLOC_BYTES 1512
 #define GECO_STREAM_STACK_ALLOC_BITS (BYTES_TO_BITS(GECO_STREAM_STACK_ALLOC_BYTES))
 
 // another imple of singleton using static methods instead of inhertance

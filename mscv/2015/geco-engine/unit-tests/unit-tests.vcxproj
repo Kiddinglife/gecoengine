@@ -197,9 +197,13 @@
     <ClCompile Include="..\..\..\..\unittest\test-debugging.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-geco-bit-stream.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-msg-handlers.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-time.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-ultils.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-watcher.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\unittest\test-msg-handlers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
