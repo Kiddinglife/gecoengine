@@ -287,7 +287,7 @@
       <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>../../../../src/common/debugging;../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
-      <CallingConvention>Cdecl</CallingConvention>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

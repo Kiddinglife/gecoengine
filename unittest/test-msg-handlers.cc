@@ -135,6 +135,9 @@ TEST(geco_engine_network, test_msg_handler_macros)
 	// sctp receive() returns a complete msg at one time and so msg is the smallest logic unit.
 	// call sctp send() to send a complete msg with reliable flg stream id and so on.
 	// geco_bit_stream_t will help you handle the case where a single msg that is exceeding default max msg size 1MB
+	// client script :: self.health = 12; // generate and send an set_entity_property_value_msg to server 
+	// server c++ ::  set_entity_property_value_handler(set_entity_property_value_msg); // decode msg and call python-c-api::set_property_value(playerobj,"pname_health", newval12) 
+	// in periodlly update, server will construct unpdate packets and thus the change will be also progatated other entities.
 	geco_bit_stream_t stream(1024 * 1024 * 1024); // 1MB this is kept send buffer and wil be release when pragram exits so make it very big 1MB
 	network_recv_stats_t recv_stats_;
 	MyMsgFilter msg_filter_; /*bundle::*/

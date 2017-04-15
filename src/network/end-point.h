@@ -7,68 +7,6 @@
 #include "common/ds/eastl/EASTL/map.h"
 #include "common/ds/eastl/EASTL/vector.h"
 
-#include <sys/types.h>
-#include <errno.h>
-#include <stdlib.h>
-
-#if defined(__linux__ ) || defined( PLAYSTATION3 )
-#include <sys/time.h>
-#include <sys/socket.h>
-#ifndef PLAYSTATION3
-#include <sys/fcntl.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#endif
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#else
-#include <WINSOCK.H>
-#endif
-
-#ifdef PLAYSTATION3
-#include <netex/libnetctl.h>
-#endif
-
-#ifndef __linux__
-
-#ifdef PLAYSTATION3
-typedef uint8_t 	u_int8_t;
-typedef uint16_t 	u_int16_t;
-typedef uint32_t 	u_int32_t;
-#else
-#ifndef socklen_t
-typedef int socklen_t;
-#endif
-typedef u_short u_int16_t;
-typedef u_long u_int32_t;
-#endif
-
-#ifdef _WIN32
-#define IFNAMSIZ 256
-#else
-#define IFNAMSIZ 16
-#endif
-
-#ifndef IFF_UP
-enum
-{
-	IFF_UP = 0x1,
-	IFF_BROADCAST = 0x2,
-	IFF_DEBUG = 0x4,
-	IFF_LOOPBACK = 0x8,
-	IFF_POINTOPOINT = 0x10,
-	IFF_NOTRAILERS = 0x20,
-	IFF_RUNNING = 0x40,
-	IFF_NOARP = 0x80,
-	IFF_PROMISC = 0x100,
-	IFF_MULTICAST = 0x1000
-};
-#endif
-
-#endif
-
 class geco_bit_stream_t;
 
 /**

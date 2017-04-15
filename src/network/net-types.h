@@ -2,6 +2,12 @@
 #ifndef __GecoNetTypes_H__
 #define __GecoNetTypes_H__
 
+// winsock2 must include before windows.h
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2ipdef.h>
+#endif
+
 #include "common/geco-plateform.h"
 #include "common/ds/geco-bit-stream.h"
 #include "common/ds/eastl/EASTL/string.h"
@@ -13,6 +19,234 @@
 
 #include <vector>
 #include <limits>
+
+#include <sys/types.h>
+#include <errno.h>
+#include <stdlib.h>
+
+#if defined(__linux__ ) || defined( PLAYSTATION3 )
+#include <sys/time.h>
+#include <sys/socket.h>
+#ifndef PLAYSTATION3
+#include <sys/fcntl.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#else
+#include <netex/libnetctl.h>
+#endif
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#endif
+
+#ifndef __linux__
+#ifdef PLAYSTATION3
+typedef uint8_t 	u_int8_t;
+typedef uint16_t 	u_int16_t;
+typedef uint32_t 	u_int32_t;
+#else
+#ifndef socklen_t
+typedef int socklen_t;
+#endif
+typedef u_short u_int16_t;
+typedef u_long u_int32_t;
+#endif
+#ifdef _WIN32
+#define IFNAMSIZ 256
+#else
+#define IFNAMSIZ 16
+#endif
+enum
+{
+	//IFF_UP = 0x1,
+	//IFF_BROADCAST = 0x2,
+	IFF_DEBUG = 0x4,
+	//IFF_LOOPBACK = 0x8,
+	IFF_POINTOPOINT = 0x10,
+	IFF_NOTRAILERS = 0x20,
+	IFF_RUNNING = 0x40,
+	IFF_NOARP = 0x80,
+	IFF_PROMISC = 0x100,
+	//IFF_MULTICAST = 0x1000
+};
+#endif
+
+#ifndef _WIN32
+#include <sys/time.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#include <netinet/ip6.h>
+#include <netdb.h>
+#include <arpa/inet.h>      /* for inet_ntoa() under both SOLARIS/LINUX */
+#include <sys/errno.h>
+#include <sys/uio.h>        /* for struct iovec */
+#include <sys/param.h>
+#include <sys/ioctl.h>
+#include <netinet/tcp.h>
+#include <net/if.h>
+#ifdef USE_UDP
+#include <netinet/udp.h>
+#endif
+#include <asm/types.h>
+#include <linux/rtnetlink.h>
+#else
+//#include <Netioapi.h>
+#include <ws2tcpip.h> // has #include <ws2ipdef.h> and #include <winsock2.h>
+#include <ws2def.h>
+#include <mstcpip.h>
+#include <mswsock.h>
+#include <iphlpapi.h>
+#include <sys/timeb.h>
+#endif
+
+#if defined (__linux__)
+#include <asm/types.h>
+#include <linux/rtnetlink.h>
+#else /* this may not be okay for SOLARIS !!! */
+#ifndef _WIN32
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#ifndef __sun
+#include <net/if_var.h>
+#include <machine/param.h>
+#else
+#include <sys/sockio.h>
+#endif
+#endif
+#endif
+
+#if defined( __linux__) || defined(__unix__)
+#include <sys/poll.h>
+#else
+#define POLLIN     0x001 //2base    0001
+#define POLLPRI    0x002 //2base    0010
+#define POLLOUT    0x004 //2base  0100
+#define POLLERR    0x008//2base    1000
+#endif
+
+#define IFA_BUFFER_LENGTH   1024
+#define POLL_FD_UNUSED     -1
+#define MAX_FD_SIZE     32
+#define    EVENTCB_TYPE_SCTP       1
+#define    EVENTCB_TYPE_UDP        2
+#define    EVENTCB_TYPE_USER       3
+#define    EVENTCB_TYPE_ROUTING    4
+#define    EVENTCB_TYPE_STDIN          5
+#define    EVENTCB_TYPE_TASK       6
+
+#ifndef CMSG_ALIGN
+#ifdef ALIGN
+#define CMSG_ALIGN ALIGN
+#else
+#define CMSG_ALIGN(len) ( ((len)+sizeof(long)-1) & ~(sizeof(long)-1) )
+#endif
+#endif
+
+#ifndef CMSG_SPACE
+#define CMSG_SPACE(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + CMSG_ALIGN(len))
+#endif
+
+#ifndef CMSG_LEN
+#define CMSG_LEN(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + (len))
+#endif
+
+#ifdef _WIN32
+#define MY_CMSG_DATA WSA_CMSG_DATA
+#else
+#define MY_CMSG_DATA CMSG_DATA
+#endif
+
+#ifndef _WIN32
+#define LINUX_PROC_IPV6_FILE "/proc/net/if_inet6"
+
+#else
+#define ADDRESS_LIST_BUFFER_SIZE        4096
+struct iphdr
+{
+	uchar version_length;
+	uchar typeofservice; /* type of service */
+	ushort length; /* total length */
+	ushort identification; /* identification */
+	ushort fragment_offset; /* fragment offset field */
+	uchar ttl; /* time to live */
+	uchar protocol; /* protocol */
+	ushort checksum; /* checksum */
+	struct in_addr src_addr; /* source and dest address */
+	struct in_addr dst_addr;
+};
+
+#define msghdr _WSAMSG
+#define iovec _WSABUF
+#endif
+
+#ifndef _WIN32
+//#define USES_BSD_4_4_SOCKET
+#ifndef __sun
+#define ROUNDUP(a, size) (((a) & ((size)-1)) ? (1 + ((a) | ((size)-1))) : (a))
+#define NEXT_SA(ap) \
+ap = (struct sockaddr *)((caddr_t) ap + (ap->sa_len ? \
+ROUNDUP(ap->sa_len, sizeof (u_long)) : sizeof(u_long)))
+inline bool IN6_ADDR_EQUAL(const in6_addr *x, const in6_addr *y)
+{
+	uint64_t* a = (uint64_t*)x;
+	uint64_t* b = (uint64_t*)y;
+	return (bool)((a[1] == b[1]) && (a[0] == b[0]));
+}
+#else
+#define NEXT_SA(ap) ap = (struct sockaddr *) ((caddr_t) ap + sizeof(struct sockaddr))
+#define RTAX_MAX RTA_NUMBITS
+#define RTAX_IFA 5
+#define _NO_SIOCGIFMTU_
+#endif
+#endif
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <time.h>
+#include <sys/types.h>
+#endif
+
+#ifdef __GNUC__
+#define likely(x)       __builtin_expect((x),1)
+#define unlikely(x)     __builtin_expect((x),0)
+#else
+#define likely(x)       (x)
+#define unlikely(x)    (x)
+#endif
+
+#ifdef __linux__
+#include <endian.h>
+# if __BYTE_ORDER == __LITTLE_ENDIAN
+#endif
+#endif
+
+// for linux-kernal-systems
+#ifdef __linux__
+#include <sys/time.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#endif
+
+#ifdef __FreeBSD__
+#include <netinet/in_systm.h>
+#include <sys/types.h>
+#endif
+
+#if defined(__sun)
+# if defined(__svr4__)
+/* Solaris */
+#include <netinet/in_systm.h>
+#include <stdarg.h>
+# else
+/* SunOS */
+// add more files needed
+# endif
+#endif
 
 #ifdef _XBOX360
 #include "GecoNet360.h"
@@ -32,6 +266,28 @@
 
 extern std::shared_ptr<spdlog::logger>& network_logger();
 extern bool g_enable_stats;
+
+#define s4addr(X)   (((struct sockaddr_in *)(X))->sin_addr.s_addr)
+#define sin4addr(X)   (((struct sockaddr_in *)(X))->sin_addr)
+#define s6addr(X)  (((struct sockaddr_in6 *)(X))->sin6_addr.s6_addr)
+#define sin6addr(X)  (((struct sockaddr_in6 *)(X))->sin6_addr)
+#define saddr_family(X)  (X)->sa.sa_family
+/* union for handling either type of addresses: ipv4 and ipv6 */
+union sockaddrunion
+{
+	struct sockaddr sa;
+	struct sockaddr_in sin;
+	struct sockaddr_in6 sin6;
+};
+/* converts address-string to network order endian
+* (hex for ipv6, dotted decimal for ipv4 to a sockaddrunion structure)
+*  str == NULL will bitzero saddr used as 'ANY ADRESS 0.0.0.0'
+*  port number will be always >0
+*  default  is IPv4 
+*  @return 0 for success, else -1.*/
+extern int GECOAPI str2saddr(sockaddrunion *su, const char * str, ushort port = 0);
+extern int GECOAPI saddr2str(sockaddrunion *su, char * buf, size_t len, ushort* portnum = NULL);
+extern bool GECOAPI saddr_equals(const sockaddrunion *a, const sockaddrunion *b, bool ignore_port = false);
 
 class GecoWatcher;
 class GecoNetBundle;
@@ -580,7 +836,7 @@ struct GecoNetInterfaceElement;
 */
 struct GecoNetInputMessageHandler
 {
-    virtual ~GecoNetInputMessageHandler() {};
+	virtual ~GecoNetInputMessageHandler() {};
 
 	/**
 	* 	This method is called to hndle a request,reply or normal message.
@@ -864,9 +1120,9 @@ class GECOAPI GecoNetInterfaceElementWithStats : public GecoNetInterfaceElement
 
 public:
 	GecoNetInterfaceElementWithStats(const char * name = "", GecoNetMessageID id = 0,
-	        uchar lengthStyle = INVALID_MESSAGE, int lengthParam = 0,
-	        GecoNetInputMessageHandler * pHandler = NULL) :
-	    GecoNetInterfaceElement(name, id, lengthStyle,lengthParam,pHandler),
+		uchar lengthStyle = INVALID_MESSAGE, int lengthParam = 0,
+		GecoNetInputMessageHandler * pHandler = NULL) :
+		GecoNetInterfaceElement(name, id, lengthStyle, lengthParam, pHandler),
 		maxBytesReceived_(0),
 		numBytesReceived_(0),
 		numMessagesReceived_(0),
@@ -992,8 +1248,8 @@ public:
 	bool NearTo(const GecoYawPitchRoll & oth) const
 	{
 		uint val = (m_uiYaw - oth.m_uiYaw + 1) | (m_uiPitch - oth.m_uiPitch + 1) |
-	            (m_uiRoll - oth.m_uiRoll + 1);
-	    return val <= 3;
+			(m_uiRoll - oth.m_uiRoll + 1);
+		return val <= 3;
 	}
 
 	uchar	m_uiYaw;
@@ -1426,7 +1682,7 @@ struct GecoInterfaceMinder
 		int lengthParam, GecoNetInputMessageHandler * pHandler = NULL)
 	{
 		// Set up the new bucket and add it to the list
-	    void* dest = elements_.push_back_uninitialized();
+		void* dest = elements_.push_back_uninitialized();
 		return *(new (dest) GecoNetInterfaceElementWithStats(name, elements_.size() - 1, lengthStyle, lengthParam, pHandler));
 	}
 

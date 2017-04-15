@@ -118,7 +118,7 @@
       <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../../src/;../../../../src/common/ds/eastl;../../../../src/common/debugging;../../../../thirdparty/;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl-1.0.0d/include;../../../../thirdparty/googletest/include/;../../../../thirdparty/googlemock/include/;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <CallingConvention>Cdecl</CallingConvention>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

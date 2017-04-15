@@ -1206,6 +1206,16 @@ public:
 	/// @author mengdi[Jackie]
 	void write_ranged_float(float src, float floatMin = -1.0f, float floatMax = 1.0f);
 
+	/// reserve bytes 
+	/// @pre write pos must be aligned
+	uchar* reserve(uint bytes_count)
+	{
+		if (0 != (writable_bit_pos_ & 7))
+			abort();
+		uchar* pos =  &uchar_data_[writable_bit_pos_ >> 3];
+		writable_bit_pos_ += BYTES_TO_BITS(bytes_count);
+		return pos;
+	}
 	/// @func Write
 	/// @brief write any integral type to a bitstream.
 	/// @access  public

@@ -2,9 +2,6 @@
 //#include "GecoWatcher.h"
 
 #ifdef _WIN32
-#ifndef _XBOX360
-#include <Winsock.h>
-#endif
 #elif defined( PLAYSTATION3 )
 #include <netinet/in.h>
 #else
@@ -12,7 +9,147 @@
 #endif
 
 bool g_enable_stats = true;
+bool saddr_equals(const sockaddrunion *a, const sockaddrunion *b, bool ignore_port)
+{
+	if (saddr_family(a) == AF_INET)
+	{
+		if (saddr_family(b) == AF_INET)
+		{
+			if (a->sin.sin_addr.s_addr == b->sin.sin_addr.s_addr)
+			{
+				if (ignore_port)
+					return true;
+				else if (a->sin.sin_port == b->sin.sin_port)
+					return true;
+				else
+					return false;
+			}
+			return false;
+		}
+		return false;
+	}
+	else if (saddr_family(a) == AF_INET6)
+	{
+		if (saddr_family(b) == AF_INET6)
+		{
+			if (IN6_ADDR_EQUAL(&a->sin6.sin6_addr, &b->sin6.sin6_addr))
+			{
+				if (ignore_port)
+					return true;
+				else if (a->sin6.sin6_port == b->sin6.sin6_port)
+					return true;
+				else
+					return false;
+			}
+			return false;
+		}
+		return false;
+	}
+	else
+	{
+		network_logger()->critical("saddr_equals()::no such af!!");
+	}
+}
+int str2saddr(sockaddrunion *su, const char * str, ushort hs_port)
+{
+	int ret;
+	memset((void*)su, 0, sizeof(union sockaddrunion));
 
+	if (hs_port < 0)
+	{
+		network_logger()->error("Invalid port \n");
+		return -1;
+	}
+
+	if (str != NULL && strlen(str) > 0)
+	{
+#ifndef WIN32
+		ret = inet_aton(str, &su->sin.sin_addr);
+#else
+		(su->sin.sin_addr.s_addr = inet_addr(str)) == INADDR_NONE ? ret = 0 : ret = 1;
+#endif
+	}
+	else
+	{
+		network_logger()->warn("no s_addr specified, set to all zeros\n");
+		ret = 1;
+	}
+
+	if (ret > 0) /* Valid IPv4 address format. */
+	{
+		su->sin.sin_family = AF_INET;
+		su->sin.sin_port = htons(hs_port);
+		return 0;
+	}
+
+	if (str != NULL && strlen(str) > 0)
+	{
+		ret = inet_pton(AF_INET6, (const char *)str, &su->sin6.sin6_addr);
+	}
+	else
+	{
+		network_logger()->warn("no s_addr specified, set to all zeros\n");
+		ret = 1;
+	}
+
+	if (ret > 0) /* Valid IPv6 address format. */
+	{
+		su->sin6.sin6_family = AF_INET6;
+		su->sin6.sin6_port = htons(hs_port);
+		su->sin6.sin6_scope_id = 0;
+		su->sin6.sin6_flowinfo = 0;
+		return 0;
+	}
+	return -1;
+}
+int saddr2str(sockaddrunion *su, char * buf, size_t len, ushort* portnum)
+{
+
+	if (su->sa.sa_family == AF_INET)
+	{
+		if (buf != NULL)
+			strncpy(buf, inet_ntoa(su->sin.sin_addr), 16);
+		if (portnum != NULL)
+			*portnum = ntohs(su->sin.sin_port);
+		return (1);
+	}
+	else if (su->sa.sa_family == AF_INET6)
+	{
+		if (buf != NULL)
+		{
+			char ifnamebuffer[IFNAMSIZ];
+			const char* ifname = 0;
+
+			if (inet_ntop(AF_INET6, &su->sin6.sin6_addr, buf, len) == NULL)
+				return 0;
+			if (IN6_IS_ADDR_LINKLOCAL(&su->sin6.sin6_addr))
+			{
+#ifdef _WIN32
+				NET_LUID luid;
+				ConvertInterfaceIndexToLuid(su->sin6.sin6_scope_id, &luid);
+				ifname = (char*)ConvertInterfaceLuidToNameA(&luid, (char*)&ifnamebuffer, IFNAMSIZ);
+#else
+				ifname = if_indextoname(su->sin6.sin6_scope_id, (char*)&ifnamebuffer);
+#endif
+				if (ifname == NULL)
+				{
+					return (0); /* Bad scope ID! */
+				}
+				if (strlen(buf) + strlen(ifname) + 2 >= len)
+				{
+					return (0); /* Not enough space! */
+				}
+				strcat(buf, "%");
+				strcat(buf, ifname);
+			}
+
+			if (portnum != NULL)
+				*portnum = ntohs(su->sin6.sin6_port);
+		}
+		return (1);
+	}
+	return 0;
+}
 /*GecoNetAddress*/
 char GecoNetAddress::ms_pcStringBuf[2][GecoNetAddress::MAX_STRLEN];
 int GecoNetAddress::ms_iCurrStringBuf = 0;
