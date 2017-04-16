@@ -14,6 +14,7 @@ class geco_bit_stream_t;
 *
 *	@ingroup network
 */
+typedef eastl::hash_map< GecoNetAddress, eastl::string, geco_net_addr_hash_functor, geco_net_addr_cmp_functor> GecoNetAddStringInterfaces;
 class GECOAPI GecoNetEndpoint
 {
 private:
@@ -28,7 +29,6 @@ private:
 	bool m_bShouldSendClose;
 	typedef eastl::map< eastl::string, GecoNetAddress > FrontEndInterfaces;
 	static FrontEndInterfaces ms_kFrontEndInterfaces;
-	typedef eastl::hash_map< GecoNetAddress, eastl::string, geco_net_addr_hash_functor, geco_net_addr_cmp_functor> GecoNetAddStringInterfaces;
 	static GecoNetAddStringInterfaces ms_kGecoNetAddStringInterfaces;
 public:
 	/// @name Construction/Destruction
@@ -105,7 +105,7 @@ public:
 	*
 	* @returns true on success, false on error.
 	*/
-	bool GetInterfaces();
+	const GecoNetAddStringInterfaces& GetInterfaces();
 	/**
 	*  This function finds the default interface, i.e. the one to use if
 	*	an IP address is required for a socket that is bound to all interfaces.

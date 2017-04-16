@@ -126,7 +126,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 	return isResultSet;
 }
 
-bool GecoNetEndpoint::GetInterfaces()
+const GecoNetAddStringInterfaces& GecoNetEndpoint::GetInterfaces()
 {
 #ifdef _WIN32
 	if (!s_kAdapterInfoList.empty())
@@ -144,9 +144,9 @@ bool GecoNetEndpoint::GetInterfaces()
 		printf("Unable to discover network interfaces.\n");
 		return false;
 	}
-
 	int		flags = 0;
 	struct if_nameindex* pIfInfoCur = pIfInfo;
+	GecoNetAddress addr;
 	while (pIfInfoCur->if_name)
 	{
 		flags = 0;
@@ -154,19 +154,16 @@ bool GecoNetEndpoint::GetInterfaces()
 
 		if ((flags & IFF_UP) && (flags & IFF_RUNNING))
 		{
-			u_int32_t	addr;
 			if (this->GetInterfaceAddress(pIfInfoCur->if_name, addr) == 0)
 			{
-				interfaces[addr] = pIfInfoCur->if_name;
+				ms_kGecoNetAddStringInterfaces[addr] = pIfInfoCur->if_name;
 			}
 		}
 		++pIfInfoCur;
 	}
 	if_freenameindex(pIfInfo);
-
 #endif
-
-	return true;
+	return ms_kGecoNetAddStringInterfaces;
 }
 
 
