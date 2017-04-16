@@ -52,17 +52,19 @@ void guarder_packet_t::read(geco_bit_stream_t &is)
 bool guarder_packet_t::write(geco_bit_stream_t &os) const
 {
 	os.Write(m_uiFlags);
+	const char* addr;
 	if (saddr_family(&ms_uiBuddy.su) == AF_INET)
 	{
 		IN4_ADDR_EQUAL(&ms_uiBuddy.su.sin.sin_addr, &in4addr_loopback) ?
-			os.WriteRaw((const char*)&s4addr(&ms_uiBuddy), sizeof(uint)) :
-			os.WriteRaw((const char*)&s4addr(&m_uiBuddy), sizeof(uint));
+			addr = (const char*)&s4addr(&ms_uiBuddy.su) : addr = (const char*)&s4addr(&m_uiBuddy.su);
+		os.WriteRaw(addr, sizeof(uint));
 	}
 	else
 	{
 		IN6_ADDR_EQUAL(&ms_uiBuddy.su.sin6.sin6_addr, &in6addr_loopback) ?
-			os.WriteRaw((const char*)&saddr_family(&m_uiBuddy.su), sizeof(in6_addr)) :
-			os.WriteRaw((const char*)&saddr_family(&ms_uiBuddy.su), sizeof(in6_addr));
+			addr = (const char*)&saddr_family(&m_uiBuddy.su) :
+			addr = (const char*)&saddr_family(&ms_uiBuddy.su);
+		os.WriteRaw(addr, sizeof(in6_addr));
 	}
 	uint* msglenpos;
 	uint msglen;
@@ -80,9 +82,11 @@ bool guarder_packet_t::write(geco_bit_stream_t &os) const
 	}
 	return !isOversized;
 }
-guarder_msg_t::guarder_msg_t(uchar message, uchar flags /*= 0*/, ushort seq /*= 0*/)
-{
 
+guarder_msg_t::guarder_msg_t(uchar message, uchar flags /*= 0*/, ushort seq /*= 0*/) :
+	m_uiMessage(message), m_uiFlags(flags), m_uiSeq(seq), m_bSeqSent(false)
+{
+	if (m_uiSeq == 0) this->refresh_seq();
 }
 guarder_msg_t * guarder_msg_t::from(geco_bit_stream_t &is)
 {
@@ -128,16 +132,15 @@ guarder_msg_t * guarder_msg_t::from(geco_bit_stream_t &is)
 }
 guarder_msg_t * guarder_msg_t::from(void *buf, int length)
 {
-	return 0;
+	geco_bit_stream_t is((uchar*)buf, length, false);
+	return from(is);
 }
-
 const char* guarder_msg_t::c_str() const
 {
-	strcpy(ms_acBuf, this->msg_type2str());
+	strcpy(ms_acBuf, this->type2str());
 	return ms_acBuf;
 }
-
-const char* guarder_msg_t::msg_type2str() const
+const char* guarder_msg_t::type2str() const
 {
 	static char buf[32];
 	switch (m_uiMessage)
@@ -159,8 +162,37 @@ const char* guarder_msg_t::msg_type2str() const
 	}
 	return buf;
 }
-
 uint guarder_msg_t::write(geco_bit_stream_t & os)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	if (m_bSeqSent && !this->outgoing())
+		this->refresh_seq();
+	os.Write(m_uiMessage);
+	os.Write(m_uiFlags);
+	os.Write(m_uiSeq);
+	m_bSeqSent = true;
+	return sizeof(uint) * 3;
+}
+void guarder_msg_t::Read(geco_bit_stream_t &is)
+{
+	is.Read(m_uiMessage);
+	is.Read(m_uiFlags);
+	is.Read(m_uiSeq);
+}
+void guarder_msg_t::refresh_seq()
+{
+	if (ms_uiSeqTicker == 0)
+	{
+		srand(gettimestamp());
+		ms_uiSeqTicker = rand() % 0xffff;
+	}
+	ms_uiSeqTicker = (ms_uiSeqTicker + 1) % 0xffff;
+	if (ms_uiSeqTicker == 0)
+		ms_uiSeqTicker++;
+	m_uiSeq = ms_uiSeqTicker;
+	m_bSeqSent = false;
+}
+void guarder_msg_t::copy_seq(const guarder_msg_t &mgm)
+{
+	m_uiSeq = mgm.m_uiSeq;
+	m_bSeqSent = false;
 }

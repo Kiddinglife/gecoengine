@@ -92,22 +92,32 @@ protected:
 	static ushort ms_uiSeqTicker;
 	bool m_bSeqSent;
 private:
-	ushort m_uiSeq;
+	uint m_uiSeq;
 public:
 	guarder_msg_t() {};
 	guarder_msg_t(uchar message, uchar flags = 0, ushort seq = 0);
 	virtual ~guarder_msg_t() {}
+	void outgoing(bool b) { this->flags(MESSAGE_DIRECTION_OUTGOING, b); }
+	bool outgoing() const { return this->flags(MESSAGE_DIRECTION_OUTGOING); }
+	void flags(uint flag, bool status) { status ? m_uiFlags |= flag : m_uiFlags &= ~flag; }
+	bool flags(uint flag) const { return (m_uiFlags & flag) ? true : false; }
+	const char* c_str() const;
+	const char* type2str() const;
+	uint write(geco_bit_stream_t & os);
+	void Read(geco_bit_stream_t &is);
 	static guarder_msg_t *from(geco_bit_stream_t &is);
 	static guarder_msg_t *from(void *buf, int length);
-	const char* c_str() const;
-	const char* msg_type2str() const;
-	uint write(geco_bit_stream_t & os);
+	// Get a fresh sequence number
+	void refresh_seq();
+	// Copy sequence number from another message (usually used for tagging
+	// pre-generated replies with the seq of an incoming message)
+	void copy_seq(const guarder_msg_t &mgm);
 };
 /// provides a more detailed version of the 
 /// machine statistics that are provided by a MachineMessage.
 class high_precision_msg_t : public guarder_msg_t
 {
-		
+
 };
 /// A WholeMachineMessage provides info about a machine, such as CPU load,
  /// memory load, network throughput, and other system level stuff.
