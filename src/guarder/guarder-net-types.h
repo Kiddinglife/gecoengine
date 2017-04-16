@@ -34,49 +34,25 @@ public:
 	const static int MAX_SIZE = 32768;
 	const static uchar PACKET_STAGGER_REPLIES = 0x1;
 	typedef std::vector< guarder_msg_t* > guarder_msgs_t;
-
 	uint	m_uiFlags;
 	sockaddrunion m_uiBuddy;
 	guarder_msgs_t	m_kMessages;
 	// The buddy that is automatically inserted into replies
 	static sockaddrunion  ms_uiBuddy;
-
 protected:
 	// Each message is tagged with a flag of whether or not to delete it when this packet is destroyed
 	std::vector< bool > m_kDelInfo;
 	// If this is true then nothing is cleaned up when this packet is destroyed
 	bool	dont_delete_msgs_;
-
 public:
-	guarder_packet_t() : m_uiFlags(0), dont_delete_msgs_(false) {}
-	guarder_packet_t(geco_bit_stream_t &is) :
-		m_uiFlags(0), dont_delete_msgs_(false)
-	{
-		geco_zero_mem(&m_uiBuddy, sizeof(sockaddrunion));
-		this->read(is);
-	}
-	~guarder_packet_t()
-	{
-		if (!dont_delete_msgs_)
-		{
-			for (unsigned i = 0; i < m_kMessages.size(); i++)
-				if (m_kDelInfo[i])
-					delete m_kMessages[i];
-		}
-	}
-	void add(guarder_msg_t* msg, bool should_delete)
-	{
-		m_kMessages.push_back(msg);
-		m_kDelInfo.push_back(should_delete);
-	}
+	guarder_packet_t();
+	guarder_packet_t(geco_bit_stream_t &is);
+	~guarder_packet_t();
+	void add(guarder_msg_t* msg, bool should_delete);
 	// Machined's use this to set a buddy field that will be written into every
 	// reply message instead of the buddy that is actually on the message
-	static void set_buddy(sockaddrunion addr)
-	{
-		ms_uiBuddy = addr;
-	}
+	static void set_buddy(sockaddrunion addr) { ms_uiBuddy = addr; }
 	void steal_msgs() { dont_delete_msgs_ = true; }
-
 	void read(geco_bit_stream_t &is);
 	/// Write the contents of PACKET to the output stream to send. 
 	/// @returns True on success, False on error.
@@ -104,24 +80,19 @@ public:
 		HIGH_PRECISION_MESSAGE = 14,
 		ANNOUNCE_MESSAGE = 64,
 	};
-
 	enum Flags : uint
 	{
 		MESSAGE_DIRECTION_OUTGOING = 0x1,
 		MESSAGE_NOT_UNDERSTOOD = 0x2
 	};
-
 	uint	m_uiMessage;
 	uint m_uiFlags;
-
 protected:
 	static char ms_acBuf[1024];
 	static ushort ms_uiSeqTicker;
 	bool m_bSeqSent;
-
 private:
 	ushort m_uiSeq;
-
 public:
 	guarder_msg_t() {};
 	guarder_msg_t(uchar message, uchar flags = 0, ushort seq = 0);
@@ -136,7 +107,7 @@ public:
 /// machine statistics that are provided by a MachineMessage.
 class high_precision_msg_t : public guarder_msg_t
 {
-
+		
 };
 /// A WholeMachineMessage provides info about a machine, such as CPU load,
  /// memory load, network throughput, and other system level stuff.

@@ -7,10 +7,6 @@
 #endif
 
 #include "end-point.h"
-
-GecoNetEndpoint * GecoNetEndpoint::ms_pkHijackEndpointSync = NULL;
-GecoNetEndpoint * GecoNetEndpoint::ms_pkHijackEndpointAsync = NULL;
-geco_bit_stream_t * GecoNetEndpoint::ms_pkHijackStream = NULL;
 GecoNetEndpoint::FrontEndInterfaces GecoNetEndpoint::ms_kFrontEndInterfaces;
 
 #ifdef __linux__
@@ -28,8 +24,8 @@ static bool s_bGetAdaptersAddresses = false;
 struct AdapterInfo
 {
 	eastl::string	kName;
-	u_int32_t	uiAddr;
-	AdapterInfo(eastl::string& kName_, u_int32_t uiAddr_) :kName(kName_), uiAddr(uiAddr_) {}
+	GecoNetAddress	uiAddr;
+	AdapterInfo(eastl::string& kName_, GecoNetAddress& uiAddr_) :kName(kName_), uiAddr(uiAddr_) {}
 };
 static eastl::vector<AdapterInfo> s_kAdapterInfoList;
 void GetAdaptersAddresses();
@@ -54,12 +50,9 @@ INLINE void if_freenameindex(struct if_nameindex *)
 
 GecoNetEndpoint::GecoNetEndpoint(bool useSyncHijack) :
 	m_kSocket(NO_SOCKET),
-	m_bUseSyncHijack(useSyncHijack),
-	m_bShouldSendClose(false),
-	m_uiHijackPort(0),
-	m_uiHijackAddr(0),
-	m_pkHijackEndpoint(NULL)
+	m_bShouldSendClose(false)
 {
+	geco_zero_mem(&bindsu, sizeof(sockaddrunion));
 #ifdef _WIN32
 	GetAdaptersAddresses();
 #endif
@@ -134,18 +127,16 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
 	return isResultSet;
 }
 
-bool GecoNetEndpoint::GetInterfaces(eastl::map< u_int32_t, eastl::string > &interfaces)
+bool GecoNetEndpoint::GetInterfaces()
 {
 #ifdef _WIN32
-
 	if (!s_kAdapterInfoList.empty())
 	{
 		for (int i = 0; i < (int)s_kAdapterInfoList.size(); ++i)
 		{
-			interfaces[s_kAdapterInfoList[i].uiAddr] = s_kAdapterInfoList[i].kName;
+			ms_kGecoNetAddStringInterfaces[s_kAdapterInfoList[i].uiAddr] = s_kAdapterInfoList[i].kName;
 		}
 	}
-
 #else
 
 	struct if_nameindex* pIfInfo = if_nameindex();
@@ -182,24 +173,6 @@ bool GecoNetEndpoint::GetInterfaces(eastl::map< u_int32_t, eastl::string > &inte
 
 int GecoNetEndpoint::FindDefaultInterface(char * name)
 {
-	if (GecoNetEndpoint::IsHijacked())
-	{
-		FrontEndInterfaces::iterator iter = ms_kFrontEndInterfaces.begin();
-
-		while (iter != ms_kFrontEndInterfaces.end())
-		{
-			if (iter->first != GECO_NET_LOCALHOSTNAME)
-			{
-				strcpy(name, iter->first.c_str());
-				return 0;
-			}
-
-			++iter;
-		}
-
-		return -1;
-	}
-
 #ifndef __linux__
 
 #ifdef _WIN32
@@ -252,9 +225,9 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 	}
 	else
 	{
-	    network_logger()->error("GecoNetEndpoint::FindDefaultInterface: "
-	            "if_nameindex returned NULL ({})",
-	            strerror(errno));
+		network_logger()->error("GecoNetEndpoint::FindDefaultInterface: "
+			"if_nameindex returned NULL ({})",
+			strerror(errno));
 	}
 
 	return ret;
@@ -276,14 +249,14 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 
 	char* slash;
 	int netmaskbits = 32;
-	u_int32_t addr = 0;
+	GecoNetAddress addr;
 
 	if (slash = const_cast<char *>(strchr(spec, '/')))
 	{
 		char iftemp[IFNAMSIZ] = { 0 };
 		strncpy(iftemp, spec, slash - spec);
 		iftemp[slash - spec] = 0;
-		bool ok = GecoNetEndpoint::ConvertAddress(iftemp, addr) == 0;
+		bool ok = GecoNetEndpoint::ConvertAddress(addr, iftemp, 0) == 0;
 
 		netmaskbits = atoi(slash + 1);
 		ok &= netmaskbits > 0 && netmaskbits <= 32;
@@ -299,7 +272,7 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 	{
 		strcpy(name, spec);
 	}
-	else if (GecoNetEndpoint::ConvertAddress(spec, addr) == 0)
+	else if (GecoNetEndpoint::ConvertAddress(addr,spec) == 0)
 	{
 		netmaskbits = 32;
 	}
@@ -313,42 +286,25 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 	if (name[0] == 0)
 	{
 		int netmaskshift = 32 - netmaskbits;
-		u_int32_t netmaskmatch = ntohl(addr);
-
+		u_int32_t netmaskmatch = ntohl(s4addr(&addr.su));
 		eastl::vector< eastl::string > interfaceNames;
-
-		if (GecoNetEndpoint::IsHijacked())
-		{
-			FrontEndInterfaces::iterator iter = ms_kFrontEndInterfaces.begin();
-			while (iter != ms_kFrontEndInterfaces.end())
-			{
-				interfaceNames.push_back(iter->first);
-				++iter;
-			}
-		}
 #ifdef _WIN32
-		else
+		if (!s_kAdapterInfoList.empty())
 		{
-			if (!s_kAdapterInfoList.empty())
+			for (int i = 0; i < (int)s_kAdapterInfoList.size(); ++i)
 			{
-				for (int i = 0; i < (int)s_kAdapterInfoList.size(); ++i)
-				{
-					interfaceNames.push_back(s_kAdapterInfoList[i].kName);
-				}
+				interfaceNames.push_back(s_kAdapterInfoList[i].kName);
 			}
 		}
 #endif
 		eastl::vector< eastl::string >::iterator iter = interfaceNames.begin();
-
+		GecoNetAddress tip;
 		while (iter != interfaceNames.end())
 		{
-			u_int32_t tip = 0;
 			char * currName = (char *)iter->c_str();
-
 			if (this->GetInterfaceAddress(currName, tip) == 0)
 			{
-				u_int32_t htip = ntohl(tip);
-
+				u_int32_t htip = ntohl(s4addr(&tip.su));
 				if ((htip >> netmaskshift) == (netmaskmatch >> netmaskshift))
 				{
 					strncpy(name, currName, IFNAMSIZ);
@@ -392,7 +348,7 @@ int GecoNetEndpoint::GetInterfaceFlags(char * name, int & flags)
 	return 0;
 }
 
-int GecoNetEndpoint::GetInterfaceAddress(const char * name, u_int32_t & address)
+int GecoNetEndpoint::GetInterfaceAddress(const char * name, GecoNetAddress & address)
 {
 	if (!s_kAdapterInfoList.empty())
 	{
@@ -411,41 +367,32 @@ int GecoNetEndpoint::GetInterfaceAddress(const char * name, u_int32_t & address)
 
 #endif
 
-int GecoNetEndpoint::ConvertAddress(const char * string, u_int32_t & address)
+int GecoNetEndpoint::ConvertAddress(GecoNetAddress& address, const char * string, ushort port)
 {
-	u_int32_t	trial;
-
-#ifdef __linux__
-	if (inet_aton(string, (struct in_addr*)&trial) != 0)
-#else // __linux__
-	if ((trial = inet_addr(string)) != INADDR_NONE)
-#endif // !__linux__
+	GecoNetAddress	trial(port, string);
+	if (!trial.IsNone())
 	{
 		address = trial;
 		return 0;
 	}
-
-#ifdef _WIN32
-	if (!s_kAdapterInfoList.empty())
-	{
-		for (int i = 0; i < (int)s_kAdapterInfoList.size(); ++i)
-		{
-			if (!_stricmp(s_kAdapterInfoList[i].kName.c_str(), string))
-			{
-				address = s_kAdapterInfoList[i].uiAddr;
-				return 0;
-			}
-		}
-	}
-#else
+	// ok, try looking it up then
 	struct hostent * hosts = gethostbyname(string);
 	if (hosts != NULL)
 	{
-		address = *(u_int32_t*)(hosts->h_addr_list[0]);
+		if (hosts->h_addrtype == AF_INET)
+		{
+			s4addr(&address.su) = *(u_int32_t*)(hosts->h_addr_list[0]);
+			saddr_family(&address.su) = AF_INET;
+		}
+		else if (hosts->h_addrtype == AF_INET6)
+		{
+			memcpy_fast(s6addr(&address.su), hosts->h_addr_list[0], sizeof(in6_addr));
+			saddr_family(&address.su) = AF_INET6;
+		}
+		else
+			network_logger()->critical("GecoNetEndpoint::ConvertAddress(): no such af {}", hosts->h_addrtype);
 		return 0;
 	}
-#endif
-
 	return -1;
 }
 
@@ -575,61 +522,9 @@ bool GecoNetEndpoint::RecvAll(void * gramData, int gramSize)
 	return true;
 }
 
-
-void GecoNetEndpoint::SetHijackEndpoints(GecoNetEndpoint * pSync, GecoNetEndpoint * pAsync)
+void GecoNetEndpoint::AddFrontEndInterface(const eastl::string & name, GecoNetAddress* addr)
 {
-	ms_pkHijackEndpointSync = pSync;
-	ms_pkHijackEndpointAsync = pAsync;
-}
-
-
-bool GecoNetEndpoint::HijackRecvAllFrom(void * gramData, int gramSize,
-	u_int16_t * pPort, u_int32_t * pAddr)
-{
-	if (m_pkHijackEndpoint == NULL)
-	{
-		return
-			this->RecvFrom(gramData, gramSize, pPort, pAddr) == gramSize;
-	}
-	else
-	{
-		short msgType;
-		int dstFD;
-		int dataLen;
-		u_int32_t addr;
-		u_int16_t port;
-
-		if (!m_pkHijackEndpoint->RecvAll(&msgType, sizeof(msgType)) ||
-			(msgType != GecoNetEndpoint::HIJACK_MSG_UDP) ||
-			!m_pkHijackEndpoint->RecvAll(&dstFD, sizeof(dstFD)) ||
-			(dstFD != m_kSocket) ||
-			!m_pkHijackEndpoint->RecvAll(&dataLen, sizeof(dataLen)) ||
-			(dataLen != gramSize + 6) ||
-			!m_pkHijackEndpoint->RecvAll(&addr, sizeof(addr)) ||
-			!m_pkHijackEndpoint->RecvAll(&port, sizeof(port)))
-		{
-			return false;
-		}
-
-		if (pAddr)
-			*pAddr = addr;
-		if (pPort)
-			*pPort = port;
-
-		return m_pkHijackEndpoint->RecvAll(gramData, gramSize);
-	}
-}
-
-
-int GecoNetEndpoint::HijackFD() const
-{
-	return m_pkHijackEndpoint ? m_pkHijackEndpoint->m_kSocket : m_kSocket;
-}
-
-
-void GecoNetEndpoint::AddFrontEndInterface(const eastl::string & name, u_int32_t addr)
-{
-	ms_kFrontEndInterfaces[name] = addr;
+	ms_kFrontEndInterfaces[name] = *addr;
 }
 
 #ifdef _WIN32
@@ -718,13 +613,12 @@ void GetAdaptersAddresses()
 		{
 			eastl::string kFriendlyName;
 			WCharToSTLStr(pkCurrAddresses->FriendlyName, kFriendlyName);
-			sockaddr_in* pAddr = (sockaddr_in*)pkCurrAddresses->FirstUnicastAddress->Address.lpSockaddr;
+			sockaddr* pAddr = pkCurrAddresses->FirstUnicastAddress->Address.lpSockaddr;
 
-			//! �ж��Ƿ���127.0.0.1
-			if (pAddr->sin_addr.s_addr == GECO_NET_LOCALHOST)
+			//! 127.0.0.1
+			if (IN4ADDR_ISLOOPBACK((sockaddr_in*)pAddr) || IN6ADDR_ISLOOPBACK((sockaddr_in6*)pAddr))
 				kFriendlyName = GECO_NET_LOCALHOSTNAME;
-
-			s_kAdapterInfoList.push_back(AdapterInfo(kFriendlyName, pAddr->sin_addr.s_addr));
+			s_kAdapterInfoList.push_back(AdapterInfo(kFriendlyName, GecoNetAddress(pAddr)));
 		}
 
 		pkCurrAddresses = pkCurrAddresses->Next;

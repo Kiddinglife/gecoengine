@@ -9,6 +9,7 @@
 #endif
 
 bool g_enable_stats = true;
+
 bool saddr_equals(const sockaddrunion *a, const sockaddrunion *b, bool ignore_port)
 {
 	if (saddr_family(a) == AF_INET)
@@ -150,84 +151,172 @@ int saddr2str(sockaddrunion *su, char * buf, size_t len, ushort* portnum)
 	}
 	return 0;
 }
+unsigned int sockaddr2hashcode(const sockaddrunion* sa)
+{
+	ushort local_saaf = saddr_family(sa);
+	unsigned int lastHash = SuperFastHashIncremental((const char*)&sa->sin.sin_port,
+		sizeof(sa->sin.sin_port), local_saaf);
+	if (local_saaf == AF_INET)
+	{
+		lastHash = SuperFastHashIncremental((const char*)&sa->sin.sin_addr.s_addr, sizeof(in_addr),
+			lastHash);
+	}
+	else if (local_saaf == AF_INET6)
+	{
+		lastHash = SuperFastHashIncremental((const char*)&sa->sin6.sin6_addr.s6_addr,
+			sizeof(in6_addr), lastHash);
+	}
+	else
+	{
+		network_logger()->critical("sockaddr2hashcode()::no such af {}", local_saaf);
+	}
+	return lastHash;
+}
+#undef get16bits
+#if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) || defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
+#define get16bits(d) (*((const unsigned short *) (d)))
+#else
+#define get16bits(d) ((((unsigned int)(((const unsigned char *)(d))[1])) << 8)\
+	+(unsigned int)(((const unsigned char *)(d))[0]) )
+#endif
+static const int INCREMENTAL_READ_BLOCK = 65536;
+unsigned long SuperFastHash(const char * data, int length)
+{
+	// All this is necessary or the hash does not match SuperFastHashIncremental
+	int bytesRemaining = length;
+	unsigned int lastHash = length;
+	int offset = 0;
+	while (bytesRemaining >= INCREMENTAL_READ_BLOCK)
+	{
+		lastHash = SuperFastHashIncremental(data + offset, INCREMENTAL_READ_BLOCK, lastHash);
+		bytesRemaining -= INCREMENTAL_READ_BLOCK;
+		offset += INCREMENTAL_READ_BLOCK;
+	}
+	if (bytesRemaining > 0)
+	{
+		lastHash = SuperFastHashIncremental(data + offset, bytesRemaining, lastHash);
+	}
+	return lastHash;
+
+	//	return SuperFastHashIncremental(data,len,len);
+}
+unsigned long SuperFastHashIncremental(const char * data, int len, unsigned int lastHash)
+{
+	unsigned int hash = (unsigned int)lastHash;
+	unsigned int tmp;
+	int rem;
+
+	if (len <= 0 || data == NULL) return 0;
+
+	rem = len & 3;
+	len >>= 2;
+
+	/* Main loop */
+	for (; len > 0; len--)
+	{
+		hash += get16bits(data);
+		tmp = (get16bits(data + 2) << 11) ^ hash;
+		hash = (hash << 16) ^ tmp;
+		data += 2 * sizeof(unsigned short);
+		hash += hash >> 11;
+	}
+
+	/* Handle end cases */
+	switch (rem)
+	{
+	case 3:
+		hash += get16bits(data);
+		hash ^= hash << 16;
+		hash ^= data[sizeof(unsigned short)] << 18;
+		hash += hash >> 11;
+		break;
+	case 2:
+		hash += get16bits(data);
+		hash ^= hash << 11;
+		hash += hash >> 17;
+		break;
+	case 1:
+		hash += *data;
+		hash ^= hash << 10;
+		hash += hash >> 1;
+	}
+
+	/* Force "avalanching" of final 127 bits */
+	hash ^= hash << 3;
+	hash += hash >> 5;
+	hash ^= hash << 4;
+	hash += hash >> 17;
+	hash ^= hash << 25;
+	hash += hash >> 6;
+
+	return (unsigned int)hash;
+
+}
+unsigned long SuperFastHashFile(const char * filename)
+{
+	FILE *fp = fopen(filename, "rb");
+	if (fp == 0) return 0;
+	unsigned int hash = SuperFastHashFilePtr(fp);
+	fclose(fp);
+	return hash;
+}
+unsigned long SuperFastHashFilePtr(FILE *fp)
+{
+	fseek(fp, 0, SEEK_END);
+	int length = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	int bytesRemaining = length;
+	unsigned int lastHash = length;
+	char readBlock[INCREMENTAL_READ_BLOCK];
+	while (bytesRemaining >= (int) sizeof(readBlock))
+	{
+		fread(readBlock, sizeof(readBlock), 1, fp);
+		lastHash = SuperFastHashIncremental(readBlock, (int) sizeof(readBlock), lastHash);
+		bytesRemaining -= (int) sizeof(readBlock);
+	}
+	if (bytesRemaining > 0)
+	{
+		fread(readBlock, bytesRemaining, 1, fp);
+		lastHash = SuperFastHashIncremental(readBlock, bytesRemaining, lastHash);
+	}
+	return lastHash;
+}
+
 /*GecoNetAddress*/
 char GecoNetAddress::ms_pcStringBuf[2][GecoNetAddress::MAX_STRLEN];
 int GecoNetAddress::ms_iCurrStringBuf = 0;
-const GecoNetAddress GecoNetAddress::NONE(0, 0);
+const GecoNetAddress GecoNetAddress::NONE;
 bool WatcherStringToValue(const char * valueStr, GecoNetAddress & value)
 {
-	int a1, a2, a3, a4, a5;
-	if (sscanf(valueStr, "%d.%d.%d.%d:%d",
-		&a1, &a2, &a3, &a4, &a5) != 5)
+	char ret[256];
+	short port;
+	if (sscanf(valueStr, "%s:%d",ret, &port) != 2)
 	{
 		network_logger()->error("WatcherStringToValue: Cannot convert '{}' to an Address", valueStr);
 		return false;
 	}
-	value.m_uiIP = (a1 << 24) | (a2 << 16) | (a3 << 8) | a4;
-	value.m_uiPort = ushort(a5);
-	value.m_uiPort = ntohs(value.m_uiPort);
-	value.m_uiIP = ntohl(value.m_uiIP);
+	value.su;
+	str2saddr(&value.su, ret, port);
 	return true;
 }
-GecoNetAddress::GecoNetAddress(char* str)
-	:m_uiIP(0)
-	, m_uiPort(0)
-	, m_uiSalt(0)
+int GecoNetAddress::WriteToString(char * str, int length)
 {
-	SetFromString(str);
+	ushort port;
+	saddr2str(&su, str, length, &port);
+	return geco_snprintf(str, length - sizeof(sockaddr), ":%d", port);
 }
-int GecoNetAddress::WriteToString(char * str, int length) const
-{
-	uint	hip = ntohl(m_uiIP);
-	ushort	hport = ntohs(m_uiPort);
-
-	return geco_snprintf(str, length,
-		"%d.%d.%d.%d:%d",
-		(int)(unsigned char)(hip >> 24),
-		(int)(unsigned char)(hip >> 16),
-		(int)(unsigned char)(hip >> 8),
-		(int)(unsigned char)(hip),
-		(int)hport);
-}
-char * GecoNetAddress::c_str() const
+char * GecoNetAddress::c_str()
 {
 	char * buf = GecoNetAddress::NextStringBuf();
-	this->WriteToString(buf, MAX_STRLEN);
+	WriteToString(buf, MAX_STRLEN);
 	return buf;
 }
-const char * GecoNetAddress::IPAsString() const
+const char * GecoNetAddress::IPAsString()
 {
-	uint	hip = ntohl(m_uiIP);
 	char * buf = GecoNetAddress::NextStringBuf();
-
-	geco_snprintf(buf, MAX_STRLEN,
-		"%d.%d.%d.%d",
-		(int)(unsigned char)(hip >> 24),
-		(int)(unsigned char)(hip >> 16),
-		(int)(unsigned char)(hip >> 8),
-		(int)(unsigned char)(hip));
-
 	return buf;
 }
-bool GecoNetAddress::SetFromString(char* str)
-{
-	if (!str)
-		return false;
 
-	int a1, a2, a3, a4, a5;
-
-	if (sscanf(str, "%d.%d.%d.%d:%d",
-		&a1, &a2, &a3, &a4, &a5) != 5)
-		return false;
-
-	m_uiIP = (a1 << 24) | (a2 << 16) | (a3 << 8) | a4;
-
-	m_uiPort = ushort(a5);
-	m_uiPort = ntohs(m_uiPort);
-	m_uiIP = ntohl(m_uiIP);
-
-	return true;
-}
 // @TODO
 GecoWatcher* GecoNetAddress::GetWatcher()
 {

@@ -283,11 +283,36 @@ union sockaddrunion
 * (hex for ipv6, dotted decimal for ipv4 to a sockaddrunion structure)
 *  str == NULL will bitzero saddr used as 'ANY ADRESS 0.0.0.0'
 *  port number will be always >0
-*  default  is IPv4 
+*  default  is IPv4
 *  @return 0 for success, else -1.*/
 extern int GECOAPI str2saddr(sockaddrunion *su, const char * str, ushort port = 0);
 extern int GECOAPI saddr2str(sockaddrunion *su, char * buf, size_t len, ushort* portnum = NULL);
 extern bool GECOAPI saddr_equals(const sockaddrunion *a, const sockaddrunion *b, bool ignore_port = false);
+//! From http://www.azillionmonkeys.com/qed/hash.html
+//! Author of main code is Paul Hsieh. I just added some convenience functions
+//! Also note http://burtleburtle.net/bob/hash/doobs.html, which shows that this is 20%
+//! faster than the one on that page but has more collisions
+extern unsigned long SuperFastHash(const char * data, int length);
+extern unsigned long SuperFastHashIncremental(const char * data, int len, unsigned int lastHash);
+extern unsigned long SuperFastHashFile(const char * filename);
+extern unsigned long SuperFastHashFilePtr(FILE *fp);
+extern unsigned int transportaddr2hashcode(const sockaddrunion* local_sa, const sockaddrunion* peer_sa);
+extern unsigned int sockaddr2hashcode(const sockaddrunion* sa);
+
+struct sockaddr_hash_functor
+{
+	size_t operator()(const sockaddrunion& addr) const
+	{
+		return sockaddr2hashcode(&addr);
+	}
+};
+struct sockaddr_cmp_functor
+{
+	bool operator()(const sockaddrunion& a, const sockaddrunion& b) const
+	{
+		return saddr_equals(&a, &b, true);
+	}
+};
 
 class GecoWatcher;
 class GecoNetBundle;
@@ -561,30 +586,29 @@ INLINE const char * NetReasonToString(GecoNetReason reason)
 class GECOAPI GecoNetAddress
 {
 private:
-	static const int MAX_STRLEN = 32;
+	static const int MAX_STRLEN = 256;
 	static char ms_pcStringBuf[2][MAX_STRLEN];
 	static int ms_iCurrStringBuf;
 	static char * NextStringBuf();
 
 public:
-	uint m_uiIP;
-	ushort m_uiPort;
+	sockaddrunion su;
 	ushort m_uiSalt;
 
 public:
 	GecoNetAddress();
-	GecoNetAddress(uint ipArg, ushort portArg);
-	GecoNetAddress(char* str);
+	GecoNetAddress(sockaddr* saddr) : m_uiSalt(0)
+	{
+		su.sa = *saddr;
+	}
+	GecoNetAddress(ushort port, const char* addrstr);
 
-	int WriteToString(char * str, int length) const;
-	operator char*() const { return this->c_str(); }
-	char *c_str() const;
-	const char *IPAsString() const;
+	int WriteToString(char * str, int length);
+	operator char*() { return c_str(); }
+	char *c_str();
+	const char *IPAsString();
 
-	bool SetFromString(char* str);
-
-	bool IsNone() const { return this->m_uiIP == 0; }
-
+	bool IsNone() const { return IN4ADDR_ISANY(&su.sin) || IN6ADDR_ISANY(&su.sin6); }
 	static GecoWatcher* GetWatcher();
 
 	static const GecoNetAddress NONE;
@@ -592,43 +616,24 @@ public:
 
 INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b);
 INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b);
-INLINE bool operator<(const GecoNetAddress & a, const GecoNetAddress & b);
-INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, GecoNetAddress& kDes)
-{
-	if (kIS.is_compression_mode())
-	{
-		kIS.ReadMini(kDes.m_uiIP);
-		kIS.ReadMini(kDes.m_uiPort);
-		kIS.ReadMini(kDes.m_uiSalt);
-	}
-	else
-	{
-		kIS.Read(kDes.m_uiIP);
-		kIS.Read(kDes.m_uiPort);
-		kIS.Read(kDes.m_uiSalt);
-	}
-	return kIS;
-}
-INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoNetAddress& kDes)
-{
-	if (kOS.is_compression_mode())
-	{
-		kOS.WriteMini(kDes.m_uiIP);
-		kOS.WriteMini(kDes.m_uiPort);
-		kOS.WriteMini(kDes.m_uiSalt);
-	}
-	else
-	{
-		kOS.WriteMini(kDes.m_uiIP);
-		kOS.WriteMini(kDes.m_uiPort);
-		kOS.WriteMini(kDes.m_uiSalt);
-	}
-	return kOS;
-}
-
 
 GECOAPI bool  WatcherStringToValue(const char *, GecoNetAddress &);
 GECOAPI eastl::string  WatcherValueToString(const GecoNetAddress &);
+
+struct geco_net_addr_hash_functor
+{
+	size_t operator()(const GecoNetAddress& addr) const
+	{
+		return sockaddr2hashcode(&addr.su);
+	}
+};
+struct geco_net_addr_cmp_functor
+{
+	bool operator()(const GecoNetAddress& a, const GecoNetAddress& b) const
+	{
+		return saddr_equals(&a.su, &b.su);
+	}
+};
 
 /**
 *	This structure is a packed version of a mailbox for an entity
@@ -651,7 +656,7 @@ struct GECOAPI GecoEntityMailBoxRef
 	GecoEntityTypeID GetType() const { return m_kAddr.m_uiSalt & 0x1FFF; }
 	void SetType(GecoEntityTypeID t) { m_kAddr.m_uiSalt = (m_kAddr.m_uiSalt & 0xE000) | t; }
 
-	void Init() { m_iID = 0; m_kAddr.m_uiIP = 0; m_kAddr.m_uiPort = 0; m_kAddr.m_uiSalt = 0; }
+	void Init() { m_iID = 0; m_kAddr.su = { 0 }; m_kAddr.m_uiSalt = 0; }
 	void Init(GecoEntityID i, const GecoNetAddress & a,
 		Component c, GecoEntityTypeID t)
 	{
@@ -665,42 +670,6 @@ struct GECOAPI GecoEntityMailBoxRef
 };
 INLINE bool operator==(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b);
 INLINE bool operator!=(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b);
-INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, GecoEntityMailBoxRef& kDes)
-{
-	if (kIS.is_compression_mode())
-	{
-		kIS.ReadMini(kDes.m_iID);
-		kIS.ReadMini(kDes.m_kAddr.m_uiIP);
-		kIS.ReadMini(kDes.m_kAddr.m_uiPort);
-		kIS.ReadMini(kDes.m_kAddr.m_uiSalt);
-	}
-	else
-	{
-		kIS.Read(kDes.m_iID);
-		kIS.Read(kDes.m_kAddr.m_uiIP);
-		kIS.Read(kDes.m_kAddr.m_uiPort);
-		kIS.Read(kDes.m_kAddr.m_uiSalt);
-	}
-	return kIS;
-}
-INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoEntityMailBoxRef& kDes)
-{
-	if (kOS.is_compression_mode())
-	{
-		kOS.WriteMini(kDes.m_iID);
-		kOS.WriteMini(kDes.m_kAddr.m_uiIP);
-		kOS.WriteMini(kDes.m_kAddr.m_uiPort);
-		kOS.WriteMini(kDes.m_kAddr.m_uiSalt);
-	}
-	else
-	{
-		kOS.Write(kDes.m_iID);
-		kOS.Write(kDes.m_kAddr.m_uiIP);
-		kOS.Write(kDes.m_kAddr.m_uiPort);
-		kOS.Write(kDes.m_kAddr.m_uiSalt);
-	}
-	return kOS;
-}
 
 /**
 *	This class maintains a set of 32 boolean capabilities.
@@ -728,38 +697,6 @@ class GECOAPI GecoSpaceEntryID : public GecoNetAddress { };
 INLINE bool operator==(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
 INLINE bool operator!=(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
 INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b);
-INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& kIS, GecoSpaceEntryID& kDes)
-{
-	if (kIS.is_compression_mode())
-	{
-		kIS.ReadMini(kDes.m_uiIP);
-		kIS.ReadMini(kDes.m_uiPort);
-		kIS.ReadMini(kDes.m_uiSalt);
-	}
-	else
-	{
-		kIS.Read(kDes.m_uiIP);
-		kIS.Read(kDes.m_uiPort);
-		kIS.Read(kDes.m_uiSalt);
-	}
-	return kIS;
-}
-INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& kOS, const GecoSpaceEntryID& kDes)
-{
-	if (kOS.is_compression_mode())
-	{
-		kOS.WriteMini(kDes.m_uiIP);
-		kOS.WriteMini(kDes.m_uiPort);
-		kOS.WriteMini(kDes.m_uiSalt);
-	}
-	else
-	{
-		kOS.WriteMini(kDes.m_uiIP);
-		kOS.WriteMini(kDes.m_uiPort);
-		kOS.WriteMini(kDes.m_uiSalt);
-	}
-	return kOS;
-}
 
 struct GECOAPI InterfaceListenerMsg
 {
@@ -1572,24 +1509,21 @@ INLINE geco_bit_stream_t& operator<<(geco_bit_stream_t& os, const GecoPackedXYZ 
 
 INLINE GecoNetAddress::GecoNetAddress()
 {
+	geco_zero_mem(&su, sizeof(sockaddrunion));
+	m_uiSalt = 0;
 }
-INLINE GecoNetAddress::GecoNetAddress(uint ipArg, ushort portArg) :
-	m_uiIP(ipArg),
-	m_uiPort(portArg),
+INLINE GecoNetAddress::GecoNetAddress(ushort port, const char* addrstr) :
 	m_uiSalt(0)
 {
+	str2saddr(&su, addrstr, port);
 }
 INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b)
 {
-	return (a.m_uiIP == b.m_uiIP) && (a.m_uiPort == b.m_uiPort);
+	return saddr_equals(&a.su, &b.su);
 }
 INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b)
 {
-	return (a.m_uiIP != b.m_uiIP) || (a.m_uiPort != b.m_uiPort);
-}
-INLINE bool operator<(const GecoNetAddress & a, const GecoNetAddress & b)
-{
-	return (a.m_uiIP < b.m_uiIP) || (a.m_uiIP == b.m_uiIP && (a.m_uiPort < b.m_uiPort));
+	return  !saddr_equals(&a.su, &b.su);
 }
 INLINE bool operator==(const GecoEntityMailBoxRef & a, const GecoEntityMailBoxRef & b)
 {
@@ -1633,11 +1567,6 @@ INLINE bool operator==(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
 INLINE bool operator!=(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
 {
 	return operator!=((GecoNetAddress)a, (GecoNetAddress)b) || a.m_uiSalt != b.m_uiSalt;
-}
-INLINE bool operator<(const GecoSpaceEntryID & a, const GecoSpaceEntryID & b)
-{
-	return operator<((GecoNetAddress)a, (GecoNetAddress)b) ||
-		(operator==((GecoNetAddress)a, (GecoNetAddress)b) && (a.m_uiSalt < b.m_uiSalt));
 }
 
 class GecoNetworkInterface

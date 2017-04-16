@@ -1,5 +1,26 @@
 #include "guarder-net-types.h"
 
+guarder_packet_t::guarder_packet_t() : m_uiFlags(0), dont_delete_msgs_(false) {}
+guarder_packet_t::guarder_packet_t(geco_bit_stream_t &is) :
+	m_uiFlags(0), dont_delete_msgs_(false)
+{
+	geco_zero_mem(&m_uiBuddy, sizeof(sockaddrunion));
+	this->read(is);
+}
+guarder_packet_t::~guarder_packet_t()
+{
+	if (!dont_delete_msgs_)
+	{
+		for (unsigned i = 0; i < m_kMessages.size(); i++)
+			if (m_kDelInfo[i])
+				delete m_kMessages[i];
+	}
+}
+void guarder_packet_t::add(guarder_msg_t* msg, bool should_delete)
+{
+	m_kMessages.push_back(msg);
+	m_kDelInfo.push_back(should_delete);
+}
 void guarder_packet_t::read(geco_bit_stream_t &is)
 {
 	is.Read(m_uiFlags);
@@ -28,7 +49,6 @@ void guarder_packet_t::read(geco_bit_stream_t &is)
 		}
 	}
 }
-
 bool guarder_packet_t::write(geco_bit_stream_t &os) const
 {
 	os.Write(m_uiFlags);
@@ -60,12 +80,10 @@ bool guarder_packet_t::write(geco_bit_stream_t &os) const
 	}
 	return !isOversized;
 }
-
 guarder_msg_t::guarder_msg_t(uchar message, uchar flags /*= 0*/, ushort seq /*= 0*/)
 {
 
 }
-
 guarder_msg_t * guarder_msg_t::from(geco_bit_stream_t &is)
 {
 	uint message;
@@ -108,7 +126,6 @@ guarder_msg_t * guarder_msg_t::from(geco_bit_stream_t &is)
 		return NULL;
 	}
 }
-
 guarder_msg_t * guarder_msg_t::from(void *buf, int length)
 {
 
