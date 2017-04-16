@@ -24,13 +24,13 @@ void guarder_packet_t::add(guarder_msg_t* msg, bool should_delete)
 void guarder_packet_t::read(geco_bit_stream_t &is)
 {
 	is.Read(m_uiFlags);
-	if (saddr_family(&ms_uiBuddy) == AF_INET)
+	if (saddr_family(&ms_uiBuddy.su) == AF_INET)
 	{
-		is.ReadRaw((char*)&s4addr(&ms_uiBuddy), sizeof(uint));
+		is.ReadRaw((char*)&s4addr(&ms_uiBuddy, su), sizeof(uint));
 	}
 	else
 	{
-		is.ReadRaw((char*)&saddr_family(&m_uiBuddy), sizeof(in6_addr));
+		is.ReadRaw((char*)&saddr_family(&m_uiBuddy.su), sizeof(in6_addr));
 	}
 
 	uint msglen;
@@ -52,17 +52,17 @@ void guarder_packet_t::read(geco_bit_stream_t &is)
 bool guarder_packet_t::write(geco_bit_stream_t &os) const
 {
 	os.Write(m_uiFlags);
-	if (saddr_family(&ms_uiBuddy) == AF_INET)
+	if (saddr_family(&ms_uiBuddy.su) == AF_INET)
 	{
-		s4addr(&ms_uiBuddy) != in4addr_loopback.s_addr ?
+		IN4_ADDR_EQUAL(&ms_uiBuddy.su.sin.sin_addr, &in4addr_loopback) ?
 			os.WriteRaw((const char*)&s4addr(&ms_uiBuddy), sizeof(uint)) :
 			os.WriteRaw((const char*)&s4addr(&m_uiBuddy), sizeof(uint));
 	}
 	else
 	{
-		IN6_ADDR_EQUAL(&ms_uiBuddy.sin6.sin6_addr, &in6addr_loopback) ?
-			os.WriteRaw((const char*)&saddr_family(&m_uiBuddy), sizeof(in6_addr)) :
-			os.WriteRaw((const char*)&saddr_family(&ms_uiBuddy), sizeof(in6_addr));
+		IN6_ADDR_EQUAL(&ms_uiBuddy.su.sin6.sin6_addr, &in6addr_loopback) ?
+			os.WriteRaw((const char*)&saddr_family(&m_uiBuddy.su), sizeof(in6_addr)) :
+			os.WriteRaw((const char*)&saddr_family(&ms_uiBuddy.su), sizeof(in6_addr));
 	}
 	uint* msglenpos;
 	uint msglen;
@@ -128,7 +128,7 @@ guarder_msg_t * guarder_msg_t::from(geco_bit_stream_t &is)
 }
 guarder_msg_t * guarder_msg_t::from(void *buf, int length)
 {
-
+	return 0;
 }
 
 const char* guarder_msg_t::c_str() const

@@ -35,10 +35,10 @@ public:
 	const static uchar PACKET_STAGGER_REPLIES = 0x1;
 	typedef std::vector< guarder_msg_t* > guarder_msgs_t;
 	uint	m_uiFlags;
-	sockaddrunion m_uiBuddy;
+	GecoNetAddress m_uiBuddy;
 	guarder_msgs_t	m_kMessages;
 	// The buddy that is automatically inserted into replies
-	static sockaddrunion  ms_uiBuddy;
+	static GecoNetAddress  ms_uiBuddy;
 protected:
 	// Each message is tagged with a flag of whether or not to delete it when this packet is destroyed
 	std::vector< bool > m_kDelInfo;
@@ -51,7 +51,7 @@ public:
 	void add(guarder_msg_t* msg, bool should_delete);
 	// Machined's use this to set a buddy field that will be written into every
 	// reply message instead of the buddy that is actually on the message
-	static void set_buddy(sockaddrunion addr) { ms_uiBuddy = addr; }
+	static void set_buddy(GecoNetAddress addr) { ms_uiBuddy = addr; }
 	void steal_msgs() { dont_delete_msgs_ = true; }
 	void read(geco_bit_stream_t &is);
 	/// Write the contents of PACKET to the output stream to send. 
