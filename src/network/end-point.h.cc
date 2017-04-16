@@ -52,7 +52,6 @@ GecoNetEndpoint::GecoNetEndpoint(bool useSyncHijack) :
 	m_kSocket(NO_SOCKET),
 	m_bShouldSendClose(false)
 {
-	geco_zero_mem(&bindsu, sizeof(sockaddrunion));
 #ifdef _WIN32
 	GetAdaptersAddresses();
 #endif

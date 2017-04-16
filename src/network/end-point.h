@@ -23,7 +23,6 @@ private:
 #else //ifdef __linux__
 	SOCKET	m_kSocket;
 #endif //def _WIN32
-	sockaddrunion bindsu;
 
 	/// this for one-off socket
 	bool m_bShouldSendClose;
@@ -132,7 +131,7 @@ public:
 	*
 	*	@return 0 if successful, -1 otherwise.
 	*/
-	static int ConvertAddress(GecoNetAddress& address, const char * string, ushort port=0);
+	static int ConvertAddress(GecoNetAddress& address, const char * string, ushort port = 0);
 	//@}
 
 	/// @name Queue Size Methods
