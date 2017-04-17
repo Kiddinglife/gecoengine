@@ -51,11 +51,12 @@ public:
 	void Socket(ushort af, int type);
 
 	int SetNonblocking(bool nonblocking);
-	int SetBroadcast(bool broadcast);
+	int set_sock_broadcast(bool broadcast);
 	int SetReuseaddr(bool reuseaddr);
 	int SetKeepalive(bool keepalive);
 
 	int Bind(u_int16_t networkPort, const char* networkAddr);
+	int GecoNetEndpoint::Bind(GecoNetAddress& bindaddr);
 
 	int GecoNetEndpoint::JoinMulticastGroup(const sockaddrunion* networkAddr);
 	int GecoNetEndpoint::QuitMulticastGroup(const sockaddrunion* networkAddr);
@@ -74,20 +75,22 @@ public:
 
 	/// @name Connectionless Socket Methods
 	//@{
-	int SendTo(void * gramData, int gramSize,
-		u_int16_t networkPort, u_int32_t networkAddr = GECO_NET_BROADCAST);
-	int SendTo(void * gramData, int gramSize, struct sockaddr_in & sin);
-	int RecvFrom(void * gramData, int gramSize,
-		u_int16_t * networkPort, u_int32_t * networkAddr);
-	int RecvFrom(void * gramData, int gramSize,
-		struct sockaddr_in & sin);
+	int SendTo(void * gramData, int gramSize, GecoNetAddress& networkAddr)
+	{
+		return ::sendto(m_kSocket, (char*)gramData, gramSize, 0, &networkAddr.su.sa, sizeof(sockaddr));
+	}
+	int RecvFrom(void * gramData, int gramSize, GecoNetAddress& networkAddr)
+	{
+			socklen_t	 sinLen = sizeof(sockaddr);
+			return ::recvfrom(m_kSocket, (char*)gramData, gramSize, 0, &networkAddr.su.sa, &sinLen);
+	}
 	//@}
 
 	/// @name Connecting Socket Methods
 	//@{
 	int Listen(int backlog = 1024);
 	int Connect(const sockaddrunion* networkAddr);
-	GecoNetEndpoint * Accept(sockaddrunion* networkAddr = NULL);
+	GecoNetEndpoint * Accept(GecoNetAddress& networkAddr);
 	int Send(const void * gramData, int gramSize);
 	int Recv(void * gramData, int gramSize);
 	bool RecvAll(void * gramData, int gramSize);
@@ -194,7 +197,7 @@ INLINE int GecoNetEndpoint::SetNonblocking(bool nonblocking)
 #endif
 }
 
-INLINE int GecoNetEndpoint::SetBroadcast(bool broadcast)
+INLINE int GecoNetEndpoint::set_sock_broadcast(bool broadcast)
 {
 #ifdef __linux__
 	int val;
@@ -207,8 +210,7 @@ INLINE int GecoNetEndpoint::SetBroadcast(bool broadcast)
 	bool val;
 #endif
 	val = broadcast ? 1 : 0;
-	return ::setsockopt(m_kSocket, SOL_SOCKET, SO_BROADCAST,
-		(char*)&val, sizeof(val));
+	return ::setsockopt(m_kSocket, SOL_SOCKET, SO_BROADCAST,(char*)&val, sizeof(val));
 }
 INLINE int GecoNetEndpoint::SetReuseaddr(bool reuseaddr)
 {
@@ -237,6 +239,10 @@ INLINE int GecoNetEndpoint::Bind(u_int16_t networkPort, const char* networkAddr)
 	sockaddrunion su;
 	str2saddr(&su, networkAddr, networkPort);
 	return ::bind(m_kSocket, (struct sockaddr*)&su, sizeof(sockaddr));
+}
+INLINE int GecoNetEndpoint::Bind(GecoNetAddress& bindaddr)
+{
+	return ::bind(m_kSocket, (struct sockaddr*)&bindaddr.su, sizeof(sockaddr));
 }
 INLINE int GecoNetEndpoint::JoinMulticastGroup(const sockaddrunion* networkAddr)
 {
@@ -293,7 +299,7 @@ INLINE int GecoNetEndpoint::Close()
 		this->SetFileDescriptor(NO_SOCKET);
 	}
 	return ret;
-}
+	}
 INLINE int GecoNetEndpoint::Detach()
 {
 	int ret = (int)m_kSocket;
@@ -336,48 +342,6 @@ INLINE int GecoNetEndpoint::GetRemoteHostname(eastl::string * host) const
 	return ret;
 }
 
-INLINE int GecoNetEndpoint::SendTo(void * gramData, int gramSize,
-	u_int16_t networkPort, u_int32_t networkAddr)
-{
-	sockaddr_in	sin;
-	sin.sin_family = AF_INET;
-	sin.sin_port = networkPort;
-	sin.sin_addr.s_addr = networkAddr;
-
-	return this->SendTo(gramData, gramSize, sin);
-}
-
-INLINE int GecoNetEndpoint::SendTo(void * gramData, int gramSize,
-	struct sockaddr_in & sin)
-{
-	return ::sendto(m_kSocket, (char*)gramData, gramSize,
-		0, (sockaddr*)&sin, sizeof(sin));
-}
-
-
-INLINE int GecoNetEndpoint::RecvFrom(void * gramData, int gramSize,
-	u_int16_t * networkPort, u_int32_t * networkAddr)
-{
-	sockaddr_in sin;
-	int result = this->RecvFrom(gramData, gramSize, sin);
-
-	if (result >= 0)
-	{
-		if (networkPort != NULL) *networkPort = sin.sin_port;
-		if (networkAddr != NULL) *networkAddr = sin.sin_addr.s_addr;
-	}
-
-	return result;
-}
-
-
-INLINE int GecoNetEndpoint::RecvFrom(void * gramData, int gramSize,
-	struct sockaddr_in & sin)
-{
-	socklen_t		sinLen = sizeof(sin);
-	return ::recvfrom(m_kSocket, (char*)gramData, gramSize, 0, (sockaddr*)&sin, &sinLen);
-}
-
 INLINE int GecoNetEndpoint::Listen(int backlog)
 {
 	return ::listen(m_kSocket, backlog);
@@ -388,16 +352,15 @@ INLINE int GecoNetEndpoint::Connect(const sockaddrunion* saddr)
 	return ::connect(m_kSocket, (sockaddr*)&saddr->sa, sizeof(sockaddr));
 }
 
-INLINE GecoNetEndpoint * GecoNetEndpoint::Accept(sockaddrunion* networkAddr)
+INLINE GecoNetEndpoint * GecoNetEndpoint::Accept(GecoNetAddress& networkAddr)
 {
 	socklen_t		sinLen = sizeof(sockaddr);
-	int ret = (int)::accept(m_kSocket, (sockaddr*)&networkAddr, &sinLen);
+	int ret = (int)::accept(m_kSocket, &networkAddr.su.sa, &sinLen);
 #if defined( __linux__ ) || defined( PLAYSTATION3 )
 	if (ret < 0) return NULL;
 #else
 	if (ret == INVALID_SOCKET) return NULL;
 #endif
-
 	GecoNetEndpoint * pNew = new GecoNetEndpoint();
 	pNew->SetFileDescriptor(ret);
 	return pNew;

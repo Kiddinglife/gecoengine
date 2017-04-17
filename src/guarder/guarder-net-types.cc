@@ -120,7 +120,7 @@ guarder_msg_t * guarder_msg_t::from(geco_bit_stream_t &is)
 		pMgm = new reset_msg_t(); break;
 	case guarder_msg_t::ERROR_MESSAGE:
 		pMgm = new error_msg_t(); break;
-	case guarder_msg_t::ANNOUNCE_MESSAGE:
+	case guarder_msg_t::GUARDER_ANNOUNCE_MESSAGE:
 		pMgm = new announce_msg_t(); break;
 	case guarder_msg_t::QUERY_INTERFACE_MESSAGE:
 		pMgm = new query_interface_msg_t(); break;
@@ -156,7 +156,7 @@ const char* guarder_msg_t::type2str() const
 	case USER_MESSAGE: strcpy(buf, "USER"); break;
 	case PID_MESSAGE: strcpy(buf, "PID"); break;
 	case RESET_MESSAGE: strcpy(buf, "RESET"); break;
-	case ANNOUNCE_MESSAGE: strcpy(buf, "ANNOUNCE"); break;
+	case GUARDER_ANNOUNCE_MESSAGE: strcpy(buf, "ANNOUNCE"); break;
 	case QUERY_INTERFACE_MESSAGE: strcpy(buf, "QUERY_INTERFACE"); break;
 	default: strcpy(buf, "** UNKNOWN **"); break;
 	}
@@ -171,12 +171,15 @@ uint guarder_msg_t::write(geco_bit_stream_t & os)
 	os.Write(m_uiSeq);
 	m_bSeqSent = true;
 	return sizeof(uint) * 3;
+	// uint extrasize = write_extra(os);
+	//return sizeof(uint) * 3 + extrasize;
 }
-void guarder_msg_t::Read(geco_bit_stream_t &is)
+void guarder_msg_t::read(geco_bit_stream_t &is)
 {
 	is.Read(m_uiMessage);
 	is.Read(m_uiFlags);
 	is.Read(m_uiSeq);
+	//read_extra(is);
 }
 void guarder_msg_t::refresh_seq()
 {
@@ -195,4 +198,114 @@ void guarder_msg_t::copy_seq(const guarder_msg_t &mgm)
 {
 	m_uiSeq = mgm.m_uiSeq;
 	m_bSeqSent = false;
+}
+bool guarder_msg_t::sendto(GecoNetEndpoint &ep, GecoNetAddress& addr, uint packFlags)
+{
+	guarder_packet_t packet;
+	geco_bit_stream_t os;
+	packet.m_uiFlags = packFlags;
+	packet.add(this);
+	packet.write(os);
+	return ep.SendTo(os.uchar_data(), os.get_bytes_length(), addr);
+}
+GecoNetReason guarder_msg_t::send_and_recv(GecoNetEndpoint &ep, GecoNetAddress& dest, guarder_input_msg_handler_t *pHandler /*= NULL*/)
+{
+	ep.set_sock_broadcast(dest.is_broadcast_addr());
+	fd_set fds;
+	int fd = int(ep);
+	timeval tv = { 1, 0 };
+	GecoNetAddress srcaddr, buddyaddr;
+	int recvlen;
+	bool badseq;
+	bool continueProcessing;
+	int countdown = 3;
+	while (countdown--)
+	{
+		if (!this->sendto(ep, dest, guarder_packet_t::PACKET_STAGGER_REPLIES))
+		{
+			network_logger()->error("guarder_msg_t::send_and_recv(): Failed to send entire MGM ({} tries left), destAddr:{}, errorno:{}", countdown, dest.c_str(), strerror(errno));
+			continue;
+		}
+		FD_ZERO(&fds);
+		FD_SET(fd, &fds);
+		while (select(fd + 1, &fds, NULL, NULL, &tv) == 1)
+		{
+			recvlen = ep.RecvFrom(guarder_packet_t::recvbuf, guarder_packet_t::MAX_SIZE, srcaddr);
+			if (recvlen == -1)
+			{
+				network_logger()->warn("guarder_msg_t::send_and_recv(): recvfrom failed ({})\n", strerror(errno));
+				continue;
+			}
+			badseq = false;
+			continueProcessing = true;
+			geco_bit_stream_t is((uchar*)guarder_packet_t::recvbuf, recvlen);
+			guarder_packet_t packet(is);
+			buddyaddr = packet.m_uiBuddy;
+			for (auto replymsgptr : packet.m_kMessages)
+			{
+				guarder_msg_t& reply = *replymsgptr;
+				if (reply.m_uiSeq != m_uiSeq)
+				{
+					network_logger()->warn("guarder_msg_t::send_and_recv(): Bad seq ({}, wanted {}) from {}:{}",
+						reply.m_uiSeq, m_uiSeq, srcaddr.c_str(), reply.c_str());
+					badseq = true;
+					break;
+				}
+				if (reply.m_uiFlags & reply.MESSAGE_NOT_UNDERSTOOD)
+				{
+					network_logger()->error("guarder_msg_t::send_and_recv(): Machined on [{}] did not understand msg type [{}]",
+						srcaddr.c_str(), reply.c_str());
+					continue;
+				}
+				if (pHandler)
+				{
+					continueProcessing = pHandler->handle(reply, srcaddr);
+					if (!continueProcessing)
+						break;
+				}
+			}
+
+			if (badseq)
+				continue;
+
+			guarder_packet_t::replied.insert(srcaddr);
+			if (guarder_packet_t::waiting.count(srcaddr))
+				guarder_packet_t::waiting.erase(srcaddr);
+			if (buddyaddr != GecoNetAddress::NONE && guarder_packet_t::replied.count(buddyaddr) == 0)
+				guarder_packet_t::waiting.insert(buddyaddr); // store byddy addr if it is not replied
+
+			if (!continueProcessing ||
+				!dest.is_broadcast_addr() ||
+				(guarder_packet_t::replied.size() > 0 && guarder_packet_t::waiting.size() == 0))
+				return GECO_NET_REASON_SUCCESS;
+		}
+	}
+	guarder_packet_t::replied.clear();
+	guarder_packet_t::waiting.clear();
+	network_logger()->error("guarder_msg_t::send_and_recv(): timed out!");
+	return GECO_NET_REASON_TIMER_EXPIRED;
+}
+
+GecoNetReason guarder_msg_t::send_and_recv(const char* bindipaddr, GecoNetAddress& dest, guarder_input_msg_handler_t *pHandler /*= NULL*/)
+{
+	GecoNetEndpoint ep;
+	ep.Socket(AF_INET, SOCK_DGRAM);
+	if (!ep.Good() || ep.Bind(0, bindipaddr) != 0)
+		return GECO_NET_REASON_GENERAL_NETWORK;
+}
+GecoNetReason guarder_msg_t::send_and_recv_with_endpoint_address(GecoNetEndpoint & ep, GecoNetAddress& dest, guarder_input_msg_handler_t * pHandler /*= NULL*/)
+{
+	GecoNetAddress tmp;
+	if (ep.GetLocalAddress(&tmp))
+	{
+		network_logger()->error("guarder_msg_t::send_and_recv_with_endpoint_address(): Couldn't get local address of provided endpoint");
+		return GECO_NET_REASON_GENERAL_NETWORK;
+	}
+	char ipstr[256];
+	saddr2str(&tmp.su, ipstr, 256);
+	return this->send_and_recv(ipstr, dest, pHandler);
+}
+bool guarder_input_msg_handler_t::handle(guarder_msg_t& reply, GecoNetAddress& srcaddr)
+{
+	throw std::logic_error("The method or operation is not implemented.");
 }

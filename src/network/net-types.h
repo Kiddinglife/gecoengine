@@ -609,14 +609,26 @@ public:
 	const char *IPAsString();
 
 	bool IsNone() const { return IN4ADDR_ISANY(&su.sin) || IN6ADDR_ISANY(&su.sin6); }
+	// Broadcast only supoorts ip4
+	bool is_broadcast_addr() const { return su.sa.sa_family == AF_INET && ntohl(su.sin.sin_addr.s_addr) == GECO_NET_BROADCAST; }
 	static GecoWatcher* GetWatcher();
-
 	static const GecoNetAddress NONE;
 };
 
 INLINE bool operator==(const GecoNetAddress & a, const GecoNetAddress & b);
 INLINE bool operator!=(const GecoNetAddress & a, const GecoNetAddress & b);
-
+INLINE geco_bit_stream_t& operator << (geco_bit_stream_t& os, GecoNetAddress & a)
+{
+	a.su.sa.sa_family = htons(a.su.sa.sa_family);
+	os.WriteRaw((uchar*)&a.su, sizeof(sockaddr));
+	return os;
+}
+INLINE geco_bit_stream_t& operator >> (geco_bit_stream_t& os, GecoNetAddress & a)
+{
+	os.ReadRaw((uchar*)&a.su, sizeof(sockaddr));
+	a.su.sa.sa_family = ntohs(a.su.sa.sa_family);
+	return  os;
+}
 GECOAPI bool  WatcherStringToValue(const char *, GecoNetAddress &);
 GECOAPI eastl::string  WatcherValueToString(const GecoNetAddress &);
 
