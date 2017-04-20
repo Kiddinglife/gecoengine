@@ -6,7 +6,9 @@
 #endif
 
 #include "end-point.h"
+
 GecoNetEndpoint::FrontEndInterfaces GecoNetEndpoint::ms_kFrontEndInterfaces;
+GecoNetAddStringInterfaces GecoNetEndpoint::ms_kGecoNetAddStringInterfaces;
 
 #ifdef __linux__
 extern "C"
@@ -52,8 +54,8 @@ INLINE void if_freenameindex(struct if_nameindex *)
 {}
 #endif	// !__linux__
 
-GecoNetEndpoint::GecoNetEndpoint(bool useSyncHijack) :
-        m_kSocket(NO_SOCKET), m_bShouldSendClose(false)
+GecoNetEndpoint::GecoNetEndpoint() :
+        m_kSocket(GecoNetEndpoint::NO_SOCKET)
 {
 #ifdef _WIN32
     GetAdaptersAddresses();
@@ -135,7 +137,6 @@ const GecoNetAddStringInterfaces* GecoNetEndpoint::GetInterfaces()
         }
     }
 #else
-
     struct if_nameindex* pIfInfo = if_nameindex();
     if (!pIfInfo)
     {
@@ -229,8 +230,9 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 
 int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
 {
-    name[0] = 0;
+    name[0] = 0; // start with it cleared
 
+    // make sure there's something there
     if (spec == NULL || spec[0] == 0)
         return -1;
 
@@ -244,16 +246,16 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
     int netmaskbits = 32;
     GecoNetAddress addr;
 
-    if (slash = const_cast<char *>(strchr(spec, '/')))
+    // see if it's a netmask
+    if ((slash = const_cast<char *>(strchr(spec, '/'))))
     {
         char iftemp[IFNAMSIZ] = { 0 };
         strncpy(iftemp, spec, slash - spec);
         iftemp[slash - spec] = 0;
         bool ok = GecoNetEndpoint::ConvertAddress(addr, iftemp, 0) == 0;
-
         netmaskbits = atoi(slash + 1);
-        ok &= netmaskbits > 0 && netmaskbits <= 32;
-
+        int len =  addr.su.sa.sa_family == AF_INET ? 32 : 64;
+        ok &= netmaskbits > 0 && netmaskbits <= len;
         if (!ok)
         {
             network_logger()->error("GecoNetEndpoint::FindIndicatedInterface: "
@@ -263,11 +265,11 @@ int GecoNetEndpoint::FindIndicatedInterface(const char * spec, char * name)
     }
     else if (this->GetInterfaceAddress(spec, addr) == 0)
     {
-        strcpy(name, spec);
+        strcpy(name, spec); // specified name of interface
     }
     else if (GecoNetEndpoint::ConvertAddress(addr, spec) == 0)
     {
-        netmaskbits = 32;
+        netmaskbits = addr.su.sa.sa_family == AF_INET ? 32 : 64;
     }
     else
     {

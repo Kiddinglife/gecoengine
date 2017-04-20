@@ -14,6 +14,7 @@ class geco_bit_stream_t;
  *	@ingroup network
  */
 typedef eastl::hash_map<GecoNetAddress, eastl::string, geco_net_addr_hash_functor, geco_net_addr_cmp_functor> GecoNetAddStringInterfaces;
+
 class GECOAPI GecoNetEndpoint
 {
     private:
@@ -29,10 +30,11 @@ class GECOAPI GecoNetEndpoint
         typedef eastl::map<eastl::string, GecoNetAddress> FrontEndInterfaces;
         static FrontEndInterfaces ms_kFrontEndInterfaces;
         static GecoNetAddStringInterfaces ms_kGecoNetAddStringInterfaces;
+
     public:
         /// @name Construction/Destruction
         //@{
-        GecoNetEndpoint(bool useSyncHijack = true);
+        GecoNetEndpoint();
         ~GecoNetEndpoint();
         //@}
 
@@ -88,7 +90,7 @@ class GECOAPI GecoNetEndpoint
         /// @name Connecting Socket Methods
         //@{
         int Listen(int backlog = 1024);
-        int Connect(const sockaddrunion* networkAddr);
+        int Connect(const GecoNetAddress& networkAddr);
         GecoNetEndpoint * Accept(GecoNetAddress& networkAddr);
         int Send(const void * gramData, int gramSize);
         int Recv(void * gramData, int gramSize);
@@ -344,9 +346,9 @@ INLINE int GecoNetEndpoint::Listen(int backlog)
     return ::listen(m_kSocket, backlog);
 }
 
-INLINE int GecoNetEndpoint::Connect(const sockaddrunion* saddr)
+INLINE int GecoNetEndpoint::Connect(const GecoNetAddress& saddr)
 {
-    return ::connect(m_kSocket, (sockaddr*) &saddr->sa, sizeof(sockaddr));
+    return ::connect(m_kSocket, (sockaddr*) &saddr.su.sa, sizeof(sockaddr));
 }
 
 INLINE GecoNetEndpoint * GecoNetEndpoint::Accept(GecoNetAddress& networkAddr)
@@ -400,6 +402,12 @@ INLINE int GecoNetEndpoint::GetInterfaceAddress(const char * name, GecoNetAddres
     if (request.ifr_addr.sa_family == AF_INET)
     {
         s4addr(&address.su) = ((sockaddr_in*) &request.ifr_addr)->sin_addr.s_addr;
+        return 0;
+    }
+    else if (request.ifr_addr.sa_family == AF_INET6)
+    {
+        memcpy_fast(address.su.sin6.sin6_addr.s6_addr, ((sockaddr_in6*) &request.ifr_addr)->sin6_addr.s6_addr,
+                sizeof(in6_addr));
         return 0;
     }
     else
