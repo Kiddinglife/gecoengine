@@ -107,7 +107,7 @@ class GECOAPI GecoNetEndpoint
          *
          * @returns true on success, false on error.
          */
-        const GecoNetAddStringInterfaces& GetInterfaces();
+        const GecoNetAddStringInterfaces* GetInterfaces();
         /**
          *  This function finds the default interface, i.e. the one to use if
          *	an IP address is required for a socket that is bound to all interfaces.
@@ -152,6 +152,7 @@ class GECOAPI GecoNetEndpoint
         static void AddFrontEndInterface(const eastl::string & name, GecoNetAddress* addr);
         //@}
 };
+
 INLINE GecoNetEndpoint::~GecoNetEndpoint()
 {
     this->Close();
@@ -407,7 +408,7 @@ INLINE int GecoNetEndpoint::GetInterfaceAddress(const char * name, GecoNetAddres
     }
 }
 
-INLINE int GecoNetEndpoint::GetInterfaceNetmask(const char * name, u_int32_t & netmask)
+INLINE int GecoNetEndpoint::GetInterfaceNetmask(const char * name, GecoNetAddress& netmask)
 {
     struct ifreq request;
     strncpy(request.ifr_name, name, IFNAMSIZ);
@@ -416,9 +417,13 @@ INLINE int GecoNetEndpoint::GetInterfaceNetmask(const char * name, u_int32_t & n
     {
         return -1;
     }
-
-    netmask = ((sockaddr_in&) request.ifr_netmask).sin_addr.s_addr;
-
+    if (request.ifr_addr.sa_family == AF_INET)
+        netmask.su.sin.sin_addr.s_addr = ((sockaddr_in&) request.ifr_netmask).sin_addr.s_addr;
+    else if (request.ifr_addr.sa_family == AF_INET6)
+        memcpy_fast(netmask.su.sin6.sin6_addr.s6_addr, ((sockaddr_in6&) request.ifr_netmask).sin6_addr.s6_addr,
+                sizeof(in6_addr));
+    else
+        network_logger()->critical("GecoNetEndpoint::GetInterfaceNetmask(): no such sa family !");
     return 0;
 }
 

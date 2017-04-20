@@ -106,7 +106,6 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
     if (ctlHeader != NULL)
     {
         struct sock_extended_err * extError = (struct sock_extended_err*) CMSG_DATA(ctlHeader);
-
         if (errHeader.msg_namelen == 0)
         {
             offender = *(sockaddr_in*) SO_EE_OFFENDER(extError);
@@ -115,8 +114,8 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
                     "ProcessPendingEvents:Kernel has a bug:recv_msg did not set msg_name.\n");
         }
 
-        closedPort.m_uiIP = offender.sin_addr.s_addr;
-        closedPort.m_uiPort = offender.sin_port;
+        closedPort.su.sin.sin_addr.s_addr = offender.sin_addr.s_addr;
+        closedPort.su.sin.sin_port = offender.sin_port;
 
         isResultSet = true;
     }
@@ -125,7 +124,7 @@ bool GecoNetEndpoint::GetClosedPort(GecoNetAddress & closedPort)
     return isResultSet;
 }
 
-const GecoNetAddStringInterfaces& GecoNetEndpoint::GetInterfaces()
+const GecoNetAddStringInterfaces* GecoNetEndpoint::GetInterfaces()
 {
 #ifdef _WIN32
     if (!s_kAdapterInfoList.empty())
@@ -141,7 +140,7 @@ const GecoNetAddStringInterfaces& GecoNetEndpoint::GetInterfaces()
     if (!pIfInfo)
     {
         printf("Unable to discover network interfaces.\n");
-        return false;
+        return NULL;
     }
     int flags = 0;
     struct if_nameindex* pIfInfoCur = pIfInfo;
@@ -162,7 +161,7 @@ const GecoNetAddStringInterfaces& GecoNetEndpoint::GetInterfaces()
     }
     if_freenameindex(pIfInfo);
 #endif
-    return ms_kGecoNetAddStringInterfaces;
+    return &ms_kGecoNetAddStringInterfaces;
 }
 
 int GecoNetEndpoint::FindDefaultInterface(char * name)
@@ -196,6 +195,7 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
     {
         int flags = 0;
         struct if_nameindex* pIfInfoCur = pIfInfo;
+        GecoNetAddress addr;
         while (pIfInfoCur->if_name)
         {
             flags = 0;
@@ -203,7 +203,6 @@ int GecoNetEndpoint::FindDefaultInterface(char * name)
 
             if ((flags & IFF_UP) && (flags & IFF_RUNNING))
             {
-                u_int32_t addr;
                 if (this->GetInterfaceAddress(pIfInfoCur->if_name, addr) == 0)
                 {
                     strcpy(name, pIfInfoCur->if_name);
@@ -395,10 +394,11 @@ int GecoNetEndpoint::GetQueueSizes(int & tx, int & rx) const
     int ret = -1;
 
     u_int16_t nport = 0;
-    this->GetLocalAddress(&nport, NULL);
+    GecoNetAddress addr;
+    this->GetLocalAddress(&addr);
 
     char match[16];
-    geco_snprintf(match, sizeof(match), "%04X", (int) ntohs(nport));
+    //geco_snprintf(match, sizeof(match), "%04X", (int) ntohs(addr.su.sa.sa_family));
 
     FILE * f = fopen("/proc/net/udp", "r");
 
