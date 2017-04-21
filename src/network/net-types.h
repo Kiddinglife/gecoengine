@@ -599,8 +599,8 @@ class GECOAPI GecoNetAddress
         {
             return c_str();
         }
-        char *c_str();
-        const char *IPAsString();
+        char* c_str();
+        const char* ip_str();
 
         bool IsNone() const
         {

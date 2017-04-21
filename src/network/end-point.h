@@ -401,7 +401,7 @@ INLINE int GecoNetEndpoint::GetInterfaceAddress(const char * name, GecoNetAddres
 
     if (request.ifr_addr.sa_family == AF_INET)
     {
-        s4addr(&address.su) = ((sockaddr_in*) &request.ifr_addr)->sin_addr.s_addr;
+        address.su.sin.sin_addr.s_addr = ((sockaddr_in*) &request.ifr_addr)->sin_addr.s_addr;
         return 0;
     }
     else if (request.ifr_addr.sa_family == AF_INET6)

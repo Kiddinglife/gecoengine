@@ -296,7 +296,8 @@ int GecoNetAddress::WriteToString(char * str, int length)
 {
     ushort port;
     saddr2str(&su, str, length, &port);
-    return geco_snprintf(str, length - sizeof(sockaddr), ":%d", port);
+    size_t len = strlen(str);
+    return snprintf(str + len, length - len, ":%d", port);
 }
 char * GecoNetAddress::c_str()
 {
@@ -304,9 +305,10 @@ char * GecoNetAddress::c_str()
     WriteToString(buf, MAX_STRLEN);
     return buf;
 }
-const char * GecoNetAddress::IPAsString()
+const char * GecoNetAddress::ip_str()
 {
     char * buf = GecoNetAddress::NextStringBuf();
+    saddr2str(&su, buf, MAX_STRLEN);
     return buf;
 }
 
