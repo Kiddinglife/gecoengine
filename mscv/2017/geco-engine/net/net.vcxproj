@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,36 +19,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A1B4B6A8-5038-4A8E-80D4-55731987760F}</ProjectGuid>
+    <ProjectGuid>{98A57B8D-7707-4C8E-AB8F-ACA534261A76}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>protocol</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>geco-protocol-stack</ProjectName>
+    <RootNamespace>net</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -81,7 +80,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -90,17 +88,15 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../../src;../../../../src/common/ds/eastl;../../../../src/common/debugging;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../../../../src/common/ds/eastl;</AdditionalIncludeDirectories>
-      <CallingConvention>Cdecl</CallingConvention>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).lib</OutputFile>
       <AdditionalDependencies>Iphlpapi.lib;Ws2_32.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -116,7 +112,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -130,11 +125,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -143,24 +136,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\protocol\geco-common.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-ds-timer.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-auth.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-chunk.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-common.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-config.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-dispatch.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-msg.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net-transport.h" />
-    <ClInclude Include="..\..\..\..\src\protocol\geco-net.h" />
+    <ClInclude Include="..\..\..\..\src\network\end-point.h" />
+    <ClInclude Include="..\..\..\..\src\network\msg-handler-defines.h" />
+    <ClInclude Include="..\..\..\..\src\network\net-types.h" />
+    <ClInclude Include="..\..\..\..\src\network\networkstats.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\protocol\geco-net-auth.cc" />
-    <ClCompile Include="..\..\..\..\src\protocol\geco-net-chunk.cc" />
-    <ClCompile Include="..\..\..\..\src\protocol\geco-net-common.cc" />
-    <ClCompile Include="..\..\..\..\src\protocol\geco-net-dispatch.cc" />
-    <ClCompile Include="..\..\..\..\src\protocol\geco-net-timer.cc" />
-    <ClCompile Include="..\..\..\..\src\protocol\geco-net-transport.cc" />
+    <ClCompile Include="..\..\..\..\src\network\end-point.h.cc" />
+    <ClCompile Include="..\..\..\..\src\network\net-types.cc" />
+    <ClCompile Include="..\..\..\..\src\network\networkstats.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

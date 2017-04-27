@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>unittests</RootNamespace>
     <ProjectName>unit-tests</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -116,22 +116,27 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>SERVER_BUILD;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../../src/;../../../../src/common/ds/eastl;../../../../thirdparty/;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl-1.0.0d/include;../../../../thirdparty/googletest/include/;../../../../thirdparty/googlemock/include/;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GECO_BUILD_STATIC_LIBS;SERVER_BUILD;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../../src/;../../../../src/common/ds/eastl;../../../../src/common/debugging;../../../../thirdparty/;../../../../thirdparty/cat/include/;../../../../thirdparty/openssl-1.0.0d/include;../../../../thirdparty/googletest/include/;../../../../thirdparty/googlemock/include/;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <CallingConvention>Cdecl</CallingConvention>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).exe</OutputFile>
-      <AdditionalDependencies>gmock_Debugx64.lib;geco-engine_protocol_Debugx64.lib;geco-engine_network_Debugx64.lib;geco-engine_common_Debugx64.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmock_Debugx64.lib;common.lib;math.lib;net.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../../../thirdparty/libs/;$(SolutionDir)$(Platform)\$(Configuration)\;</AdditionalLibraryDirectories>
+      <StackReserveSize>4</StackReserveSize>
+      <StackCommitSize>4</StackCommitSize>
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)$(Platform).exe</OutputFile>
       <AdditionalLibraryDirectories>../../../../thirdparty/googlemock/libs/;</AdditionalLibraryDirectories>
     </Lib>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -191,11 +196,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\unittest\test-auth.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-debugging.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-endpoint.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-geco-bit-stream.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-msg-handlers.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-time.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-ultils.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-watcher.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\unittest\test-msg-handlers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
