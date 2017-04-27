@@ -150,12 +150,14 @@ public:
 	*/
 	GecoNetReason send_and_recv_with_endpoint_address(GecoNetEndpoint & ep, GecoNetAddress& dest, guarder_input_msg_handler_t * pHandler = NULL);
 };
+
 // Network statistics for a single interface.
 struct high_precision_msg_t : public guarder_msg_t
 {
 	virtual uint write(geco_bit_stream_t &os);
 	virtual void read(geco_bit_stream_t &is);
 };
+
 // A WholeMachineMessage provides info about a machine, such as CPU load,
 // memory load, network throughput, and other system level stuff.
 struct machine_msg_t : public guarder_msg_t
@@ -164,15 +166,66 @@ struct machine_msg_t : public guarder_msg_t
 };
 struct process_msg_t : public guarder_msg_t
 {
-
+	enum Type :uint
+	{
+		FIND = 0,
+		REGISTER = 1,
+		DEREGISTER = 2,
+		NOTIFY_BIRTH = 3,
+		NOTIFY_DEATH = 4
+	};
+	enum Param : uint
+	{
+		PARAM_USE_CATEGORY = 0x1,
+		PARAM_USE_UID = 0x2,
+		PARAM_USE_PID = 0x4,
+		PARAM_USE_PORT = 0x8,
+		PARAM_USE_ID = 0x10,
+		PARAM_USE_NAME = 0x20,
+		PARAM_IS_MSGTYPE = 0x80
+	};
+	enum Category : uint
+	{
+		SERVER_COMPONENT = 0,
+		WATCHER_NUB = 1
+	};
+	uint m_uiParam;
+	uint m_uiCategory;
+	uint m_uiUID;
+	uint m_uiPID;
+	uint m_uiPort;
+	uint m_uiID;
+	char m_kName[256];
+	process_msg_t();
+	virtual ~process_msg_t();
+	virtual uint write(geco_bit_stream_t &os);
+	virtual void read(geco_bit_stream_t &is);
+	virtual const char *c_str() const;
+	bool matches(const process_msg_t &query) const;
+	const char *cate2str(uint category) const;
+	process_msg_t & operator<<(const process_msg_t &pm);
 };
-struct process_stats_msg_t : public guarder_msg_t
+
+struct process_stats_msg_t : public process_msg_t
 {
 
 };
-struct listenner_msg_t : public guarder_msg_t
-{
 
+struct listenner_msg_t : public process_msg_t
+{
+	enum Type
+	{
+		ADD_BIRTH_LISTENER = 0,
+		ADD_DEATH_LISTENER = 1
+	};
+	static const ushort ANY_UID = 0xffff;
+	char m_kPreAddr[128];
+	char m_kPostAddr[128];
+	listenner_msg_t();
+	virtual ~listenner_msg_t();
+	virtual uint write(geco_bit_stream_t &os);
+	virtual void read(geco_bit_stream_t &is);
+	virtual const char *c_str() const;
 };
 struct create_msg_t : public guarder_msg_t
 {
@@ -205,30 +258,20 @@ struct error_msg_t : public guarder_msg_t
 struct announce_msg_t : public guarder_msg_t
 {
 };
+
 // Used to query guarder for the address of a specific interface.
-struct query_interface_msg_t : public guarder_msg_t
+struct GECOAPI query_interface_msg_t : public guarder_msg_t
 {
 	enum { INTERNAL = 0x0 };
 	GecoNetAddress address_;	//!< Address of the requesting interface
-	query_interface_msg_t() : guarder_msg_t() {}
+
+	query_interface_msg_t();
 	virtual ~query_interface_msg_t() {}
-	virtual uint write(geco_bit_stream_t & os)
-	{
-		uint size = guarder_msg_t::write(os);
-		os << address_;
-		return size + sizeof(sockaddrunion);
-	}
-	virtual void read(geco_bit_stream_t &is)
-	{
-		guarder_msg_t::read(is);
-		is >> address_;
-	}
-	virtual const char *c_str() const
-	{
-		geco_snprintf(guarder_msg_t::ms_acBuf, sizeof(guarder_msg_t::ms_acBuf), "QueryInterfaceMessage");
-		return guarder_msg_t::ms_acBuf;
-	}
+	virtual uint write(geco_bit_stream_t & os);
+	virtual void read(geco_bit_stream_t &is);
+	virtual const char *c_str() const;
 };
+
 struct create_with_args_msg_t : public guarder_msg_t
 {
 };

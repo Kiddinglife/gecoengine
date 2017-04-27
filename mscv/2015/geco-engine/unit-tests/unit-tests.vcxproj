@@ -195,6 +195,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\unittest\test-auth.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-debugging.cc" />
+    <ClCompile Include="..\..\..\..\unittest\test-endpoint.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-geco-bit-stream.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-main.cc" />
     <ClCompile Include="..\..\..\..\unittest\test-msg-handlers.cc" />

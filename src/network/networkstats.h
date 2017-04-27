@@ -80,7 +80,7 @@ public:
 	void reset();
 
 	ProfileVal * pRunningTime() { return profiles_[0]; }
-	const ProfileVal * pRunningTime() const { return profiles_[0]; } 
+	const ProfileVal * pRunningTime() const { return profiles_[0]; }
 	/// sets the timer profile for this group, i.e. the one that is always running and exists to track how long the group has been running for.
 	time_stamp_t runningTime() const; // 由此可得到系统profile时间
 	/// returns a reference to the default group.
@@ -551,7 +551,7 @@ private:
 		char buf[256];
 		geco_watcher_base_t* ptr;
 		stat_entries_t::size_type count = mstats_entries_.size();
-		for (stat_entries_t::size_type i = 0; i < count;i++)
+		for (stat_entries_t::size_type i = 0; i < count; i++)
 		{
 			stat_entry_t & entry = mstats_entries_[i];
 			geco_snprintf(buf, sizeof(buf), "%s/%sPerSecond", entry.first.c_str(), name);
